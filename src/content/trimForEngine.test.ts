@@ -27,6 +27,7 @@ describe('a phrase pasted over and over', () => {
     ['TAPA NA CARA PELOS TP TAPA NA CARA PELOS TP TAPA NA CARA PELOS TP TA', 'TAPA NA CARA PELOS TP'],
     ["I'm a BBW Lover I'm a BBW Lover I'm a BBW Lover", "I'm a BBW Lover"],
     ['BOOYAH BOOYAH booyah', 'BOOYAH'],
+    ['FUGA FUGA FUGA FUGAAAAAA FUGAA FUGA', 'FUGA'],
     ['さよならそくそさよならそくそさよならそくそ', 'さよならそくそ'],
   ])('%s -> %s', (input, out) => expect(trimForEngine(input)).toBe(out));
 
@@ -43,6 +44,8 @@ describe('laughter and emoji at the ends of a real line', () => {
     ['สบายเลยดิคิม 555555', 'สบายเลยดิคิม'],
     ['الي يكتب ٦٧ ههه', 'الي يكتب ٦٧'],
     ['hyy devathe 👋🏻', 'hyy devathe'],
+    ['GATA ONLY🔥', 'GATA ONLY'],
+    ['🔥vamos equipo', 'vamos equipo'],
     ['cual copia? es inspirado en xD', 'cual copia? es inspirado en'],
   ])('%s -> %s', (input, out) => expect(trimForEngine(input)).toBe(out));
 
@@ -95,5 +98,16 @@ describe('links without a scheme', () => {
 describe('never turns noise into a word', () => {
   it.each(['jajaja', 'hahaha', 'kkkkkk', 'lalala', 'no no no'])('%s comes back whole', (t) => {
     expect(trimForEngine(t)).toBe(t);
+  });
+});
+
+describe('Brazilian laughter seen live', () => {
+  it.each(['kkkj', 'MKKKKKKKKKKKKKKKK', 'kkkkkkkkkkkkkkkkkkm', 'kkkkkkkkkkkkkkkkkkkkkkkkko', 'KAKAKAAKAKAKAKAKAKA', 'OAKAKAKAKKKAKAK', 'kkjkkk'])(
+    '%s is laughter',
+    (t) => expect(isLaughter(t)).toBe(true),
+  );
+
+  it.each(['kaka', 'kakao', 'ok', 'skate', 'kick', 'Kaká', 'akka'])('%s is not', (t) => {
+    expect(isLaughter(t)).toBe(false);
   });
 });

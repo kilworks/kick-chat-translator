@@ -254,9 +254,15 @@ export function isBareCommand(text: string): boolean {
 const EMO = String.raw`\p{Extended_Pictographic}(?:\p{Emoji_Modifier}|\uFE0F|\u200D\p{Extended_Pictographic})*`;
 const EMOJI_RUN = new RegExp(String.raw`(${EMO})(?:\s*${EMO})+`, 'gu');
 const EMOJI_ONLY = new RegExp(`^(?:${EMO})+$`, 'u');
+const EMOJI_EDGE = new RegExp(String.raw`^(?:${EMO}|\s)+|(?:${EMO}|\s)+$`, 'gu');
 
 /** "SEM TP SEM TP SEM TP SEM T" -> "SEM TP": three copies or more, a cut-off last one allowed. */
 function collapseRepeat(t: string): string {
+  // "FUGA FUGA FUGAAAAAA FUGAA FUGA": the stretched copies are not equal, so the
+  // pattern below misses them. Same word once flattened, three times or more.
+  const toks = t.split(/\s+/);
+  const flat = (w: string): string => w.toLowerCase().replace(/(\p{L})\1+/gu, '$1');
+  if (toks.length >= 3 && toks[0]!.length >= 3 && toks.every((w) => flat(w) === flat(toks[0]!))) return toks[0]!;
   // The copy has to end on a word boundary, or "Oye hoye hoye hoye" repeats
   // "oye h" and collapses to "Oye h". Scripts written without spaces have no
   // such boundary, so there any character ends a copy.
@@ -286,7 +292,10 @@ function trimEdgeNoise(t: string): string {
   let b = toks.length - 1;
   while (a <= b && noise(toks[a]!)) a++;
   while (b >= a && noise(toks[b]!)) b--;
-  return a > b ? t : toks.slice(a, b + 1).join(' ');
+  if (a > b) return t;
+  // Emoji glued to a word ("GATA ONLY🔥") is not a token of its own.
+  const kept = toks.slice(a, b + 1).join(' ').replace(EMOJI_EDGE, '');
+  return /\p{L}/u.test(kept) ? kept : toks.slice(a, b + 1).join(' ');
 }
 
 /** The part of a chat line sent to the engine. Bare commands are the caller's to skip. */
