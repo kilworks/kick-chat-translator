@@ -102,12 +102,12 @@ describe('never turns noise into a word', () => {
 });
 
 describe('Brazilian laughter seen live', () => {
-  it.each(['kkkj', 'MKKKKKKKKKKKKKKKK', 'kkkkkkkkkkkkkkkkkkm', 'kkkkkkkkkkkkkkkkkkkkkkkkko', 'KAKAKAAKAKAKAKAKAKA', 'OAKAKAKAKKKAKAK', 'kkjkkk'])(
+  it.each(['kkkj', 'MKKKKKKKKKKKKKKKK', 'kkkkkkkkkkkkkkkkkkm', 'kkkkkkkkkkkkkkkkkkkkkkkkko', 'KAKAKAAKAKAKAKAKAKA', 'OAKAKAKAKKKAKAK', 'kkjkkk', 'klkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk', 'kkjkkkkl'])(
     '%s is laughter',
     (t) => expect(isLaughter(t)).toBe(true),
   );
 
-  it.each(['kaka', 'kakao', 'ok', 'skate', 'kick', 'Kaká', 'akka'])('%s is not', (t) => {
+  it.each(['kaka', 'kakao', 'ok', 'skate', 'kick', 'Kaká', 'akka', 'kakak', 'kukuk', 'kokok'])('%s is not', (t) => {
     expect(isLaughter(t)).toBe(false);
   });
 });

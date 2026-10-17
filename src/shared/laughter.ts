@@ -72,6 +72,10 @@ const FORMES: FormeDeRire[] = [
     langue: 'pt',
   },
   {
+    motif: /^(?=.*kkk)[a-jl-z]?(?:k+[a-jl-z])*k+[a-jl-z]?$/i,
+    langue: 'pt',
+  },
+  {
     motif: /^(?=.{6,}$)(?=.*ka)[oa]?(?:ka|ak|kk|aa)+[ka]?$/i,
     langue: 'pt',
   },
@@ -244,6 +248,8 @@ export const LAUGHTER_NOTES: Readonly<Record<string, string>> = {
     'Brazilian Portuguese kkkk. Three or more: kk alone is too short to claim a language',
   '^(?=(?:[^k]*k){3})[a-z]?k{2,}(?:[a-jl-z]?k{2,})*[a-z]?$':
     'Brazilian kkkk with a stray key: kkkj, MKKKKKKK, kkkkkkkm, kkkjkkk. Seen reaching the engine on a live Brazilian channel (2026-10-17), 4 of 53 lines sent',
+  '^(?=.*kkk)[a-jl-z]?(?:k+[a-jl-z])*k+[a-jl-z]?$':
+    'Brazilian kkkk broken by single stray keys anywhere: klkkkkkkkk, kkjkkkkl. Same live channel. A run of three k is required, so Indonesian kakak (older sibling) stays a word',
   '^(?=.{6,}$)(?=.*ka)[oa]?(?:ka|ak|kk|aa)+[ka]?$':
     'Brazilian KAKAKA, the shouted kkkk: KAKAKAAKAKAKA, OAKAKAKAKKKAKAK. Same live channel. Six letters minimum, so kaka stays a word',
   '^(?:rs){2,}$':
