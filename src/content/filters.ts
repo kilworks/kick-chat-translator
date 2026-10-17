@@ -123,12 +123,37 @@ export function isKeyboardSmash(text: string): boolean {
   if (distinctes < 6 && !groupeRepete) return false;
 
   let memeRangee = 0;
+  let voisines = 0;
   for (let i = 0; i < lettres.length - 1; i++) {
     const a = RANGEES_CLAVIER.findIndex((r) => r.includes(lettres[i]!));
     const b = RANGEES_CLAVIER.findIndex((r) => r.includes(lettres[i + 1]!));
-    if (a >= 0 && a === b) memeRangee++;
+    if (a >= 0 && a === b) {
+      memeRangee++;
+      const r = RANGEES_CLAVIER[a]!;
+      if (Math.abs(r.indexOf(lettres[i]!) - r.indexOf(lettres[i + 1]!)) === 1) voisines++;
+    }
   }
-  return memeRangee / (lettres.length - 1) >= MARTELEMENT_PROPORTION;
+  if (memeRangee / (lettres.length - 1) < MARTELEMENT_PROPORTION) return false;
+
+  // La rangee seule ne suffit pas : celle du haut porte e, u, i, o, y, assez
+  // pour ecrire des mots. Mesure le 2026-10-17 sur les 27 297 mots Tatoeba du
+  // banc (langCorpus.ts) : 62 vrais mots passaient pour du martelement, dont
+  // `quiero`, `porque`, `primeiro`, `europa`, `airport`, et sur le vrai chat
+  // `portugal`, `inshallah`, `DENTROOOOO`. Un message fait de ce seul mot etait
+  // jete comme du bruit.
+  //
+  // Ce qui les separe, mesure contre 17 martelements attestes et ces 68 mots :
+  // un martelement a peu de voyelles (moins d'un quart, allongements aplatis
+  // pour que `predictionnnnn` ne soit pas dilue), ou bien en a un peu plus mais
+  // repete un groupe de trois lettres (`dksaj...dksaj`), ou bien suit les touches
+  // voisines (`qwertyuiop`). 17 sur 17 gardes, 0 mot sur 68 avale. Les mots
+  // nordiques a 25 pour cent de voyelles (`skjorter`, `triskart`) ne repetent
+  // aucun groupe, c'est ce qui les sauve. Seuils regles sur ces jeux memes :
+  // un nouveau faux positif se corrige en l'ajoutant aux temoins du test.
+  if (groupeRepete || voisines / (lettres.length - 1) >= 0.8) return true;
+  const plat = lettres.replace(/(.)\1+/g, '$1');
+  const voyelles = (plat.match(/[aeiou]/g) ?? []).length / plat.length;
+  return voyelles < 0.25 || (voyelles < 0.3 && /(...).*\1/.test(lettres));
 }
 
 /**
