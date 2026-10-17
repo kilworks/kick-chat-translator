@@ -47,6 +47,7 @@ export const zh: Record<string, string> = {
   skipSame: '译文与原文一样',
   skipSameLang: '它本来就是你的语言',
   skipSlang: '只是聊天用语',
+  skipCommand: '这是给聊天机器人的指令',
   skipTooLong: '超出了长度上限',
   toastAllDown: '所有翻译服务都不可用，稍后会自动重试。',
   toastChatNotFound: 'Kick Chat Translator：找不到聊天区。可能需要更新。',

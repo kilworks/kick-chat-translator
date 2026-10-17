@@ -228,3 +228,74 @@ export function normalizeElongation(text: string): string {
     .join('')
     .trim();
 }
+
+// ── What is worth paying to translate inside a line ─────────────────────────
+//
+// Measured on 15,155 live Kick lines in 31 languages (test/e2e/capture-chat.mjs),
+// after every filter above had run: a phrase pasted over and over in one message
+// was 4.3 percent of all the characters sent to the engine, laughter or emoji at
+// either end of a real sentence 1.7, bare bot commands 0.5, emoji runs 0.2. The
+// original line stays on screen untouched; only what goes to the engine shrinks.
+
+const COMMAND = /^[!/][\p{L}\d_]+/u;
+
+/**
+ * `!points`, `!slots 332`, `!gamble all`: addressed to a bot, nothing to read.
+ * A command carrying a sentence (`!tts eso te pasa por bocon...`, read aloud on
+ * stream) is not bare: three words or more and the sentence is worth translating.
+ */
+export function isBareCommand(text: string): boolean {
+  const t = text.trim();
+  const m = t.match(COMMAND);
+  if (!m) return false;
+  return t.slice(m[0].length).split(/\s+/).filter((w) => /\p{L}{2,}/u.test(w)).length < 3;
+}
+
+const EMO = String.raw`\p{Extended_Pictographic}(?:\p{Emoji_Modifier}|\uFE0F|\u200D\p{Extended_Pictographic})*`;
+const EMOJI_RUN = new RegExp(String.raw`(${EMO})(?:\s*${EMO})+`, 'gu');
+const EMOJI_ONLY = new RegExp(`^(?:${EMO})+$`, 'u');
+
+/** "SEM TP SEM TP SEM TP SEM T" -> "SEM TP": three copies or more, a cut-off last one allowed. */
+function collapseRepeat(t: string): string {
+  // The copy has to end on a word boundary, or "Oye hoye hoye hoye" repeats
+  // "oye h" and collapses to "Oye h". Scripts written without spaces have no
+  // such boundary, so there any character ends a copy.
+  const m = t.match(
+    /^(.{2,}?(?:(?<=\P{L})|(?=\P{L}|$)|(?<=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}])))(?:\s*\1){2,}\s*(.*)$/isu,
+  );
+  // Three characters minimum: "jajaja" -> "ja" would turn laughter into the
+  // German for yes, and "lalala" -> "la" into an article.
+  if (!m || !/\p{L}/u.test(m[1]!) || m[1]!.trim().length < 3) return t;
+  return m[1]!.toLowerCase().startsWith(m[2]!.toLowerCase()) ? m[1]!.trim() : t;
+}
+
+/**
+ * Laughter, keyboard smash or emoji at either end of a line with real words in
+ * it. Punctuation stays (`????` and `))` carry meaning), so do digits (`10 ضغط`),
+ * and so does a line that is nothing but noise: isNoise owns that one.
+ */
+function trimEdgeNoise(t: string): string {
+  const toks = t.split(/\s+/);
+  const noise = (w: string): boolean => {
+    const core = w.replace(/^\p{P}+|\p{P}+$/gu, '');
+    // No isKeyboardSmash here: it calls "equipo" a smash (every letter on the
+    // top row), and at the edge of a sentence that deletes a real word.
+    return core.length >= 2 && (isLaughter(core.toLowerCase()) || EMOJI_ONLY.test(core));
+  };
+  let a = 0;
+  let b = toks.length - 1;
+  while (a <= b && noise(toks[a]!)) a++;
+  while (b >= a && noise(toks[b]!)) b--;
+  return a > b ? t : toks.slice(a, b + 1).join(' ');
+}
+
+/** The part of a chat line sent to the engine. Bare commands are the caller's to skip. */
+export function trimForEngine(text: string): string {
+  // A line that is all noise is isNoise's to skip whole; trimming it first could
+  // leave a fragment that no longer looks like noise.
+  if (isNoise(text)) return text.trim();
+  let t = text.trim().replace(COMMAND, '').trim();
+  t = t.replace(EMOJI_RUN, '$1');
+  t = collapseRepeat(t);
+  return trimEdgeNoise(t);
+}

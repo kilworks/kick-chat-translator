@@ -47,6 +47,7 @@ export const pl: Record<string, string> = {
   skipSame: 'tłumaczenie wyszło takie samo jak oryginał',
   skipSameLang: 'jest już w twoim języku',
   skipSlang: 'to tylko czatowy slang',
+  skipCommand: 'to polecenie dla bota czatu',
   skipTooLong: 'jest dłuższa niż dozwolony limit',
   toastAllDown: 'Wszyscy dostawcy tłumaczeń są niedostępni. Za chwilę spróbuję ponownie.',
   toastChatNotFound: 'Kick Chat Translator: nie znaleziono czatu. Może być potrzebna aktualizacja.',

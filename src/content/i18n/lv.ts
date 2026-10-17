@@ -47,6 +47,7 @@ export const lv: Record<string, string> = {
   skipSame: 'tulkojums sakrita ar oriģinālu',
   skipSameLang: 'tā jau ir tavā valodā',
   skipSlang: 'tas ir tikai čata slengs',
+  skipCommand: 'tā ir komanda tērzēšanas robotam',
   skipTooLong: 'tā ir garāka par pieļaujamo limitu',
   toastAllDown: 'Visi tulkošanas pakalpojumi nedarbojas. Drīz mēģinās vēlreiz.',
   toastChatNotFound: 'Kick Chat Translator: čats nav atrasts. Iespējams, nepieciešams atjauninājums.',

@@ -47,6 +47,7 @@ export const ar: Record<string, string> = {
   skipSame: 'جاءت الترجمة مطابقة للأصل',
   skipSameLang: 'هي بلغتك أصلًا',
   skipSlang: 'عامية دردشة فقط',
+  skipCommand: 'إنه أمر لبوت الدردشة',
   skipTooLong: 'تتجاوز الحد المسموح للطول',
   toastAllDown: 'جميع خدمات الترجمة متعطلة. ستُعاد المحاولة بعد قليل.',
   toastChatNotFound: 'Kick Chat Translator: تعذّر العثور على الدردشة. قد تحتاج الإضافة إلى تحديث.',

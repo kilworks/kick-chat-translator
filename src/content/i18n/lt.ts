@@ -47,6 +47,7 @@ export const lt: Record<string, string> = {
   skipSame: 'vertimas sutapo su originalu',
   skipSameLang: 'ji jau tavo kalba',
   skipSlang: 'tai tik pokalbių slengas',
+  skipCommand: 'tai komanda pokalbių robotui',
   skipTooLong: 'ji ilgesnė už leidžiamą ribą',
   toastAllDown: 'Visos vertimo paslaugos neveikia. Netrukus bandoma dar kartą.',
   toastChatNotFound: 'Kick Chat Translator: pokalbis nerastas. Gali reikėti atnaujinimo.',

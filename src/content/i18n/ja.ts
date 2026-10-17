@@ -47,6 +47,7 @@ export const ja: Record<string, string> = {
   skipSame: '翻訳結果が原文と同じでした',
   skipSameLang: 'すでにお使いの言語です',
   skipSlang: 'チャット用のスラングだけです',
+  skipCommand: 'チャットボット用のコマンドです',
   skipTooLong: '長さの上限を超えています',
   toastAllDown: 'すべての翻訳サービスが停止しています。まもなく再試行します。',
   toastChatNotFound: 'Kick Chat Translator：チャットが見つかりません。更新が必要かもしれません。',

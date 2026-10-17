@@ -47,6 +47,7 @@ export const sl: Record<string, string> = {
   skipSame: 'prevod je enak izvirniku',
   skipSameLang: 'je že v vašem jeziku',
   skipSlang: 'vsebuje samo klepetalni sleng',
+  skipCommand: 'to je ukaz za klepetalnega bota',
   skipTooLong: 'presega omejitev dolžine',
   toastAllDown: 'Noben ponudnik prevajanja ne deluje. Kmalu bo sledil nov poskus.',
   toastChatNotFound: 'Kick Chat Translator: klepeta ni mogoče najti. Morda je potrebna posodobitev.',

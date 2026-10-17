@@ -47,6 +47,7 @@ export const hu: Record<string, string> = {
   skipSame: 'a fordítás megegyezik az eredetivel',
   skipSameLang: 'már a te nyelveden van',
   skipSlang: 'csak csevegési szleng',
+  skipCommand: 'ez egy parancs a csevegőbotnak',
   skipTooLong: 'hosszabb a megengedett méretnél',
   toastAllDown: 'Egyik fordítási szolgáltató sem működik. Hamarosan újrapróbálja.',
   toastChatNotFound: 'Kick Chat Translator: a csevegés nem található. Lehet, hogy frissítés szükséges.',

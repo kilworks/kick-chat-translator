@@ -47,6 +47,7 @@ export const cs: Record<string, string> = {
   skipSame: 'překlad vyšel stejně jako originál',
   skipSameLang: 'je už ve tvém jazyce',
   skipSlang: 'je v ní jen chatový slang',
+  skipCommand: 'je to příkaz pro chatovacího bota',
   skipTooLong: 'je delší než povolený limit',
   toastAllDown: 'Žádný poskytovatel překladu teď není dostupný. Brzy to zkusíme znovu.',
   toastChatNotFound: 'Kick Chat Translator: chat nebyl nalezen. Možná je potřeba aktualizace.',

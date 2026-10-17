@@ -47,6 +47,7 @@ export const ta: Record<string, string> = {
   skipSame: 'மொழிபெயர்ப்பு மூல உரையைப் போலவே வந்தது',
   skipSameLang: 'இது ஏற்கெனவே உங்கள் மொழியில் உள்ளது',
   skipSlang: 'அரட்டை ஸ்லாங் மட்டுமே',
+  skipCommand: 'இது அரட்டை பாட்டுக்கான கட்டளை',
   skipTooLong: 'அளவு வரம்பை மீறுகிறது',
   toastAllDown: 'எல்லா மொழிபெயர்ப்புச் சேவைகளும் இயங்கவில்லை. சிறிது நேரத்தில் மீண்டும் முயலும்.',
   toastChatNotFound: 'Kick Chat Translator: அரட்டை கிடைக்கவில்லை. புதுப்பிப்பு தேவைப்படலாம்.',
