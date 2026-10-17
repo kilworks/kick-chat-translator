@@ -111,3 +111,27 @@ describe('Brazilian laughter seen live', () => {
     expect(isLaughter(t)).toBe(false);
   });
 });
+
+describe('mostly the same few words over again', () => {
+  it.each([
+    ['yo quiero remiix yo quiero yo quiero remiix yo quiero yo quiero remiix', 'yo quiero remiix'],
+    ['TELEGRAM TELEGRAM TELEGRAM TELEGRAM :POLICE TELEGRAM : TELEGRAM TELEGRAM TELEGRAM TELEGRAM', 'TELEGRAM :POLICE'],
+  ])('%s -> %s', (input, out) => expect(trimForEngine(input)).toBe(out));
+
+  it('keeps a real sentence whose words repeat, negation included', () => {
+    const pl = 'NIE JEST W CIĄŻY BO GRUBAS JEJ NIE DYMAŁ OD ROKU ALE NIE WIE, ŻE KTOŚ INNY JĄ POMPUJE';
+    expect(trimForEngine(pl)).toBe(pl);
+  });
+});
+
+// The guard on every rule above: 5040 human-labelled sentences in 42 languages,
+// none of them chat noise, must reach the engine byte for byte.
+describe('real sentences', () => {
+  it('every Tatoeba sentence of the bench comes through untouched', async () => {
+    const { LANG_CORPUS } = await import('./langCorpus');
+    const changed = Object.values(LANG_CORPUS)
+      .flat()
+      .filter((l) => trimForEngine(l) !== l.trim());
+    expect(changed).toEqual([]);
+  });
+});

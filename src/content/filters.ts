@@ -318,9 +318,37 @@ function trimEdgeNoise(t: string): string {
   while (a <= b && noise(toks[a]!)) a++;
   while (b >= a && noise(toks[b]!)) b--;
   if (a > b) return t;
+  // Rejoined only when something was cut: a clean line keeps its own spaces,
+  // the French no-break space before "?" and the ideographic one included.
+  const words = a === 0 && b === toks.length - 1 ? t : toks.slice(a, b + 1).join(' ');
   // Emoji glued to a word ("GATA ONLY🔥") is not a token of its own.
-  const kept = toks.slice(a, b + 1).join(' ').replace(EMOJI_EDGE, '');
-  return /\p{L}/u.test(kept) ? kept : toks.slice(a, b + 1).join(' ');
+  const kept = words.replace(EMOJI_EDGE, '');
+  return /\p{L}/u.test(kept) ? kept : words;
+}
+
+/**
+ * A long line that is mostly the same few words over again, copies that are
+ * not equal: "yo quiero remiix yo quiero yo quiero remiix...", "CON TOS
+ * VOY CONTOSVOY CON TOSVOY...". It goes out as its distinct words, in order.
+ *
+ * Only when two words in three or more are repeats, over eight words or more.
+ * Measured: at that floor the 8 lines touched in the 15,155-line capture are all
+ * spam (0.34 percent of the characters sent), and no Tatoeba sentence is. At
+ * half instead of a third it starts dropping the second "nie" of a Polish
+ * sentence, which turns its meaning around.
+ */
+function dedupeWords(t: string): string {
+  const toks = t.split(/\s+/).filter(Boolean);
+  if (toks.length < 8) return t;
+  const seen = new Set<string>();
+  const keep: string[] = [];
+  for (const w of toks) {
+    const k = w.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '').replace(/(.)\1+/gu, '$1');
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    keep.push(w);
+  }
+  return keep.length / toks.length <= 0.35 ? keep.join(' ') : t;
 }
 
 /** The part of a chat line sent to the engine. Bare commands are the caller's to skip. */
@@ -330,6 +358,6 @@ export function trimForEngine(text: string): string {
   if (isNoise(text)) return text.trim();
   let t = text.trim().replace(COMMAND, '').trim();
   t = t.replace(EMOJI_RUN, '$1');
-  t = collapseRepeat(t);
+  t = dedupeWords(collapseRepeat(t));
   return trimEdgeNoise(t);
 }
