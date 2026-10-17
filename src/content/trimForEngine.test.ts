@@ -124,6 +124,22 @@ describe('mostly the same few words over again', () => {
   });
 });
 
+describe('junk appended to get past the duplicate check', () => {
+  it.each([
+    ['fala pro salve kosky krlh 👺 qqqq', 'fala pro salve kosky krlh'],
+    ['fala pro salve kosky krlh 👺 q', 'fala pro salve kosky krlh'],
+    ['fala pro salve kosky krlh 👺 qaqa', 'fala pro salve kosky krlh'],
+    ['FALA PRO KOSKY MANDAR SALVE FIEL AQUI 🚨 bbbbbb', 'FALA PRO KOSKY MANDAR SALVE FIEL AQUI'],
+  ])('%s -> %s', (input, out) => expect(trimForEngine(input)).toBe(out));
+
+  it.each(['te amo ❤️ mucho', 'vienes? 🙏 no', 'listo 👍 ok', 'vamos 🔥 ya', 'qqqq sin emoji antes'])(
+    '%s keeps its last word',
+    (t) => expect(trimForEngine(t)).toBe(t),
+  );
+
+  it.each(['kqkqkqkkqqkkqqqkqq', 'KKKKKKKKKKKKLLL'])('%s is laughter', (t) => expect(isLaughter(t)).toBe(true));
+});
+
 // The guard on every rule above: 5040 human-labelled sentences in 42 languages,
 // none of them chat noise, must reach the engine byte for byte.
 describe('real sentences', () => {

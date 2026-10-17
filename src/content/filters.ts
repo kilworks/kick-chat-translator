@@ -351,6 +351,24 @@ function dedupeWords(t: string): string {
   return keep.length / toks.length <= 0.35 ? keep.join(' ') : t;
 }
 
+/**
+ * "fala pro salve kosky krlh 👺 qqqq", then "👺 q", "👺 qaqa", "👺 aaaa": the
+ * same line resent with junk after an emoji to get past Kick's duplicate check.
+ * Every variant is a different text, so each one missed the cache and was paid
+ * for: 14 of 148 lines sent on a live Brazilian channel (2026-10-17).
+ *
+ * Only the last word after the last emoji, and only junk: at most two different
+ * letters, one letter or three and more. Two-letter words ("no", "si", "ok")
+ * and real words ("te amo ❤️ mucho") stay.
+ */
+function trimBypassSuffix(t: string): string {
+  const m = t.match(new RegExp(String.raw`^(.*\p{L}.*?(?:${EMO}))\s+(\p{L}+)$`, 'u'));
+  if (!m) return t;
+  const junk = m[2]!;
+  const ok = new Set(junk.toLowerCase()).size <= 2 && (junk.length === 1 || junk.length >= 3);
+  return ok ? m[1]!.trim() : t;
+}
+
 /** The part of a chat line sent to the engine. Bare commands are the caller's to skip. */
 export function trimForEngine(text: string): string {
   // A line that is all noise is isNoise's to skip whole; trimming it first could
@@ -358,6 +376,6 @@ export function trimForEngine(text: string): string {
   if (isNoise(text)) return text.trim();
   let t = text.trim().replace(COMMAND, '').trim();
   t = t.replace(EMOJI_RUN, '$1');
-  t = dedupeWords(collapseRepeat(t));
+  t = dedupeWords(collapseRepeat(trimBypassSuffix(t)));
   return trimEdgeNoise(t);
 }
