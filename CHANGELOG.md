@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The About tab links to Twitch Chat Translator, the same extension for Twitch.
+
 ## [3.3.0] - 2026-10-16
 
 ### Added

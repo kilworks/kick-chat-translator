@@ -160,6 +160,11 @@ export function AboutSection({
             href="https://github.com/Pkkls/kick-chat-translator/issues"
             label={t('Report an issue')}
           />
+          {/* Nom propre, pas de cle i18n : le meme projet pour Twitch. */}
+          <Lien
+            href="https://github.com/kilworks/twitch-chat-translator"
+            label="Twitch Chat Translator"
+          />
         </ul>
       </section>
     </>

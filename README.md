@@ -21,6 +21,8 @@ Free, no account, nothing to set up. 43 languages, in the chat and in the extens
 
 [Watch it on a real chat](https://www.youtube.com/watch?v=NoGJeUrwy9o)
 
+Watching Twitch too? [Twitch Chat Translator](https://github.com/kilworks/twitch-chat-translator) does the same there.
+
 </div>
 
 ## How it works
@@ -212,6 +214,7 @@ Stack: Manifest V3, Vite, TypeScript, Preact, Tailwind.
 
 ## Related projects
 
+- [Twitch Chat Translator](https://github.com/kilworks/twitch-chat-translator), the same extension for Twitch chat
 - [kick-ad-blocker](https://github.com/Pkkls/kick-ad-blocker), blocks Kick's pre-roll and overlay ads
 - [kick-core](https://github.com/Pkkls/kick-core), the realtime gateway client shared across these extensions
 - [kickbus](https://github.com/Pkkls/kickbus), official Kick webhooks relayed to local bots over SSE
