@@ -47,6 +47,7 @@ export const ms: Record<string, string> = {
   skipSame: 'hasil terjemahannya sama dengan yang asal',
   skipSameLang: 'sudah dalam bahasa anda',
   skipSlang: 'hanya bahasa slanga sembang',
+  skipCommand: 'ini arahan untuk bot sembang',
   skipTooLong: 'melebihi had saiz',
   toastAllDown: 'Semua penyedia terjemahan tidak berfungsi. Mencuba semula sebentar lagi.',
   toastChatNotFound: 'Kick Chat Translator: sembang tidak ditemui. Mungkin perlu kemas kini.',

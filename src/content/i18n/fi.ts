@@ -47,6 +47,7 @@ export const fi: Record<string, string> = {
   skipSame: 'käännös palautui samana kuin alkuperäinen',
   skipSameLang: 'se on jo kielelläsi',
   skipSlang: 'se on pelkkää chat-slangia',
+  skipCommand: 'se on komento chattibotille',
   skipTooLong: 'se on pituusrajaa pidempi',
   toastAllDown: 'Kaikki käännöspalvelut ovat alhaalla. Yritetään pian uudelleen.',
   toastChatNotFound: 'Kick Chat Translator: chattia ei löytynyt. Laajennus saattaa tarvita päivityksen.',

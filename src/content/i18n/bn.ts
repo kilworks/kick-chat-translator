@@ -47,6 +47,7 @@ export const bn: Record<string, string> = {
   skipSame: 'অনুবাদ মূল লেখার মতোই এসেছে',
   skipSameLang: 'এটি আগে থেকেই আপনার ভাষায়',
   skipSlang: 'শুধু চ্যাটের স্ল্যাং',
+  skipCommand: 'এটি চ্যাট বটের একটি কমান্ড',
   skipTooLong: 'নির্ধারিত দৈর্ঘ্যের সীমার চেয়ে বড়',
   toastAllDown: 'কোনো অনুবাদ পরিষেবা সাড়া দিচ্ছে না। একটু পরে আবার চেষ্টা হবে।',
   toastChatNotFound: 'Kick Chat Translator: চ্যাট খুঁজে পাওয়া যায়নি। আপডেট লাগতে পারে।',

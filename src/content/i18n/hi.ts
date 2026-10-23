@@ -47,6 +47,7 @@ export const hi: Record<string, string> = {
   skipSame: 'अनुवाद मूल जैसा ही आया',
   skipSameLang: 'यह पहले से आपकी भाषा में है',
   skipSlang: 'यह सिर्फ़ चैट का स्लैंग है',
+  skipCommand: 'यह चैट बॉट के लिए एक कमांड है',
   skipTooLong: 'यह तय सीमा से लंबा है',
   toastAllDown: 'सभी अनुवाद सेवाएँ बंद हैं। थोड़ी देर में फिर कोशिश होगी।',
   toastChatNotFound: 'Kick Chat Translator: चैट नहीं मिली। शायद अपडेट की ज़रूरत है।',

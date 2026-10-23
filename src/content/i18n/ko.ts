@@ -47,6 +47,7 @@ export const ko: Record<string, string> = {
   skipSame: '번역 결과가 원문과 같습니다',
   skipSameLang: '이미 내 언어입니다',
   skipSlang: '채팅 은어뿐입니다',
+  skipCommand: '채팅 봇에게 보내는 명령어입니다',
   skipTooLong: '길이 제한을 넘습니다',
   toastAllDown: '모든 번역 서비스가 중단되었습니다. 잠시 후 다시 시도합니다.',
   toastChatNotFound: 'Kick Chat Translator: 채팅을 찾을 수 없습니다. 업데이트가 필요할 수 있습니다.',

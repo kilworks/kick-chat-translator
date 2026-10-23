@@ -410,3 +410,27 @@ describe('TranslationPipeline — English chat abbreviations', () => {
     expect(sentText()).toBe('był w domu cały dzień');
   });
 });
+
+describe('TranslationPipeline: only the part worth translating is sent', () => {
+  beforeEach(() => {
+    sendMock.mockReset();
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: false, error: { code: 'x', message: 'x' } } });
+  });
+  const run = async (text: string) => {
+    const pipeline = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false });
+    await pipeline.onWebSocketMessage(wsMsg(text));
+    return (sendMock.mock.calls[0]?.[0] as { payload: { text: string } } | undefined)?.payload.text;
+  };
+
+  it('sends a pasted phrase once', async () => {
+    expect(await run('TAPA NA CARA PELOS TP TAPA NA CARA PELOS TP TAPA NA CARA PELOS TP')).toBe('TAPA NA CARA PELOS TP');
+  });
+
+  it('sends the sentence without the laughter around it', async () => {
+    expect(await run('jajajaja como te explico que es Roblox')).toBe('como te explico que es Roblox');
+  });
+
+  it('sends nothing for a bare bot command', async () => {
+    expect(await run('!slots 332')).toBeUndefined();
+  });
+});

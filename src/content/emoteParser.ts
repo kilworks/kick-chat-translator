@@ -4,7 +4,11 @@ import type { TextToken } from '~/shared/types';
 // @<user> for mentions, and bare URLs for links.
 const EMOTE_RE = /\[emote:(\d+):([^\]]+)\]/g;
 const MENTION_RE = /(^|[\s,.!?])@([a-z0-9_]{2,32})/gi;
-const URL_RE = /\bhttps?:\/\/[^\s<>"']+/gi;
+// Bare domains too (`www.nordtvs.com`, `Eldorado.gg`, `discord.gg/xyz`): measured
+// on live chat they reached the engine, which has nothing to translate in them.
+// A short list of TLDs, not any dot: "ok.so" or "e.g." must stay words.
+const URL_RE =
+  /\bhttps?:\/\/[^\s<>"']+|\bwww\.[^\s<>"']+|\b[a-z0-9-]{2,}\.(?:com|gg|tv|net|org|io|be|ly|me|pl|br|bet|xyz|app|link)\b(?:\/[^\s<>"']*)?/gi;
 
 /**
  * An emote name typed as a word (pepeLaugh, catJam, PogChamp): a lowercase

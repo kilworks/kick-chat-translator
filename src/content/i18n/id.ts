@@ -47,6 +47,7 @@ export const id: Record<string, string> = {
   skipSame: 'hasil terjemahannya sama dengan aslinya',
   skipSameLang: 'sudah dalam bahasa Anda',
   skipSlang: 'hanya bahasa gaul chat',
+  skipCommand: 'ini perintah untuk bot obrolan',
   skipTooLong: 'melebihi batas ukuran',
   toastAllDown: 'Semua penyedia terjemahan sedang gangguan. Mencoba lagi sebentar.',
   toastChatNotFound: 'Kick Chat Translator: chat tidak ditemukan. Mungkin perlu pembaruan.',

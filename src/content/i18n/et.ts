@@ -47,6 +47,7 @@ export const et: Record<string, string> = {
   skipSame: 'tõlge tuli originaaliga identne',
   skipSameLang: 'see on juba sinu keeles',
   skipSlang: 'see on ainult vestlusslängi',
+  skipCommand: 'see on vestlusroboti käsk',
   skipTooLong: 'see ületab pikkusepiiri',
   toastAllDown: 'Kõik tõlketeenused on maas. Proovitakse varsti uuesti.',
   toastChatNotFound: 'Kick Chat Translator: vestlust ei leitud. Võib vaja minna uuendust.',

@@ -123,12 +123,37 @@ export function isKeyboardSmash(text: string): boolean {
   if (distinctes < 6 && !groupeRepete) return false;
 
   let memeRangee = 0;
+  let voisines = 0;
   for (let i = 0; i < lettres.length - 1; i++) {
     const a = RANGEES_CLAVIER.findIndex((r) => r.includes(lettres[i]!));
     const b = RANGEES_CLAVIER.findIndex((r) => r.includes(lettres[i + 1]!));
-    if (a >= 0 && a === b) memeRangee++;
+    if (a >= 0 && a === b) {
+      memeRangee++;
+      const r = RANGEES_CLAVIER[a]!;
+      if (Math.abs(r.indexOf(lettres[i]!) - r.indexOf(lettres[i + 1]!)) === 1) voisines++;
+    }
   }
-  return memeRangee / (lettres.length - 1) >= MARTELEMENT_PROPORTION;
+  if (memeRangee / (lettres.length - 1) < MARTELEMENT_PROPORTION) return false;
+
+  // La rangee seule ne suffit pas : celle du haut porte e, u, i, o, y, assez
+  // pour ecrire des mots. Mesure le 2026-10-17 sur les 27 297 mots Tatoeba du
+  // banc (langCorpus.ts) : 62 vrais mots passaient pour du martelement, dont
+  // `quiero`, `porque`, `primeiro`, `europa`, `airport`, et sur le vrai chat
+  // `portugal`, `inshallah`, `DENTROOOOO`. Un message fait de ce seul mot etait
+  // jete comme du bruit.
+  //
+  // Ce qui les separe, mesure contre 17 martelements attestes et ces 68 mots :
+  // un martelement a peu de voyelles (moins d'un quart, allongements aplatis
+  // pour que `predictionnnnn` ne soit pas dilue), ou bien en a un peu plus mais
+  // repete un groupe de trois lettres (`dksaj...dksaj`), ou bien suit les touches
+  // voisines (`qwertyuiop`). 17 sur 17 gardes, 0 mot sur 68 avale. Les mots
+  // nordiques a 25 pour cent de voyelles (`skjorter`, `triskart`) ne repetent
+  // aucun groupe, c'est ce qui les sauve. Seuils regles sur ces jeux memes :
+  // un nouveau faux positif se corrige en l'ajoutant aux temoins du test.
+  if (groupeRepete || voisines / (lettres.length - 1) >= 0.8) return true;
+  const plat = lettres.replace(/(.)\1+/g, '$1');
+  const voyelles = (plat.match(/[aeiou]/g) ?? []).length / plat.length;
+  return voyelles < 0.25 || (voyelles < 0.3 && /(...).*\1/.test(lettres));
 }
 
 export function isNoise(text: string): boolean {
@@ -184,4 +209,130 @@ export function normalizeElongation(text: string): string {
     .replace(/ー{2,}/gu, 'ー')
     .replace(/([!?！？])\1{2,}/gu, '$1$1')
     .trim();
+}
+
+// ── What is worth paying to translate inside a line ─────────────────────────
+//
+// Measured on 15,155 live Kick lines in 31 languages (test/e2e/capture-chat.mjs),
+// after every filter above had run: a phrase pasted over and over in one message
+// was 4.3 percent of all the characters sent to the engine, laughter or emoji at
+// either end of a real sentence 1.7, bare bot commands 0.5, emoji runs 0.2. The
+// original line stays on screen untouched; only what goes to the engine shrinks.
+
+const COMMAND = /^[!/][\p{L}\d_]+/u;
+
+/**
+ * `!points`, `!slots 332`, `!gamble all`: addressed to a bot, nothing to read.
+ * A command carrying a sentence (`!tts eso te pasa por bocon...`, read aloud on
+ * stream) is not bare: three words or more and the sentence is worth translating.
+ */
+export function isBareCommand(text: string): boolean {
+  const t = text.trim();
+  const m = t.match(COMMAND);
+  if (!m) return false;
+  return t.slice(m[0].length).split(/\s+/).filter((w) => /\p{L}{2,}/u.test(w)).length < 3;
+}
+
+const EMO = String.raw`\p{Extended_Pictographic}(?:\p{Emoji_Modifier}|\uFE0F|\u200D\p{Extended_Pictographic})*`;
+const EMOJI_RUN = new RegExp(String.raw`(${EMO})(?:\s*${EMO})+`, 'gu');
+const EMOJI_ONLY = new RegExp(`^(?:${EMO})+$`, 'u');
+const EMOJI_EDGE = new RegExp(String.raw`^(?:${EMO}|\s)+|(?:${EMO}|\s)+$`, 'gu');
+
+/** "SEM TP SEM TP SEM TP SEM T" -> "SEM TP": three copies or more, a cut-off last one allowed. */
+function collapseRepeat(t: string): string {
+  // "FUGA FUGA FUGAAAAAA FUGAA FUGA": the stretched copies are not equal, so the
+  // pattern below misses them. Same word once flattened, three times or more.
+  const toks = t.split(/\s+/);
+  const flat = (w: string): string => w.toLowerCase().replace(/(\p{L})\1+/gu, '$1');
+  if (toks.length >= 3 && toks[0]!.length >= 3 && toks.every((w) => flat(w) === flat(toks[0]!))) return toks[0]!;
+  // The copy has to end on a word boundary, or "Oye hoye hoye hoye" repeats
+  // "oye h" and collapses to "Oye h". Scripts written without spaces have no
+  // such boundary, so there any character ends a copy.
+  const m = t.match(
+    /^(.{2,}?(?:(?<=\P{L})|(?=\P{L}|$)|(?<=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}])))(?:\s*\1){2,}\s*(.*)$/isu,
+  );
+  // Three characters minimum: "jajaja" -> "ja" would turn laughter into the
+  // German for yes, and "lalala" -> "la" into an article.
+  if (!m || !/\p{L}/u.test(m[1]!) || m[1]!.trim().length < 3) return t;
+  return m[1]!.toLowerCase().startsWith(m[2]!.toLowerCase()) ? m[1]!.trim() : t;
+}
+
+/**
+ * Laughter, keyboard smash or emoji at either end of a line with real words in
+ * it. Punctuation stays (`????` and `))` carry meaning), so do digits (`10 ضغط`),
+ * and so does a line that is nothing but noise: isNoise owns that one.
+ */
+function trimEdgeNoise(t: string): string {
+  const toks = t.split(/\s+/);
+  const noise = (w: string): boolean => {
+    const core = w.replace(/^\p{P}+|\p{P}+$/gu, '');
+    // No isKeyboardSmash here: it calls "equipo" a smash (every letter on the
+    // top row), and at the edge of a sentence that deletes a real word.
+    return core.length >= 2 && (isLaughter(core.toLowerCase()) || EMOJI_ONLY.test(core));
+  };
+  let a = 0;
+  let b = toks.length - 1;
+  while (a <= b && noise(toks[a]!)) a++;
+  while (b >= a && noise(toks[b]!)) b--;
+  if (a > b) return t;
+  // Rejoined only when something was cut: a clean line keeps its own spaces,
+  // the French no-break space before "?" and the ideographic one included.
+  const words = a === 0 && b === toks.length - 1 ? t : toks.slice(a, b + 1).join(' ');
+  // Emoji glued to a word ("GATA ONLY🔥") is not a token of its own.
+  const kept = words.replace(EMOJI_EDGE, '');
+  return /\p{L}/u.test(kept) ? kept : words;
+}
+
+/**
+ * A long line that is mostly the same few words over again, copies that are
+ * not equal: "yo quiero remiix yo quiero yo quiero remiix...", "CON TOS
+ * VOY CONTOSVOY CON TOSVOY...". It goes out as its distinct words, in order.
+ *
+ * Only when two words in three or more are repeats, over eight words or more.
+ * Measured: at that floor the 8 lines touched in the 15,155-line capture are all
+ * spam (0.34 percent of the characters sent), and no Tatoeba sentence is. At
+ * half instead of a third it starts dropping the second "nie" of a Polish
+ * sentence, which turns its meaning around.
+ */
+function dedupeWords(t: string): string {
+  const toks = t.split(/\s+/).filter(Boolean);
+  if (toks.length < 8) return t;
+  const seen = new Set<string>();
+  const keep: string[] = [];
+  for (const w of toks) {
+    const k = w.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '').replace(/(.)\1+/gu, '$1');
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    keep.push(w);
+  }
+  return keep.length / toks.length <= 0.35 ? keep.join(' ') : t;
+}
+
+/**
+ * "fala pro salve kosky krlh 👺 qqqq", then "👺 q", "👺 qaqa", "👺 aaaa": the
+ * same line resent with junk after an emoji to get past Kick's duplicate check.
+ * Every variant is a different text, so each one missed the cache and was paid
+ * for: 14 of 148 lines sent on a live Brazilian channel (2026-10-17).
+ *
+ * Only the last word after the last emoji, and only junk: at most two different
+ * letters, one letter or three and more. Two-letter words ("no", "si", "ok")
+ * and real words ("te amo ❤️ mucho") stay.
+ */
+function trimBypassSuffix(t: string): string {
+  const m = t.match(new RegExp(String.raw`^(.*\p{L}.*?(?:${EMO}))\s+(\p{L}+)$`, 'u'));
+  if (!m) return t;
+  const junk = m[2]!;
+  const ok = new Set(junk.toLowerCase()).size <= 2 && (junk.length === 1 || junk.length >= 3);
+  return ok ? m[1]!.trim() : t;
+}
+
+/** The part of a chat line sent to the engine. Bare commands are the caller's to skip. */
+export function trimForEngine(text: string): string {
+  // A line that is all noise is isNoise's to skip whole; trimming it first could
+  // leave a fragment that no longer looks like noise.
+  if (isNoise(text)) return text.trim();
+  let t = text.trim().replace(COMMAND, '').trim();
+  t = t.replace(EMOJI_RUN, '$1');
+  t = dedupeWords(collapseRepeat(trimBypassSuffix(t)));
+  return trimEdgeNoise(t);
 }

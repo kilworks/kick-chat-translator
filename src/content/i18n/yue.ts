@@ -47,6 +47,7 @@ export const yue: Record<string, string> = {
   skipSame: '譯文同原文一樣',
   skipSameLang: '佢本身已經係你嘅語言',
   skipSlang: '淨係聊天用語',
+  skipCommand: '呢個係俾聊天機械人嘅指令',
   skipTooLong: '超過長度上限',
   toastAllDown: '所有翻譯服務都用唔到，稍後會自動重試。',
   toastChatNotFound: 'Kick Chat Translator：搵唔到聊天室。可能需要更新。',

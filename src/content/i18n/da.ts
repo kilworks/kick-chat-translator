@@ -47,6 +47,7 @@ export const da: Record<string, string> = {
   skipSame: 'oversættelsen var den samme som originalen',
   skipSameLang: 'den er allerede på dit sprog',
   skipSlang: 'den består kun af chatslang',
+  skipCommand: 'det er en kommando til en chatbot',
   skipTooLong: 'den er længere end længdegrænsen',
   toastAllDown: 'Alle oversættelsesudbydere er nede. Prøver igen om lidt.',
   toastChatNotFound: 'Kick Chat Translator: chatten blev ikke fundet. Der kan mangle en opdatering.',

@@ -47,6 +47,7 @@ export const nl: Record<string, string> = {
   skipSame: 'de vertaling was gelijk aan het origineel',
   skipSameLang: 'het is al in jouw taal',
   skipSlang: 'het is alleen chattaal',
+  skipCommand: 'het is een opdracht voor een chatbot',
   skipTooLong: 'het is langer dan de toegestane lengte',
   toastAllDown: 'Alle vertaalaanbieders zijn niet bereikbaar. Er volgt zo een nieuwe poging.',
   toastChatNotFound: 'Kick Chat Translator: chat niet gevonden. Mogelijk is een update nodig.',

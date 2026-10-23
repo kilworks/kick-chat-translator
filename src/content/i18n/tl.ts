@@ -47,6 +47,7 @@ export const tl: Record<string, string> = {
   skipSame: 'kapareho ng orihinal ang bumalik na salin',
   skipSameLang: 'nasa wika mo na ito',
   skipSlang: 'slang lang sa chat ito',
+  skipCommand: 'ito ay utos para sa isang chat bot',
   skipTooLong: 'lampas ito sa limitasyon ng haba',
   toastAllDown: 'Walang gumaganang serbisyo sa pagsasalin. Susubukan ulit maya-maya.',
   toastChatNotFound: 'Kick Chat Translator: hindi makita ang chat. Baka kailangan ng update.',

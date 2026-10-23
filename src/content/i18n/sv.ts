@@ -47,6 +47,7 @@ export const sv: Record<string, string> = {
   skipSame: 'översättningen blev densamma som originalet',
   skipSameLang: 'den är redan på ditt språk',
   skipSlang: 'den är bara chattslang',
+  skipCommand: 'det är ett kommando till en chattbot',
   skipTooLong: 'den är längre än storleksgränsen',
   toastAllDown: 'Alla översättningstjänster ligger nere. Försöker igen strax.',
   toastChatNotFound: 'Kick Chat Translator: hittade inte chatten. Tillägget kan behöva uppdateras.',

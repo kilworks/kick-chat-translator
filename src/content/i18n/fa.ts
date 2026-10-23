@@ -47,6 +47,7 @@ export const fa: Record<string, string> = {
   skipSame: 'ترجمه با متن اصلی یکی بود',
   skipSameLang: 'از قبل به زبان شماست',
   skipSlang: 'فقط اصطلاحات عامیانه چت است',
+  skipCommand: 'این یک فرمان برای ربات چت است',
   skipTooLong: 'از حداکثر طول مجاز بیشتر است',
   toastAllDown: 'همه سرویس‌های ترجمه از کار افتاده‌اند. به‌زودی دوباره تلاش می‌شود.',
   toastChatNotFound: 'Kick Chat Translator: چت پیدا نشد. شاید لازم باشد افزونه به‌روزرسانی شود.',

@@ -13,7 +13,7 @@ import { extractMessageText, findAllRows } from './selectors';
 import { confidentLanguage, detectLanguage } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
 import { isContextCritical } from '~/shared/langTiers';
-import { hasBlockedKeyword, hasNonEnglishLetter, isNoise, isSameLanguageAsTarget, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel } from './filters';
+import { hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, isSameLanguageAsTarget, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, trimForEngine } from './filters';
 import { HANDLED_SELECTOR, inject, incrementFloatingCount, armHoverTranslate, markSkipped, removeAllArtifacts, showError, showLoading, showThrottleIndicator, showToast, updateActiveProvider } from './injector';
 import { localEngine } from './localEngine';
 import { memCache } from './memcache';
@@ -190,7 +190,9 @@ export class TranslationPipeline {
       if (dedupKey) this.userDedup.set(dedupKey, rawText);
     }
 
-    const { realText } = parseKickContent(rawText);
+    const parsed = parseKickContent(rawText).realText;
+    if (isBareCommand(parsed)) return localised('skipCommand', 'it is a command for a chat bot');
+    const realText = trimForEngine(parsed);
     if (realText.length < this.settings.minTextLength) {
       return `it is shorter than your ${this.settings.minTextLength} character minimum`;
     }

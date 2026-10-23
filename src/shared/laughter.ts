@@ -68,6 +68,26 @@ const FORMES: FormeDeRire[] = [
     langue: 'pt',
   },
   {
+    motif: /^(?=(?:[^k]*k){3})[a-z]?k{2,}(?:[a-jl-z]?k{2,})*[a-z]?$/i,
+    langue: 'pt',
+  },
+  {
+    motif: /^(?=.*kkk)[a-jl-z]?(?:k+[a-jl-z])*k+[a-jl-z]?$/i,
+    langue: 'pt',
+  },
+  {
+    motif: /^(?=(?:[^k]*k){3})(?=.*q)[kq]{6,}$/i,
+    langue: 'pt',
+  },
+  {
+    motif: /^k{3,}([a-jl-z])\1*$/i,
+    langue: 'pt',
+  },
+  {
+    motif: /^(?=.{6,}$)(?=.*ka)[oa]?(?:ka|ak|kk|aa)+[ka]?$/i,
+    langue: 'pt',
+  },
+  {
     motif: /^(?:rs){2,}$/i,
     langue: 'pt',
   },
@@ -160,6 +180,8 @@ const FORMES: FormeDeRire[] = [
     motif: /^(?:x+d+|(?:xd){2,})$/i,
   },
   { motif: /^ke+k+(?:w)?$/i },
+  { motif: /^(?=[ha]*h[ha]*h)(?=[ha]*a[ha]*a)[ha]{6,}$/i },
+  { motif: /^(?=[ja]*j[ja]*j)(?=[ja]*a[ja]*a)[ja]{6,}$/i, langue: 'es' },
   { motif: /^u?wu$|^owo$/i },
 ];
 
@@ -212,6 +234,16 @@ export const LAUGHTER_NOTES: Readonly<Record<string, string>> = {
     'Spanish jsjsjs, jaja typed with the neighbouring key',
   '^k{3,}$':
     'Brazilian Portuguese kkkk. Three or more: kk alone is too short to claim a language',
+  '^(?=(?:[^k]*k){3})[a-z]?k{2,}(?:[a-jl-z]?k{2,})*[a-z]?$':
+    'Brazilian kkkk with a stray key: kkkj, MKKKKKKK, kkkkkkkm, kkkjkkk. Seen reaching the engine on a live Brazilian channel (2026-10-17), 4 of 53 lines sent',
+  '^(?=.*kkk)[a-jl-z]?(?:k+[a-jl-z])*k+[a-jl-z]?$':
+    'Brazilian kkkk broken by single stray keys anywhere: klkkkkkkkk, kkjkkkkl. Same live channel. A run of three k is required, so Indonesian kakak (older sibling) stays a word',
+  '^(?=(?:[^k]*k){3})(?=.*q)[kq]{6,}$':
+    'Brazilian kkkk typed across k and its neighbour q: kqkqkqkkqqkk. Live Brazilian channel, 2026-10-17',
+  '^k{3,}([a-jl-z])\\1*$':
+    'Brazilian kkkk ending on a held stray key: KKKKKKKKKKKKLLL. Same channel',
+  '^(?=.{6,}$)(?=.*ka)[oa]?(?:ka|ak|kk|aa)+[ka]?$':
+    'Brazilian KAKAKA, the shouted kkkk: KAKAKAAKAKAKA, OAKAKAKAKKKAKAK. Same live channel. Six letters minimum, so kaka stays a word',
   '^(?:rs){2,}$':
     'Brazilian Portuguese rsrsrs, repeated from riso, laughter',
   '^(?:hue){2,}h?u?e?$':
@@ -290,6 +322,10 @@ export const LAUGHTER_NOTES: Readonly<Record<string, string>> = {
     'rofl, rolling on the floor laughing, borrowed into many languages',
   '^ke+k+(?:w)?$':
     'kek and kekw, from streaming chat',
+  '^(?=[ha]*h[ha]*h)(?=[ha]*a[ha]*a)[ha]{6,}$':
+    'hahaha mistyped: hahhahahahahahha, AHAHAAHAH. Measured reaching the engine on live Kick chat (2026-10-17). Six letters minimum, no word is made of h and a alone',
+  '^(?=[ja]*j[ja]*j)(?=[ja]*a[ja]*a)[ja]{6,}$':
+    'Spanish jajaja mistyped: jJAAJAJJA. Same live capture, same six-letter floor',
   '^u?wu$|^owo$':
     'uwu and owo',
 };

@@ -47,6 +47,7 @@ export const bg: Record<string, string> = {
   skipSame: 'преводът е същият като оригинала',
   skipSameLang: 'вече е на вашия език',
   skipSlang: 'съдържа само чат жаргон',
+  skipCommand: 'това е команда за чат бот',
   skipTooLong: 'по-дълго е от допустимото',
   toastAllDown: 'Всички услуги за превод са недостъпни. Скоро ще опитаме отново.',
   toastChatNotFound: 'Kick Chat Translator: чатът не е намерен. Може да е нужна актуализация.',

@@ -47,6 +47,7 @@ export const vi: Record<string, string> = {
   skipSame: 'bản dịch giống hệt bản gốc',
   skipSameLang: 'tin nhắn đã bằng ngôn ngữ của bạn',
   skipSlang: 'chỉ là tiếng lóng trong chat',
+  skipCommand: 'đây là lệnh cho bot trò chuyện',
   skipTooLong: 'tin nhắn vượt quá giới hạn kích thước',
   toastAllDown: 'Tất cả dịch vụ dịch đang gặp sự cố. Sẽ thử lại sau ít phút.',
   toastChatNotFound: 'Kick Chat Translator: không tìm thấy chat. Có thể cần cập nhật.',

@@ -189,6 +189,28 @@ describe('isKeyboardSmash', () => {
     expect(isKeyboardSmash(mot)).toBe(false);
   });
 
+  // Les mots sur une seule rangee. Tous pris par la regle des rangees seule,
+  // releves le 2026-10-17 : 62 dans les 27 297 mots Tatoeba de langCorpus.ts,
+  // 6 sur le vrai chat Kick. Un message fait d'un seul d'entre eux etait jete.
+  it.each([
+    'regals', 'ritual', 'xiquet', 'europa', 'skjorter', 'bageriet', 'politiet', 'antworte',
+    'karotten', 'airport', 'quiero', 'muerto', 'quejarte', 'yorkshire', 'quiera', 'quieres',
+    'porque', 'naljakad', 'peaksite', 'toredad', 'nuoret', 'euroopan', 'saadakseen',
+    'puuhaamassa', 'supporte', 'courrier', 'peinture', 'seperti', 'spirito', 'portarti',
+    'proteggerti', 'aperto', 'aktore', 'neturiu', 'kompiuterio', 'popierius', 'triskart',
+    'pasakyti', 'dariet', 'itulah', 'perlahan', 'perasaan', 'paspoort', 'rotterdam',
+    'foretrekker', 'flerlags', 'papierowy', 'klasie', 'quieto', 'primeiro', 'leitores',
+    'direto', 'oprostite', 'sprehajal', 'skorajda', 'utopila', 'slaget', 'tillsagd', 'djupet',
+    'nagdasal', 'pasaporte', 'hayrete', 'equipo', 'portugal', 'inshallah', 'DENTROOOOOOOO',
+    'PIJAMADAAAAA', 'PREDICTIONNNNNNNNNNNN', 'gaaaaaaybruuuuuu',
+  ])('laisse passer le mot sur une rangee %s', (mot) => {
+    expect(isKeyboardSmash(mot)).toBe(false);
+  });
+
+  it('reconnait le martelement vu sur le vrai chat', () => {
+    expect(isKeyboardSmash('DJASKLJDASKJD')).toBe(true);
+  });
+
   it('ne touche pas a une phrase, meme si un mot y ressemble', () => {
     expect(isKeyboardSmash('asdfghjkl mais je rigole')).toBe(false);
     expect(isKeyboardSmash('regarde asdfghjkl')).toBe(false);

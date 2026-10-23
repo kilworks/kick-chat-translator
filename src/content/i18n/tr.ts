@@ -47,6 +47,7 @@ export const tr: Record<string, string> = {
   skipSame: 'çeviri orijinaliyle aynı çıktı',
   skipSameLang: 'zaten senin dilinde',
   skipSlang: 'yalnızca sohbet argosu',
+  skipCommand: 'bir sohbet botu komutu',
   skipTooLong: 'boyut sınırını aşıyor',
   toastAllDown: 'Tüm çeviri hizmetleri çalışmıyor. Birazdan yeniden denenecek.',
   toastChatNotFound: 'Kick Chat Translator: sohbet bulunamadı. Güncelleme gerekebilir.',

@@ -47,6 +47,7 @@ export const uk: Record<string, string> = {
   skipSame: 'переклад збігся з оригіналом',
   skipSameLang: 'воно вже вашою мовою',
   skipSlang: 'у ньому лише чатовий сленг',
+  skipCommand: 'це команда для чат-бота',
   skipTooLong: 'воно довше за допустиму довжину',
   toastAllDown: 'Усі сервіси перекладу недоступні. Скоро повторимо спробу.',
   toastChatNotFound: 'Kick Chat Translator: чат не знайдено. Можливо, потрібне оновлення.',

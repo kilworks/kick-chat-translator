@@ -47,6 +47,7 @@ export const ca: Record<string, string> = {
   skipSame: "la traducció és idèntica a l'original",
   skipSameLang: 'ja està en el teu idioma',
   skipSlang: 'només és argot de xat',
+  skipCommand: 'és una ordre per a un bot del xat',
   skipTooLong: 'supera la mida màxima',
   toastAllDown: 'Tots els serveis de traducció estan caiguts. Es tornarà a provar d\'aquí a poc.',
   toastChatNotFound: "Kick Chat Translator: no s'ha trobat el xat. Pot ser que calgui una actualització.",
