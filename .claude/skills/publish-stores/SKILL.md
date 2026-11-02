@@ -93,6 +93,31 @@ No API sets the listing and no extension may act on the dashboard. `scripts/stor
 
 Languages are matched by the code after the dash in the picker ("anglais – en"), and the dashboard writes `pt-BR`, `pt-PT`, `zh-CN` and `zh-TW` with a hyphen, and Hebrew as `iw` (`cws: 'iw'` in `languages.mjs`). A tab left in the background takes no synthetic click: the script brings it to front first.
 
+## 1c. Chrome listing analytics: GA4 on, for every item
+
+Every Chrome item gets the dashboard's Google Analytics 4 switched on, from its first publication
+(kil, 2026-11-02). It is not the extension's own opt-in usage statistics (skill `ga-usage-stats`):
+it measures the store page, and it adds the "Google Analytics" entry under Analytics in the
+dashboard menu. Kick had it, Twitch 1.0.0 went out without it and nobody saw the gap for ten days.
+
+Where: the item's `edit` page (the "Fiche Play Store" tab), section "Google Analytics 4 (GA4)".
+Off reads "Activer Google Analytics"; on reads "Désactiver Google Analytics" plus an "Accéder à
+Google Analytics" link to the property Google creates (Twitch: `p561905641`). No terms to accept,
+nothing to type: one button, then a confirmation dialog "Activer Google Analytics 4 (GA4) ?" with
+"Annuler" and "Activer".
+
+How, with the debug browser (`cws-listing.mjs launch`), over CDP `Runtime.evaluate`: walk the text
+nodes for `/activer\s+google/i` and click the node's `closest('button')`, then find the dialog's
+"Activer" button the same way (the container of the text `/\(GA4\)\s*\?/` that holds two
+buttons). Traps: the label has a no-break space between "Google" and "Analytics", so a literal
+"Google Analytics" match finds nothing; `innerText` shows the text while the button search misses
+it. Reload and read the section back: "Désactiver Google Analytics" is the proof.
+
+Side effect: right after the switch the "État" tab read "La publication de ce brouillon a été
+annulée" while the API (`cws.mjs status`) said PUBLISHED 1.0.2 at 100 %, with no submitted
+revision. The API is the authority; on an item still in review, run `cws.mjs status` after the
+switch and resubmit (`cws.mjs publish`) if the submission is gone.
+
 ## 2. AMO: through the API
 
 `amo.mjs release` uploads the package with `channel=listed`, waits for validation, creates the version with its source archive (multipart: the API refuses a source in JSON), then sets the release notes and the reviewer notes (JSON: the API refuses them in multipart). `amo.mjs listing` sets the name (the manifest's `extName`), summary and description per locale and reads them back. The devhub spells locales `en-us`, the API `en-US`: the script converts.
