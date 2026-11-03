@@ -45,6 +45,28 @@ reads dist/, so it serialises behind any build. D touches no code.
 
 ## Open
 
+- [x] **Translation quality, research items 1 to 10, S1 and S2 (2026-11-03,
+  branch `feat/translation-quality`).** From the study in
+  `kick-translator-research`, each commit witnessed red first: sticky provider
+  expires at 60 s (867f7f1), cache key keeps digit runs (51bcdf6), overrides
+  through edge punctuation and stretching (c12d8b8), blind corpus 4 of 500
+  lines (cb44f75), confident path vetoes on chat words (f02a639: corpus 4
+  wrong 17 to 6, Tatoeba right 3731 to 3716, wrong 3), one-word CJK and more
+  noise (06da9c8: 27 of 30 and 56 of 60 on fresh sets), on-device unchanged
+  goes to the cloud in local-first (81cff2e), DeepL batch keeps a shared
+  source and sends NB (673971f), two stale statements (0939934). The study's
+  `verify-handover-claims.mjs` runs again: 48 of 67, the 19 others are counts
+  grown since 2.10.0.
+- [ ] **Corpus 4: the bar is not met.** Written before the change: at most one
+  confident wrong answer per set, 0.7 % overall. Measured 1.2 % (6 of 500),
+  three of them Russian in Latin letters named fi. Read only in totals
+  (`impl/c4totals.mts`), already read twice: the next rule needs a fresh
+  blind set, not this one.
+- [ ] **DeepL changes never observed.** No key on this machine. The batch
+  `source_lang` and NB for Norwegian are pinned by tests on the request body
+  only; NB as a source code comes from the DeepL list as recalled, not
+  re-read. Check with one real key before calling it done.
+
 - [x] **A fast chat lost its foreign lines inside the Google batch, and some
   that survived were shown wrong.** The coalescer joins up to forty lines into
   one Google request and Google detects one source for the whole of it.
