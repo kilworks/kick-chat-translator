@@ -28,11 +28,15 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
   // Doing its job: it answers on two lines in five and is almost never wrong.
   // The engine detects the rest itself, which is the safe outcome.
   it('confidentLanguage stays quiet and is rarely wrong', () => {
-    expect(plain(CONFIDENT.total)).toEqual({ right: 3731, silent: 1306, wrong: 3 });
+    // 3731 avant le 2026-11-03. Les quinze lignes perdues sont sept phrases
+    // hongroises qui ne portaient que `nem` et huit bulgares qui ne portaient que
+    // `го` ou `ще` : retirees parce qu'elles nommaient a tort le portugais, le
+    // russe de chat et l'ukrainien. Silencieuses, pas fausses : wrong reste a 3.
+    expect(plain(CONFIDENT.total)).toEqual({ right: 3716, silent: 1321, wrong: 3 });
   });
 
   it('confidentLanguage on short lines, the regime a chat lives in', () => {
-    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1080, silent: 597, wrong: 3 });
+    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1072, silent: 605, wrong: 3 });
   });
 
   // The expensive one. This is the answer that deletes a message in silence when
@@ -40,7 +44,9 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
   // to the on-device engine as a source language on Chrome, where the on-device
   // engine is the default.
   it('detectLanguage is wrong on a fifth of all lines', () => {
-    expect(plain(DETECT.total)).toEqual({ right: 4154, silent: 388, wrong: 498 });
+    // 4154/498 avant le 2026-11-03 : deux des huit phrases bulgares devenues
+    // silencieuses sur le chemin sur tombent sur franc, qui les dit uk et ru.
+    expect(plain(DETECT.total)).toEqual({ right: 4152, silent: 388, wrong: 500 });
   });
 
   it('detectLanguage is wrong on a quarter of short lines', () => {

@@ -70,8 +70,10 @@ describe('le chemin sur, sur du chat', () => {
   // derniers points pendant que le lexique avait cesse de rapporter quoi que ce
   // soit. C'etait une prediction, pas une mesure, et elle s'est trompee.
   it('se tait sur trois lignes de chat sur quatre', () => {
-    expect(plain(CHAT_SURE.total)).toEqual({ right: 237, silent: 153, wrong: 0 });
-    expect(muet(CHAT_SURE.total)).toBe(39);
+    // 237 avant le 2026-11-03 : `ezt nem hiszem el` et `nem látok semmit` ne
+    // portaient que `nem`, sorti parce que c'est aussi du portugais courant.
+    expect(plain(CHAT_SURE.total)).toEqual({ right: 235, silent: 155, wrong: 0 });
+    expect(muet(CHAT_SURE.total)).toBe(40);
   });
 
   // Ce que coute le clavier, et c'est la fragilite de toute l'approche par
@@ -85,8 +87,8 @@ describe('le chemin sur, sur du chat', () => {
   // vingt-six portes a lettre sont muettes. Une ligne de plus ici, et c'est la
   // direction a retenir pour les langues que le clavier deshabille.
   it('perd un tiers de son rappel quand les diacritiques tombent', () => {
-    expect(plain(NU_SURE.total)).toEqual({ right: 159, silent: 231, wrong: 0 });
-    expect(muet(NU_SURE.total)).toBe(59);
+    expect(plain(NU_SURE.total)).toEqual({ right: 157, silent: 233, wrong: 0 });
+    expect(muet(NU_SURE.total)).toBe(60);
   });
 });
 
@@ -155,7 +157,7 @@ describe('le contraste avec Tatoeba, sur les memes langues', () => {
   it('montre que le registre coute a franc et pas au chemin sur', () => {
     const t = runMatrix(confidentLanguage, memesLangues());
     expect(muet(t.total)).toBe(38);
-    expect(muet(CHAT_SURE.total)).toBe(39);
+    expect(muet(CHAT_SURE.total)).toBe(40);
     // 5, puis 3 avec le retrait de `mano`, puis 1 avec les mots jawi : la seule
     // erreur qui reste sur les 26 langues du chat est `ms -> ar`, une ligne
     // jawi sans lettre ni mot utilisable.

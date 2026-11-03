@@ -15,6 +15,10 @@ import { confidentLanguage, detectLanguage } from './langDetect';
  * Celui-ci a ete ecrit apres, sur d'autres sujets, sans consulter une seule fois
  * ce que le detecteur en faisait. L'ecart entre les deux EST la part de
  * memorisation, et c'est la seule facon de la connaitre.
+ *
+ * IL N'EST PLUS AVEUGLE (2026-11-03). Trois scripts de candidats le lisent et la
+ * regle `-aat` a ete retaillee sur son effet ici ; son zero est une borne haute.
+ * Le banc aveugle est desormais le corpus 4, `langChat4.test.ts`.
  */
 
 const SURE1 = runMatrix(confidentLanguage, LANG_CHAT);
@@ -55,8 +59,9 @@ describe('le detecteur sur du chat qu il n a jamais vu', () => {
   // quatre. Un mecanisme qui rapporte autant la ou il n'a pas ete regle que la
   // ou il l'a ete est exactement ce que le lexique n'arrivait plus a faire.
   it('rappelle un tiers de moins en brut, mais la longueur en explique la moitie', () => {
-    expect(plain(SURE2.total)).toEqual({ right: 148, silent: 112, wrong: 0 });
-    expect(rappel(SURE1.total)).toBe(61);
+    // 148 et 61 avant le 2026-11-03, le retrait de `nem` du hongrois.
+    expect(plain(SURE2.total)).toEqual({ right: 147, silent: 113, wrong: 0 });
+    expect(rappel(SURE1.total)).toBe(60);
     expect(rappel(SURE2.total)).toBe(57);
     // Le facteur confondant, mesure : les deux corpus ne sont pas comparables tels quels.
     const lignes = (c: Record<string, readonly string[]>): string[] => Object.values(c).flat();
@@ -98,6 +103,8 @@ describe('le detecteur sur du chat qu il n a jamais vu', () => {
   // c'est que les deux corpus n'ont pas les memes langues aux memes longueurs.
   // Ne pas lire l'ecart d'une bande comme une mesure de reglage sans avoir
   // d'abord regarde de quoi cette bande est faite.
+  // 2026-11-03 : l'ecart est de 4 points en bande courte et 3 en bande longue
+  // depuis le retrait de `nem`, donc le titre ne se lit plus a la lettre.
   it('memorise trois fois moins au-dela de la borne du lexique', () => {
     const bande = (
       corp: Record<string, readonly string[]>,
@@ -106,10 +113,10 @@ describe('le detecteur sur du chat qu il n a jamais vu', () => {
       Object.fromEntries(Object.entries(corp).map(([l, v]) => [l, v.filter(garde)]));
     const court = (t: string): boolean => t.length <= 20;
     const long = (t: string): boolean => t.length > 20;
-    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT, court)).total)).toBe(61);
+    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT, court)).total)).toBe(60);
     expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, court)).total)).toBe(56);
     expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT, long)).total)).toBe(60);
-    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, long)).total)).toBe(58);
+    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, long)).total)).toBe(57);
   });
 
   // Le chemin brut perd moins parce qu'il ne depend pas du lexique : franc lit

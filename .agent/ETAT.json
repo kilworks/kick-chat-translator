@@ -1,34 +1,131 @@
 {
-  "genere": "2026-10-10T09:18:41.461Z",
+  "genere": "2026-11-03T19:53:15.374Z",
   "parQui": ".agent/state.mjs",
   "avertissement": "Genere. Ne pas editer a la main : la prochaine passe ecrase. La version commitee decrit l'etat d'AVANT le commit qui la porte, puisque la fin de passe genere puis commite : git.head y pointe le commit precedent et git.arbrePropre y est faux. Relancer `node .agent/state.mjs` avant de lire, ce que le prompt demande deja en premier.",
   "git": {
     "remotesEnDouble": [],
-    "branche": "claude/translation-quality-wr8p3r",
-    "head": "07e828a2a89c066a972334e2e5707de202f88b1a",
-    "sujet": "Merge pull request #23 from Pkkls/claude/extension-optimization-pv81bb",
+    "branche": "feat/translation-quality",
+    "head": "09399344d58a0c87ced098b4d60901347fbaa196",
+    "sujet": "Fix two stale statements: corpus 3 title and the tinyld bet",
     "arbrePropre": false,
-    "fichiersModifies": 3,
-    "dernierTag": "v3.0.2",
-    "decrit": "v3.0.2-66-g07e828a",
+    "fichiersModifies": 8,
+    "dernierTag": "v3.3.0",
+    "decrit": "v3.3.0-12-g0939934",
     "remotes": {
-      "origin": "https://github.com/Pkkls/kick-chat-translator"
+      "origin": "https://github.com/kilworks/kick-chat-translator.git"
     },
     "ecarts": {
       "origin": {
         "derriere": 0,
-        "devant": 7,
+        "devant": 3,
         "aJour": false
       }
     }
   },
   "versions": {
-    "packageJson": "3.0.2",
-    "distManifest": "3.0.2",
+    "packageJson": "3.3.0",
+    "distManifest": "3.3.0",
     "accordent": true,
     "note": null
   },
-  "paquets": [],
+  "paquets": [
+    {
+      "fichier": "kick-chat-translator-3.0.0-chromium.zip",
+      "octets": 320917,
+      "versionDuNom": "3.0.0",
+      "versionDuManifest": "3.0.0",
+      "accordent": true,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.0.0-firefox.zip",
+      "octets": 320846,
+      "versionDuNom": "3.0.0",
+      "versionDuManifest": "3.0.0",
+      "accordent": true,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.0.0-source.zip",
+      "octets": 1565158,
+      "versionDuNom": "3.0.0",
+      "versionDuManifest": null,
+      "accordent": false,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.0.2-chromium.zip",
+      "octets": 326278,
+      "versionDuNom": "3.0.2",
+      "versionDuManifest": "3.0.2",
+      "accordent": true,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.0.2-firefox.zip",
+      "octets": 326207,
+      "versionDuNom": "3.0.2",
+      "versionDuManifest": "3.0.2",
+      "accordent": true,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.0.2-source.zip",
+      "octets": 1811044,
+      "versionDuNom": "3.0.2",
+      "versionDuManifest": null,
+      "accordent": false,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.1.0-chromium.zip",
+      "octets": 270656,
+      "versionDuNom": "3.1.0",
+      "versionDuManifest": "3.1.0",
+      "accordent": true,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.1.0-firefox.zip",
+      "octets": 270582,
+      "versionDuNom": "3.1.0",
+      "versionDuManifest": "3.1.0",
+      "accordent": true,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.2.0-chromium.zip",
+      "octets": 474594,
+      "versionDuNom": "3.2.0",
+      "versionDuManifest": "3.2.0",
+      "accordent": true,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.2.0-firefox.zip",
+      "octets": 474520,
+      "versionDuNom": "3.2.0",
+      "versionDuManifest": "3.2.0",
+      "accordent": true,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.3.0-chromium.zip",
+      "octets": 448823,
+      "versionDuNom": "3.3.0",
+      "versionDuManifest": "3.3.0",
+      "accordent": true,
+      "erreur": null
+    },
+    {
+      "fichier": "kick-chat-translator-3.3.0-firefox.zip",
+      "octets": 448774,
+      "versionDuNom": "3.3.0",
+      "versionDuManifest": "3.3.0",
+      "accordent": true,
+      "erreur": null
+    }
+  ],
   "portes": {
     "runner": "test/e2e/run-gates.mjs",
     "enumerees": 42,
@@ -76,7 +173,7 @@
       "poids-notes",
       "audit-fiche"
     ],
-    "harnaisSurDisque": 80,
+    "harnaisSurDisque": 81,
     "orphelins": [
       "a11y",
       "anglais-essai",
@@ -90,6 +187,7 @@
       "charge-chat",
       "collision-clavier",
       "compose-kick-live",
+      "compose-scenarios",
       "feuille",
       "flag-render",
       "flags-preview",
@@ -137,32 +235,69 @@
       "unanimite",
       "variante"
     ],
-    "nbOrphelins": 58,
+    "nbOrphelins": 59,
     "note": "Les portes live ouvrent un navigateur sur kick.com et ne sont dans aucun runner. Un orphelin n est pas forcement un defaut ; un orphelin qui couvre du code livre en est un."
   },
   "releaseGithub": {
-    "depot": "Pkkls/kick-chat-translator",
-    "http": 403,
-    "note": "reponse inattendue"
+    "depot": "kilworks/kick-chat-translator",
+    "http": 200,
+    "tag": "v3.3.0",
+    "publiee": "2026-10-16T19:15:39Z",
+    "assets": [
+      {
+        "nom": "kick-chat-translator-3.3.0-chromium.zip",
+        "octets": 448844
+      },
+      {
+        "nom": "kick-chat-translator-3.3.0-firefox.zip",
+        "octets": 448795
+      },
+      {
+        "nom": "kick-chat-translator-3.3.0-source.zip",
+        "octets": 3740880
+      }
+    ]
   },
   "paquetsContreRelease": {
-    "note": "reponse inattendue"
+    "compares": 2,
+    "ecarts": [
+      {
+        "fichier": "kick-chat-translator-3.3.0-chromium.zip",
+        "local": 448823,
+        "publie": 448844,
+        "delta": -21
+      },
+      {
+        "fichier": "kick-chat-translator-3.3.0-firefox.zip",
+        "local": 448774,
+        "publie": 448795,
+        "delta": -21
+      }
+    ],
+    "note": "un zip local porte un numero publie sans etre ce build : ne pas le soumettre, republier ou le supprimer"
   },
   "boutiques": {
     "note": "Lu sur les pages, jamais recopie. Une version de boutique change sans commit : la valeur commitee ici decrit l'instant de la generation et rien d'autre.",
     "chrome": {
       "id": "nkkjmbkmacbdkboijmnhjnblcaiclhni",
-      "note": "requete impossible: TypeError: fetch failed"
+      "http": 200,
+      "version": "3.3.0",
+      "maj": "October 17, 2026",
+      "utilisateurs": 212
     },
     "amo": {
       "slug": "kick-chat-translator",
-      "note": "requete impossible: TypeError: fetch failed"
+      "http": 200,
+      "version": "3.3.0",
+      "relue": "2026-10-16T19:21:41Z",
+      "utilisateurs": 9,
+      "statut": "public"
     }
   },
   "boutiquesContreVersion": {
-    "versionLocale": "3.0.2",
-    "chrome": null,
-    "amo": null,
+    "versionLocale": "3.3.0",
+    "chrome": "a jour",
+    "amo": "a jour",
     "note": "Un retard n'est pas un defaut : soumettre est du ressort de kil. Ce champ existe pour qu'on cesse de citer un chiffre de tete."
   },
   "file": {
@@ -179,7 +314,7 @@
       "**Store submissions.** The 2.10.0 archives exist and are published on"
     ],
     "nbBloques": 10,
-    "nbOuverts": 2,
-    "nbFaits": 119
+    "nbOuverts": 4,
+    "nbFaits": 120
   }
 }

@@ -361,3 +361,48 @@ describe('detection memo', () => {
     expect(first[0]).toBe('fr');
   });
 });
+
+// The confident answer becomes the provider's source language and drives the
+// same-language skip, so a wrong one costs more than silence. Each line below
+// was named wrongly by one rule before 2026-11-03; each keep-line is the rule's
+// own language, so the fix cannot have been bought by deleting the rule.
+describe('confidentLanguage does not name a language on common chat words', () => {
+  const wrong: [string, string][] = [
+    ['buenisimo el clutch', 'it'],
+    ['nem fodendo', 'hu'],
+    ['arigatou gozaimasu', 'pt'],
+    ['zashto ne govori', 'sl'],
+    ['kya baat hai bhai', 'nl'],
+    ['yaar mast stream', 'nl'],
+    ['kitne saal ka hai', 'nl'],
+    ['wait for it', 'fr'],
+    ['that was bait', 'fr'],
+    ['heyyy guys', 'fi'],
+    ['heyy guys', 'fi'],
+    ['okayy then', 'fi'],
+    ['lich king', 'de'],
+    ['го еще катку', 'bg'],
+    ['давай ще одну', 'bg'],
+    ['kkkk no way bro', 'pt'],
+    ['wkwkwk what', 'id'],
+  ];
+  for (const [line, was] of wrong) {
+    it(`no longer says ${was} for "${line}"`, () => {
+      expect(confidentLanguage(line)).not.toBe(was);
+    });
+  }
+
+  it('says nothing rather than ru when only the shared ще decides', () => {
+    expect(confidentLanguage('давай ще одну')).toBeUndefined();
+  });
+
+  it('keeps the languages those rules exist for', () => {
+    expect(confidentLanguage('bellissimo questo gioco')).toBe('it');
+    expect(confidentLanguage('che bella partita')).toBe('it');
+    expect(confidentLanguage('pyydän anteeksi')).toBe('fi');
+    expect(confidentLanguage('kkkk mano')).toBe('pt');
+    expect(confidentLanguage('wkwk anjir')).toBe('id');
+    expect(confidentLanguage('jajaja que buena')).toBe('es');
+    expect(confidentLanguage('това е много добре')).toBe('bg');
+  });
+});

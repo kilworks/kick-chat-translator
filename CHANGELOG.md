@@ -11,6 +11,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The About tab links to Twitch Chat Translator, the same extension for Twitch.
 
+### Fixed
+
+- **A fallback engine no longer takes over for good.** After one line went to
+  the backup engine, every later line did too until it failed. The lead now
+  returns to your engine order after 60 seconds.
+- **Numbers stay right in cached translations.** "100 subs", "1000 subs" and
+  "10000 subs" shared one cache entry and could come back with the wrong number.
+- **Built-in translations work with punctuation and stretching.** "merci!",
+  "holaaa", "gracias!!" and "thanks!" now find the same fixed answer as the
+  bare word, with the punctuation put back.
+- **Fewer chat words read as the wrong language.** Hinglish (yaar, bhai),
+  romanised Japanese and Russian, "buenisimo", "nem", Russian "go", "heyy" and
+  laughter inside an English sentence no longer name a language they are not
+  in. On a new blind set of 500 chat lines, wrong confident answers went from
+  17 to 6.
+- **One-word Chinese, Japanese and Korean answers are translated** (好, 对, 네,
+  헐), while laughter and crying (哈哈, 草, 呜呜) are still skipped. More noise
+  is skipped too: mixed-key laughter (JAJSJAJS, ksksk, awokawok), scores and
+  ratings (3:1, 8/10), o7, 1v5, "KEKWWWW".
+- **The retry on a stretched line keeps laughter and links whole**
+  ("kkkkk mano", "www.youtube.com" were mangled).
+- **On-device first: a line the on-device engine hands back unchanged goes to
+  the cloud** instead of being dropped. On-device only keeps the skip.
+- **DeepL:** a batch whose lines share a known source language now sends it,
+  and Norwegian is sent as NB. Not tested against DeepL itself (no key).
+
 ## [3.3.0] - 2026-10-16
 
 ### Added

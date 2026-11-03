@@ -188,6 +188,38 @@ describe('deeplProvider', () => {
     ).rejects.toMatchObject({ code: 'count_mismatch' });
   });
 
+  // Never observed against DeepL: no key on this machine. These pin what is sent.
+  const batchBody = async (hints: (string | undefined)[]): Promise<string> => {
+    let sentBody = '';
+    globalThis.fetch = vi.fn(async (_url: unknown, init: { body?: string }) => {
+      sentBody = String(init.body);
+      return new Response(
+        JSON.stringify({ translations: hints.map(() => ({ detected_source_language: 'JA', text: 'x' })) }),
+        { status: 200 },
+      );
+    }) as unknown as typeof fetch;
+    await deeplProvider.translateBatch!(
+      hints.map((h, i) => ({ messageId: String(i), text: `t${i}`, targetLang: 'en', ...(h ? { sourceLangHint: h } : {}) })),
+      { ...baseCtx, deeplApiKey: 'k:fx' },
+    );
+    return sentBody;
+  };
+
+  it('keeps the source language on a batch whose lines all share it', async () => {
+    expect(await batchBody(['ja', 'ja'])).toContain('source_lang=JA');
+  });
+
+  it('leaves a batch with mixed or missing hints to detection', async () => {
+    expect(await batchBody(['ja', 'ko'])).not.toContain('source_lang');
+    expect(await batchBody(['ja', undefined])).not.toContain('source_lang');
+  });
+
+  it('sends Norwegian as NB, not NO', async () => {
+    const body = await batchBody(['no', 'no']);
+    expect(body).toContain('source_lang=NB');
+    expect(body).not.toContain('source_lang=NO');
+  });
+
   it('does not hit the network for an empty batch', async () => {
     const fetchSpy = vi.fn();
     globalThis.fetch = fetchSpy as unknown as typeof fetch;

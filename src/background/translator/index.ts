@@ -86,7 +86,10 @@ function markSuccess(id: CloudProviderId): void {
   h.cooldownUntilMs = 0;
   h.lastError = undefined;
   h.lastUsedMs = Date.now();
-  stickyProvider = id;
+  if (stickyProvider !== id) {
+    stickyProvider = id;
+    stickySinceMs = Date.now();
+  }
 }
 
 function ok(req: TranslationRequest, id: CloudProviderId, translatedText: string, detectedLang: string): TranslationOutcome {
@@ -119,7 +122,17 @@ function isDeeplBudgetExhausted(ctx: ProviderContext): boolean {
 
 // Provider sticky: prefer the last provider that succeeded to avoid unnecessary
 // switching (and toast spam). Only overridden when that provider enters cooldown.
+//
+// It expires. Unbounded, one fallback was forever: Google answering `clutch` to
+// ja in katakana handed the line to MyMemory, MyMemory became sticky, resolved
+// everything after it, and Google was never asked again, for any target, until
+// MyMemory itself failed. The clock starts when the sticky provider changes, not
+// on each success, or a fallback that keeps answering would never expire.
+// shortcut: 60 s is the longest network cooldown below, not a measured optimum;
+// revisit with the cooldown.trip metrics once a real session reads them.
+const STICKY_TTL_MS = 60_000;
 let stickyProvider: CloudProviderId | undefined;
+let stickySinceMs = 0;
 
 /** Configured + not budget-blocked (ignores transient cooldown). */
 function isConfiguredAndAllowed(id: CloudProviderId, ctx: ProviderContext): boolean {
@@ -150,6 +163,7 @@ function eligibleOrder(settings: Settings, ctx: ProviderContext, targetLang?: st
   // DeepL when budget routing has deliberately demoted it for this target.
   if (
     stickyProvider &&
+    Date.now() - stickySinceMs < STICKY_TTL_MS &&
     !(deeplDemoted && stickyProvider === 'deepl') &&
     live.includes(stickyProvider) &&
     live[0] !== stickyProvider

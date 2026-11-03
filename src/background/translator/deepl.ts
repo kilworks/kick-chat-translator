@@ -47,6 +47,9 @@ const DEEPL_SOURCES = new Set([...DEEPL_SUPPORTED].map((c) => c.split('-')[0] ??
  */
 function deeplSourceCode(code: string): string | undefined {
   const base = code.toUpperCase().split('-')[0] ?? code.toUpperCase();
+  // Norwegian is NB on both sides of DeepL; NO is not a language code it knows.
+  // shortcut: from the DeepL language list as recalled, never sent with a real key.
+  if (base === 'NO') return 'NB';
   return DEEPL_SOURCES.has(base.toLowerCase()) ? base : undefined;
 }
 
@@ -128,6 +131,11 @@ async function translateBatch(
   assertDeeplTarget(target);
   const form = new URLSearchParams();
   form.set('target_lang', deeplTargetCode(target));
+  // One source_lang covers the whole call, so it only goes out when every line
+  // shares the same looked-up hint. Mixed or missing hints leave DeepL to detect.
+  const hint = reqs[0]!.sourceLangHint;
+  const sourceLang = hint && reqs.every((r) => r.sourceLangHint === hint) ? deeplSourceCode(hint) : undefined;
+  if (sourceLang) form.set('source_lang', sourceLang);
   // DeepL preserves order and returns exactly one translation per `text` param.
   for (const r of reqs) form.append('text', r.text);
 

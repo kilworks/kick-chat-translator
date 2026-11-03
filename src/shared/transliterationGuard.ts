@@ -433,20 +433,39 @@ function normalizeForLookup(text: string): string {
     .replace(/\s+/g, ' ');
 }
 
+/** Runs of three or more of the same letter, shortened to `keep` letters. */
+function collapseLetterRuns(text: string, keep: 1 | 2): string {
+  return text.replace(/(\p{L})\1{2,}/gu, keep === 1 ? '$1' : '$1$1');
+}
+
 /**
  * Look up a semantic override for a short expression that providers are
  * known to transliterate.  Returns the correct translation or undefined.
  *
  * Tries the full target code first ('zh-tw'), then the base code ('zh').
+ *
+ * Chat rarely types the bare key: 'merci!', 'holaaa' and 'gracias!!' all missed
+ * an exact lookup and went to the provider that mistranslates them. Edge
+ * punctuation and symbols are set aside and put back around the answer, so the
+ * emphasis survives; Spanish opening marks are dropped, they mean nothing in
+ * another script. Elongation is tried at two letters before one, because 'good'
+ * and 'kawaii' are keys and 'holaaa' is not 'holaa'. No table key carries edge
+ * punctuation or a run of three, so the bare forms look up exactly as before.
  */
 export function getSemanticOverride(
   text: string,
   targetLang: string,
 ): string | undefined {
-  const key = normalizeForLookup(text);
+  const edges = /^([\p{P}\p{S}\s]*)(.*?)([\p{P}\p{S}\s]*)$/su.exec(text.trim());
+  const core = edges?.[2] ?? '';
+  if (!core) return undefined;
   const target = targetLang.toLowerCase();
   const base = target.split('-')[0] ?? target;
-  return OVERRIDES[key]?.[target] ?? OVERRIDES[key]?.[base];
+  const find = (key: string): string | undefined => OVERRIDES[key]?.[target] ?? OVERRIDES[key]?.[base];
+  const key = normalizeForLookup(core);
+  const answer = find(key) ?? find(collapseLetterRuns(key, 2)) ?? find(collapseLetterRuns(key, 1));
+  if (answer === undefined) return undefined;
+  return `${(edges?.[1] ?? '').replace(/[¡¿]/g, '').trimStart()}${answer}${edges?.[3] ?? ''}`;
 }
 
 // ─── Context enhancement ────────────────────────────────────────────────────

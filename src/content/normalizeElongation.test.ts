@@ -46,3 +46,17 @@ describe('normalizeElongation', () => {
     expect(normalizeElongation(plain)).toBe(plain);
   });
 });
+
+// The retry asked the engine about text nobody typed: `k mano`, `ㅋ 진짜`,
+// `w.youtube.com`. Laughter and links stay whole; the rest still flattens.
+describe('normalizeElongation leaves laughter and links whole', () => {
+  it('keeps laughter tokens', () => {
+    expect(normalizeElongation('kkkkk mano que isso')).toBe('kkkkk mano que isso');
+    expect(normalizeElongation('ㅋㅋㅋ 진짜 웃기네')).toBe('ㅋㅋㅋ 진짜 웃기네');
+    expect(normalizeElongation('kkkkk! muuuuy bien')).toBe('kkkkk! muy bien');
+  });
+  it('keeps links with or without a scheme', () => {
+    expect(normalizeElongation('www.youtube.com/watch?v=x olhaaaa')).toBe('www.youtube.com/watch?v=x olha');
+    expect(normalizeElongation('miraaa kick.com/clips/abc')).toBe('mira kick.com/clips/abc');
+  });
+});

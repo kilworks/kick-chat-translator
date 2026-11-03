@@ -25,11 +25,22 @@ function tokenize(text: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * A slang token as chat stretches it: `poggg`, `sheeeesh`, `kekwww`. Folded for
+ * this membership test only; the text sent to the engine is never changed,
+ * because flattening before translation was measured to make lines worse.
+ */
+function isSlangToken(t: string): boolean {
+  return (
+    SLANG.has(t) || SLANG.has(t.replace(/(\p{L})\1{2,}/gu, '$1$1')) || SLANG.has(t.replace(/(\p{L})\1{2,}/gu, '$1'))
+  );
+}
+
 /** True when every token is streaming slang → no point translating. */
 export function isSlangOnly(text: string): boolean {
   const tokens = tokenize(text);
   if (tokens.length === 0) return false;
-  return tokens.every((t) => SLANG.has(t));
+  return tokens.every(isSlangToken);
 }
 
 /**

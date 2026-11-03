@@ -124,6 +124,24 @@ describe('getSemanticOverride', () => {
     }
   });
 
+  // Chat rarely types the bare key. Before, every one of these missed the table
+  // and went to the provider that mistranslates the bare form.
+  it('looks up through edge punctuation and elongation, and puts the punctuation back', () => {
+    expect(getSemanticOverride('merci!', 'ja')).toBe('ありがとう!');
+    expect(getSemanticOverride('gracias!!', 'ja')).toBe(getSemanticOverride('gracias', 'ja') + '!!');
+    expect(getSemanticOverride('¡hola!', 'ja')).toBe('こんにちは!');
+    expect(getSemanticOverride('holaaa', 'ja')).toBe('こんにちは');
+    expect(getSemanticOverride('merciii', 'ja')).toBe('ありがとう');
+    expect(getSemanticOverride('arigatou!', 'bg')).toBe('Благодаря!');
+    expect(getSemanticOverride('thanks!', 'ko')).toBe('고마워!');
+    // Two letters first: these keys hold a real double letter.
+    expect(getSemanticOverride('goooood luck', 'zh-tw')).toBe('祝你好運');
+    expect(getSemanticOverride('kawaiiii', 'ja')).toBe(getSemanticOverride('kawaii', 'ja'));
+    // Nothing that missed as a bare form hits because of the new steps.
+    expect(getSemanticOverride('abcdef!!!', 'ja')).toBeUndefined();
+    expect(getSemanticOverride('!!!', 'ja')).toBeUndefined();
+  });
+
   it('returns undefined for unknown expressions', () => {
     expect(getSemanticOverride('supercalifragilisticexpialidocious', 'ja')).toBeUndefined();
     expect(getSemanticOverride('abcdef', 'ja')).toBeUndefined();
