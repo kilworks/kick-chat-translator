@@ -144,7 +144,7 @@ const FORMES: FormeDeRire[] = [
   { motif: /^[ㅋㅎ]{2,}$/ },
   { motif: /^(?:哈){2,}$/ },
   { motif: /^(?:呵){2,}$/ },
-  { motif: /^(?:草|大草原)$/ },
+  { motif: /^(?:[wｗ]*草+[wｗ]*|大草原)$/ },
   { motif: /^(?:हा){2,}$/ },
   { motif: /^(?:হা\s?){2,}$/ },
 
@@ -159,8 +159,28 @@ const FORMES: FormeDeRire[] = [
   {
     motif: /^(?:x+d+|(?:xd){2,})$/i,
   },
-  { motif: /^ke+k+(?:w)?$/i },
+  { motif: /^ke+k+w*$/i },
   { motif: /^u?wu$|^owo$/i },
+
+  // ── Added 2026-11-03, and none of them marks a language. Each reached the
+  //    provider as a lone message. They carry no `langue` on purpose: a form
+  //    with one also votes per token in `detectByShortWords`, so `ksksks` as pt
+  //    would pin the source language of a Turkish sentence that contains it.
+  //    The first two are SHAPE rules, laughter typed across neighbouring keys,
+  //    not lexicon entries, so no source attests them as written.
+  { motif: /^(?=(?:.*j){2})(?=(?:.*a){2})[jas]{6,}$/i },
+  { motif: /^(?=(?:.*h){2})(?=(?:.*a){2})[has]{6,}$/i },
+  { motif: /^k(?:sk){2,}s?$/i },
+  { motif: /^k{3,}j+k*$/i },
+  { motif: /^(?:hau|hua){2,}h?$/i },
+  { motif: /^(?:kw){2,}k?$/i },
+  { motif: /^(?:a?wok){2,}$/i },
+  { motif: /^а?(?:за){2,}$/i },
+  { motif: /^х+д+$/i },
+  { motif: /^ワロタ+$/ },
+  { motif: /^笑死(?:了|我了)?$/ },
+  { motif: /^xswl$/i },
+  { motif: /^(?:อิ){2,}$/ },
 ];
 
 /** Every message that is nothing but laughter, in any of the forms above. */
@@ -268,8 +288,8 @@ export const LAUGHTER_NOTES: Readonly<Record<string, string>> = {
     'Mandarin haha',
   '^(?:呵){2,}$':
     'Mandarin hehe, the dry register',
-  '^(?:草|大草原)$':
-    'Japanese grass, from www looking like blades of it',
+  '^(?:[wｗ]*草+[wｗ]*|大草原)$':
+    'Japanese grass, from www looking like blades of it; repeated and mixed with w in chat',
   '^(?:हा){2,}$':
     'Devanagari haha',
   '^(?:হা\\s?){2,}$':
@@ -288,8 +308,34 @@ export const LAUGHTER_NOTES: Readonly<Record<string, string>> = {
     'lmao and lmfao',
   '^rofl$':
     'rofl, rolling on the floor laughing, borrowed into many languages',
-  '^ke+k+(?:w)?$':
-    'kek and kekw, from streaming chat',
+  '^ke+k+w*$':
+    'kek and kekw, from streaming chat, w stretched as in KEKWWWW',
+  '^(?=(?:.*j){2})(?=(?:.*a){2})[jas]{6,}$':
+    'Spanish jajaja typed across the j, a, s keys (JAJSJAJS); a shape rule, no source lists it',
+  '^(?=(?:.*h){2})(?=(?:.*a){2})[has]{6,}$':
+    'hahaha typed across the h, a, s keys (HAHAHSHA); a shape rule, no source lists it',
+  '^k(?:sk){2,}s?$':
+    'ksksk, Brazilian and Turkish chat laughter; marks no language because both use it',
+  '^k{3,}j+k*$':
+    'kkkj, Brazilian kkkk with the neighbouring j; chat usage, not in the three sources',
+  '^(?:hau|hua){2,}h?$':
+    'hauhau and huahua, Brazilian chat laughter; chat usage, not in the three sources',
+  '^(?:kw){2,}k?$':
+    'kwkw, the Indonesian wkwk started on the other key; chat usage',
+  '^(?:a?wok){2,}$':
+    'awokawok, Indonesian chat laughter; chat usage, not in the three sources',
+  '^а?(?:за){2,}$':
+    'Russian azaza, an internet laugh; the script already names the language',
+  '^х+д+$':
+    'Russian xD typed on the Cyrillic layout; the script already names the language',
+  '^ワロタ+$':
+    'Japanese net slang warota, I laughed; kana already names the language',
+  '^笑死(?:了|我了)?$':
+    'Chinese xiaosi, dying of laughter; Han does not decide zh against ja, so no mark',
+  '^xswl$':
+    'Chinese pinyin initials of xiao si wo le, dying of laughter; Latin, so no mark claimed',
+  '^(?:อิ){2,}$':
+    'Thai ii, a giggle like hihi; the script already names the language',
   '^u?wu$|^owo$':
     'uwu and owo',
 };

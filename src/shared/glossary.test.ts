@@ -49,3 +49,18 @@ describe('applyUserGlossary', () => {
     expect(applyUserGlossary('(o)', ['(o)→circle'])).toBe('circle');
   });
 });
+
+// Chat stretches slang as it stretches everything. The fold is for this test
+// only: the text sent to the engine is never changed.
+describe('isSlangOnly, stretched slang', () => {
+  it('reads stretched slang as slang', () => {
+    expect(isSlangOnly('poggg')).toBe(true);
+    expect(isSlangOnly('sheeeesh')).toBe(true);
+    expect(isSlangOnly('kekwww')).toBe(true);
+    expect(isSlangOnly('ggggg ezzzz')).toBe(true);
+  });
+  it('does not fold a real double letter away', () => {
+    expect(isSlangOnly('lull')).toBe(false);
+    expect(isSlangOnly('good')).toBe(false);
+  });
+});

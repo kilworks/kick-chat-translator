@@ -131,6 +131,30 @@ export function isKeyboardSmash(text: string): boolean {
   return memeRangee / (lettres.length - 1) >= MARTELEMENT_PROPORTION;
 }
 
+/**
+ * A Han character or a Hangul syllable is a word, and a one-word answer is the
+ * commonest reply in East Asian chat: 好, 对, 是, 네, 헐, and doubled, 对对对, 好好,
+ * 네네, 嗯嗯. The repeated-character rule below took every one of them as noise.
+ * Hangul jamo (ㅋ ㅎ ㅠ ㅜ ㅇ) are letters, not syllables, so they stay noise, and so
+ * do the few syllables that are laughter on their own.
+ */
+const SYLLABE_QUI_EST_UN_MOT = /^[\p{Script=Han}가-힣]$/u;
+// Laughter and crying written with one syllable: 呜呜呜 slipped through the first
+// version of the exemption on a fresh set and is why the crying marks are here.
+const SYLLABES_DE_RIRE = new Set(['草', '哈', '呵', '笑', '艹', '呜', '嗚', '嘻', '嘿']);
+
+/**
+ * Length as the minimum-length setting means it: a Han, kana or Hangul
+ * character counts as two, the width convention for those scripts, so 好
+ * passes the default of 2 and a reader who set 5 still skips 你好.
+ * shortcut: a width rule, not a measured one; revisit with a real capture.
+ */
+export function chatLength(text: string): number {
+  // UTF-16 length as before, so an emoji still counts two and is skipped as noise
+  // rather than as too short; one more for each Han, kana or Hangul character.
+  return text.length + (text.match(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}가-힣]/gu)?.length ?? 0);
+}
+
 export function isNoise(text: string): boolean {
   const t = text.trim();
   if (!t) return true;
@@ -140,8 +164,11 @@ export function isNoise(text: string): boolean {
   if (stripped.length === 0) return true;
 
   const lower = stripped.toLowerCase();
-  // single character repeated (wwww, ーーー, 草草草, !!!)
-  if (/^(.)\1*$/u.test(lower)) return true;
+  // single character repeated (wwww, ーーー, 草草草, !!!), unless that character
+  // is a word on its own
+  const first = [...lower][0] ?? '';
+  const isWord = SYLLABE_QUI_EST_UN_MOT.test(first) && !SYLLABES_DE_RIRE.has(first);
+  if (/^(.)\1*$/u.test(lower) && !isWord) return true;
   // Le rire vit dans `~/shared/laughter`, une table par langue avec ses
   // sources, plutot qu'une alternation grossie a la main ici. Elle sert deux
   // fois : reconnaitre un message qui n'est que du rire, et dire de quelle
@@ -152,11 +179,16 @@ export function isNoise(text: string): boolean {
   // la version sans espaces, "hahaha ha que risa" devient un mot de quinze
   // lettres majoritairement sur la rangee du milieu, donc du martelement.
   if (isKeyboardSmash(t)) return true;
-  // digits / punctuation only
-  if (/^[\d\s.,!?'"()-]+$/u.test(t)) return true;
+  // digits / punctuation only, scores and ratings included (3:1, 8/10)
+  if (/^[\d\s.,:/!?'"()-]+$/u.test(t)) return true;
+  // the o7 salute and match formats (1v5, 2v2), alone or repeated
+  if (/^(?:o7|\d+v\d+)(?:\s+(?:o7|\d+v\d+))*$/iu.test(t)) return true;
 
   return false;
 }
+
+/** A link a chatter typed, with or without a scheme: never a word to flatten. */
+const LIEN = /^(?:https?:\/\/|www\.)|\.[a-z]{2,}(?:\/|$)/i;
 
 /**
  * Flatten stretched characters, for a second attempt at a line the engine refused.
@@ -175,13 +207,24 @@ export function isNoise(text: string): boolean {
  * carries meaning, and stripping it turns コーヒー into コヒ, ラーメン into ラメン and
  * スーパー into スパ. Elongation of the おーわーりー kind is therefore not handled,
  * because no rule tested here separates it from a real word without a dictionary.
+ *
+ * Laughter and links are left whole. Flattened, `kkkkk mano` became `k mano`,
+ * `ㅋㅋㅋ 진짜` became `ㅋ 진짜` and `www.youtube.com` became `w.youtube.com`: the
+ * retry asked the engine about text nobody typed.
  */
 export function normalizeElongation(text: string): string {
   return text
-    // Three or more of the same letter is not a word in any language we target.
-    .replace(/(\p{L})\1{2,}/gu, '$1')
-    // Repeated prolongation marks; a single one is left in place.
-    .replace(/ー{2,}/gu, 'ー')
-    .replace(/([!?！？])\1{2,}/gu, '$1$1')
+    .split(/(\s+)/)
+    .map((tok) =>
+      isLaughter(tok.replace(/^\p{P}+|\p{P}+$/gu, '')) || LIEN.test(tok)
+        ? tok
+        : tok
+            // Three or more of the same letter is not a word in any language we target.
+            .replace(/(\p{L})\1{2,}/gu, '$1')
+            // Repeated prolongation marks; a single one is left in place.
+            .replace(/ー{2,}/gu, 'ー')
+            .replace(/([!?！？])\1{2,}/gu, '$1$1'),
+    )
+    .join('')
     .trim();
 }

@@ -13,7 +13,7 @@ import { extractMessageText, findAllRows } from './selectors';
 import { confidentLanguage, detectLanguage } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
 import { isContextCritical } from '~/shared/langTiers';
-import { hasBlockedKeyword, hasNonEnglishLetter, isNoise, isSameLanguageAsTarget, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel } from './filters';
+import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isNoise, isSameLanguageAsTarget, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel } from './filters';
 import { HANDLED_SELECTOR, inject, incrementFloatingCount, armHoverTranslate, markSkipped, removeAllArtifacts, showError, showLoading, showThrottleIndicator, showToast, updateActiveProvider } from './injector';
 import { localEngine } from './localEngine';
 import { memCache } from './memcache';
@@ -191,7 +191,7 @@ export class TranslationPipeline {
     }
 
     const { realText } = parseKickContent(rawText);
-    if (realText.length < this.settings.minTextLength) {
+    if (chatLength(realText) < this.settings.minTextLength) {
       return `it is shorter than your ${this.settings.minTextLength} character minimum`;
     }
     if (realText.length > MAX_TEXT_LENGTH) return localised('skipTooLong', 'it is longer than the size limit');

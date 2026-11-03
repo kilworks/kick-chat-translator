@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { defaultSettings } from '~/shared/settings';
 import {
+  chatLength,
   hasBlockedKeyword,
   isKeyboardSmash,
   isNoise,
@@ -214,4 +215,38 @@ describe('hasBlockedKeyword', () => {
     expect(hasBlockedKeyword('hi covfefe', s(['!fish']))).toBe(false);
     expect(hasBlockedKeyword('anything', s(['']))).toBe(false);
   });
+});
+
+// A one-word East Asian answer is a word, and the repeated-character rule took
+// every one of these as noise; the default length of 2 dropped the single ones
+// before that. Laughter and crying marks in the same scripts must still go.
+describe('isNoise and chatLength, one-word CJK answers', () => {
+  const words = ['好', '对', '是', '네', '헐', '对对对', '好好', '네네', '嗯嗯'];
+  for (const w of words) {
+    it(`lets ${w} through`, () => {
+      expect(isNoise(w)).toBe(false);
+      expect(chatLength(w)).toBeGreaterThanOrEqual(2);
+    });
+  }
+  for (const n of ['草草', '草草草', 'ㅠㅠ', 'ㅜㅜ', 'ーーー', '哈', '呜呜呜', 'ㅋㅋㅋ', 'ㅇㅇ', 'wwww', '!!!']) {
+    it(`still skips ${n}`, () => expect(isNoise(n)).toBe(true));
+  }
+  it('counts like before outside those scripts', () => {
+    expect(chatLength('ok')).toBe(2);
+    expect(chatLength('😭')).toBe(2);
+    expect(chatLength('你好')).toBe(4);
+  });
+});
+
+// Each of these reached the provider as a lone message.
+describe('isNoise, mixed-key laughter, scores and gamer tokens', () => {
+  const noise = [
+    'JAJSJAJSJAJ', 'jajsjajs', 'HAHAHSHAHSHA', 'ksksk', 'kkkj', 'hauhau', 'азаза', 'хд', 'kwkw',
+    'awokawok', 'ワロタ', '笑死', 'xswl', 'อิอิ', '3:1', '8/10', '10/10', 'o7', 'o7 o7', '1v5', 'KEKWWWW',
+    'wwwwwwww草',
+  ];
+  for (const n of noise) it(`skips ${n}`, () => expect(isNoise(n)).toBe(true));
+  for (const s of ['jajaja que golazo', 'hasta luego', 'saja', 'o7 gg wp bro', '3:1 for them', 'ksksk que isso']) {
+    it(`keeps ${s}`, () => expect(isNoise(s)).toBe(false));
+  }
 });

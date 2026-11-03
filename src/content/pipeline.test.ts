@@ -22,6 +22,7 @@ vi.mock('./localEngine', () => ({
 vi.mock('./memcache', () => ({ memCache: { get: () => undefined, set: vi.fn() } }));
 
 import { TranslationPipeline } from './pipeline';
+import { chatLength } from './filters';
 import { markSkipped, showError, showThrottleIndicator } from './injector';
 import { defaultSettings } from '~/shared/settings';
 import { detectLanguage } from './langDetect';
@@ -76,7 +77,9 @@ describe('TranslationPipeline — minTextLength', () => {
       enabled: true,
       targetLang: 'fr',
       pauseWhenHidden: false,
-      minTextLength: SHORT_JP.length + 1,
+      // The floor counts a kana as two since 2026-11-03 (chatLength), so a
+      // one-character answer like 好 passes the default of 2.
+      minTextLength: chatLength(SHORT_JP) + 1,
     });
     await pipeline.onWebSocketMessage(wsMsg(SHORT_JP));
     expect(sendMock).not.toHaveBeenCalled();
