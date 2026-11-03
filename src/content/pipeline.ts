@@ -347,14 +347,21 @@ export class TranslationPipeline {
         const t0 = performance.now();
         try {
           const translatedText = await localEngine.translate(localSource, target, real);
-          this.applyTranslation(msg, real, { translatedText, detectedLang: localSource, provider: 'local' }, { store: true });
-          // Seen to painted, on device. `e2e.cloud` in translateAndApply is the
-          // same span for the other path, so the two are directly comparable.
-          // local-first has been the default since it shipped and nothing has
-          // ever measured whether it is the faster one.
-          if (__KT_METRICS__) metrics.timing('e2e.local', performance.now() - t0);
-          void send({ type: 'stats.local', payload: { lang: localSource, chars: real.length } }).catch(() => undefined);
-          return;
+          // Handed back as is, usually because the guessed source was wrong. The
+          // cloud detects per line, so local-first asks it instead of skipping.
+          // local-only has nowhere else to ask and keeps the skip below.
+          if (this.settings.engineMode !== 'local-only' && translatedText.trim().toLowerCase() === real.trim().toLowerCase()) {
+            if (__KT_METRICS__) metrics.count('local.same.toCloud');
+          } else {
+            this.applyTranslation(msg, real, { translatedText, detectedLang: localSource, provider: 'local' }, { store: true });
+            // Seen to painted, on device. `e2e.cloud` in translateAndApply is the
+            // same span for the other path, so the two are directly comparable.
+            // local-first has been the default since it shipped and nothing has
+            // ever measured whether it is the faster one.
+            if (__KT_METRICS__) metrics.timing('e2e.local', performance.now() - t0);
+            void send({ type: 'stats.local', payload: { lang: localSource, chars: real.length } }).catch(() => undefined);
+            return;
+          }
         } catch (err: unknown) {
           log.debug('local translate failed, falling back', err);
         }
@@ -563,6 +570,8 @@ export class TranslationPipeline {
           void this.retryNormalized(msg, flat);
           return;
         }
+        // Per provider, so a handed-back line can be told apart by who refused it.
+        if (__KT_METRICS__) metrics.count(`skipSame.${result.provider}`);
         this.skip(msg, localised('skipSame', 'the translation came back the same as the original'));
         removeAllArtifacts(msg.injectionTarget);
         return;

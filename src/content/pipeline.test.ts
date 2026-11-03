@@ -413,3 +413,45 @@ describe('TranslationPipeline — English chat abbreviations', () => {
     expect(sentText()).toBe('był w domu cały dzień');
   });
 });
+
+// On device has no auto-detect, so a line it was told the wrong source for comes
+// back unchanged. local-first used to stop there and drop it as "the same as the
+// original"; the cloud, which detects per line, was never asked.
+describe('TranslationPipeline, an on-device line handed back unchanged', () => {
+  const domMsg = (text: string) => {
+    const rowElement = document.createElement('div');
+    const injectionTarget = document.createElement('div');
+    rowElement.appendChild(injectionTarget);
+    return { rowElement, injectionTarget, id: 'd1', text, channel: 'chan', username: 'user', isBot: false };
+  };
+  const reader = (engineMode: 'local-first' | 'local-only') =>
+    new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false, engineMode });
+  const sentToCloud = () => sendMock.mock.calls.some((c) => c[0]?.type === 'translate');
+
+  beforeEach(async () => {
+    const { localEngine } = await import('./localEngine');
+    Object.assign(localEngine, { present: () => true, isReady: () => true, translate: vi.fn(async (_s: string, _t: string, text: string) => text) });
+    sendMock.mockReset();
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: false, error: { code: 'x', message: 'x' } } });
+  });
+
+  it('asks the cloud in local-first', async () => {
+    await reader('local-first').onDomMessage(domMsg(JP));
+    await flush();
+    expect(sentToCloud()).toBe(true);
+  });
+
+  it('never reaches the cloud in local-only', async () => {
+    await reader('local-only').onDomMessage(domMsg(JP));
+    await flush();
+    expect(sentToCloud()).toBe(false);
+  });
+
+  it('keeps a real on-device translation without asking the cloud', async () => {
+    const { localEngine } = await import('./localEngine');
+    Object.assign(localEngine, { translate: vi.fn(async () => 'ceci est un message de test') });
+    await reader('local-first').onDomMessage(domMsg(JP));
+    await flush();
+    expect(sentToCloud()).toBe(false);
+  });
+});
