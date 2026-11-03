@@ -25,7 +25,9 @@ export function normalizeForKey(text: string): string {
   return foldCase(text.trim())
     .normalize('NFKC')
     .replace(/\s+/g, ' ')
-    .replace(/(.)\1{2,}/gu, '$1$1')
+    // Digits are not elongation: collapsing them made "1000" and "100" one key, and
+    // both caches replayed the first line's translation with the wrong number.
+    .replace(/(\P{N})\1{2,}/gu, '$1$1')
     // Strip ALL trailing AND leading punctuation/symbols — "¿hola!" = "hola" = "hola."
     .replace(/^[\s\p{P}\p{S}]+|[\s\p{P}\p{S}]+$/gu, '');
 }
