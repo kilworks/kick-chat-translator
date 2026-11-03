@@ -166,8 +166,10 @@ Rien ici n'est recommande. Ce sont les pistes identifiees et jamais tentees.
 **`tinyld.light` a la place de franc.** Les donnees de franc pesent 98 Ko dans
 le bundle injecte, `tinyld.light.browser` en pese 68, licence MIT. Trente
 kilo-octets rendus, treize pour cent du bundle, **si** l'experience de justesse
-tourne en sa faveur. Elle n'a jamais tourne. Le banc pour la trancher existe
-deja : c'est `langMatrix.test.ts`.
+tourne en sa faveur. Elle a tourne le 2026-10-16 sur `langMatrix.test.ts`
+(5040 lignes Tatoeba) et l'a ecarte : justes 4154 a 4291, mais faux 498 a 739,
+et une reponse fausse est celle qui supprime une ligne. Pari ferme, detail dans
+`docs/HANDOFF.md`, tableau des impasses.
 
 **`pt-br` contre `pt`.** Question ouverte depuis le debut, jamais tranchee avec
 toi. Distinction lexicale fine, aucun corpus separe chez Tatoeba. La proposition

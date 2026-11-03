@@ -29,7 +29,7 @@ describe('le corpus de reglage', () => {
     expect(SURE3.total.wrong).toBe(0);
   });
 
-  it('en nomme 117 sur 260', () => {
+  it('en nomme 136 sur 260', () => {
     expect(plain(SURE3.total)).toEqual({ right: 136, silent: 124, wrong: 0 });
     expect(plain(BRUT3.total)).toEqual({ right: 172, silent: 33, wrong: 55 });
   });
