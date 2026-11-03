@@ -113,6 +113,37 @@ describe('translateGroup, transliteration cascade', () => {
   });
 });
 
+describe('the sticky provider expires', () => {
+  const originalFetch = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.useRealTimers();
+  });
+
+  // Before the expiry, one katakana answer from Google to `clutch` made MyMemory
+  // sticky, and MyMemory then resolved every later line for every target: Google
+  // was never asked again. Witnessed red with the TTL check removed.
+  it('hands the chain back to the user order after the TTL, and not before', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-03T12:00:00Z'));
+    let seen = stubFetch({ google: KATA, mymemory: SEMANTIC });
+    await translateGroup([req('s1', 'clutch')], settings(['google', 'mymemory']), 1);
+    expect(seen).toEqual(['google', 'mymemory']);
+
+    // Inside the window the fallback keeps the lead: that is the anti-churn half.
+    vi.setSystemTime(new Date('2026-11-03T12:00:30Z'));
+    seen = stubFetch({ google: SEMANTIC, mymemory: SEMANTIC });
+    await translateGroup([{ messageId: 's2', text: 'nice play', targetLang: 'fr' }], settings(['google', 'mymemory']), 1);
+    expect(seen).toEqual(['mymemory']);
+
+    // Past it, the user's first choice is asked first again.
+    vi.setSystemTime(new Date('2026-11-03T12:01:01Z'));
+    seen = stubFetch({ google: SEMANTIC, mymemory: SEMANTIC });
+    await translateGroup([{ messageId: 's3', text: 'nice play', targetLang: 'fr' }], settings(['google', 'mymemory']), 1);
+    expect(seen).toEqual(['google']);
+  });
+});
+
 describe('the detected language comes back in the product codes', () => {
   const originalFetch = globalThis.fetch;
   afterEach(() => {
