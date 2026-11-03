@@ -47,6 +47,7 @@ export const he: Record<string, string> = {
   skipSame: 'התרגום חזר זהה למקור',
   skipSameLang: 'ההודעה כבר בשפה שלך',
   skipSlang: "זה רק סלנג של צ'אט",
+  skipCommand: 'זו פקודה לבוט של הצ׳אט',
   skipTooLong: 'ההודעה חורגת ממגבלת הגודל',
   toastAllDown: 'כל שירותי התרגום מושבתים. ננסה שוב בעוד רגע.',
   toastChatNotFound: "Kick Chat Translator: הצ'אט לא נמצא. ייתכן שצריך לעדכן.",

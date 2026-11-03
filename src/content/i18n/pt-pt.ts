@@ -47,6 +47,7 @@ export const pt_pt: Record<string, string> = {
   skipSame: 'a tradução saiu igual ao original',
   skipSameLang: 'já está no teu idioma',
   skipSlang: 'só tem gíria de chat',
+  skipCommand: 'é um comando para um bot do chat',
   skipTooLong: 'excede o limite de tamanho',
   toastAllDown: 'Todos os fornecedores de tradução estão inativos. A tentar de novo dentro de instantes.',
   toastChatNotFound: 'Kick Chat Translator: chat não encontrado. Pode ser necessário atualizar a extensão.',

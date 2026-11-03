@@ -47,6 +47,7 @@ export const th: Record<string, string> = {
   skipSame: 'คำแปลออกมาเหมือนต้นฉบับ',
   skipSameLang: 'เป็นภาษาของคุณอยู่แล้ว',
   skipSlang: 'เป็นแค่คำสแลงในแชท',
+  skipCommand: 'เป็นคำสั่งสำหรับบอตในแชท',
   skipTooLong: 'ยาวเกินขีดจำกัดขนาด',
   toastAllDown: 'บริการแปลทุกตัวใช้ไม่ได้ จะลองใหม่เร็ว ๆ นี้',
   toastChatNotFound: 'Kick Chat Translator: ไม่พบแชท อาจต้องอัปเดต',

@@ -47,6 +47,7 @@ export const ro: Record<string, string> = {
   skipSame: 'traducerea a ieșit identică cu originalul',
   skipSameLang: 'este deja în limba ta',
   skipSlang: 'conține doar argou de chat',
+  skipCommand: 'este o comandă pentru un bot de chat',
   skipTooLong: 'depășește limita de lungime',
   toastAllDown: 'Niciun serviciu de traducere nu răspunde. Se reîncearcă în curând.',
   toastChatNotFound: 'Kick Chat Translator: chatul nu a fost găsit. Poate fi nevoie de o actualizare.',

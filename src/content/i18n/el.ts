@@ -47,6 +47,7 @@ export const el: Record<string, string> = {
   skipSame: 'η μετάφραση βγήκε ίδια με το πρωτότυπο',
   skipSameLang: 'είναι ήδη στη γλώσσα σου',
   skipSlang: 'περιέχει μόνο αργκό του chat',
+  skipCommand: 'είναι εντολή για bot της συνομιλίας',
   skipTooLong: 'ξεπερνά το όριο μεγέθους',
   toastAllDown: 'Κανένας πάροχος μετάφρασης δεν είναι διαθέσιμος. Νέα προσπάθεια σε λίγο.',
   toastChatNotFound: 'Kick Chat Translator: η συνομιλία δεν βρέθηκε. Ίσως χρειάζεται ενημέρωση.',
