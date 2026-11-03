@@ -39,40 +39,54 @@ describe('le corpus 4, aveugle', () => {
 
   // LE RESULTAT, et il contredit l'invariant des trois autres corpus de chat.
   // Le chemin sur, celui qui fixe la langue source annoncee au fournisseur et le
-  // saut de meme langue, n'y fait pas zero erreur : 17 lignes sur 500.
+  // saut de meme langue, n'y faisait pas zero erreur : 17 lignes sur 500 au commit
+  // qui l'a ajoute, 8 natives, 6 romanisees, 3 de rire.
+  //
+  // APRES le tour du 2026-11-03 (veto hinglish et romanise, `-ssimo`, `nem`,
+  // `го`/`ще`, etirement et mots de chat anglais avant la table des lettres, rire
+  // sans vote dans une phrase anglaise), lu une fois en totaux : 6 sur 500, pour
+  // 3 lignes passees de juste a muet et aucune de juste a faux. La barre ecrite
+  // avant, au plus une erreur par jeu et 0,7 % en tout, n'est PAS tenue : 1,2 %,
+  // et le russe en lettres latines en garde trois.
   it('mesure le chemin sur en totaux', () => {
+    // avant : 221 / 196 / 8
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4).total)).toEqual({
-      right: 221,
-      silent: 196,
-      wrong: 8,
+      right: 218,
+      silent: 206,
+      wrong: 1,
     });
+    // avant : 0 / 44 / 6
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4_ROMAN).total)).toEqual({
       right: 0,
-      silent: 44,
-      wrong: 6,
+      silent: 46,
+      wrong: 4,
     });
+    // avant : 5 / 17 / 3
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4_LAUGH).total)).toEqual({
       right: 5,
-      silent: 17,
-      wrong: 3,
+      silent: 19,
+      wrong: 1,
     });
   });
 
   it('mesure le chemin brut en totaux', () => {
+    // avant : 291 / 57 / 77
     expect(plain(runMatrix(detectLanguage, LANG_CHAT4).total)).toEqual({
-      right: 291,
-      silent: 57,
-      wrong: 77,
+      right: 292,
+      silent: 60,
+      wrong: 73,
     });
+    // avant : 3 / 25 / 22
     expect(plain(runMatrix(detectLanguage, LANG_CHAT4_ROMAN).total)).toEqual({
       right: 3,
-      silent: 25,
-      wrong: 22,
+      silent: 27,
+      wrong: 20,
     });
+    // avant : 14 / 4 / 7
     expect(plain(runMatrix(detectLanguage, LANG_CHAT4_LAUGH).total)).toEqual({
-      right: 14,
+      right: 15,
       silent: 4,
-      wrong: 7,
+      wrong: 6,
     });
   });
 

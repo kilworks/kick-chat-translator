@@ -316,15 +316,34 @@ const SHORT_WORD_LANG = new Map<string, string>([
  */
 const SHORT_TEXT_MAX = 20;
 
+/** Mots que seul l'anglais ecrit ainsi ; les jetons de chat universels (gg, ez,
+ * lol, bro) n'y sont pas, ils ne disent rien de la phrase. */
+const ANGLAIS_AUTOUR_DU_RIRE = new Set([
+  'way', 'what', 'that', 'the', 'this', 'you', 'your', 'she', 'they', 'we',
+  'lets', 'guys', 'dude', 'why', 'how', 'yeah', 'yep', 'are', 'not', 'dont',
+  'cant', 'just', 'like', 'really', 'damn', 'insane', 'crazy', 'and', 'but',
+  'with', 'of', 'it', 'is', 'wait', 'look', 'funny',
+]);
+// Dehors parce qu'une langue a rire les ecrit aussi : he (espagnol), am, im, was
+// (allemand), nah (indonesien), wow (partout).
+
 /** Unanimous vote from the lexicon, or undefined when the words disagree. */
 function detectByShortWords(text: string): string | undefined {
   let vote: string | undefined;
-  for (const token of text.toLowerCase().split(/[^\p{L}]+/u)) {
+  const tokens = text.toLowerCase().split(/[^\p{L}]+/u);
+  // Un rire ne vote plus quand la phrase autour est anglaise : `kkkk no way bro`
+  // sortait `pt` et `wkwkwk what` `id`, donc sl faux pour tous et la ligne sautee
+  // pour le lecteur bresilien ou indonesien. Seul le vote du rire tombe : un mot
+  // de la table vote toujours, `kkkk mano` et `wkwk anjir` gardent leur langue.
+  const anglais = tokens.some((t) => ANGLAIS_AUTOUR_DU_RIRE.has(t));
+  for (const token of tokens) {
     // Une forme de rire est un fait sur le texte au meme titre qu'un mot de la
     // table : `jajaja` est espagnol, `kkkk` bresilien, `wkwk` indonesien. C'est
     // ce qui permet a `confidentLanguage` de s'en servir, alors qu'il refuse la
     // reponse de franc. `haha`, `lol` et `xd` ne marquent rien et ne votent pas.
-    const lang = token ? (SHORT_WORD_LANG.get(token) ?? laughterLanguage(token)) : undefined;
+    const lang = token
+      ? (SHORT_WORD_LANG.get(token) ?? (anglais ? undefined : laughterLanguage(token)))
+      : undefined;
     if (!lang) continue;
     if (vote && vote !== lang) return undefined;
     vote = lang;
@@ -429,7 +448,9 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // double son y la ou l'estonien n'en a pas du tout, l'estonien double son o
   // barre la ou le finnois ecrit yö, et la terminaison portugaise -ção n'existe
   // nulle part ailleurs dans les 43.
-  [/yy/iu, 'fi'],
+  // Jamais apres a ni e : l'harmonie vocalique interdit `ayy` au finnois et il
+  // n'ecrit pas `eyy`, alors que l'anglais etire ainsi heyy, okayy, yayy.
+  [/(?<![ae])yy/iu, 'fi'],
   // L'harmonie vocalique finnoise : le finnois met un ä dans ses terminaisons la
   // ou l'estonien ne le fait pas, et aucune autre des 43 n'a ces suites en fin
   // de mot. C'est de la morphologie et non du lexique, donc ca porte sur
@@ -749,7 +770,10 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // DEUX et rien ailleurs. **Resserrer plutot que supprimer**, quand la
   // collision vient de la forme courte et que la longue est sans ambiguite.
   [/(inho|inha|eiro|eira|dade)([^\p{L}]|$)/iu, 'pt'],
-  [/(iamo|simo|glio|tto|nno)([^\p{L}]|$)/iu, 'it'],
+  // `ssimo` et non `simo` : le superlatif italien double le s, bellissimo,
+  // prossimo, massimo. Le s simple prenait l'espagnol tape sans accent,
+  // buenisimo, et l'envoyait au moteur avec sl=it.
+  [/(iamo|ssimo|glio|tto|nno)([^\p{L}]|$)/iu, 'it'],
   [/(knya|nmu|anku)([^\p{L}]|$)/iu, 'id'],
   [/ným([^\p{L}]|$)/iu, 'sk'],
   // LA SEULE ENTREE DU FICHIER QUI AIT JAMAIS RAPPORTE NEGATIF QUELQUE PART.
@@ -949,7 +973,9 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   //
   // DEHORS : `volt` est un volt partout, `imam` est un imam, `bi` et `ez` sont
   // trop courts, `bila` est le malais pour "quand".
-  [/(^|[^\p{L}])(nem|egy|mindent)([^\p{L}]|$)/iu, 'hu'],
+  // `nem` est sorti, comme la liste plus haut le demandait deja : c'est du
+  // portugais courant, et `nem fodendo` partait avec sl=hu.
+  [/(^|[^\p{L}])(egy|mindent)([^\p{L}]|$)/iu, 'hu'],
   [/(^|[^\p{L}])(vsi|dober|svojo|kdor)([^\p{L}]|$)/iu, 'sl'],
   [/(^|[^\p{L}])(tady|velmi|líbí)([^\p{L}]|$)/iu, 'cs'],
   [/(^|[^\p{L}])(taas|sinne)([^\p{L}]|$)/iu, 'fi'],
@@ -1699,7 +1725,20 @@ function malaisOuIndonesien(text: string): string | undefined {
  * devenue muette alors que les deux disaient italien. Le test du banc latin sur
  * `sta giocando malissimo` l'a attrape.
  */
-function detectByExclusiveLetter(text: string): string | undefined {
+/**
+ * Ce que la table ne doit pas lire, retire avant de la consulter.
+ *
+ * L'etirement d'abord : `heyyy` et `okayyy` portaient le `yy` finnois, et un
+ * `yy` de trois lettres ou plus n'est jamais finnois, c'est un cri. Ramener la
+ * serie a une lettre garde le `yy` du finnois ecrit, qui n'en a jamais trois.
+ * Puis trois mots de chat anglais qui tombaient sur une terminaison : `wait` et
+ * `bait` sur le `-ait` francais, `lich` (World of Warcraft) sur le `-lich`
+ * allemand, qui n'existe jamais seul.
+ */
+const ANGLAIS_DE_CHAT = /(^|[^\p{L}])(wait|bait|lich)(?=[^\p{L}]|$)/giu;
+
+function detectByExclusiveLetter(raw: string): string | undefined {
+  const text = raw.replace(/(\p{L})\1{2,}/gu, '$1').replace(ANGLAIS_DE_CHAT, '$1 ');
   let vote: string | undefined;
   for (const [lettres, lang] of LETTRES_EXCLUSIVES) {
     if (!lettres.test(text)) continue;
@@ -2051,8 +2090,13 @@ const MOTS_RUSSES =
  * autres. Son jumeau -ий est DEHORS, il prend vingt lignes ukrainiennes.
  */
 const ADJECTIF_RUSSE = /ый([^\p{L}]|$)/iu;
+// `ще` et `го` sont sortis de la liste. `ще` est aussi ukrainien, ou il est
+// partout (давай ще одну), et `го` est le go du chat russe (го катку) bien
+// avant d'etre le pronom bulgare. Seuls, ils nommaient bg sur ces deux lignes.
+// Une ligne bulgare qui les porte porte presque toujours un autre marqueur.
+const UKRAINIEN_OU_BULGARE = /(^|[^\p{L}])ще([^\p{L}]|$)/iu;
 const MOTS_BULGARES =
-  /(^|[^\p{L}])(съм|си|сме|сте|са|какво|кой|кога|къде|защо|много|добре|това|няма|ще|аз|мога|гледа|гледам|искам|този|започва|благодаря|страхотен|поздрави|дошли|се|го|има|нещо|тя|моля)([^\p{L}]|$)/iu;
+  /(^|[^\p{L}])(съм|си|сме|сте|са|какво|кой|кога|къде|защо|много|добре|това|няма|аз|мога|гледа|гледам|искам|този|започва|благодаря|страхотен|поздрави|дошли|се|има|нещо|тя|моля)([^\p{L}]|$)/iu;
 
 /**
  * Le repli `ru` etait une DEVINETTE posee sur le chemin sans devinette.
@@ -2113,6 +2157,9 @@ function cyrilliqueQuelleLangue(text: string): string | undefined {
   ) {
     return 'bg';
   }
+  // Sans autre marqueur, `ще` laisse le choix entre ukrainien et bulgare, et le
+  // russe ne l'ecrit pas : pas de reponse plutot que `ru` par `давай`.
+  if (UKRAINIEN_OU_BULGARE.test(text)) return undefined;
   if (
     LETTRES_RUSSES.test(text) ||
     INFINITIF_RUSSE.test(text) ||
@@ -2391,6 +2438,37 @@ function detectByScript(text: string): string | undefined {
  * the chat-word lexicon, and the Unicode script check. Everything here is a lookup,
  * so a hit is a fact about the text, not a probability.
  */
+/**
+ * Le hindi tape en lettres latines, que le chat indien ecrit couramment.
+ *
+ * Il ne nomme aucune langue ici, il en empeche une : `yaar`, `saal` et `baat`
+ * tombaient sur les terminaisons neerlandaises `-aar` et `-aal`, et quatre
+ * lignes de hinglish sur vingt-six partaient avec sl=nl. Deux mots distincts
+ * de la liste, jamais un seul, parce que `hai` est aussi italien et
+ * vietnamien. Les mots trop courts ou trop communs ailleurs sont dehors : se,
+ * ko, ka, ki, wo, ye, tha, bas, kar, raha.
+ */
+const MOTS_HINGLISH = new Set([
+  'yaar', 'yar', 'bhai', 'kya', 'kyu', 'kyun', 'nahi', 'nahin', 'hai', 'hain',
+  'kitne', 'kitna', 'baat', 'saal', 'kamaal', 'kamal', 'accha', 'acha', 'achha',
+  'bahut', 'bohot', 'matlab', 'mujhe', 'tujhe', 'abhi', 'arre', 'arey', 'haan',
+  'dekho', 'chalo', 'bhi', 'toh', 'kuch', 'kaise', 'kaisa', 'sahi', 'bilkul',
+  'mera', 'meri', 'tera', 'teri',
+]);
+
+// Trois mots qu'aucune langue latine du produit n'ecrit, assez forts seuls :
+// `yaar` au milieu d'une phrase anglaise sortait encore `nl`.
+const MOTS_HINGLISH_FORTS = new Set(['yaar', 'bhai', 'kya']);
+
+function estHinglish(text: string): boolean {
+  const vus = new Set<string>();
+  for (const jeton of text.toLowerCase().split(/[^\p{L}]+/u)) {
+    if (MOTS_HINGLISH_FORTS.has(jeton)) return true;
+    if (MOTS_HINGLISH.has(jeton)) vus.add(jeton);
+  }
+  return vus.size >= 2;
+}
+
 function detectByLookup(trimmed: string): string | undefined {
   // ASCII short message: probably English chat-speak
   const lower = trimmed.toLowerCase();
@@ -2400,6 +2478,12 @@ function detectByLookup(trimmed: string): string | undefined {
       return 'en';
     }
   }
+
+  // Une langue qui n'est pas latine, tapee en lettres latines : aucune table
+  // latine ci-dessous n'a le droit d'y repondre. Sinon `arigatou` sortait `pt`
+  // par `-tou` et `zashto` `sl`. Le veto ne nomme rien : la ligne part sans
+  // langue source, et `detectLanguage` donne toujours la sienne aux filtres.
+  if (romanisedLanguage(trimmed) || estHinglish(trimmed)) return detectByScript(trimmed);
 
   // Une lettre propre a une seule langue, a toute longueur, et AVANT le lexique.
   //
