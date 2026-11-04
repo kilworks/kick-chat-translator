@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { spellOutAbbreviations } from './abbreviations';
+import { spellOutAbbreviations, spellOutForLanguage } from './abbreviations';
+
+describe('spellOutForLanguage', () => {
+  it('spells out whole words of the table of that language, in any case', () => {
+    expect(spellOutForLanguage('SLK que lag pqp', 'pt')).toBe('você é louco que lag puta que pariu');
+    expect(spellOutForLanguage('slkk', 'pt')).toBe('slkk');
+  });
+
+  it('touches nothing for another language or no language', () => {
+    expect(spellOutForLanguage('slk pqp', 'pl')).toBe('slk pqp');
+    expect(spellOutForLanguage('slk pqp', undefined)).toBe('slk pqp');
+    expect(spellOutForLanguage('constructor', 'constructor')).toBe('constructor');
+  });
+});
 
 describe('spellOutAbbreviations', () => {
   it('spells out whole words only, in any case', () => {

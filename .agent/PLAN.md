@@ -141,6 +141,17 @@ reads dist/, so it serialises behind any build. D touches no code.
   altering it; 41 on lines with an emote, which the pipeline strips before
   sending, so part of those may be the bench and not the reader's screen. To
   settle at the start of point 4.
+- [x] **Protect tokens, spell out shorthand by language (2026-11-04, phase B).**
+  Point 4: emotes, mentions and links never reach the engine, so the 90
+  `emote_user` errors were the bench; `FACEIT` goes as a placeholder (the only
+  term the bench showed mistranslated). Point 3: 44 candidates sourced, 12 with
+  two sources, 9 of those on real lines outside heldout (27 lines). Only 10 of
+  the 27 lines get a confident language, which is the gate. Two entries beat
+  Google: pt `slk`, `pqp`: 10.5 to 0.72 penalty a line on 9 outputs, two blind
+  judges, 3.25 to 0.25 without the one line where the change exposes a word
+  Google seems to have invented (not scored). `vc`, `tb`: no gain. `msm`: inside
+  the noise. `pfv`, `vtnc`, `mdr`, `wlh`: never reached, not measured. Baseline
+  bench: 690 of 690 sends unchanged. MyMemory not observed (daily quota).
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.

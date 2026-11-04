@@ -23,7 +23,7 @@ vi.mock('./memcache', () => ({ memCache: { get: () => undefined, set: vi.fn() } 
 
 import { TranslationPipeline } from './pipeline';
 import { chatLength } from './filters';
-import { markSkipped, showError, showThrottleIndicator } from './injector';
+import { inject, markSkipped, showError, showThrottleIndicator } from './injector';
 import { defaultSettings } from '~/shared/settings';
 import { detectLanguage } from './langDetect';
 
@@ -412,6 +412,16 @@ describe('TranslationPipeline — English chat abbreviations', () => {
     await reader('fr').onWebSocketMessage(wsMsg('był w domu cały dzień'));
     expect(sentText()).toBe('był w domu cały dzień');
   });
+
+  it('spells out Portuguese shorthand on a line it is sure is Portuguese', async () => {
+    await reader('fr').onWebSocketMessage(wsMsg('ta um calor da porra e eles com ese macacão slk'));
+    expect(sentText()).toBe('ta um calor da porra e eles com ese macacão você é louco');
+  });
+
+  it('leaves the shorthand alone when no language is sure of the line', async () => {
+    await reader('fr').onWebSocketMessage(wsMsg('pqp lag assim ja era'));
+    expect(sentText()).toBe('pqp lag assim ja era');
+  });
 });
 
 // On device has no auto-detect, so a line it was told the wrong source for comes
@@ -477,5 +487,69 @@ describe('TranslationPipeline: only the part worth translating is sent', () => {
 
   it('sends nothing for a bare bot command', async () => {
     expect(await run('!slots 332')).toBeUndefined();
+  });
+});
+
+// A name the engines translate when they should not goes out as a placeholder
+// and comes back as itself. Measured on the real bench (2026-11-04): Google
+// gave `faceit` as Portuguese "encarar". The placeholder form was chosen on a
+// round trip of 100 bench lines through Google (98 of 100 kept, one short of
+// the best form) and because a chat never types it.
+describe('TranslationPipeline: names kept as they are', () => {
+  let seq = 0;
+  const domMsg = (text: string) => {
+    const rowElement = document.createElement('div');
+    const injectionTarget = document.createElement('div');
+    // Attached and shaped like a Kick row, or the recycled-row guard paints nothing.
+    const span = document.createElement('span');
+    span.className = 'font-normal';
+    span.textContent = text;
+    injectionTarget.appendChild(span);
+    rowElement.appendChild(injectionTarget);
+    document.body.appendChild(rowElement);
+    return { rowElement, injectionTarget, id: `k${++seq}`, text, channel: `names${seq}`, username: 'user', isBot: false };
+  };
+  // Cloud only: an earlier block leaves the shared on-device mock answering.
+  const build = () =>
+    new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'pt-br', pauseWhenHidden: false, localEnabled: false });
+  const answer = (translatedText: string) =>
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: true, result: { translatedText, detectedLang: 'pl', provider: 'google' } } });
+  const sentText = async () => {
+    const asks = () => sendMock.mock.calls.filter((c) => c[0]?.type === 'translate');
+    await vi.waitFor(() => expect(asks().length).toBeGreaterThan(0));
+    return asks().at(-1)?.[0]?.payload?.text as string;
+  };
+  const shown = async () => {
+    await vi.waitFor(() => expect(vi.mocked(inject)).toHaveBeenCalled());
+    return vi.mocked(inject).mock.calls.at(-1)?.[1]?.translatedText;
+  };
+
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    sendMock.mockReset();
+    vi.mocked(inject).mockClear();
+  });
+
+  it('sends the name as a placeholder and shows it back in the translation', async () => {
+    answer('eu odeio ⟦1⟧ de 2200 elo');
+    await build().onDomMessage(domMsg('nienawidzę faceit z 2200 elo'));
+    await flush();
+    expect(await sentText()).toBe('nienawidzę ⟦1⟧ z 2200 elo');
+    expect(await shown()).toBe('eu odeio FACEIT de 2200 elo');
+  });
+
+  it('shows the translation without the name rather than a placeholder the engine dropped', async () => {
+    answer('eu odeio de 2200 elo');
+    await build().onDomMessage(domMsg('nienawidzę faceit z 2200 elo'));
+    await flush();
+    expect(await shown()).toBe('eu odeio de 2200 elo');
+  });
+
+  it('leaves a line without such a name exactly as it was', async () => {
+    answer('eu odeio isso');
+    await build().onDomMessage(domMsg('nienawidzę tego [1] bardzo'));
+    await flush();
+    expect(await sentText()).toBe('nienawidzę tego [1] bardzo');
+    expect(await shown()).toBe('eu odeio isso');
   });
 });

@@ -4,11 +4,11 @@ import type { ProviderId, TranslationOutcome, TranslationResult } from '~/shared
 import { MAX_TEXT_LENGTH } from '~/shared/constants';
 import { rootLogger } from '~/shared/logger';
 import { send } from '~/shared/messages';
-import { applyUserGlossary, isSlangOnly } from '~/shared/glossary';
+import { applyUserGlossary, isSlangOnly, protectNames, restoreNames } from '~/shared/glossary';
 import { createMetrics } from '~/shared/metrics';
 import { mentionsOf, parseKickContent } from './emoteParser';
 import { countUsage } from './usage';
-import { spellOutAbbreviations } from './abbreviations';
+import { spellOutAbbreviations, spellOutForLanguage } from './abbreviations';
 import { extractMessageText, findAllRows } from './selectors';
 import { confidentLanguage, detectLanguage } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
@@ -247,10 +247,13 @@ export class TranslationPipeline {
     // "ngl", "idc", "lmk" reach a reader in another language as they are, or as
     // something else. Spelled out, the engine translates what was said. Same
     // English gate as the skip above, so a Polish `w` or a French `l` stays.
-    const real =
+    // Other languages spell out only on the looked-up answer, never on franc's guess.
+    // Names the engines mistranslate leave as placeholders, after detection read the line as written.
+    const real = protectNames(
       this.effTarget !== 'en' && detected === 'en' && !hasNonEnglishLetter(realText)
         ? spellOutAbbreviations(realText)
-        : realText;
+        : spellOutForLanguage(realText, hint),
+    );
     return { real, detected, hint };
   }
 
@@ -546,7 +549,7 @@ export class TranslationPipeline {
       }
       msg = { ...msg, rowElement: rescued.row, injectionTarget: rescued.target };
     }
-    const tt = applyUserGlossary(result.translatedText, this.settings.glossary);
+    const tt = applyUserGlossary(restoreNames(result.translatedText), this.settings.glossary);
     if (!tt) {
       this.skip(msg, localised('skipGlossary', 'your glossary emptied the translation'));
       removeAllArtifacts(msg.injectionTarget);
@@ -558,7 +561,7 @@ export class TranslationPipeline {
         removeAllArtifacts(msg.injectionTarget);
         return;
       }
-      if (tt.trim().toLowerCase() === real.trim().toLowerCase()) {
+      if (tt.trim().toLowerCase() === restoreNames(real).trim().toLowerCase()) {
         // The engine handed the line straight back. On stretched chat that is
         // usually why: "BINNNNNNNGOOOOOOO" and "muuuuy biennnn" both return
         // unchanged, and flattened they come back as "BINGO" and "très bien".

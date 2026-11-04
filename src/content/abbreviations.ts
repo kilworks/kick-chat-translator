@@ -60,6 +60,36 @@ const SPELLED_OUT = new Map<string, string>(Object.entries({
   sm: 'so much',
 }));
 
+/**
+ * Chat shorthand of other languages. Each entry has two independent sources (a
+ * Wiktionary edition and a slang dictionary) and beat the engine on real chat.
+ * Applied only to the text the engine gets, only when the looked-up language of
+ * the line is this one.
+ *
+ * Google left `slk` as typed and read `pqp` as `pq`, "because". Measured on the 9
+ * Google outputs of the 3 real lines these reach, two blind judges: 10.5 penalty
+ * points a line before, 0.72 after. One of the 3 lines, untranslated before, now
+ * comes back with a word Google seems to have invented, which the judges did not
+ * score; without it, 3.25 and 0.25 on 6 outputs.
+ *
+ * `vc` and `tb` were measured and Google already gets them right. `msm` gains
+ * nothing and "mesmo" can come back as "the same". `pfv`, `vtnc`, `mdr` and `wlh`
+ * have two sources too, but no real line carrying them got a looked-up language,
+ * so they were never measured.
+ */
+const SPELLED_OUT_BY_LANGUAGE = new Map<string, Map<string, string>>([
+  ['pt', new Map(Object.entries({
+    slk: 'você é louco',
+    pqp: 'puta que pariu',
+  }))],
+]);
+
+export function spellOutForLanguage(text: string, language: string | undefined): string {
+  const table = language ? SPELLED_OUT_BY_LANGUAGE.get(language) : undefined;
+  if (!table) return text;
+  return text.replace(/[\p{L}\p{N}']+/gu, (word) => table.get(word.toLowerCase()) ?? word);
+}
+
 /** "follow my ig" is Instagram, and so is "ig" after any of these. */
 const INSTAGRAM_BEFORE = /(^|[^\p{L}])(my|on|his|her|their|your|ur|the)[^\p{L}]+$/iu;
 

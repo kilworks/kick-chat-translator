@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyUserGlossary, isSlangOnly } from './glossary';
+import { applyUserGlossary, isSlangOnly, protectNames, restoreNames } from './glossary';
 
 describe('isSlangOnly', () => {
   it('flags pure streaming slang', () => {
@@ -62,5 +62,17 @@ describe('isSlangOnly, stretched slang', () => {
   it('does not fold a real double letter away', () => {
     expect(isSlangOnly('lull')).toBe(false);
     expect(isSlangOnly('good')).toBe(false);
+  });
+});
+
+describe('protectNames / restoreNames', () => {
+  it('takes the name in any case, and only as a whole word', () => {
+    expect(protectNames('FaceIt jest zły')).toBe('⟦1⟧ jest zły');
+    expect(protectNames('xfaceit faceitowy')).toBe('xfaceit faceitowy');
+  });
+
+  it('puts the name back, and removes a placeholder it cannot read', () => {
+    expect(restoreNames('odeio ⟦1⟧')).toBe('odeio FACEIT');
+    expect(restoreNames('odeio ⟦ 1 ⟧ e ⟦9⟧')).toBe('odeio FACEIT e ');
   });
 });
