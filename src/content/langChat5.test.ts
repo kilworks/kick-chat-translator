@@ -40,16 +40,24 @@ describe('le corpus 5, aveugle', () => {
   // La premiere regle jugee sur lui, la forme -yy de l'adjectif russe (reglee sur
   // un banc a part, 8 lignes de 50 passees de `fi` a muet), n'y change RIEN : les
   // trois russes romanisees fausses n'ont pas cette forme. Lu une fois.
+  //
+  // La deuxieme, le rire qui ne vote plus a cote d'un mot que la table ne connait
+  // pas et qui ne decide plus de l'ecriture (reglee sur un banc a part de 141
+  // lignes, 73 sures fausses a 1), lue une deuxieme fois en totaux : 13 a 6 sur
+  // 500 (1,2 %), le rire de 7 a 0 et 12 a 14 justes, les natives de 190 a 185
+  // justes et toujours 3 fausses. Barre toujours pas tenue. Plus aveugle : la regle
+  // suivante se juge sur un corpus 6.
   it('mesure le chemin sur en totaux', () => {
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT5).total)).toEqual({ right: 190, silent: 232, wrong: 3 });
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT5).total)).toEqual({ right: 185, silent: 237, wrong: 3 });
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT5_ROMAN).total)).toEqual({ right: 0, silent: 47, wrong: 3 });
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT5_LAUGH).total)).toEqual({ right: 12, silent: 6, wrong: 7 });
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT5_LAUGH).total)).toEqual({ right: 14, silent: 11, wrong: 0 });
   });
 
   it('mesure le chemin brut en totaux', () => {
     expect(plain(runMatrix(detectLanguage, LANG_CHAT5).total)).toEqual({ right: 270, silent: 75, wrong: 80 });
     expect(plain(runMatrix(detectLanguage, LANG_CHAT5_ROMAN).total)).toEqual({ right: 2, silent: 32, wrong: 16 });
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT5_LAUGH).total)).toEqual({ right: 15, silent: 2, wrong: 8 });
+    // 15 / 2 / 8 avant le rire sans vote du chemin sur
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT5_LAUGH).total)).toEqual({ right: 16, silent: 1, wrong: 8 });
   });
 
   it('n est lu par aucun autre fichier', () => {

@@ -1,6 +1,6 @@
 import { franc } from 'franc-min';
 import { francToIso2 } from '~/shared/languages';
-import { laughterLanguage } from '~/shared/laughter';
+import { isLaughter, laughterLanguage } from '~/shared/laughter';
 import { isArabizi } from '~/shared/arabizi';
 import { romanisedLanguage } from '~/shared/romanised';
 
@@ -68,8 +68,10 @@ const SHORT_WORD_LANG = new Map<string, string>([
   ['entonces', 'es'], ['también', 'es'], ['tambien', 'es'], ['ahora', 'es'],
 
   ['salut', 'fr'], ['bonjour', 'fr'], ['bonsoir', 'fr'], ['merci', 'fr'], ['oui', 'fr'],
-  ['ouais', 'fr'], ['voilà', 'fr'], ['voila', 'fr'], ['putain', 'fr'], ['mdr', 'fr'],
-  ['ptdr', 'fr'], ['quoi', 'fr'], ['alors', 'fr'], ['toujours', 'fr'], ['jamais', 'fr'],
+  ['ouais', 'fr'], ['voilà', 'fr'], ['voila', 'fr'], ['putain', 'fr'],
+  // mdr et ptdr sont des rires et vivent dans `laughter.ts` : ici ils votaient
+  // fr meme a cote de mots d'une autre langue (`mdr der typ`).
+  ['quoi', 'fr'], ['alors', 'fr'], ['toujours', 'fr'], ['jamais', 'fr'],
   ['beaucoup', 'fr'], ['très', 'fr'], ['pourquoi', 'fr'], ['enfin', 'fr'],
 
   // `mano` a ete retire de cette ligne. C'est du portugais bresilien courant et
@@ -328,21 +330,25 @@ const ANGLAIS_AUTOUR_DU_RIRE = new Set([
 // (allemand), nah (indonesien), wow (partout).
 
 /** Unanimous vote from the lexicon, or undefined when the words disagree. */
-function detectByShortWords(text: string): string | undefined {
+function detectByShortWords(text: string, rireMalgreInconnus = false): string | undefined {
   let vote: string | undefined;
   const tokens = text.toLowerCase().split(/[^\p{L}]+/u);
   // Un rire ne vote plus quand la phrase autour est anglaise : `kkkk no way bro`
   // sortait `pt` et `wkwkwk what` `id`, donc sl faux pour tous et la ligne sautee
   // pour le lecteur bresilien ou indonesien. Seul le vote du rire tombe : un mot
-  // de la table vote toujours, `kkkk mano` et `wkwk anjir` gardent leur langue.
+  // de la table vote toujours.
   const anglais = tokens.some((t) => ANGLAIS_AUTOUR_DU_RIRE.has(t));
+  // Meme chose pour tout mot que la table ne connait pas : le rire est une
+  // habitude de clavier, pas une langue, et `kkkk was zum` ou `jajaja helal`
+  // sortaient pt et es. Il ne vote donc que seul ou a cote de mots de la table.
+  const inconnu = tokens.some((t) => t && !SHORT_WORD_LANG.has(t) && !isLaughter(t));
   for (const token of tokens) {
     // Une forme de rire est un fait sur le texte au meme titre qu'un mot de la
     // table : `jajaja` est espagnol, `kkkk` bresilien, `wkwk` indonesien. C'est
     // ce qui permet a `confidentLanguage` de s'en servir, alors qu'il refuse la
     // reponse de franc. `haha`, `lol` et `xd` ne marquent rien et ne votent pas.
     const lang = token
-      ? (SHORT_WORD_LANG.get(token) ?? (anglais ? undefined : laughterLanguage(token)))
+      ? (SHORT_WORD_LANG.get(token) ?? (anglais || (inconnu && !rireMalgreInconnus) ? undefined : laughterLanguage(token)))
       : undefined;
     if (!lang) continue;
     if (vote && vote !== lang) return undefined;
@@ -2483,7 +2489,7 @@ function detectByLookup(trimmed: string): string | undefined {
   // latine ci-dessous n'a le droit d'y repondre. Sinon `arigatou` sortait `pt`
   // par `-tou` et `zashto` `sl`. Le veto ne nomme rien : la ligne part sans
   // langue source, et `detectLanguage` donne toujours la sienne aux filtres.
-  if (romanisedLanguage(trimmed) || estHinglish(trimmed)) return detectByScript(trimmed);
+  if (romanisedLanguage(trimmed) || estHinglish(trimmed)) return detectByScript(sansRire(trimmed));
 
   // Une lettre propre a une seule langue, a toute longueur, et AVANT le lexique.
   //
@@ -2524,7 +2530,13 @@ function detectByLookup(trimmed: string): string | undefined {
 
   // Unicode script pre-check: more reliable than franc on short texts.
   // CJK, Arabic, Cyrillic etc. are unambiguous from their script alone.
-  return detectByScript(trimmed);
+  return detectByScript(sansRire(trimmed));
+}
+
+/** Le rire d'une autre ecriture ne nomme pas la langue des mots qu'il suit :
+ * `que golazo ㅋㅋㅋ` sortait ko. Seul, il garde son ecriture. */
+function sansRire(text: string): string {
+  return text.split(/\s+/).filter((t) => !isLaughter(t)).join(' ') || text;
 }
 
 /**
@@ -2600,6 +2612,14 @@ function detectUncached(trimmed: string): string | undefined {
 
   if (isArabizi(trimmed)) return 'ar';
   if (arabeDeChat(trimmed)) return 'ar';
+
+  // Le rire qui ne nomme plus la source sure nourrit encore le drapeau et les
+  // filtres : dans un vrai chat `kkkk mano` est bresilien bien plus souvent que
+  // `kkkk was zum` n'est allemand, et franc devine moins bien que lui.
+  if (trimmed.length <= SHORT_TEXT_MAX) {
+    const rire = detectByShortWords(trimmed, true);
+    if (rire) return rire;
+  }
 
   const francCode = franc(trimmed, { minLength: 3 });
   if (francCode === 'und') {

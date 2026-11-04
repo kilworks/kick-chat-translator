@@ -64,8 +64,14 @@ reads dist/, so it serialises behind any build. D touches no code.
   (2.6 %) before any rule, 3 native, 3 romanised, **7 of 25 laughter**. The
   Russian -yy adjective form (tuned on a separate 50-line bench, 10 confident
   wrong to 2) takes corpus 4 romanised from 4 to 2 and changes nothing on
-  corpus 5. Corpus 5 is now read once in totals. Next: laughter is the largest
-  class; tune it on a bench of its own, then judge on a corpus 6.
+  corpus 5. Laughter next (2026-11-04), tuned on a scratch bench of 141 mixed
+  culture lines (73 confident wrong to 1): a laugh no longer votes beside a
+  word the table does not know, mdr and ptdr leave the word table for the
+  laughter table, and a laugh in another script no longer decides the script
+  check. The raw path keeps the laugh vote before franc. Corpus 5, read a
+  second time in totals: 13 to 6 of 500 (1.2 %), laughter 7 to 0, native right
+  190 to 185 and still 3 wrong. Corpus 5 is no longer blind. Next: the 3 native
+  and 3 romanised, tuned on a bench, judged on a corpus 6.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.

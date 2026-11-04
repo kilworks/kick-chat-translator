@@ -49,10 +49,11 @@ describe('le corpus 4, aveugle', () => {
   // avant, au plus une erreur par jeu et 0,7 % en tout, n'est PAS tenue : 1,2 %,
   // et le russe en lettres latines en garde trois.
   it('mesure le chemin sur en totaux', () => {
-    // avant : 221 / 196 / 8
+    // avant : 221 / 196 / 8 ; 218 / 206 / 1 avant le rire sans vote a cote d'un
+    // mot inconnu (2026-11-04, regle hors de ce corpus), qui en rend 2 muettes
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4).total)).toEqual({
-      right: 218,
-      silent: 206,
+      right: 216,
+      silent: 208,
       wrong: 1,
     });
     // avant : 0 / 44 / 6 ; 0 / 46 / 4 apres le tour du 2026-11-03 ; la forme
@@ -62,11 +63,11 @@ describe('le corpus 4, aveugle', () => {
       silent: 48,
       wrong: 2,
     });
-    // avant : 5 / 17 / 3
+    // avant : 5 / 17 / 3 ; 5 / 19 / 1 avant le rire sans vote a cote d'un mot inconnu
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4_LAUGH).total)).toEqual({
       right: 5,
-      silent: 19,
-      wrong: 1,
+      silent: 20,
+      wrong: 0,
     });
   });
 

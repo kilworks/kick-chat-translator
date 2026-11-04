@@ -158,10 +158,13 @@ describe('un nom d hote n est pas du rire japonais', () => {
   });
 
   // Ce que la pleine chasse recupere en face, et pourquoi elle a le droit de
-  // marquer la langue : aucun nom d hote ne s ecrit en ｗ.
+  // marquer la langue : aucun nom d hote ne s ecrit en ｗ. Seul, ou pour le
+  // drapeau : a cote d un mot inconnu le rire ne nomme plus la source sure
+  // (2026-11-04), sinon `helal ｗｗｗ` partait en ja.
   it('lit le rire japonais tape en pleine chasse', () => {
     expect(detectLanguage('sugoi ｗｗｗ')).toBe('ja');
-    expect(confidentLanguage('sugoi ｗｗｗ')).toBe('ja');
+    expect(confidentLanguage('ｗｗｗ')).toBe('ja');
+    expect(confidentLanguage('sugoi ｗｗｗ')).toBeUndefined();
   });
 
   // Le prix, ecrit plutot que cache : le japonais en romaji suivi d un rire
@@ -400,9 +403,15 @@ describe('confidentLanguage does not name a language on common chat words', () =
     expect(confidentLanguage('bellissimo questo gioco')).toBe('it');
     expect(confidentLanguage('che bella partita')).toBe('it');
     expect(confidentLanguage('pyydän anteeksi')).toBe('fi');
-    expect(confidentLanguage('kkkk mano')).toBe('pt');
-    expect(confidentLanguage('wkwk anjir')).toBe('id');
-    expect(confidentLanguage('jajaja que buena')).toBe('es');
+    // Le rire a cote d un mot que la table ne connait pas ne nomme plus la source
+    // sure : `kkkk was zum` sortait pt. Il garde le drapeau et les filtres.
+    expect(confidentLanguage('kkkk mano')).toBeUndefined();
+    expect(detectLanguage('kkkk mano')).toBe('pt');
+    expect(detectLanguage('wkwk anjir')).toBe('id');
+    expect(detectLanguage('jajaja que buena')).toBe('es');
+    expect(confidentLanguage('kkkk was zum')).toBeUndefined();
+    expect(confidentLanguage('que golazo ㅋㅋㅋ')).toBeUndefined();
+    expect(confidentLanguage('ㅋㅋㅋ 진짜')).toBe('ko');
     expect(confidentLanguage('това е много добре')).toBe('bg');
   });
 });
