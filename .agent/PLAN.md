@@ -108,7 +108,9 @@ reads dist/, so it serialises behind any build. D touches no code.
   read right) judges them, read once in totals: 8 of 500 before any pass, 1
   (0.2 %) after, native 1, romanised 0, laughter 0. **The bar is met**, on one
   blind corpus. One corpus 11 line was seen in an error message after the
-  judgment.
+  judgment. Blind corpus 12 confirms it cleanly (23 collisions rewritten
+  unread, 0 at judgment, no line read): 8 of 500 before any pass, 1 (0.2 %)
+  after, native 1, romanised 0, laughter 0.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.
