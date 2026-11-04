@@ -94,7 +94,17 @@ reads dist/, so it serialises behind any build. D touches no code.
   after it, 6 after the corpus 4/5 rules, 6 (1.2 %) after the corpus 6 rules,
   which move nothing there. Native 3, romanised 3, laughter 0. The bar is not
   met, and the last pass did not move the blind count: rules read off single
-  wrong lines generalise to their own class only. Stopped here (2026-11-04).
+  wrong lines generalise to their own class only. Then the same loop again,
+  each blind corpus judged once and then used as a bench: corpora 7 and 8
+  (shared words vse, iz, mia, davai; Ukrainian -yut, -plyat; Tagalog lahat;
+  Ukrainian tsya, znovu, zaraz; Russian -kogo), corpus 9 (fight and night
+  stripped as English chat words, Turkish -iyor against Tagalog niy, hitto,
+  Ukrainian budut and koli: blind 12 to 5), corpus 10 (Korean syllable
+  laughter, dah no longer Malay, Hinglish karne and baad: blind 11 to 5,
+  native 1 and romanised 1 meet the per-set bar, laughter keeps 3). Benches
+  4 to 10 hold 1 wrong in 3500 (gg bro). Cost: Tatoeba confident right 3716
+  to 3709, Malay pair confident right 39 to 36. Corpus 11 judges the corpus
+  10 rules.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.
