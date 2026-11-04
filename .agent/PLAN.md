@@ -57,7 +57,7 @@ reads dist/, so it serialises behind any build. D touches no code.
   source and sends NB (673971f), two stale statements (0939934). The study's
   `verify-handover-claims.mjs` runs again: 48 of 67, the 19 others are counts
   grown since 2.10.0.
-- [ ] **The blind bar is not met, and corpus 5 says it is further off than
+- [x] **The blind bar is not met, and corpus 5 says it is further off than
   corpus 4 did.** Bar written before: at most one confident wrong answer per
   set, 0.7 % overall. Corpus 4 ended at 1.2 % and was read twice, so blind
   corpus 5 was written to the same brief (2026-11-04, 1c743c4): 13 of 500
@@ -103,8 +103,12 @@ reads dist/, so it serialises behind any build. D touches no code.
   laughter, dah no longer Malay, Hinglish karne and baad: blind 11 to 5,
   native 1 and romanised 1 meet the per-set bar, laughter keeps 3). Benches
   4 to 10 hold 1 wrong in 3500 (gg bro). Cost: Tatoeba confident right 3716
-  to 3709, Malay pair confident right 39 to 36. Corpus 11 judges the corpus
-  10 rules.
+  to 3709, Malay pair confident right 39 to 36. Blind corpus 11 (new author,
+  27 collisions rewritten unread, one left at judgment: a native Russian line
+  read right) judges them, read once in totals: 8 of 500 before any pass, 1
+  (0.2 %) after, native 1, romanised 0, laughter 0. **The bar is met**, on one
+  blind corpus. One corpus 11 line was seen in an error message after the
+  judgment.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.
