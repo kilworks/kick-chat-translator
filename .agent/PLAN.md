@@ -89,7 +89,12 @@ reads dist/, so it serialises behind any build. D touches no code.
   words (Ukrainian writes it the same), sab and ko join Hinglish. Corpora 4 to
   6 now hold 1 confident wrong line in 1500 (gg bro). Tatoeba loses one right
   line, No, no, no!, now silent. Corpus 7, read a second time by its pin: native
-  3 to 2. Judged on a blind corpus 8.
+  3 to 2. Blind corpus 8 (new author, 25 collisions rewritten unread), read
+  once in totals on four detector states: 14 of 500 (2.8 %) before laughter, 8
+  after it, 6 after the corpus 4/5 rules, 6 (1.2 %) after the corpus 6 rules,
+  which move nothing there. Native 3, romanised 3, laughter 0. The bar is not
+  met, and the last pass did not move the blind count: rules read off single
+  wrong lines generalise to their own class only. Stopped here (2026-11-04).
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.
