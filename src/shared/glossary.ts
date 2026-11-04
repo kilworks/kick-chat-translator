@@ -71,3 +71,25 @@ export function applyUserGlossary(text: string, entries: string[]): string {
   }
   return out;
 }
+
+/**
+ * Names the engines translate when they should not, each entered on a measured
+ * miss: on the real bench (2026-11-04) Google gave the match platform `faceit`
+ * as Portuguese "encarar". Written as it is shown back.
+ *
+ * The engine gets a placeholder in its place. `⟦n⟧` kept its place in 98 of 100
+ * bench lines through Google, one line short of the best form (`[n]`, 99), and a
+ * chat never types it, where a literal `[1]` would be taken for a placeholder.
+ */
+const KEEP_AS_IS = ['FACEIT'];
+const KEEP_RE = new RegExp(String.raw`(?<![\p{L}\p{N}])(${KEEP_AS_IS.join('|')})(?![\p{L}\p{N}])`, 'giu');
+
+/** The text for the engine, each kept name swapped for its placeholder. */
+export function protectNames(text: string): string {
+  return text.replace(KEEP_RE, (m) => `⟦${KEEP_AS_IS.findIndex((n) => n.toLowerCase() === m.toLowerCase()) + 1}⟧`);
+}
+
+/** The names back in place. A placeholder the engine dropped stays dropped; one it mangled is removed, never shown. */
+export function restoreNames(translated: string): string {
+  return translated.replace(/⟦\s*(\d+)\s*⟧/g, (_, n: string) => KEEP_AS_IS[Number(n) - 1] ?? '');
+}
