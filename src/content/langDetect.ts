@@ -547,7 +547,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // contient pas.
   [/(^|[^\p{L}])(jsi|jsou)([^\p{L}]|$)/iu, 'cs'],
   [/(iť|sť)/iu, 'sk'],
-  [/fue/iu, 'es'],
+  // `fuer` est le für allemand tape sans u trema, aucun mot espagnol n'y finit.
+  [/fue(?!r([^\p{L}]|$))/iu, 'es'],
   [/oet/iu, 'nl'],
   [/för/iu, 'sv'],
   [/ał/iu, 'pl'],
@@ -801,7 +802,9 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // celui qui gagne. Supprimer `aat` tout court avait ete mesure aussi et
   // coutait deux lignes Tatoeba pour le meme gain : RESSERRER PLUTOT QUE
   // SUPPRIMER, quand la collision vient de la forme la plus courte.
-  [/(tste|[^s]aat|aal)([^\p{L}]|$)/iu, 'nl'],
+  // Pas sur une ligne a ii, que le neerlandais n'ecrit pas et le finnois partout :
+  // `kiitti kun streamaat` sortait nl par `-aat`.
+  [/^(?!.*ii).*(tste|[^s]aat|aal)([^\p{L}]|$)/iu, 'nl'],
   [/lich([^\p{L}]|$)/iu, 'de'],
   [/lige([^\p{L}]|$)/iu, 'da'],
   [/ait([^\p{L}]|$)/iu, 'fr'],
@@ -1373,7 +1376,7 @@ const JEUX_DE_PORTE: Readonly<Record<string, RegExp>> = {
   pl: /(^|[^\p{L}])(się|nasz|bardzo|jeszcze|wszystko|dlaczego|który)([^\p{L}]|$)/iu,
   vi: /(^|[^\p{L}])(với|của|một|không|được|rồi|quá|này|tôi)([^\p{L}]|$)/iu,
   es: /(^|[^\p{L}])(pero|muy|con|los|las|una|esto|esa|siempre|qué|yo|ese|ayer)([^\p{L}]|$)/iu,
-  pt: /(^|[^\p{L}])(uma|não|você|muito|isso|essa|também|tudo|só|foi|ainda|esse|um)([^\p{L}]|$)/iu,
+  pt: /(^|[^\p{L}])(uma|não|você|muito|isso|essa|também|tudo|só|foi|ainda|esse|um|pfv)([^\p{L}]|$)/iu,
   ca: /(^|[^\p{L}])(això|què|també|més|són|una|és|sóc|després|ací)([^\p{L}]|$)/iu,
   fr: /(^|[^\p{L}])(est|avec|pour|dans|tout|comme|très|sont|fait|ça|été|étais|fois|mois)([^\p{L}]|$)/iu,
   tr: /(^|[^\p{L}])(bir|için|değil|çok|var|bu|şey|daha)([^\p{L}]|$)/iu,
@@ -2460,6 +2463,9 @@ const MOTS_HINGLISH = new Set([
   'bahut', 'bohot', 'matlab', 'mujhe', 'tujhe', 'abhi', 'arre', 'arey', 'haan',
   'dekho', 'chalo', 'bhi', 'toh', 'kuch', 'kaise', 'kaisa', 'sahi', 'bilkul',
   'mera', 'meri', 'tera', 'teri',
+  // Verbes et mots de tous les jours : `sab kuch haar gaya` n'avait que kuch et
+  // sortait nl par `-aar`. Seuls ils ne decident rien, il en faut deux.
+  'gaya', 'gayi', 'raha', 'rahi', 'dekh', 'baar', 'phir', 'maza', 'haar', 'pehli',
 ]);
 
 // Trois mots qu'aucune langue latine du produit n'ecrit, assez forts seuls :

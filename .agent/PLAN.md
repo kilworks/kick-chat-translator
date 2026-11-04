@@ -74,8 +74,13 @@ reads dist/, so it serialises behind any build. D touches no code.
   (same brief, 0 overlap after 53 lines rewritten by its author) judges it, read
   once in totals: 12 to 3 of 500 (2.4 % to 0.6 %), laughter 9 to 0, native right
   162 to 159. The overall bar holds; the per-set bar does not (native 2 wrong).
-  Corpus 6 is read once. Next: native and romanised, tuned on a bench, judged on
-  a corpus 7.
+  Corpus 6 is read once. Then corpora 4 and 5 became tuning benches and their
+  9 confident wrong lines were read: fuer (German ue) no longer votes es,
+  everyday Hinglish verbs join the lexicon, the Dutch -aat/-aal rule skips lines
+  with ii, the Russian adjective form takes ch/sh/zh/kh before -yy and -noe, pfv
+  joins the Portuguese gate words. Corpus 4 to 0 wrong, corpus 5 to 1 (gg bro,
+  filed Indonesian, read English). Corpus 6, read a second time in totals: 3
+  wrong unchanged, one native silent to right. Judged on a corpus 7.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.

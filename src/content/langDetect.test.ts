@@ -415,3 +415,31 @@ describe('confidentLanguage does not name a language on common chat words', () =
     expect(confidentLanguage('това е много добре')).toBe('bg');
   });
 });
+
+// Lues sur les corpus 4 et 5 devenus bancs de reglage (2026-11-04) : chacune
+// nommait une langue sure fausse.
+describe('les regles lues sur les corpus 4 et 5', () => {
+  it('ne prend pas le fuer allemand pour de l espagnol', () => {
+    expect(confidentLanguage('was fuer ein clip')).not.toBe('es');
+    expect(confidentLanguage('fuera de aqui')).toBe('es');
+  });
+
+  it('reconnait le hinglish de tous les jours avant le -aar neerlandais', () => {
+    expect(confidentLanguage('sab kuch haar gaya lol')).toBeUndefined();
+    expect(confidentLanguage('phir se sab slots me haar gaya')).toBeUndefined();
+  });
+
+  it('ne lit pas -aat neerlandais sur une ligne finnoise a ii', () => {
+    expect(confidentLanguage('kiitti kun streamaat')).not.toBe('nl');
+    expect(confidentLanguage('hij gaat naar huis')).toBe('nl');
+  });
+
+  it('tient le russe en lettres latines a ch et -noe pour russe', () => {
+    expect(confidentLanguage('eys byl chistyy')).toBeUndefined();
+    expect(confidentLanguage('stavi vse na krasnoe')).toBeUndefined();
+  });
+
+  it('laisse pfv au portugais devant som slovaque', () => {
+    expect(confidentLanguage('abaixa o som da música pfv')).not.toBe('sk');
+  });
+});

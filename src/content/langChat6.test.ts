@@ -37,9 +37,13 @@ describe('le corpus 6, aveugle', () => {
   // lu une fois en totaux : 12 sur 500 (2,4 %) avant, 3 apres (0,6 %), le rire
   // de 9 a 0, les natives de 162 a 159 justes et 2 fausses avant comme apres.
   // Le total tient la barre, pas le jeu natif (2 fausses).
+  //
+  // Relu une deuxieme fois en totaux pour les regles reglees sur les corpus 4 et
+  // 5 (2026-11-04) : une native de muette a juste, les 3 fausses inchangees. Plus
+  // aveugle ; ces regles se jugent sur le corpus 7.
   it('mesure le chemin sur en totaux', () => {
     // avant : 162 / 261 / 2
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6).total)).toEqual({ right: 159, silent: 264, wrong: 2 });
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6).total)).toEqual({ right: 160, silent: 263, wrong: 2 });
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT6_ROMAN).total)).toEqual({ right: 0, silent: 49, wrong: 1 });
     // avant : 7 / 9 / 9
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT6_LAUGH).total)).toEqual({ right: 9, silent: 16, wrong: 0 });

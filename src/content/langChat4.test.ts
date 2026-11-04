@@ -53,15 +53,16 @@ describe('le corpus 4, aveugle', () => {
     // mot inconnu (2026-11-04, regle hors de ce corpus), qui en rend 2 muettes
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4).total)).toEqual({
       right: 216,
-      silent: 208,
-      wrong: 1,
+      silent: 209,
+      wrong: 0,
     });
     // avant : 0 / 44 / 6 ; 0 / 46 / 4 apres le tour du 2026-11-03 ; la forme
-    // -yy de l'adjectif russe (2026-11-04, reglee hors de ce corpus) en prend 2
+    // -yy de l'adjectif russe (2026-11-04, reglee hors de ce corpus) en prend 2,
+    // puis les regles lues sur les corpus 4 et 5 devenus bancs de reglage (2026-11-04) les 2 autres
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4_ROMAN).total)).toEqual({
       right: 0,
-      silent: 48,
-      wrong: 2,
+      silent: 50,
+      wrong: 0,
     });
     // avant : 5 / 17 / 3 ; 5 / 19 / 1 avant le rire sans vote a cote d'un mot inconnu
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4_LAUGH).total)).toEqual({
@@ -74,15 +75,15 @@ describe('le corpus 4, aveugle', () => {
   it('mesure le chemin brut en totaux', () => {
     // avant : 291 / 57 / 77
     expect(plain(runMatrix(detectLanguage, LANG_CHAT4).total)).toEqual({
-      right: 292,
+      right: 293,
       silent: 60,
-      wrong: 73,
+      wrong: 72,
     });
     // avant : 3 / 25 / 22 ; 3 / 27 / 20 avant la forme -yy
     expect(plain(runMatrix(detectLanguage, LANG_CHAT4_ROMAN).total)).toEqual({
-      right: 5,
+      right: 6,
       silent: 27,
-      wrong: 18,
+      wrong: 17,
     });
     // avant : 14 / 4 / 7
     expect(plain(runMatrix(detectLanguage, LANG_CHAT4_LAUGH).total)).toEqual({

@@ -119,8 +119,10 @@ for (const [langue, mots] of Object.entries(MARQUEURS)) {
  * Une forme plutot qu'une liste, parce que chaque adjectif en est une entree.
  * Le finnois finit aussi en -yy, mais apres t, k, s (loytyy, nakyy, pysyy) ou
  * sur trois lettres (syy, myy), d'ou la consonne et la lettre devant elle.
+ * Apres t, k, s encore russe si le mot porte ch, sh, zh ou kh, que le finnois
+ * n'ecrit pas (chistyy). Le neutre -oe apres consonne et n (krasnoe) aussi.
  */
-const ADJECTIF_RU = /^\p{L}+[bvmnlpr]yy$/u;
+const ADJECTIF_RU = /^(?:\p{L}+[bvmnlpr]yy|\p{L}*[cszk]h\p{L}*yy|\p{L}{2,}[^aeiouy]noe)$/u;
 
 const FAIBLES = new Map<string, string>();
 for (const [langue, mots] of Object.entries(FAIBLES_PAR_LANGUE)) {
