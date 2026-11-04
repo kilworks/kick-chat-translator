@@ -33,9 +33,13 @@ describe('le corpus 7, aveugle', () => {
   // fois en totaux, sur trois etats du detecteur : 12 sur 500 (2,4 %) avant le
   // rire sans vote, 8 apres, 6 (1,2 %) apres les regles lues sur les corpus 4 et
   // 5. Barre NON tenue : natif 3, romanise 2, rire 1.
+  //
+  // Relu une deuxieme fois en totaux, par cette epingle, quand le corpus 6 est
+  // devenu banc de reglage (2026-11-04) : natif 3 a 2. Plus aveugle ; ces
+  // regles se jugent sur le corpus 8.
   it('mesure le chemin sur en totaux', () => {
     // avant le rire : 166 / 254 / 5 ; apres : 164 / 256 / 5
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7).total)).toEqual({ right: 165, silent: 257, wrong: 3 });
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7).total)).toEqual({ right: 165, silent: 258, wrong: 2 });
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT7_ROMAN).total)).toEqual({ right: 0, silent: 48, wrong: 2 });
     // avant le rire : 9 / 11 / 5
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT7_LAUGH).total)).toEqual({ right: 9, silent: 15, wrong: 1 });
@@ -43,7 +47,7 @@ describe('le corpus 7, aveugle', () => {
 
   it('mesure le chemin brut en totaux', () => {
     // avant : 261 / 87 / 77
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT7).total)).toEqual({ right: 263, silent: 87, wrong: 75 });
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT7).total)).toEqual({ right: 263, silent: 88, wrong: 74 });
     expect(plain(runMatrix(detectLanguage, LANG_CHAT7_ROMAN).total)).toEqual({ right: 2, silent: 30, wrong: 18 });
     // avant le rire : 13 / 4 / 8
     expect(plain(runMatrix(detectLanguage, LANG_CHAT7_LAUGH).total)).toEqual({ right: 13, silent: 6, wrong: 6 });

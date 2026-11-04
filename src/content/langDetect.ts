@@ -24,7 +24,7 @@ const COMMON_SHORT_TOKENS = new Set([
   'hey',
   'haha',
   'yes',
-  'no',
+  // pas `no` : espagnol, italien et portugais l'ecrivent pareil (`no no no no`).
   'ok',
   'okay',
   'nice',
@@ -2090,8 +2090,9 @@ const INFINITIF_RUSSE = /ть([^\p{L}]|$)/iu;
  * ecran de ce genre doit imprimer la source de son regex et echouer si elle ne
  * contient pas ce qu'elle doit contenir.
  */
+// Pas `давай` : l'ukrainien l'ecrit lettre pour lettre (`давай давай` sortait ru).
 const MOTS_RUSSES =
-  /(^|[^\p{L}])(кто|нет|они|его|он|она|вчера|можно|это|очень|сейчас|только|когда|хорошо|меня|тебя|ничего|нужно|давай|сколько|пока|больше|спасибо|привет|тоже|где|почему|здесь|сегодня|какой|вообще|лучше|понятно|молодец|смотрю|смотреть|происходит|отлично|отличная|вы|мы|всё|себя)([^\p{L}]|$)/iu;
+  /(^|[^\p{L}])(кто|нет|они|его|он|она|вчера|можно|это|очень|сейчас|только|когда|хорошо|меня|тебя|ничего|нужно|сколько|пока|больше|спасибо|привет|тоже|где|почему|здесь|сегодня|какой|вообще|лучше|понятно|молодец|смотрю|смотреть|происходит|отлично|отличная|вы|мы|всё|себя)([^\p{L}]|$)/iu;
 
 /**
  * La terminaison d'adjectif masculin russe. L'ukrainien ecrit -ий et le bulgare
@@ -2466,6 +2467,7 @@ const MOTS_HINGLISH = new Set([
   // Verbes et mots de tous les jours : `sab kuch haar gaya` n'avait que kuch et
   // sortait nl par `-aar`. Seuls ils ne decident rien, il en faut deux.
   'gaya', 'gayi', 'raha', 'rahi', 'dekh', 'baar', 'phir', 'maza', 'haar', 'pehli',
+  'sab', 'ko',
 ]);
 
 // Trois mots qu'aucune langue latine du produit n'ecrit, assez forts seuls :

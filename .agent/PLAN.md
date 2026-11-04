@@ -84,8 +84,12 @@ reads dist/, so it serialises behind any build. D touches no code.
   collisions rewritten unread) judges both passes, read once in totals on three
   detector states: 12 of 500 before laughter, 8 after it, 6 (1.2 %) after the
   corpus 4/5 rules (native 3, romanised 2, laughter 1). The bar is not met.
-  Next: corpus 6, read twice, can become the tuning bench; judge on corpus 7's
-  second read or a corpus 8.
+  Then corpus 6 became a tuning bench, its 3 wrong lines read: no leaves the
+  English short tokens (es, it, pt write it too), davai leaves the Russian
+  words (Ukrainian writes it the same), sab and ko join Hinglish. Corpora 4 to
+  6 now hold 1 confident wrong line in 1500 (gg bro). Tatoeba loses one right
+  line, No, no, no!, now silent. Corpus 7, read a second time by its pin: native
+  3 to 2. Judged on a blind corpus 8.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.

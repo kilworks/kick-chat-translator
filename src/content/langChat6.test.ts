@@ -41,17 +41,21 @@ describe('le corpus 6, aveugle', () => {
   // Relu une deuxieme fois en totaux pour les regles reglees sur les corpus 4 et
   // 5 (2026-11-04) : une native de muette a juste, les 3 fausses inchangees. Plus
   // aveugle ; ces regles se jugent sur le corpus 7.
+  //
+  // Devenu banc de reglage le 2026-11-04 : ses 3 lignes fausses lues pour
+  // retirer `no` des jetons anglais, `давай` des mots russes, et ajouter `sab`
+  // et `ko` au hinglish. Plus aucune fausse.
   it('mesure le chemin sur en totaux', () => {
     // avant : 162 / 261 / 2
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6).total)).toEqual({ right: 160, silent: 263, wrong: 2 });
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6_ROMAN).total)).toEqual({ right: 0, silent: 49, wrong: 1 });
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6).total)).toEqual({ right: 159, silent: 266, wrong: 0 });
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant : 7 / 9 / 9
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT6_LAUGH).total)).toEqual({ right: 9, silent: 16, wrong: 0 });
   });
 
   it('mesure le chemin brut en totaux', () => {
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT6).total)).toEqual({ right: 237, silent: 113, wrong: 75 });
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT6_ROMAN).total)).toEqual({ right: 2, silent: 30, wrong: 18 });
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT6).total)).toEqual({ right: 236, silent: 116, wrong: 73 });
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT6_ROMAN).total)).toEqual({ right: 2, silent: 31, wrong: 17 });
     // avant : 7 / 9 / 9
     expect(plain(runMatrix(detectLanguage, LANG_CHAT6_LAUGH).total)).toEqual({ right: 9, silent: 9, wrong: 7 });
   });

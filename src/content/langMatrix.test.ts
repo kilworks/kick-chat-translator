@@ -32,11 +32,13 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
     // hongroises qui ne portaient que `nem` et huit bulgares qui ne portaient que
     // `го` ou `ще` : retirees parce qu'elles nommaient a tort le portugais, le
     // russe de chat et l'ukrainien. Silencieuses, pas fausses : wrong reste a 3.
-    expect(plain(CONFIDENT.total)).toEqual({ right: 3716, silent: 1321, wrong: 3 });
+    // 3716 avant le 2026-11-04 : `No, no, no!` ne sort plus en, `no` etant aussi
+    // espagnol, italien et portugais.
+    expect(plain(CONFIDENT.total)).toEqual({ right: 3715, silent: 1322, wrong: 3 });
   });
 
   it('confidentLanguage on short lines, the regime a chat lives in', () => {
-    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1072, silent: 605, wrong: 3 });
+    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1071, silent: 606, wrong: 3 });
   });
 
   // The expensive one. This is the answer that deletes a message in silence when
@@ -46,11 +48,12 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
   it('detectLanguage is wrong on a fifth of all lines', () => {
     // 4154/498 avant le 2026-11-03 : deux des huit phrases bulgares devenues
     // silencieuses sur le chemin sur tombent sur franc, qui les dit uk et ru.
-    expect(plain(DETECT.total)).toEqual({ right: 4152, silent: 388, wrong: 500 });
+    // 4152/388 avant le 2026-11-04 : la meme `No, no, no!`, que franc ne nomme pas.
+    expect(plain(DETECT.total)).toEqual({ right: 4151, silent: 389, wrong: 500 });
   });
 
   it('detectLanguage is wrong on a quarter of short lines', () => {
-    expect(plain(DETECT.shortOnly)).toEqual({ right: 1216, silent: 234, wrong: 230 });
+    expect(plain(DETECT.shortOnly)).toEqual({ right: 1215, silent: 235, wrong: 230 });
   });
 });
 

@@ -443,3 +443,20 @@ describe('les regles lues sur les corpus 4 et 5', () => {
     expect(confidentLanguage('abaixa o som da música pfv')).not.toBe('sk');
   });
 });
+
+// Lues sur le corpus 6 devenu banc de reglage (2026-11-04).
+describe('les regles lues sur le corpus 6', () => {
+  it('ne prend pas no pour de l anglais', () => {
+    expect(confidentLanguage('no no no no')).toBeUndefined();
+    expect(confidentLanguage('ok')).toBe('en');
+  });
+
+  it('laisse davai a l ukrainien autant qu au russe', () => {
+    expect(confidentLanguage('давай давай')).toBeUndefined();
+    expect(confidentLanguage('давай смотреть')).toBe('ru');
+  });
+
+  it('reconnait sab ko en hinglish', () => {
+    expect(confidentLanguage('good night sab ko')).toBeUndefined();
+  });
+});
