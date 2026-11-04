@@ -152,6 +152,14 @@ reads dist/, so it serialises behind any build. D touches no code.
   Google seems to have invented (not scored). `vc`, `tb`: no gain. `msm`: inside
   the noise. `pfv`, `vtnc`, `mdr`, `wlh`: never reached, not measured. Baseline
   bench: 690 of 690 sends unchanged. MyMemory not observed (daily quota).
+- [x] **On-device engines observed, Prompt API ruled out (2026-11-04).** Under
+  Playwright's launch flags Chrome 157 reports the Prompt API unavailable; started
+  by hand and joined over CDP, Translator and Gemini Nano both run. Local engine,
+  454 of 690 bench outputs: penalty a line 1.38 against Google's 0.90 on the same
+  lines, 1.87 against 1.02 on 100 hard lines under the same judges. Nano, 154 hard
+  outputs: 2.82 against 2.45, serious 31.2 % against 23.1 %, p50 452 ms, p95
+  1229 ms, so point 8 stops here. Open for a decision: on-device first is the
+  default mode and the worse engine on every source language measured.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.
