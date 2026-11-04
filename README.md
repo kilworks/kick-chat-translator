@@ -209,7 +209,9 @@ other people, so it never enters the repository: `test/e2e/capture-chat.mjs` and
 build the bench in a local folder, `KCT_BENCH=<folder> npx vitest run src/content/realBench.test.ts` measures
 on its held-out half, and without `KCT_BENCH` that test skips. `test/e2e/translation-quality.mjs` and
 `test/e2e/translation-score.mjs` translate bench lines the way the extension does and score them on an MQM
-error grid.
+error grid. `test/e2e/exclusivity-check.mjs` checks every "only this language writes this word" rule of the
+detector against word frequency lists for the 42 languages that have one (OpenSubtitles, kept outside the
+repository), and lists each rule another language also writes.
 
 A line no table recognises is checked against the browser's own detector, `i18n.detectLanguage`: what it reliably
 names wins, a guess of ours stands only if its first choice agrees, otherwise the line has no known language. That
