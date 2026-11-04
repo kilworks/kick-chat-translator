@@ -486,3 +486,23 @@ describe('les regles lues sur les corpus 7 et 8', () => {
     expect(confidentLanguage('bro bhaiya clip bana do ye wala')).toBeUndefined();
   });
 });
+
+// Lues sur le corpus 9 devenu banc de reglage (2026-11-04).
+describe('les regles lues sur le corpus 9', () => {
+  it('ne lit pas un mot de jeu anglais comme une ligne anglaise', () => {
+    expect(confidentLanguage('daj, pokazi boss fight')).not.toBe('en');
+    expect(confidentLanguage('goodnight chat, may pasok pa bukas')).not.toBe('en');
+  });
+
+  it('ne prend pas le present turc sans i sans point pour du tagalog', () => {
+    expect(confidentLanguage('hangi fareyi kullaniyorsun')).not.toBe('tl');
+  });
+
+  it('ne prend pas hitto pour de l italien', () => {
+    expect(confidentLanguage('ei hitto mikä tuuri')).not.toBe('it');
+  });
+
+  it('laisse budut et koli a l ukrainien', () => {
+    expect(confidentLanguage('коли дропи будуть')).toBe('uk');
+  });
+});

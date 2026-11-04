@@ -36,7 +36,8 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
     // espagnol, italien et portugais.
     // 3715 avant les mots partages retires (vse, iz, mia, давай) et le lexique
     // ajoute (2026-11-04) : cinq lignes de juste a muet, aucune de plus fausse.
-    expect(plain(CONFIDENT.total)).toEqual({ right: 3710, silent: 1327, wrong: 3 });
+    // 3710 / 1327 / 3 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
+    expect(plain(CONFIDENT.total)).toEqual({ right: 3709, silent: 1328, wrong: 3 });
   });
 
   it('confidentLanguage on short lines, the regime a chat lives in', () => {

@@ -611,7 +611,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   //   niy  tl=14, aucune autre. `niya`, `kaniya`, `niyang`. La table avait deja
   //        `niya` en MOT ; non bornee la sequence voit aussi les formes flechies.
   [/agy/iu, 'hu'],
-  [/niy/iu, 'tl'],
+  // pas devant -or : le present turc tape sans i sans point (`kullaniyorsun`).
+  [/niy(?!or)/iu, 'tl'],
   // LES MOTS OUTILS EXCLUSIFS, et c'est une passe que personne n'avait faite.
   //
   // Le lexique `SHORT_WORD_LANG` est un vocabulaire de CHAT et il est borne a
@@ -781,7 +782,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // `ssimo` et non `simo` : le superlatif italien double le s, bellissimo,
   // prossimo, massimo. Le s simple prenait l'espagnol tape sans accent,
   // buenisimo, et l'envoyait au moteur avec sl=it.
-  [/(iamo|ssimo|glio|tto|nno)([^\p{L}]|$)/iu, 'it'],
+  // pas `hitto`, le juron finnois du chat.
+  [/(iamo|ssimo|glio|(?<!hi)tto|nno)([^\p{L}]|$)/iu, 'it'],
   [/(knya|nmu|anku)([^\p{L}]|$)/iu, 'id'],
   [/ným([^\p{L}]|$)/iu, 'sk'],
   // LA SEULE ENTREE DU FICHIER QUI AIT JAMAIS RAPPORTE NEGATIF QUELQUE PART.
@@ -1745,9 +1747,10 @@ function malaisOuIndonesien(text: string): string | undefined {
  * serie a une lettre garde le `yy` du finnois ecrit, qui n'en a jamais trois.
  * Puis trois mots de chat anglais qui tombaient sur une terminaison : `wait` et
  * `bait` sur le `-ait` francais, `lich` (World of Warcraft) sur le `-lich`
- * allemand, qui n'existe jamais seul.
+ * allemand, qui n'existe jamais seul. Et `fight`, `night`, `goodnight`, que tout
+ * le chat emprunte et que le `-ght` anglais lisait anglais (`daj, pokazi boss fight`).
  */
-const ANGLAIS_DE_CHAT = /(^|[^\p{L}])(wait|bait|lich)(?=[^\p{L}]|$)/giu;
+const ANGLAIS_DE_CHAT = /(^|[^\p{L}])(wait|bait|lich|fight|night|goodnight)(?=[^\p{L}]|$)/giu;
 
 function detectByExclusiveLetter(raw: string): string | undefined {
   const text = raw.replace(/(\p{L})\1{2,}/gu, '$1').replace(ANGLAIS_DE_CHAT, '$1 ');
@@ -2051,16 +2054,16 @@ const LETTRES_UKRAINIENNES = /[іїєґ]/iu;
 // deux lignes bulgares contre une ukrainienne, ce qui est le mauvais sens.
 // `знаю` est russe autant qu'ukrainien.
 // ця, цей, знову, зараз : sans lettre propre, ni russes (эта, этот, снова, сейчас)
-// ni bulgares (тази, този, пак, сега). `ця мапа проклята` sortait bg.
-const MOTS_UKRAINIENS = /(^|[^\p{L}])(це|дуже|щоб|ця|цей|знову|зараз)([^\p{L}]|$)/iu;
+// ni bulgares (тази, този, пак, сега), коли (когда, кога). `ця мапа проклята` sortait bg.
+const MOTS_UKRAINIENS = /(^|[^\p{L}])(це|дуже|щоб|ця|цей|знову|зараз|коли)([^\p{L}]|$)/iu;
 const LETTRES_RUSSES = /[ыэё]/iu;
 const ER_BULGARE = /ъ/iu;
 /** L'article defini suffixe, que ni le russe ni l'ukrainien n'ont. */
 const ARTICLE_BULGARE = /(ът|ата|ята)([^\p{L}]|$)/iu;
 /** L'infinitif russe. Le bulgare n'en a pas, celui de l'ukrainien est -ти. */
 // Pas -ють, qu'aucun infinitif russe ne porte, ni -плять : c'est le pluriel
-// ukrainien (`знають`, `сплять`).
-const INFINITIF_RUSSE = /(?<!ю|пля)ть([^\p{L}]|$)/iu;
+// ukrainien (`знають`, `сплять`, `будуть`).
+const INFINITIF_RUSSE = /(?<!ю|пля|буду)ть([^\p{L}]|$)/iu;
 
 /**
  * Les mots russes, symetriques de MOTS_BULGARES, et choisis par CONTRASTE.

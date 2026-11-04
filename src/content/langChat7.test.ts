@@ -40,7 +40,8 @@ describe('le corpus 7, aveugle', () => {
   it('mesure le chemin sur en totaux', () => {
     // avant le rire : 166 / 254 / 5 ; apres : 164 / 256 / 5
     // 165 / 258 / 2 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7).total)).toEqual({ right: 163, silent: 261, wrong: 1 });
+    // 163 / 261 / 1 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7).total)).toEqual({ right: 163, silent: 262, wrong: 0 });
     // 0 / 48 / 2 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT7_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant le rire : 9 / 11 / 5
