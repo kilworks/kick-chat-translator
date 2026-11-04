@@ -70,8 +70,12 @@ reads dist/, so it serialises behind any build. D touches no code.
   laughter table, and a laugh in another script no longer decides the script
   check. The raw path keeps the laugh vote before franc. Corpus 5, read a
   second time in totals: 13 to 6 of 500 (1.2 %), laughter 7 to 0, native right
-  190 to 185 and still 3 wrong. Corpus 5 is no longer blind. Next: the 3 native
-  and 3 romanised, tuned on a bench, judged on a corpus 6.
+  190 to 185 and still 3 wrong. Corpus 5 is no longer blind. Blind corpus 6
+  (same brief, 0 overlap after 53 lines rewritten by its author) judges it, read
+  once in totals: 12 to 3 of 500 (2.4 % to 0.6 %), laughter 9 to 0, native right
+  162 to 159. The overall bar holds; the per-set bar does not (native 2 wrong).
+  Corpus 6 is read once. Next: native and romanised, tuned on a bench, judged on
+  a corpus 7.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.
