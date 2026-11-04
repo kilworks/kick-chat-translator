@@ -412,6 +412,16 @@ describe('TranslationPipeline — English chat abbreviations', () => {
     await reader('fr').onWebSocketMessage(wsMsg('był w domu cały dzień'));
     expect(sentText()).toBe('był w domu cały dzień');
   });
+
+  it('spells out Portuguese shorthand on a line it is sure is Portuguese', async () => {
+    await reader('fr').onWebSocketMessage(wsMsg('ta um calor da porra e eles com ese macacão slk'));
+    expect(sentText()).toBe('ta um calor da porra e eles com ese macacão você é louco');
+  });
+
+  it('leaves the shorthand alone when no language is sure of the line', async () => {
+    await reader('fr').onWebSocketMessage(wsMsg('pqp lag assim ja era'));
+    expect(sentText()).toBe('pqp lag assim ja era');
+  });
 });
 
 // On device has no auto-detect, so a line it was told the wrong source for comes

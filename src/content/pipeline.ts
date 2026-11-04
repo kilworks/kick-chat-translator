@@ -8,7 +8,7 @@ import { applyUserGlossary, isSlangOnly, protectNames, restoreNames } from '~/sh
 import { createMetrics } from '~/shared/metrics';
 import { mentionsOf, parseKickContent } from './emoteParser';
 import { countUsage } from './usage';
-import { spellOutAbbreviations } from './abbreviations';
+import { spellOutAbbreviations, spellOutForLanguage } from './abbreviations';
 import { extractMessageText, findAllRows } from './selectors';
 import { confidentLanguage, detectLanguage } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
@@ -247,11 +247,12 @@ export class TranslationPipeline {
     // "ngl", "idc", "lmk" reach a reader in another language as they are, or as
     // something else. Spelled out, the engine translates what was said. Same
     // English gate as the skip above, so a Polish `w` or a French `l` stays.
+    // Other languages spell out only on the looked-up answer, never on franc's guess.
     // Names the engines mistranslate leave as placeholders, after detection read the line as written.
     const real = protectNames(
       this.effTarget !== 'en' && detected === 'en' && !hasNonEnglishLetter(realText)
         ? spellOutAbbreviations(realText)
-        : realText,
+        : spellOutForLanguage(realText, hint),
     );
     return { real, detected, hint };
   }
