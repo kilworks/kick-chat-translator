@@ -124,6 +124,23 @@ reads dist/, so it serialises behind any build. D touches no code.
   508. Kept on purpose: Ukrainian koli against Bulgarian koli (cars), the
   Russian -it infinitive against the Ukrainian third person (excluding it made
   5 raw lines wrong), Malay tak.
+- [x] **Real chat bench and a translation baseline (2026-11-04, phase A).**
+  2000 live Kick lines from two captures, two independent annotators, dev
+  1007 / heldout 993 (sha256 pinned in `realBench.test.ts`, chat kept outside
+  git behind `KCT_BENCH`). Heldout, 700 lines with an agreed language:
+  confident 359 right, 338 silent, 3 wrong; raw 428 / 156 / 116; neutral lines
+  named a language 0 confident, 55 raw. MQM baseline, 6 sources (en ja th fi
+  tr pl) to en fr es pt-br, 30 lines a pair, two blind judges (kappa 0.806 on
+  a major or critical error): Google 1.30 penalty a line, 15.2 % serious
+  (n 686); MyMemory 2.12, 27.2 % (n 594, daily cap hit before pl to es, fr,
+  pt-br). Worst pairs: Finnish out (Google 2.0 to 2.7). Not observed: the
+  on-device engine (create() crashed the tab under Playwright), DeepL (no
+  key). Missing languages: 13 listed streams gave no line (el bg uk lv hr lt
+  vi no sq nl hu ast st), 9 under 30 lines (de it ko zh hi bn sr be am).
+  `emote_user` errors (90 outputs): 54 on lines with an @mention, the engine
+  altering it; 41 on lines with an emote, which the pipeline strips before
+  sending, so part of those may be the bench and not the reader's screen. To
+  settle at the start of point 4.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.
