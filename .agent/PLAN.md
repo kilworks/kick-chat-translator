@@ -153,7 +153,7 @@ reads dist/, so it serialises behind any build. D touches no code.
   the noise. `pfv`, `vtnc`, `mdr`, `wlh`: never reached, not measured. Baseline
   bench: 690 of 690 sends unchanged. MyMemory not observed (daily quota).
 - [x] **Browser detector behind the raw answer; retransliteration dropped
-  (2026-11-05, phase C).** Point 7: `i18n.detectLanguage`, rule fixed on dev.
+  (2026-11-04, phase C).** Point 7: `i18n.detectLanguage`, rule fixed on dev.
   Heldout, 700 lines, right / silent / wrong: today 428 / 156 / 116, Chrome
   409 / 276 / 15, Firefox 506 / 168 / 26; heldout read twice in totals, no change
   between. Tatoeba wrong 508, 70, 159. Content script p95 0.1 ms and 1 ms. Costs:
