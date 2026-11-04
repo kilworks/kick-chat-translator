@@ -5,8 +5,9 @@
  *
  * Read-only and anonymous: the two public endpoints the site itself calls
  * (/stream/livestreams/<lang>, /api/v2/channels/<id>/messages). Keeps only the
- * message content and the language the stream was listed under, never a user
- * or channel name. The output is third-party chat: keep it out of git.
+ * message content, the language the stream was listed under and the hour it
+ * was sent, never a user or channel name: an @mention in the text becomes an
+ * opaque @u<n>. The output is third-party chat: keep it out of git.
  *
  * Headed on purpose: Kick's Cloudflare answers a headless browser differently.
  */
@@ -70,7 +71,7 @@ for (let round = 0; round < ROUNDS; round++) {
       try {
         const r = await fetch(`/api/v2/channels/${c.id}/messages`);
         for (const m of (await r.json()).data?.messages ?? []) {
-          if (m.type === 'message') res.push({ id: m.id, lang: c.lang, ch: c.id, content: m.content });
+          if (m.type === 'message') res.push({ id: m.id, lang: c.lang, ch: c.id, content: m.content, at: m.created_at });
         }
       } catch {}
     }
@@ -79,7 +80,7 @@ for (let round = 0; round < ROUNDS; round++) {
   for (const m of got) {
     if (seen.has(m.id)) continue;
     seen.add(m.id);
-    lines.push({ lang: m.lang, ch: m.ch, content: m.content });
+    lines.push({ lang: m.lang, ch: m.ch, content: m.content, at: m.at });
   }
   console.log(`round ${round + 1}/${ROUNDS}: ${lines.length} lines from ${uniq.length} channels`);
   if (round < ROUNDS - 1) await page.waitForTimeout(60000);
@@ -88,12 +89,19 @@ await ctx.close();
 
 // The channel id only groups lines for the bot filter downstream; it is renumbered so the file names nobody.
 const renum = new Map();
+const users = new Map();
+const hour = (at) => (Number.isNaN(Date.parse(at)) ? null : new Date(Date.parse(at)).toISOString().slice(0, 13) + ':00Z');
 fs.writeFileSync(
   OUT,
   lines
     .map((l) => {
       if (!renum.has(l.ch)) renum.set(l.ch, renum.size);
-      return JSON.stringify({ lang: l.lang, ch: renum.get(l.ch), content: l.content });
+      const content = l.content.replace(/@([A-Za-z0-9_]{2,25})/g, (_, u) => {
+        const k = u.toLowerCase();
+        if (!users.has(k)) users.set(k, users.size);
+        return `@u${users.get(k)}`;
+      });
+      return JSON.stringify({ lang: l.lang, ch: renum.get(l.ch), t: hour(l.at), content });
     })
     .join('\n') + '\n',
 );
