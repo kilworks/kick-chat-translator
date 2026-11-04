@@ -78,8 +78,10 @@ describe('le corpus de la paire', () => {
   // une mesure a l aveugle. **Retrouver un aveugle propre demande un TROISIEME
   // corpus de paire, ecrit avant que quoi que ce soit ait ete lu.**
   it('mesure les deux chemins sur du registre familier', () => {
-    expect(plain(SURE.total)).toEqual({ right: 39, silent: 21, wrong: 0 });
-    expect(plain(BRUT.total)).toEqual({ right: 43, silent: 11, wrong: 6 });
+    // 39 / 21 / 0 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
+    expect(plain(SURE.total)).toEqual({ right: 36, silent: 24, wrong: 0 });
+    // 43 / 11 / 6 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
+    expect(plain(BRUT.total)).toEqual({ right: 41, silent: 12, wrong: 7 });
   });
 
   // LA MESURE QUI JUSTIFIE LE CORPUS, et la reponse n'est pas celle qu'on
@@ -104,7 +106,8 @@ describe('le corpus de la paire', () => {
         wrong: b.short.wrong + b.medium.wrong + b.long.wrong,
       };
     };
-    expect(plain(par('ms'))).toEqual({ right: 15, silent: 15, wrong: 0 });
+    // 15 / 15 / 0 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
+    expect(plain(par('ms'))).toEqual({ right: 12, silent: 18, wrong: 0 });
     expect(plain(par('id'))).toEqual({ right: 24, silent: 6, wrong: 0 });
   });
 
@@ -118,7 +121,8 @@ describe('le corpus de la paire', () => {
   // confondre les deux entre elles, il sort parfois de la famille entierement.
   it('confond les deux entre elles, et sort parfois de la paire', () => {
     expect(BRUT.confusions.get('id->ms')).toBe(2);
-    expect(BRUT.confusions.get('ms->id')).toBe(3);
+    // 3 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
+    expect(BRUT.confusions.get('ms->id')).toBe(4);
     // Le reste part ailleurs, et il en reste UNE sur six.
     expect(BRUT.confusions.get('id->fr')).toBeUndefined();
     expect(BRUT.confusions.get('ms->fr')).toBe(1);

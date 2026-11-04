@@ -33,17 +33,22 @@ describe('le corpus 10, aveugle', () => {
   // total 1,0 % : barre NON tenue.
   it('mesure le chemin sur en totaux', () => {
     // avant toute passe : 142 / 279 / 4
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT10).total)).toEqual({ right: 146, silent: 278, wrong: 1 });
+    // 146 / 278 / 1 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT10).total)).toEqual({ right: 146, silent: 279, wrong: 0 });
     // avant toute passe : 0 / 48 / 2
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT10_ROMAN).total)).toEqual({ right: 0, silent: 49, wrong: 1 });
+    // 0 / 49 / 1 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT10_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant le rire : 6 / 14 / 5
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT10_LAUGH).total)).toEqual({ right: 6, silent: 16, wrong: 3 });
+    // 6 / 16 / 3 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT10_LAUGH).total)).toEqual({ right: 6, silent: 19, wrong: 0 });
   });
 
   it('mesure le chemin brut en totaux', () => {
     expect(plain(runMatrix(detectLanguage, LANG_CHAT10).total)).toEqual({ right: 258, silent: 84, wrong: 83 });
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT10_ROMAN).total)).toEqual({ right: 4, silent: 29, wrong: 17 });
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT10_LAUGH).total)).toEqual({ right: 15, silent: 2, wrong: 8 });
+    // 4 / 29 / 17 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT10_ROMAN).total)).toEqual({ right: 4, silent: 30, wrong: 16 });
+    // 15 / 2 / 8 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT10_LAUGH).total)).toEqual({ right: 16, silent: 2, wrong: 7 });
   });
 
   it('n est lu par aucun autre fichier', () => {

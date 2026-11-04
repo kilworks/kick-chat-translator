@@ -162,6 +162,7 @@ const FORMES: FormeDeRire[] = [
   { motif: /^خ{3,}$/ },
   { motif: /^ח{3,}$/ },
   { motif: /^[ㅋㅎ]{2,}$/ },
+  { motif: /^(?:하|크|키|히|흐){2,}$/ },
   { motif: /^(?:哈){2,}$/ },
   { motif: /^(?:呵){2,}$/ },
   { motif: /^(?:[wｗ]*草+[wｗ]*|大草原)$/ },
@@ -316,6 +317,8 @@ export const LAUGHTER_NOTES: Readonly<Record<string, string>> = {
     'Hebrew chchch',
   '^[ㅋㅎ]{2,}$':
     'Korean jamo kk and hh typed on their own',
+  '^(?:하|크|키|히|흐){2,}$':
+    'Korean hahaha, keukeuke, kiki, hihi, heuheu typed as full syllables; the script already names the language',
   '^(?:哈){2,}$':
     'Mandarin haha',
   '^(?:呵){2,}$':

@@ -506,3 +506,20 @@ describe('les regles lues sur le corpus 9', () => {
     expect(confidentLanguage('коли дропи будуть')).toBe('uk');
   });
 });
+
+// Lues sur le corpus 10 devenu banc de reglage (2026-11-04).
+describe('les regles lues sur le corpus 10', () => {
+  it('ne prend pas le rire coreen en syllabes pour la langue de la ligne', () => {
+    expect(confidentLanguage('yine kaybetti 하하하하')).not.toBe('ko');
+    expect(confidentLanguage('bu boss delirmis 크크크')).not.toBe('ko');
+    expect(confidentLanguage('하하하')).toBe('ko');
+  });
+
+  it('ne prend pas dah indonesien pour du malais', () => {
+    expect(confidentLanguage('yah zonk lagi dah')).not.toBe('ms');
+  });
+
+  it('reconnait karne et baad en hinglish', () => {
+    expect(confidentLanguage('ye boss 40 baar try karne ke baad mara')).toBeUndefined();
+  });
+});

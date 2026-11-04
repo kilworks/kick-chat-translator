@@ -1715,8 +1715,9 @@ const MOTS_INDONESIENS =
 // separent dans le registre familier, que Tatoeba ne contient pas, et les deux
 // corpus de paire le montrent en passant de 48 a 65 % pendant que la matrice ne
 // bouge pas.
+// Pas `dah` : l'indonesien familier l'ecrit aussi (`udah`, `dah`).
 const MOTS_MALAIS =
-  /(^|[^\p{L}])(kerana|sahaja|cuba|esok|bilik|mahu|jom|tengok|macam|betul|sikit|jugak|memang|nak|tiada|teruk|nampak|berlaku|dah|tak|weh|lelaki)([^\p{L}]|$)/iu;
+  /(^|[^\p{L}])(kerana|sahaja|cuba|esok|bilik|mahu|jom|tengok|macam|betul|sikit|jugak|memang|nak|tiada|teruk|nampak|berlaku|tak|weh|lelaki)([^\p{L}]|$)/iu;
 
 function malaisOuIndonesien(text: string): string | undefined {
   if (!MOTS_MALAIS_INDONESIENS.test(text)) return undefined;
@@ -2478,6 +2479,7 @@ const MOTS_HINGLISH = new Set([
   // sortait nl par `-aar`. Seuls ils ne decident rien, il en faut deux.
   'gaya', 'gayi', 'raha', 'rahi', 'dekh', 'baar', 'phir', 'maza', 'haar', 'pehli',
   'sab', 'ko', 'fir', 'kal', 'aana', 'sabko', 'bhaiya', 'wala', 'wali',
+  'karne', 'karna', 'baad',
 ]);
 
 // Trois mots qu'aucune langue latine du produit n'ecrit, assez forts seuls :
