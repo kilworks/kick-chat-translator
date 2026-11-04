@@ -55,8 +55,10 @@ const nommees = LANG_MIXED.filter((t) => confidentLanguage(t) !== undefined);
 
 describe('les lignes qui changent de langue', () => {
   // Le chiffre de reference. Il doit BAISSER, jamais monter.
-  it('en nomme dix sur soixante, et c est le cout accepte du lexique', () => {
-    expect(nommees.length).toBe(10);
+  it('en nomme huit sur soixante, et c est le cout accepte du lexique', () => {
+    // 10 avant la revue linguiste (2026-11-04) : `salut` et `hola` ne votent plus,
+    // le roumain et le catalan les ecrivent aussi.
+    expect(nommees.length).toBe(8);
   });
 
   // La preuve que c'est bien la borne qui fait le travail et pas autre chose :
@@ -67,7 +69,7 @@ describe('les lignes qui changent de langue', () => {
     expect(longues).toEqual([]);
   });
 
-  // Les dix sont des salutations suivies d'un mot d'anglais de chat, le melange
+  // Les huit sont des salutations suivies d'un mot d'anglais de chat, le melange
   // le plus court et le plus frequent. C'est la limite connue du lexique : sur
   // `merci bro`, deux mots dont un francais, il n'y a pas de bonne reponse
   // evidente, et nommer le francais est defendable. Sur `merci bro that was
@@ -81,8 +83,6 @@ describe('les lignes qui changent de langue', () => {
       'tack man',
       'kiitos bro',
       'obrigado man',
-      'salut guys',
-      'hola chat',
       'ciao all',
     ]);
   });

@@ -30,7 +30,8 @@ describe('detectLanguage', () => {
   });
 
   it('identifies short foreign chat words instead of calling them English', () => {
-    expect(detectLanguage('hola')).toBe('es');
+    // `hola` n'y est plus : le catalan l'ecrit aussi (revue linguiste, 2026-11-04).
+    expect(detectLanguage('hola')).toBeUndefined();
     expect(detectLanguage('gracias')).toBe('es');
     expect(detectLanguage('merci')).toBe('fr');
     expect(detectLanguage('danke')).toBe('de');
@@ -158,10 +159,13 @@ describe('un nom d hote n est pas du rire japonais', () => {
   });
 
   // Ce que la pleine chasse recupere en face, et pourquoi elle a le droit de
-  // marquer la langue : aucun nom d hote ne s ecrit en ｗ.
+  // marquer la langue : aucun nom d hote ne s ecrit en ｗ. Seul, ou pour le
+  // drapeau : a cote d un mot inconnu le rire ne nomme plus la source sure
+  // (2026-11-04), sinon `helal ｗｗｗ` partait en ja.
   it('lit le rire japonais tape en pleine chasse', () => {
     expect(detectLanguage('sugoi ｗｗｗ')).toBe('ja');
-    expect(confidentLanguage('sugoi ｗｗｗ')).toBe('ja');
+    expect(confidentLanguage('ｗｗｗ')).toBe('ja');
+    expect(confidentLanguage('sugoi ｗｗｗ')).toBeUndefined();
   });
 
   // Le prix, ecrit plutot que cache : le japonais en romaji suivi d un rire
@@ -400,9 +404,176 @@ describe('confidentLanguage does not name a language on common chat words', () =
     expect(confidentLanguage('bellissimo questo gioco')).toBe('it');
     expect(confidentLanguage('che bella partita')).toBe('it');
     expect(confidentLanguage('pyydän anteeksi')).toBe('fi');
-    expect(confidentLanguage('kkkk mano')).toBe('pt');
-    expect(confidentLanguage('wkwk anjir')).toBe('id');
-    expect(confidentLanguage('jajaja que buena')).toBe('es');
+    // Le rire a cote d un mot que la table ne connait pas ne nomme plus la source
+    // sure : `kkkk was zum` sortait pt. Il garde le drapeau et les filtres.
+    expect(confidentLanguage('kkkk mano')).toBeUndefined();
+    expect(detectLanguage('kkkk mano')).toBe('pt');
+    expect(detectLanguage('wkwk anjir')).toBe('id');
+    expect(detectLanguage('jajaja que buena')).toBe('es');
+    expect(confidentLanguage('kkkk was zum')).toBeUndefined();
+    expect(confidentLanguage('que golazo ㅋㅋㅋ')).toBeUndefined();
+    expect(confidentLanguage('ㅋㅋㅋ 진짜')).toBe('ko');
     expect(confidentLanguage('това е много добре')).toBe('bg');
+  });
+});
+
+// Lues sur les corpus 4 et 5 devenus bancs de reglage (2026-11-04) : chacune
+// nommait une langue sure fausse.
+describe('les regles lues sur les corpus 4 et 5', () => {
+  it('ne prend pas le fuer allemand pour de l espagnol', () => {
+    expect(confidentLanguage('was fuer ein clip')).not.toBe('es');
+    expect(confidentLanguage('fuera de aqui')).toBe('es');
+  });
+
+  it('reconnait le hinglish de tous les jours avant le -aar neerlandais', () => {
+    expect(confidentLanguage('sab kuch haar gaya lol')).toBeUndefined();
+    expect(confidentLanguage('phir se sab slots me haar gaya')).toBeUndefined();
+  });
+
+  it('ne lit pas -aat neerlandais sur une ligne finnoise a ii', () => {
+    expect(confidentLanguage('kiitti kun streamaat')).not.toBe('nl');
+    expect(confidentLanguage('hij gaat naar huis')).toBe('nl');
+  });
+
+  it('tient le russe en lettres latines a ch et -noe pour russe', () => {
+    expect(confidentLanguage('eys byl chistyy')).toBeUndefined();
+    expect(confidentLanguage('stavi vse na krasnoe')).toBeUndefined();
+  });
+
+  it('laisse pfv au portugais devant som slovaque', () => {
+    expect(confidentLanguage('abaixa o som da música pfv')).not.toBe('sk');
+  });
+});
+
+// Lues sur le corpus 6 devenu banc de reglage (2026-11-04).
+describe('les regles lues sur le corpus 6', () => {
+  it('ne prend pas no pour de l anglais', () => {
+    expect(confidentLanguage('no no no no')).toBeUndefined();
+    expect(confidentLanguage('ok')).toBe('en');
+  });
+
+  it('laisse davai a l ukrainien autant qu au russe', () => {
+    expect(confidentLanguage('давай давай')).toBeUndefined();
+    expect(confidentLanguage('давай смотреть')).toBe('ru');
+  });
+
+  it('reconnait sab ko en hinglish', () => {
+    expect(confidentLanguage('good night sab ko')).toBeUndefined();
+  });
+});
+
+// Lues sur les corpus 7 et 8 devenus bancs de reglage (2026-11-04) : des mots
+// que deux langues ecrivent pareil, et du lexique qui manquait.
+describe('les regles lues sur les corpus 7 et 8', () => {
+  it('ne prend pas vse et iz du russe en lettres latines pour du slovene', () => {
+    expect(confidentLanguage('opyat slil vse dengi')).not.toBe('sl');
+    expect(confidentLanguage('ya iz Kazani, vsem salam')).not.toBe('sl');
+    expect(confidentLanguage('davno ne videl takogo farta')).not.toBe('sl');
+  });
+
+  it('ne prend pas madre mia pour de l italien', () => {
+    expect(confidentLanguage('madre mia loco')).not.toBe('it');
+  });
+
+  it('laisse le pluriel et les mots ukrainiens a l ukrainien', () => {
+    expect(confidentLanguage('модери сплять')).not.toBe('ru');
+    expect(confidentLanguage('ця мапа проклята')).toBe('uk');
+    expect(confidentLanguage('модер знову спить')).toBe('uk');
+  });
+
+  it('reconnait le tagalog et le hinglish a cote de l anglais', () => {
+    expect(confidentLanguage('good night sa lahat')).not.toBe('en');
+    expect(confidentLanguage('kal fir aana hai, good night sabko')).toBeUndefined();
+    expect(confidentLanguage('bro bhaiya clip bana do ye wala')).toBeUndefined();
+  });
+});
+
+// Lues sur le corpus 9 devenu banc de reglage (2026-11-04).
+describe('les regles lues sur le corpus 9', () => {
+  it('ne lit pas un mot de jeu anglais comme une ligne anglaise', () => {
+    expect(confidentLanguage('daj, pokazi boss fight')).not.toBe('en');
+    expect(confidentLanguage('goodnight chat, may pasok pa bukas')).not.toBe('en');
+  });
+
+  it('ne prend pas le present turc sans i sans point pour du tagalog', () => {
+    expect(confidentLanguage('hangi fareyi kullaniyorsun')).not.toBe('tl');
+  });
+
+  it('ne prend pas hitto pour de l italien', () => {
+    expect(confidentLanguage('ei hitto mikä tuuri')).not.toBe('it');
+  });
+
+  it('laisse budut et koli a l ukrainien', () => {
+    expect(confidentLanguage('коли дропи будуть')).toBe('uk');
+  });
+});
+
+// Lues sur le corpus 10 devenu banc de reglage (2026-11-04).
+describe('les regles lues sur le corpus 10', () => {
+  it('ne prend pas le rire coreen en syllabes pour la langue de la ligne', () => {
+    expect(confidentLanguage('yine kaybetti 하하하하')).not.toBe('ko');
+    expect(confidentLanguage('bu boss delirmis 크크크')).not.toBe('ko');
+    expect(confidentLanguage('하하하')).toBe('ko');
+  });
+
+  it('ne prend pas dah indonesien pour du malais', () => {
+    expect(confidentLanguage('yah zonk lagi dah')).not.toBe('ms');
+  });
+
+  it('reconnait karne et baad en hinglish', () => {
+    expect(confidentLanguage('ye boss 40 baar try karne ke baad mara')).toBeUndefined();
+  });
+});
+
+// La revue linguiste du 2026-11-04 : chaque ligne ci-dessous etait nommee a tort
+// sur le chemin sur, et chaque correction a ete vue rouge sur l ancien code.
+describe('la revue linguiste, anglais de chat', () => {
+  it.each([
+    ['ik bro', 'nl'], ['ik that was insane', 'nl'], ['wat lol', 'nl'],
+    ['did it proc', 'cs'], ['nice quest', 'ca'], ['that guest is crazy', 'ca'],
+    ['the government again', 'sl'], ['ninja move', 'sl'],
+    ['my lawyer said no', 'pl'], ['wyd bro', 'pl'], ['the czech guy', 'pl'],
+    ['wired headset is better', 'de'], ['fuel the hype', 'es'], ['pour one out', 'fr'],
+    ['nice ghetto', 'it'], ['ditto', 'it'], ['kung fu panda', 'tl'],
+    ['whyy', 'fi'], ['my guyy', 'fi'],
+    ['wait til the winner', 'no'], ['bare minimum like always', 'no'],
+    ['pokémon is the most fun', 'hu'], ['mbappé is the most cracked', 'hu'],
+  ])('%s ne sort pas %s', (ligne, faux) => {
+    expect(confidentLanguage(ligne)).not.toBe(faux);
+  });
+});
+
+describe('la revue linguiste, mots que la voisine ecrit aussi', () => {
+  it.each([
+    ['taas', 'fi'], ['anna mulle', 'et'],
+    ['aşa este', 'tr'], ['ce faci aşa', 'tr'], ['salut frate', 'fr'],
+    ['ele vin acum', 'pt'], ['ele au castigat', 'pt'],
+    ['memang betul', 'ms'], ['baiknya', 'id'],
+    ['много денег', 'bg'], ['ne sme tega', 'sk'],
+    ['hallo', 'de'], ['ja gerne', 'de'], ['vad sker', 'da'],
+    ['hola a tots', 'es'], ['hostia tu', 'es'], ['vale a pena', 'es'],
+    ['che boludo', 'it'], ['او لا', 'fa'], ['ڤيديو حلو', 'ms'],
+    ['velmi dobre', 'cs'], ['dobra hra', 'sk'], ['s krásným gólem', 'sk'],
+  ])('%s ne sort pas %s', (ligne, faux) => {
+    expect(confidentLanguage(ligne)).not.toBe(faux);
+  });
+
+  it.each([
+    ['to je pravda', 'ru'], ['nikogo nie ma', 'ru'], ['dobre sme', 'bg'],
+  ])('%s ne sort pas %s, meme hors du chemin sur', (ligne, faux) => {
+    expect(detectLanguage(ligne)).not.toBe(faux);
+  });
+
+  it('lit la cedille roumaine ancienne comme du roumain', () => {
+    expect(confidentLanguage('mulţumesc frate')).toBe('ro');
+  });
+});
+
+describe('les penchants du chemin brut', () => {
+  it('rend au brut ce que le chemin sur ne nomme plus', () => {
+    expect(confidentLanguage('no taas')).toBeUndefined();
+    expect(detectLanguage('no taas')).toBe('fi');
+    expect(confidentLanguage('ele ganhou')).toBeUndefined();
+    expect(detectLanguage('ele ganhou')).toBe('pt');
   });
 });

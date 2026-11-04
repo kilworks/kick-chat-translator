@@ -32,11 +32,18 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
     // hongroises qui ne portaient que `nem` et huit bulgares qui ne portaient que
     // `го` ou `ще` : retirees parce qu'elles nommaient a tort le portugais, le
     // russe de chat et l'ukrainien. Silencieuses, pas fausses : wrong reste a 3.
-    expect(plain(CONFIDENT.total)).toEqual({ right: 3716, silent: 1321, wrong: 3 });
+    // 3716 avant le 2026-11-04 : `No, no, no!` ne sort plus en, `no` etant aussi
+    // espagnol, italien et portugais.
+    // 3715 avant les mots partages retires (vse, iz, mia, давай) et le lexique
+    // ajoute (2026-11-04) : cinq lignes de juste a muet, aucune de plus fausse.
+    // 3710 / 1327 / 3 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
+    // 3709 / 1328 / 3 avant la revue linguiste (2026-11-04)
+    expect(plain(CONFIDENT.total)).toEqual({ right: 3676, silent: 1361, wrong: 3 });
   });
 
   it('confidentLanguage on short lines, the regime a chat lives in', () => {
-    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1072, silent: 605, wrong: 3 });
+    // 1071 / 606 / 3 avant la revue linguiste (2026-11-04)
+    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1056, silent: 621, wrong: 3 });
   });
 
   // The expensive one. This is the answer that deletes a message in silence when
@@ -46,11 +53,17 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
   it('detectLanguage is wrong on a fifth of all lines', () => {
     // 4154/498 avant le 2026-11-03 : deux des huit phrases bulgares devenues
     // silencieuses sur le chemin sur tombent sur franc, qui les dit uk et ru.
-    expect(plain(DETECT.total)).toEqual({ right: 4152, silent: 388, wrong: 500 });
+    // 4152/388 avant le 2026-11-04 : la meme `No, no, no!`, que franc ne nomme pas.
+    // 4151 / 389 / 500 avant les mots partages retires (2026-11-04)
+    // 4146 / 392 / 502 avant la revue linguiste (2026-11-04) : les lignes que le
+    // chemin sur ne nomme plus retombent sur franc, et les penchants n'en
+    // rattrapent que 13 fausses sur 19.
+    expect(plain(DETECT.total)).toEqual({ right: 4135, silent: 397, wrong: 508 });
   });
 
   it('detectLanguage is wrong on a quarter of short lines', () => {
-    expect(plain(DETECT.shortOnly)).toEqual({ right: 1216, silent: 234, wrong: 230 });
+    // 1214 / 236 / 230 avant la revue linguiste (2026-11-04)
+    expect(plain(DETECT.shortOnly)).toEqual({ right: 1206, silent: 238, wrong: 236 });
   });
 });
 
@@ -149,7 +162,8 @@ describe('the languages the detector cannot name at all', () => {
     // `bare` against `bara`, `selv` against `själv`, `mange` against `många`,
     // `hvem` against `vem`. 28 and 24 to 26 and 22, and `no` 49 of 120 to 51,
     // `da` 51 to 55.
-    expect(DETECT.confusions.get('no->sv')).toBe(26);
+    // 26 avant la revue linguiste (2026-11-04)
+    expect(DETECT.confusions.get('no->sv')).toBe(27);
     expect(DETECT.confusions.get('da->sv')).toBe(22);
     expect(DETECT.confusions.get('ca->es')).toBe(17);
   });

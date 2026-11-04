@@ -57,11 +57,76 @@ reads dist/, so it serialises behind any build. D touches no code.
   source and sends NB (673971f), two stale statements (0939934). The study's
   `verify-handover-claims.mjs` runs again: 48 of 67, the 19 others are counts
   grown since 2.10.0.
-- [ ] **Corpus 4: the bar is not met.** Written before the change: at most one
-  confident wrong answer per set, 0.7 % overall. Measured 1.2 % (6 of 500),
-  three of them Russian in Latin letters named fi. Read only in totals
-  (`impl/c4totals.mts`), already read twice: the next rule needs a fresh
-  blind set, not this one.
+- [x] **The blind bar is not met, and corpus 5 says it is further off than
+  corpus 4 did.** Bar written before: at most one confident wrong answer per
+  set, 0.7 % overall. Corpus 4 ended at 1.2 % and was read twice, so blind
+  corpus 5 was written to the same brief (2026-11-04, 1c743c4): 13 of 500
+  (2.6 %) before any rule, 3 native, 3 romanised, **7 of 25 laughter**. The
+  Russian -yy adjective form (tuned on a separate 50-line bench, 10 confident
+  wrong to 2) takes corpus 4 romanised from 4 to 2 and changes nothing on
+  corpus 5. Laughter next (2026-11-04), tuned on a scratch bench of 141 mixed
+  culture lines (73 confident wrong to 1): a laugh no longer votes beside a
+  word the table does not know, mdr and ptdr leave the word table for the
+  laughter table, and a laugh in another script no longer decides the script
+  check. The raw path keeps the laugh vote before franc. Corpus 5, read a
+  second time in totals: 13 to 6 of 500 (1.2 %), laughter 7 to 0, native right
+  190 to 185 and still 3 wrong. Corpus 5 is no longer blind. Blind corpus 6
+  (same brief, 0 overlap after 53 lines rewritten by its author) judges it, read
+  once in totals: 12 to 3 of 500 (2.4 % to 0.6 %), laughter 9 to 0, native right
+  162 to 159. The overall bar holds; the per-set bar does not (native 2 wrong).
+  Corpus 6 is read once. Then corpora 4 and 5 became tuning benches and their
+  9 confident wrong lines were read: fuer (German ue) no longer votes es,
+  everyday Hinglish verbs join the lexicon, the Dutch -aat/-aal rule skips lines
+  with ii, the Russian adjective form takes ch/sh/zh/kh before -yy and -noe, pfv
+  joins the Portuguese gate words. Corpus 4 to 0 wrong, corpus 5 to 1 (gg bro,
+  filed Indonesian, read English). Corpus 6, read a second time in totals: 3
+  wrong unchanged, one native silent to right. Blind corpus 7 (new author, 73
+  collisions rewritten unread) judges both passes, read once in totals on three
+  detector states: 12 of 500 before laughter, 8 after it, 6 (1.2 %) after the
+  corpus 4/5 rules (native 3, romanised 2, laughter 1). The bar is not met.
+  Then corpus 6 became a tuning bench, its 3 wrong lines read: no leaves the
+  English short tokens (es, it, pt write it too), davai leaves the Russian
+  words (Ukrainian writes it the same), sab and ko join Hinglish. Corpora 4 to
+  6 now hold 1 confident wrong line in 1500 (gg bro). Tatoeba loses one right
+  line, No, no, no!, now silent. Corpus 7, read a second time by its pin: native
+  3 to 2. Blind corpus 8 (new author, 25 collisions rewritten unread), read
+  once in totals on four detector states: 14 of 500 (2.8 %) before laughter, 8
+  after it, 6 after the corpus 4/5 rules, 6 (1.2 %) after the corpus 6 rules,
+  which move nothing there. Native 3, romanised 3, laughter 0. The bar is not
+  met, and the last pass did not move the blind count: rules read off single
+  wrong lines generalise to their own class only. Then the same loop again,
+  each blind corpus judged once and then used as a bench: corpora 7 and 8
+  (shared words vse, iz, mia, davai; Ukrainian -yut, -plyat; Tagalog lahat;
+  Ukrainian tsya, znovu, zaraz; Russian -kogo), corpus 9 (fight and night
+  stripped as English chat words, Turkish -iyor against Tagalog niy, hitto,
+  Ukrainian budut and koli: blind 12 to 5), corpus 10 (Korean syllable
+  laughter, dah no longer Malay, Hinglish karne and baad: blind 11 to 5,
+  native 1 and romanised 1 meet the per-set bar, laughter keeps 3). Benches
+  4 to 10 hold 1 wrong in 3500 (gg bro). Cost: Tatoeba confident right 3716
+  to 3709, Malay pair confident right 39 to 36. Blind corpus 11 (new author,
+  27 collisions rewritten unread, one left at judgment: a native Russian line
+  read right) judges them, read once in totals: 8 of 500 before any pass, 1
+  (0.2 %) after, native 1, romanised 0, laughter 0. **The bar is met**, on one
+  blind corpus. One corpus 11 line was seen in an error message after the
+  judgment. Blind corpus 12 confirms it cleanly (23 collisions rewritten
+  unread, 0 at judgment, no line read): 8 of 500 before any pass, 1 (0.2 %)
+  after, native 1, romanised 0, laughter 0.
+- [x] **Linguistic review of the rule tables (2026-11-04).** The corpora never
+  held the English that Kick chat types (ik, wat, proc, quest, government,
+  ninja, lawyer, wyd), so the bar could not see it: 77 of 97 probe lines were
+  confident wrong, 23 after (the rest is romanised and transliterated text,
+  not in this pass). Two written contradictions resolved (taas, ele), Romanian
+  legacy cedilla, sibling words removed (hallo, gerne, salut, hola, vale,
+  memang, betul, mnogo, velmi, sme, mulle, -knya, -nym, pravda). Shared forms
+  where one sibling dominates stay on the raw path only (`PENCHANTS`).
+  Confident wrong unchanged everywhere (corpus 11: 1 to 0). Cost: Tatoeba
+  confident right 3709 to 3676, tuning chats 2079 to 2035, raw wrong 502 to
+  508. Kept on purpose: Ukrainian koli against Bulgarian koli (cars), the
+  Russian -it infinitive against the Ukrainian third person (excluding it made
+  5 raw lines wrong), Malay tak.
+- [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
+  runs on 2026-11-04: extension-load, then green, then translate-cache, then
+  nav-monde, each green when run alone (2 to 3 times). Not traced.
 - [ ] **DeepL changes never observed.** No key on this machine. The batch
   `source_lang` and NB for Norwegian are pinned by tests on the request body
   only; NB as a source code comes from the DeepL list as recalled, not

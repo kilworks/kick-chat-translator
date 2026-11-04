@@ -60,9 +60,14 @@ describe('le detecteur sur du chat qu il n a jamais vu', () => {
   // ou il l'a ete est exactement ce que le lexique n'arrivait plus a faire.
   it('rappelle un tiers de moins en brut, mais la longueur en explique la moitie', () => {
     // 148 et 61 avant le 2026-11-03, le retrait de `nem` du hongrois.
-    expect(plain(SURE2.total)).toEqual({ right: 147, silent: 113, wrong: 0 });
-    expect(rappel(SURE1.total)).toBe(60);
-    expect(rappel(SURE2.total)).toBe(57);
+    // 147 / 113 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    // 146 / 114 / 0 avant la revue linguiste (2026-11-04)
+    expect(plain(SURE2.total)).toEqual({ right: 141, silent: 119, wrong: 0 });
+    // 60 avant la revue linguiste (2026-11-04)
+    expect(rappel(SURE1.total)).toBe(59);
+    // 57 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    // 56 avant la revue linguiste (2026-11-04)
+    expect(rappel(SURE2.total)).toBe(54);
     // Le facteur confondant, mesure : les deux corpus ne sont pas comparables tels quels.
     const lignes = (c: Record<string, readonly string[]>): string[] => Object.values(c).flat();
     const part = (c: Record<string, readonly string[]>): number =>
@@ -113,18 +118,25 @@ describe('le detecteur sur du chat qu il n a jamais vu', () => {
       Object.fromEntries(Object.entries(corp).map(([l, v]) => [l, v.filter(garde)]));
     const court = (t: string): boolean => t.length <= 20;
     const long = (t: string): boolean => t.length > 20;
-    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT, court)).total)).toBe(60);
-    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, court)).total)).toBe(56);
+    // 60 avant la revue linguiste (2026-11-04)
+    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT, court)).total)).toBe(59);
+    // 56 avant la revue linguiste (2026-11-04)
+    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, court)).total)).toBe(54);
     expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT, long)).total)).toBe(60);
-    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, long)).total)).toBe(57);
+    // 57 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    // 56 avant la revue linguiste (2026-11-04)
+    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, long)).total)).toBe(55);
   });
 
   // Le chemin brut perd moins parce qu'il ne depend pas du lexique : franc lit
   // des trigrammes, pas des mots choisis a la main. Sa perte, 61 % a 55 %, est
   // du bruit d'echantillonnage plutot que de la memorisation.
   it('montre que seul le chemin qui depend du lexique perd au changement de corpus', () => {
-    expect(plain(BRUT2.total)).toEqual({ right: 184, silent: 28, wrong: 48 });
-    expect(rappel(BRUT2.total)).toBe(71);
+    // 184 / 28 / 48 avant la revue linguiste (2026-11-04)
+    // 180 / 28 / 52 avant les penchants du chemin brut (2026-11-04)
+    expect(plain(BRUT2.total)).toEqual({ right: 182, silent: 28, wrong: 50 });
+    // 71 avant la revue linguiste (2026-11-04)
+    expect(rappel(BRUT2.total)).toBe(70);
   });
 
   // La regle qui garde ce banc utilisable, et elle est fragile : il suffit d'une

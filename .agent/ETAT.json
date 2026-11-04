@@ -1,24 +1,22 @@
 {
-  "genere": "2026-11-03T19:53:15.374Z",
+  "genere": "2026-11-04T00:02:16.786Z",
   "parQui": ".agent/state.mjs",
   "avertissement": "Genere. Ne pas editer a la main : la prochaine passe ecrase. La version commitee decrit l'etat d'AVANT le commit qui la porte, puisque la fin de passe genere puis commite : git.head y pointe le commit precedent et git.arbrePropre y est faux. Relancer `node .agent/state.mjs` avant de lire, ce que le prompt demande deja en premier.",
   "git": {
     "remotesEnDouble": [],
-    "branche": "feat/translation-quality",
-    "head": "09399344d58a0c87ced098b4d60901347fbaa196",
-    "sujet": "Fix two stale statements: corpus 3 title and the tinyld bet",
+    "branche": "feat/corpus5-ru-translit",
+    "head": "1c743c4396cf6ee29cdec63608af7f3aaff04bd9",
+    "sujet": "Add blind chat corpus 5, measured in totals before any rule it judges",
     "arbrePropre": false,
-    "fichiersModifies": 8,
+    "fichiersModifies": 9,
     "dernierTag": "v3.3.0",
-    "decrit": "v3.3.0-12-g0939934",
+    "decrit": "v3.3.0-6-g1c743c4",
     "remotes": {
       "origin": "https://github.com/kilworks/kick-chat-translator.git"
     },
     "ecarts": {
       "origin": {
-        "derriere": 0,
-        "devant": 3,
-        "aJour": false
+        "note": "pas de origin/feat/corpus5-ru-translit connu localement"
       }
     }
   },
@@ -173,7 +171,7 @@
       "poids-notes",
       "audit-fiche"
     ],
-    "harnaisSurDisque": 81,
+    "harnaisSurDisque": 82,
     "orphelins": [
       "a11y",
       "anglais-essai",
@@ -184,6 +182,7 @@
       "build-lang-corpus",
       "canto-bench",
       "canto-candidats",
+      "capture-chat",
       "charge-chat",
       "collision-clavier",
       "compose-kick-live",
@@ -235,7 +234,7 @@
       "unanimite",
       "variante"
     ],
-    "nbOrphelins": 59,
+    "nbOrphelins": 60,
     "note": "Les portes live ouvrent un navigateur sur kick.com et ne sont dans aucun runner. Un orphelin n est pas forcement un defaut ; un orphelin qui couvre du code livre en est un."
   },
   "releaseGithub": {
@@ -314,7 +313,7 @@
       "**Store submissions.** The 2.10.0 archives exist and are published on"
     ],
     "nbBloques": 10,
-    "nbOuverts": 4,
+    "nbOuverts": 5,
     "nbFaits": 120
   }
 }
