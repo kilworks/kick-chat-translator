@@ -68,7 +68,7 @@ const FORMES: FormeDeRire[] = [
     langue: 'pt',
   },
   {
-    motif: /^(?=(?:[^k]*k){3})[a-z]?k{2,}(?:[a-jl-z]?k{2,})*[a-z]?$/i,
+    motif: /^(?=(?:[^k]*k){3})[a-z]?k{2,}(?:[a-jl-z]k{2,})*[a-z]?$/i,
     langue: 'pt',
   },
   {
@@ -255,7 +255,7 @@ export const LAUGHTER_NOTES: Readonly<Record<string, string>> = {
     'Spanish jsjsjs, jaja typed with the neighbouring key',
   '^k{3,}$':
     'Brazilian Portuguese kkkk. Three or more: kk alone is too short to claim a language',
-  '^(?=(?:[^k]*k){3})[a-z]?k{2,}(?:[a-jl-z]?k{2,})*[a-z]?$':
+  '^(?=(?:[^k]*k){3})[a-z]?k{2,}(?:[a-jl-z]k{2,})*[a-z]?$':
     'Brazilian kkkk with a stray key: kkkj, MKKKKKKK, kkkkkkkm, kkkjkkk. Seen reaching the engine on a live Brazilian channel (2026-10-17), 4 of 53 lines sent',
   '^(?=.*kkk)[a-jl-z]?(?:k+[a-jl-z])*k+[a-jl-z]?$':
     'Brazilian kkkk broken by single stray keys anywhere: klkkkkkkkk, kkjkkkkl. Same live channel. A run of three k is required, so Indonesian kakak (older sibling) stays a word',
