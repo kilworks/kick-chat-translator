@@ -37,11 +37,13 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
     // 3715 avant les mots partages retires (vse, iz, mia, давай) et le lexique
     // ajoute (2026-11-04) : cinq lignes de juste a muet, aucune de plus fausse.
     // 3710 / 1327 / 3 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
-    expect(plain(CONFIDENT.total)).toEqual({ right: 3709, silent: 1328, wrong: 3 });
+    // 3709 / 1328 / 3 avant la revue linguiste (2026-11-04)
+    expect(plain(CONFIDENT.total)).toEqual({ right: 3676, silent: 1361, wrong: 3 });
   });
 
   it('confidentLanguage on short lines, the regime a chat lives in', () => {
-    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1071, silent: 606, wrong: 3 });
+    // 1071 / 606 / 3 avant la revue linguiste (2026-11-04)
+    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1056, silent: 621, wrong: 3 });
   });
 
   // The expensive one. This is the answer that deletes a message in silence when
@@ -53,11 +55,15 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
     // silencieuses sur le chemin sur tombent sur franc, qui les dit uk et ru.
     // 4152/388 avant le 2026-11-04 : la meme `No, no, no!`, que franc ne nomme pas.
     // 4151 / 389 / 500 avant les mots partages retires (2026-11-04)
-    expect(plain(DETECT.total)).toEqual({ right: 4146, silent: 392, wrong: 502 });
+    // 4146 / 392 / 502 avant la revue linguiste (2026-11-04) : les lignes que le
+    // chemin sur ne nomme plus retombent sur franc, et les penchants n'en
+    // rattrapent que 13 fausses sur 19.
+    expect(plain(DETECT.total)).toEqual({ right: 4135, silent: 397, wrong: 508 });
   });
 
   it('detectLanguage is wrong on a quarter of short lines', () => {
-    expect(plain(DETECT.shortOnly)).toEqual({ right: 1214, silent: 236, wrong: 230 });
+    // 1214 / 236 / 230 avant la revue linguiste (2026-11-04)
+    expect(plain(DETECT.shortOnly)).toEqual({ right: 1206, silent: 238, wrong: 236 });
   });
 });
 
@@ -156,7 +162,8 @@ describe('the languages the detector cannot name at all', () => {
     // `bare` against `bara`, `selv` against `själv`, `mange` against `många`,
     // `hvem` against `vem`. 28 and 24 to 26 and 22, and `no` 49 of 120 to 51,
     // `da` 51 to 55.
-    expect(DETECT.confusions.get('no->sv')).toBe(26);
+    // 26 avant la revue linguiste (2026-11-04)
+    expect(DETECT.confusions.get('no->sv')).toBe(27);
     expect(DETECT.confusions.get('da->sv')).toBe(22);
     expect(DETECT.confusions.get('ca->es')).toBe(17);
   });

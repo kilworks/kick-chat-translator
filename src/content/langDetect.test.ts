@@ -30,7 +30,8 @@ describe('detectLanguage', () => {
   });
 
   it('identifies short foreign chat words instead of calling them English', () => {
-    expect(detectLanguage('hola')).toBe('es');
+    // `hola` n'y est plus : le catalan l'ecrit aussi (revue linguiste, 2026-11-04).
+    expect(detectLanguage('hola')).toBeUndefined();
     expect(detectLanguage('gracias')).toBe('es');
     expect(detectLanguage('merci')).toBe('fr');
     expect(detectLanguage('danke')).toBe('de');
@@ -521,5 +522,58 @@ describe('les regles lues sur le corpus 10', () => {
 
   it('reconnait karne et baad en hinglish', () => {
     expect(confidentLanguage('ye boss 40 baar try karne ke baad mara')).toBeUndefined();
+  });
+});
+
+// La revue linguiste du 2026-11-04 : chaque ligne ci-dessous etait nommee a tort
+// sur le chemin sur, et chaque correction a ete vue rouge sur l ancien code.
+describe('la revue linguiste, anglais de chat', () => {
+  it.each([
+    ['ik bro', 'nl'], ['ik that was insane', 'nl'], ['wat lol', 'nl'],
+    ['did it proc', 'cs'], ['nice quest', 'ca'], ['that guest is crazy', 'ca'],
+    ['the government again', 'sl'], ['ninja move', 'sl'],
+    ['my lawyer said no', 'pl'], ['wyd bro', 'pl'], ['the czech guy', 'pl'],
+    ['wired headset is better', 'de'], ['fuel the hype', 'es'], ['pour one out', 'fr'],
+    ['nice ghetto', 'it'], ['ditto', 'it'], ['kung fu panda', 'tl'],
+    ['whyy', 'fi'], ['my guyy', 'fi'],
+    ['wait til the winner', 'no'], ['bare minimum like always', 'no'],
+    ['pokémon is the most fun', 'hu'], ['mbappé is the most cracked', 'hu'],
+  ])('%s ne sort pas %s', (ligne, faux) => {
+    expect(confidentLanguage(ligne)).not.toBe(faux);
+  });
+});
+
+describe('la revue linguiste, mots que la voisine ecrit aussi', () => {
+  it.each([
+    ['taas', 'fi'], ['anna mulle', 'et'],
+    ['aşa este', 'tr'], ['ce faci aşa', 'tr'], ['salut frate', 'fr'],
+    ['ele vin acum', 'pt'], ['ele au castigat', 'pt'],
+    ['memang betul', 'ms'], ['baiknya', 'id'],
+    ['много денег', 'bg'], ['ne sme tega', 'sk'],
+    ['hallo', 'de'], ['ja gerne', 'de'], ['vad sker', 'da'],
+    ['hola a tots', 'es'], ['hostia tu', 'es'], ['vale a pena', 'es'],
+    ['che boludo', 'it'], ['او لا', 'fa'], ['ڤيديو حلو', 'ms'],
+    ['velmi dobre', 'cs'], ['dobra hra', 'sk'], ['s krásným gólem', 'sk'],
+  ])('%s ne sort pas %s', (ligne, faux) => {
+    expect(confidentLanguage(ligne)).not.toBe(faux);
+  });
+
+  it.each([
+    ['to je pravda', 'ru'], ['nikogo nie ma', 'ru'], ['dobre sme', 'bg'],
+  ])('%s ne sort pas %s, meme hors du chemin sur', (ligne, faux) => {
+    expect(detectLanguage(ligne)).not.toBe(faux);
+  });
+
+  it('lit la cedille roumaine ancienne comme du roumain', () => {
+    expect(confidentLanguage('mulţumesc frate')).toBe('ro');
+  });
+});
+
+describe('les penchants du chemin brut', () => {
+  it('rend au brut ce que le chemin sur ne nomme plus', () => {
+    expect(confidentLanguage('no taas')).toBeUndefined();
+    expect(detectLanguage('no taas')).toBe('fi');
+    expect(confidentLanguage('ele ganhou')).toBeUndefined();
+    expect(detectLanguage('ele ganhou')).toBe('pt');
   });
 });

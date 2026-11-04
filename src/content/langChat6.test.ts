@@ -48,7 +48,8 @@ describe('le corpus 6, aveugle', () => {
   it('mesure le chemin sur en totaux', () => {
     // avant : 162 / 261 / 2
     // 159 / 266 / 0 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6).total)).toEqual({ right: 160, silent: 265, wrong: 0 });
+    // 160 / 265 / 0 avant la revue linguiste (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6).total)).toEqual({ right: 158, silent: 267, wrong: 0 });
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT6_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant : 7 / 9 / 9
     // 9 / 16 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
@@ -57,6 +58,8 @@ describe('le corpus 6, aveugle', () => {
 
   it('mesure le chemin brut en totaux', () => {
     // 236 / 116 / 73 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
+    // 237 / 115 / 73 avant la revue linguiste (2026-11-04)
+    // 236 / 116 / 73 avant les penchants du chemin brut (2026-11-04)
     expect(plain(runMatrix(detectLanguage, LANG_CHAT6).total)).toEqual({ right: 237, silent: 115, wrong: 73 });
     expect(plain(runMatrix(detectLanguage, LANG_CHAT6_ROMAN).total)).toEqual({ right: 2, silent: 31, wrong: 17 });
     // avant : 7 / 9 / 9

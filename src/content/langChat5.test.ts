@@ -53,14 +53,17 @@ describe('le corpus 5, aveugle', () => {
   // l'adjectif russe en ch/sh/zh/kh et -noe, `pfv`. Il en garde une, `gg bro`
   // rangee indonesienne et lue anglaise.
   it('mesure le chemin sur en totaux', () => {
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT5).total)).toEqual({ right: 185, silent: 239, wrong: 1 });
+    // 185 / 239 / 1 avant la revue linguiste (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT5).total)).toEqual({ right: 178, silent: 246, wrong: 1 });
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT5_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT5_LAUGH).total)).toEqual({ right: 14, silent: 11, wrong: 0 });
   });
 
   it('mesure le chemin brut en totaux', () => {
     // 271 / 76 / 78 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT5).total)).toEqual({ right: 269, silent: 78, wrong: 78 });
+    // 269 / 78 / 78 avant la revue linguiste (2026-11-04)
+    // 263 / 81 / 81 avant les penchants du chemin brut (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT5).total)).toEqual({ right: 266, silent: 78, wrong: 81 });
     expect(plain(runMatrix(detectLanguage, LANG_CHAT5_ROMAN).total)).toEqual({ right: 4, silent: 33, wrong: 13 });
     // 15 / 2 / 8 avant le rire sans vote du chemin sur
     expect(plain(runMatrix(detectLanguage, LANG_CHAT5_LAUGH).total)).toEqual({ right: 16, silent: 1, wrong: 8 });

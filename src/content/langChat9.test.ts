@@ -34,7 +34,8 @@ describe('le corpus 9, aveugle', () => {
   it('mesure le chemin sur en totaux', () => {
     // avant le rire : 157 / 262 / 6
     // 157 / 263 / 5 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT9).total)).toEqual({ right: 159, silent: 266, wrong: 0 });
+    // 159 / 266 / 0 avant la revue linguiste (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT9).total)).toEqual({ right: 155, silent: 270, wrong: 0 });
     // avant les regles des corpus 7 et 8 : 0 / 48 / 2
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT9_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant le rire : 10 / 11 / 4
@@ -43,7 +44,9 @@ describe('le corpus 9, aveugle', () => {
 
   it('mesure le chemin brut en totaux', () => {
     // 271 / 82 / 72 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT9).total)).toEqual({ right: 274, silent: 84, wrong: 67 });
+    // 274 / 84 / 67 avant la revue linguiste (2026-11-04)
+    // 271 / 87 / 67 avant les penchants du chemin brut (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT9).total)).toEqual({ right: 273, silent: 85, wrong: 67 });
     expect(plain(runMatrix(detectLanguage, LANG_CHAT9_ROMAN).total)).toEqual({ right: 2, silent: 34, wrong: 14 });
     expect(plain(runMatrix(detectLanguage, LANG_CHAT9_LAUGH).total)).toEqual({ right: 14, silent: 6, wrong: 5 });
   });

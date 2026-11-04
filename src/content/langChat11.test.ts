@@ -34,7 +34,8 @@ describe('le corpus 11, aveugle', () => {
   // 0,2 %, natif 1, romanise 0, rire 0.
   it('mesure le chemin sur en totaux', () => {
     // avant toute passe : 173 / 250 / 2
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT11).total)).toEqual({ right: 174, silent: 250, wrong: 1 });
+    // 174 / 250 / 1 avant la revue linguiste (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT11).total)).toEqual({ right: 170, silent: 255, wrong: 0 });
     // avant toute passe : 0 / 48 / 2
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT11_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant toute passe : 11 / 10 / 4
@@ -43,7 +44,9 @@ describe('le corpus 11, aveugle', () => {
 
   it('mesure le chemin brut en totaux', () => {
     // avant toute passe : 284 / 78 / 63
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT11).total)).toEqual({ right: 283, silent: 80, wrong: 62 });
+    // 283 / 80 / 62 avant la revue linguiste (2026-11-04)
+    // 279 / 83 / 63 avant les penchants du chemin brut (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT11).total)).toEqual({ right: 283, silent: 81, wrong: 61 });
     expect(plain(runMatrix(detectLanguage, LANG_CHAT11_ROMAN).total)).toEqual({ right: 1, silent: 30, wrong: 19 });
     // avant toute passe : 15 / 5 / 5
     expect(plain(runMatrix(detectLanguage, LANG_CHAT11_LAUGH).total)).toEqual({ right: 17, silent: 6, wrong: 2 });

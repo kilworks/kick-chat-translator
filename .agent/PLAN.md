@@ -111,6 +111,19 @@ reads dist/, so it serialises behind any build. D touches no code.
   judgment. Blind corpus 12 confirms it cleanly (23 collisions rewritten
   unread, 0 at judgment, no line read): 8 of 500 before any pass, 1 (0.2 %)
   after, native 1, romanised 0, laughter 0.
+- [x] **Linguistic review of the rule tables (2026-11-04).** The corpora never
+  held the English that Kick chat types (ik, wat, proc, quest, government,
+  ninja, lawyer, wyd), so the bar could not see it: 77 of 97 probe lines were
+  confident wrong, 23 after (the rest is romanised and transliterated text,
+  not in this pass). Two written contradictions resolved (taas, ele), Romanian
+  legacy cedilla, sibling words removed (hallo, gerne, salut, hola, vale,
+  memang, betul, mnogo, velmi, sme, mulle, -knya, -nym, pravda). Shared forms
+  where one sibling dominates stay on the raw path only (`PENCHANTS`).
+  Confident wrong unchanged everywhere (corpus 11: 1 to 0). Cost: Tatoeba
+  confident right 3709 to 3676, tuning chats 2079 to 2035, raw wrong 502 to
+  508. Kept on purpose: Ukrainian koli against Bulgarian koli (cars), the
+  Russian -it infinitive against the Ukrainian third person (excluding it made
+  5 raw lines wrong), Malay tak.
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.

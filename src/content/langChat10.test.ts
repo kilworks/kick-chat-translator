@@ -34,7 +34,8 @@ describe('le corpus 10, aveugle', () => {
   it('mesure le chemin sur en totaux', () => {
     // avant toute passe : 142 / 279 / 4
     // 146 / 278 / 1 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT10).total)).toEqual({ right: 146, silent: 279, wrong: 0 });
+    // 146 / 279 / 0 avant la revue linguiste (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT10).total)).toEqual({ right: 142, silent: 283, wrong: 0 });
     // avant toute passe : 0 / 48 / 2
     // 0 / 49 / 1 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT10_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
@@ -44,7 +45,9 @@ describe('le corpus 10, aveugle', () => {
   });
 
   it('mesure le chemin brut en totaux', () => {
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT10).total)).toEqual({ right: 258, silent: 84, wrong: 83 });
+    // 258 / 84 / 83 avant la revue linguiste (2026-11-04)
+    // 256 / 84 / 85 avant les penchants du chemin brut (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT10).total)).toEqual({ right: 257, silent: 84, wrong: 84 });
     // 4 / 29 / 17 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
     expect(plain(runMatrix(detectLanguage, LANG_CHAT10_ROMAN).total)).toEqual({ right: 4, silent: 30, wrong: 16 });
     // 15 / 2 / 8 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)

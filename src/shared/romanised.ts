@@ -43,7 +43,8 @@
 const MARQUEURS: Record<string, readonly string[]> = {
   ru: [
     'privet', 'spasibo', 'pozhaluysta', 'khorosho', 'nichego', 'ochen',
-    'konechno', 'zdravstvuyte', 'ponyatno', 'pravda', 'pobeda', 'bolshoe',
+    'konechno', 'zdravstvuyte', 'ponyatno', 'pobeda', 'bolshoe',
+    // pas `pravda` : le tcheque, le slovaque et le slovene l'ecrivent (`to je pravda`).
   ],
   el: [
     'kalimera', 'kalispera', 'kaneis', 'kanete', 'efharisto', 'ginetai',
@@ -105,7 +106,7 @@ const FAIBLES_PAR_LANGUE: Record<string, readonly string[]> = {
     // mesurait que l'ajustement.
     'shte', 'kade', 'kude', 'koga',
     'tova', 'tozi', 'tazi', 'tezi',
-    'sme',
+    // pas `sme` : le slovaque l'ecrit pareil (`dobre sme` sortait bg).
   ],
 };
 
@@ -122,9 +123,9 @@ for (const [langue, mots] of Object.entries(MARQUEURS)) {
  * Apres t, k, s encore russe si le mot porte ch, sh, zh ou kh, que le finnois
  * n'ecrit pas (chistyy). Le neutre -oe apres consonne et n (krasnoe) aussi, et
  * le genitif -kogo/-togo (takogo), que le slovene ecrit -ega ; kogo seul est
- * slovene, d'ou deux lettres devant.
+ * slovene, d'ou deux lettres devant ; nikogo est aussi polonais, d'ou le ni exclu.
  */
-const ADJECTIF_RU = /^(?:\p{L}+[bvmnlpr]yy|\p{L}*[cszk]h\p{L}*yy|\p{L}{2,}[^aeiouy]noe|\p{L}{2,}[kt]ogo)$/u;
+const ADJECTIF_RU = /^(?:\p{L}+[bvmnlpr]yy|\p{L}*[cszk]h\p{L}*yy|\p{L}{2,}[^aeiouy]noe|\p{L}{2,}(?<!ni)[kt]ogo)$/u;
 
 const FAIBLES = new Map<string, string>();
 for (const [langue, mots] of Object.entries(FAIBLES_PAR_LANGUE)) {

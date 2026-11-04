@@ -79,9 +79,11 @@ describe('le corpus de la paire', () => {
   // corpus de paire, ecrit avant que quoi que ce soit ait ete lu.**
   it('mesure les deux chemins sur du registre familier', () => {
     // 39 / 21 / 0 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
-    expect(plain(SURE.total)).toEqual({ right: 36, silent: 24, wrong: 0 });
+    // 36 / 24 / 0 avant la revue linguiste (2026-11-04)
+    expect(plain(SURE.total)).toEqual({ right: 35, silent: 25, wrong: 0 });
     // 43 / 11 / 6 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
-    expect(plain(BRUT.total)).toEqual({ right: 41, silent: 12, wrong: 7 });
+    // 41 / 12 / 7 avant la revue linguiste (2026-11-04)
+    expect(plain(BRUT.total)).toEqual({ right: 40, silent: 13, wrong: 7 });
   });
 
   // LA MESURE QUI JUSTIFIE LE CORPUS, et la reponse n'est pas celle qu'on
@@ -107,7 +109,8 @@ describe('le corpus de la paire', () => {
       };
     };
     // 15 / 15 / 0 avant dah malais retire, rire coreen en syllabes, karne/baad (2026-11-04)
-    expect(plain(par('ms'))).toEqual({ right: 12, silent: 18, wrong: 0 });
+    // 12 / 18 / 0 avant la revue linguiste (2026-11-04)
+    expect(plain(par('ms'))).toEqual({ right: 11, silent: 19, wrong: 0 });
     expect(plain(par('id'))).toEqual({ right: 24, silent: 6, wrong: 0 });
   });
 

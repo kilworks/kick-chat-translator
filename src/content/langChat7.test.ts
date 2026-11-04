@@ -41,7 +41,8 @@ describe('le corpus 7, aveugle', () => {
     // avant le rire : 166 / 254 / 5 ; apres : 164 / 256 / 5
     // 165 / 258 / 2 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
     // 163 / 261 / 1 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7).total)).toEqual({ right: 163, silent: 262, wrong: 0 });
+    // 163 / 262 / 0 avant la revue linguiste (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7).total)).toEqual({ right: 158, silent: 267, wrong: 0 });
     // 0 / 48 / 2 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT7_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant le rire : 9 / 11 / 5
@@ -52,6 +53,8 @@ describe('le corpus 7, aveugle', () => {
   it('mesure le chemin brut en totaux', () => {
     // avant : 261 / 87 / 77
     // 263 / 88 / 74 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    // 262 / 91 / 72 avant la revue linguiste (2026-11-04)
+    // 260 / 92 / 73 avant les penchants du chemin brut (2026-11-04)
     expect(plain(runMatrix(detectLanguage, LANG_CHAT7).total)).toEqual({ right: 262, silent: 91, wrong: 72 });
     // 2 / 30 / 18 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
     expect(plain(runMatrix(detectLanguage, LANG_CHAT7_ROMAN).total)).toEqual({ right: 2, silent: 32, wrong: 16 });

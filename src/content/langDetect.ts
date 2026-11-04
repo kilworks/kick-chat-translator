@@ -62,12 +62,18 @@ const COMMON_SHORT_TOKENS = new Set([
  * essa contre esa.
  */
 const SHORT_WORD_LANG = new Map<string, string>([
-  ['hola', 'es'], ['gracias', 'es'], ['buenas', 'es'], ['buenos', 'es'], ['adios', 'es'],
-  ['adiós', 'es'], ['vale', 'es'], ['venga', 'es'], ['joder', 'es'], ['oye', 'es'],
-  ['chaval', 'es'], ['hostia', 'es'], ['mucho', 'es'], ['muchas', 'es'], ['siempre', 'es'],
+  // pas `hola` ni `hostia` : le catalan les ecrit (`hola a tots`, `hòstia` sans accent).
+  // pas `vale` : le portugais `vale a pena`, l italien `vale`.
+  ['gracias', 'es'], ['buenas', 'es'], ['buenos', 'es'], ['adios', 'es'],
+  ['adiós', 'es'], ['venga', 'es'], ['joder', 'es'], ['oye', 'es'],
+  ['chaval', 'es'], ['mucho', 'es'], ['muchas', 'es'], ['siempre', 'es'],
+  // Les mots rioplatenses de la table exclusive, ici aussi : sans eux `che boludo`
+  // se taisait la-bas puis sortait italien ici par `che`.
+  ['boludo', 'es'], ['boluda', 'es'], ['pibe', 'es'], ['piba', 'es'], ['laburo', 'es'],
   ['entonces', 'es'], ['también', 'es'], ['tambien', 'es'], ['ahora', 'es'],
 
-  ['salut', 'fr'], ['bonjour', 'fr'], ['bonsoir', 'fr'], ['merci', 'fr'], ['oui', 'fr'],
+  // pas `salut` : c'est le bonjour roumain (`salut frate`) et la sante catalane.
+  ['bonjour', 'fr'], ['bonsoir', 'fr'], ['merci', 'fr'], ['oui', 'fr'],
   ['ouais', 'fr'], ['voilà', 'fr'], ['voila', 'fr'], ['putain', 'fr'],
   // mdr et ptdr sont des rires et vivent dans `laughter.ts` : ici ils votaient
   // fr meme a cote de mots d'une autre langue (`mdr der typ`).
@@ -90,8 +96,9 @@ const SHORT_WORD_LANG = new Map<string, string>([
   ['muita', 'pt'], ['beleza', 'pt'], ['caralho', 'pt'], ['porra', 'pt'], ['rapaz', 'pt'],
   ['também', 'pt'], ['tambem', 'pt'],
 
-  ['danke', 'de'], ['hallo', 'de'], ['tschüss', 'de'], ['bitte', 'de'], ['nicht', 'de'],
-  ['doch', 'de'], ['geil', 'de'], ['krass', 'de'], ['vielen', 'de'], ['gerne', 'de'],
+  // pas `hallo` : neerlandais, danois et norvegien l'ecrivent. pas `gerne` : danois.
+  ['danke', 'de'], ['tschüss', 'de'], ['bitte', 'de'], ['nicht', 'de'],
+  ['doch', 'de'], ['geil', 'de'], ['krass', 'de'], ['vielen', 'de'],
   ['wirklich', 'de'], ['natürlich', 'de'], ['warum', 'de'], ['weil', 'de'], ['aber', 'de'],
   ['immer', 'de'], ['nein', 'de'],
 
@@ -164,7 +171,9 @@ const SHORT_WORD_LANG = new Map<string, string>([
   // corpus mais apparaissent sur le banc MELANGE, ce qui suffit a les ecarter.
   ['est', 'fr'], ['trop', 'fr'], ['chez', 'fr'], ['avec', 'fr'], ['sont', 'fr'],
   ['fait', 'fr'], ['comme', 'fr'],
-  ['wat', 'nl'], ['het', 'nl'], ['een', 'nl'], ['nou', 'nl'], ['zet', 'nl'],
+  // pas `wat` : c'est le `what` du chat anglais (`wat lol`). `gebeurt` le remplace
+  // dans la phrase qui l'avait fait entrer, `wat gebeurt er nou`.
+  ['gebeurt', 'nl'], ['het', 'nl'], ['een', 'nl'], ['nou', 'nl'], ['zet', 'nl'],
   ['goed', 'nl'], ['maar', 'nl'], ['ook', 'nl'], ['voor', 'nl'], ['gaat', 'nl'],
   ['deze', 'nl'],
   ['här', 'sv'], ['hur', 'sv'], ['hon', 'sv'], ['ska', 'sv'], ['vill', 'sv'],
@@ -174,7 +183,8 @@ const SHORT_WORD_LANG = new Map<string, string>([
   ['folyik', 'hu'], ['valaki', 'hu'], ['hangot', 'hu'], ['csak', 'hu'], ['hogy', 'hu'],
   ['siin', 'et'], ['toimub', 'et'], ['keegi', 'et'], ['täna', 'et'], ['kuidas', 'et'],
   ['täällä', 'fi'], ['tapahtuu', 'fi'], ['onko', 'fi'], ['ketään', 'fi'], ['paljon', 'fi'],
-  ['sker', 'da'], ['nogen', 'da'], ['rigtig', 'da'],
+  // pas `sker` : le suedois l'ecrit (`vad sker`).
+  ['nogen', 'da'], ['rigtig', 'da'],
   ['qué', 'es'], ['pasando', 'es'], ['sube', 'es'], ['esto', 'es'], ['increíble', 'es'],
   ['che', 'it'], ['facendo', 'it'], ['alza', 'it'], ['giocando', 'it'], ['appena', 'it'],
   ['arrivato', 'it'], ['sfortuna', 'it'], ['manca', 'it'], ['niente', 'it'], ['vede', 'it'],
@@ -237,11 +247,13 @@ const SHORT_WORD_LANG = new Map<string, string>([
   ['jalle', 'et'], ['jälle', 'et'], ['praegu', 'et'], ['midagi', 'et'],
 
   ['bardzo', 'pl'], ['dzieki', 'pl'], ['dzięki', 'pl'], ['czesc', 'pl'],   ['jeszcze', 'pl'], ['wszystko', 'pl'], ['dlaczego', 'pl'], ['ktos', 'pl'], 
-  ['jsem', 'cs'], ['neni', 'cs'], ['není', 'cs'], ['dekuju', 'cs'],   ['jeste', 'cs'], ['vzdycky', 'cs'], ['vždycky', 'cs'], ['proc', 'cs'],
+  ['jsem', 'cs'], ['neni', 'cs'], ['není', 'cs'], ['dekuju', 'cs'],   ['jeste', 'cs'], ['vzdycky', 'cs'], ['vždycky', 'cs'],
+  // pas `proc` sans hacek : c'est le jargon de jeu anglais (`did it proc`).
   ['proč', 'cs'],
 
+  // pas `vždy` : le tcheque l'ecrit aussi.
   ['dakujem', 'sk'], ['ďakujem', 'sk'], ['ešte', 'sk'], ['preco', 'sk'],
-  ['prečo', 'sk'], ['vzdy', 'sk'], ['vždy', 'sk'],
+  ['prečo', 'sk'],
 
   ['foarte', 'ro'], ['multumesc', 'ro'], ['acum', 'ro'], ['nimic', 'ro'],
   ['cand', 'ro'], ['când', 'ro'], ['iarasi', 'ro'], ['bine', 'ro'],
@@ -252,8 +264,9 @@ const SHORT_WORD_LANG = new Map<string, string>([
   ['banget', 'id'], ['gak', 'id'], ['nggak', 'id'], ['gimana', 'id'], ['udah', 'id'],
   ['aja', 'id'], ['nih', 'id'], ['dong', 'id'], ['sih', 'id'],
 
-  ['macam', 'ms'], ['betul', 'ms'], ['sikit', 'ms'], ['tengok', 'ms'], ['awak', 'ms'],
-  ['jugak', 'ms'], ['nak', 'ms'], ['memang', 'ms'],
+  // pas `betul` ni `memang` : l'indonesien les ecrit tous les jours.
+  ['macam', 'ms'], ['sikit', 'ms'], ['tengok', 'ms'], ['awak', 'ms'],
+  ['jugak', 'ms'], ['nak', 'ms'],
 
   ['nagyon', 'hu'], ['koszi', 'hu'], ['köszi', 'hu'], ['szia', 'hu'], ['miert', 'hu'],
   ['miért', 'hu'], ['mindig', 'hu'], ['megint', 'hu'], ['semmi', 'hu'],
@@ -287,8 +300,10 @@ const SHORT_WORD_LANG = new Map<string, string>([
   // Les mots proprement malais, `tiada teruk nampak berlaku`, ne sont PAS ici :
   // ils vont dans la porte malais-indonesien, ou ils ne risquent pas de voler
   // une ligne indonesienne, parce que l'indonesien emploie certains d'entre eux.
-  ['niekto', 'sk'], ['práve', 'sk'], ['prave', 'sk'], ['výborne', 'sk'], ['vyborne', 'sk'],
-  ['hrá', 'sk'], ['hra', 'sk'],
+  // pas `prave` ni `vyborne` : le tcheque `právě`, `výborně` sans accents. pas `hra` :
+  // le jeu en tcheque.
+  ['niekto', 'sk'], ['práve', 'sk'], ['výborne', 'sk'],
+  ['hrá', 'sk'],
   ['endnu', 'da'], ['elendigt', 'da'],
   ['believe', 'en'], ['anyone', 'en'], ['today', 'en'],
   ['noch', 'de'], ['wieder', 'de'], ['keine', 'de'], ['gerade', 'de'],
@@ -321,6 +336,15 @@ const SHORT_TEXT_MAX = 20;
 
 /** Mots que seul l'anglais ecrit ainsi ; les jetons de chat universels (gg, ez,
  * lol, bro) n'y sont pas, ils ne disent rien de la phrase. */
+/** `the` ou une entree anglaise du lexique : des mots qu'aucune des 42 autres
+ * n'ecrit, contrairement a `is` (neerlandais, hongrois) ou `we` (neerlandais). */
+function porteUnMotAnglais(text: string): boolean {
+  return text
+    .toLowerCase()
+    .split(/[^\p{L}]+/u)
+    .some((t) => t === 'the' || SHORT_WORD_LANG.get(t) === 'en');
+}
+
 const ANGLAIS_AUTOUR_DU_RIRE = new Set([
   'way', 'what', 'that', 'the', 'this', 'you', 'your', 'she', 'they', 'we',
   'lets', 'guys', 'dude', 'why', 'how', 'yeah', 'yep', 'are', 'not', 'dont',
@@ -432,8 +456,14 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // sa propre lettre avec la virgule souscrite U+0219, juste en dessous, et le
   // crible ne trouve pas UNE ligne roumaine qui porte la forme turque. 53 lignes
   // gratuites qui attendaient dans la table depuis le debut.
+  // Les claviers roumains anciens ecrivent encore les lettres a cedille, `aşa`,
+  // `mulţumesc`, et `aşa este` partait au turc. Le turc n'ecrit jamais `ţ`, qui
+  // rejoint le roumain ; `ş` reste turc, et les mots roumains qui le portent votent
+  // roumain pour que la ligne se taise. Sortir `ş` du jeu coutait 7 lignes Tatoeba
+  // et 5 de chat turques, pour rien de plus juste.
   [/[ığş]/iu, 'tr'],
-  [/[șț]/iu, 'ro'],
+  [/[șțţ]/iu, 'ro'],
+  [/(^|[^\p{L}])(şi|aşa|ştiu|ştii|aştept)([^\p{L}]|$)/iu, 'ro'],
   [/l·l/iu, 'ca'],
   // Le vietnamien empile un ton sur une voyelle qui porte deja un accent, et
   // Unicode precompose le resultat. Aucune des 42 autres n'ecrit ces caracteres,
@@ -457,7 +487,10 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // nulle part ailleurs dans les 43.
   // Jamais apres a ni e : l'harmonie vocalique interdit `ayy` au finnois et il
   // n'ecrit pas `eyy`, alors que l'anglais etire ainsi heyy, okayy, yayy.
-  [/(?<![ae])yy/iu, 'fi'],
+  // En fin de mot, seulement derriere une voyelle anterieure deja dans le mot
+  // (`löytyy`, `näkyy`, `pysyy`) ou dans `syy` et `myy` : l'anglais etire aussi
+  // `whyy`, `guyy`, `babyy`, et l'harmonie vocalique finnoise l'en separe.
+  [/(?<![ae])yy(?!([^\p{L}]|$))|[äöy]\p{L}*yy([^\p{L}]|$)|(^|[^\p{L}])(syy|myy)([^\p{L}]|$)/iu, 'fi'],
   // L'harmonie vocalique finnoise : le finnois met un ä dans ses terminaisons la
   // ou l'estonien ne le fait pas, et aucune autre des 43 n'a ces suites en fin
   // de mot. C'est de la morphologie et non du lexique, donc ca porte sur
@@ -497,7 +530,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // ANGLAISES, alors que ce sont des lignes a deux langues dont la bonne
   // reponse est le silence. Un marqueur anglais propre reste un mauvais
   // marqueur : l'anglais est la langue avec laquelle tout le monde melange.
-  [/cz/iu, 'pl'],
+  // pas `czech` : l'anglais l'ecrit (`the czech guy`).
+  [/cz(?!ech)/iu, 'pl'],
   [/prz/iu, 'pl'],
   [/să/iu, 'ro'],
   [/că/iu, 'ro'],
@@ -549,11 +583,14 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   [/(^|[^\p{L}])(jsi|jsou)([^\p{L}]|$)/iu, 'cs'],
   [/(iť|sť)/iu, 'sk'],
   // `fuer` est le für allemand tape sans u trema, aucun mot espagnol n'y finit.
-  [/fue(?!r([^\p{L}]|$))/iu, 'es'],
+  // pas `fuel` non plus, l'anglais.
+  [/fue(?!l|r([^\p{L}]|$))/iu, 'es'],
   [/oet/iu, 'nl'],
   [/för/iu, 'sv'],
   [/ał/iu, 'pl'],
-  [/wy/iu, 'pl'],
+  // Borne : le prefixe `wy-` et la finale `-wy` polonais. Au milieu d'un mot c'est
+  // l'anglais `lawyer`, et `wyd` est le `what you doing` du chat.
+  [/(^|[^\p{L}])wy(?!d([^\p{L}]|$))|wy([^\p{L}]|$)/iu, 'pl'],
   // TROISIEME RECOLTE, la paire finno-estonienne interrogee directement.
   //   tää  fi=21, aucune autre. C'est la terminaison verbale `-tää`, `tietää`,
   //        `ymmärtää`, `näyttää` : de la morphologie, pas un mot.
@@ -579,8 +616,10 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // huit bancs. Les lignes catalanes qui le portent sont deja prises par le
   // point volat ou par la porte `é`. Un marqueur propre sur une langue faible
   // n'est pas automatiquement un marqueur utile.
-  [/wir/iu, 'de'],
-  [/gov/iu, 'sl'],
+  // Bornes a gauche et resserrees apres coup : l'anglais ecrit `wire`, `wiring`,
+  // `swirl`, et `gov`, `government`. Le slovene ecrit `govor-` dans tout le verbe.
+  [/(^|[^\p{L}])wir(?!e|ing)/iu, 'de'],
+  [/govor/iu, 'sl'],
   // CINQUIEME RECOLTE, et c'est la paire scandinave interrogee directement, ce
   // qui n'avait jamais ete fait : `porte-candidats.mjs da+no`. Le diagnostic
   // disait que 70 lignes danoises avaient la porte OUVERTE sans mot pour
@@ -636,7 +675,11 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // table doit maigrir" : elle valait zero sur trois corpus et une ligne sur le
   // quatrieme. Elle vaut zero partout maintenant. Cinquieme fois qu'un ajout
   // tue une entree ailleurs dans le fichier.
-  [/(^|[^\p{L}])(ik|hij|mijn|het|een|heb|zijn)([^\p{L}]|$)/iu, 'nl'],
+  // `ik` seul n'y est plus : c'est le `I know` du chat anglais (`ik bro`,
+  // `ik that was insane`). Il revient suivi d'un verbe a la premiere personne,
+  // ce que l'anglais n'ecrit jamais apres lui.
+  [/(^|[^\p{L}])(hij|mijn|het|een|heb|zijn)([^\p{L}]|$)/iu, 'nl'],
+  [/(^|[^\p{L}])ik[^\p{L}]+(ben|heb|weet|denk|ga|wil|kan|moet|vind|snap|zie|hoop|zou|kom|wist)([^\p{L}]|$)/iu, 'nl'],
   [/(^|[^\p{L}])(ist|zu|habe|mir|und)([^\p{L}]|$)/iu, 'de'],
   // `hon` a ete retire de cette liste par l'audit de collisions de clavier.
   // Il vaut 3 lignes suedoises sur du texte normal et coute DEUX erreurs sur du
@@ -653,7 +696,9 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   //   ist de  rejoint par deux lignes slovaques : -4 lignes contre 1 erreur.
   //           Garde, et c'est le plus discutable des quatre.
   [/(^|[^\p{L}])(jag|att|ett|och)([^\p{L}]|$)/iu, 'sv'],
-  [/(^|[^\p{L}])(est|pour|ici|nous|cette|une|deux)([^\p{L}]|$)/iu, 'fr'],
+  [/(^|[^\p{L}])(est|ici|nous|cette|une|deux)([^\p{L}]|$)/iu, 'fr'],
+  // `pour` sauf devant ce que le verbe anglais prend (`pour one out`, `pour it`).
+  [/(^|[^\p{L}])pour(?![^\p{L}]+(one|it|some|out|the|my|your|them)([^\p{L}]|$))([^\p{L}]|$)/iu, 'fr'],
   // DEUXIEME LOT DE MOTS OUTILS, quarante-huit candidats cribles d'un coup et
   // tous EXCLUSIFS avec zero ligne melangee. Dix sont refuses au critere (a) :
   //   dat hat bin till  de l'anglais courant, `dat boi`, `a hat`, `a bin`.
@@ -694,7 +739,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   [/(^|[^\p{L}])(sunt|fost|foarte|poate|pentru)([^\p{L}]|$)/iu, 'ro'],
   [/(^|[^\p{L}])(seda|siin|keegi|mida)([^\p{L}]|$)/iu, 'et'],
   [/(^|[^\p{L}])(yra|jis)([^\p{L}]|$)/iu, 'lt'],
-  [/(^|[^\p{L}])(nang|ito|wala|alam|kung|lahat)([^\p{L}]|$)/iu, 'tl'],
+  // `kung` sauf dans `kung fu` et `kung pao`.
+  [/(^|[^\p{L}])(nang|ito|wala|alam|kung(?![^\p{L}]+(fu|pao)([^\p{L}]|$))|lahat)([^\p{L}]|$)/iu, 'tl'],
   // TROISIEME LOT, et il PROMEUT des mots qui ne servaient que derriere une
   // porte. `sono` est dans le jeu italien et `lahko zelo zakaj nekaj ampak`
   // dans le jeu slovene, donc ils ne se declenchaient que si une lettre
@@ -783,9 +829,10 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // prossimo, massimo. Le s simple prenait l'espagnol tape sans accent,
   // buenisimo, et l'envoyait au moteur avec sl=it.
   // pas `hitto`, le juron finnois du chat.
-  [/(iamo|ssimo|glio|(?<!hi)tto|nno)([^\p{L}]|$)/iu, 'it'],
-  [/(knya|nmu|anku)([^\p{L}]|$)/iu, 'id'],
-  [/ným([^\p{L}]|$)/iu, 'sk'],
+  // ni `ghetto` ni le mot `ditto`, de l'anglais.
+  [/(iamo|ssimo|glio|(?<!hi|ghe|(?:^|[^\p{L}])di)tto|nno)([^\p{L}]|$)/iu, 'it'],
+  // `-knya -nmu -anku` sont sortis : le malais les ecrit aussi (`baiknya`, `kawanku`).
+  // `-ným` aussi : l'instrumental tcheque (`s krásným`, `s jiným`).
   // LA SEULE ENTREE DU FICHIER QUI AIT JAMAIS RAPPORTE NEGATIF QUELQUE PART.
   // L'ablation l'avait trouvee sans pouvoir la nommer : +8 lignes sur Tatoeba,
   // +1 sur le corpus de reglage, et **-1 sur le corpus AVEUGLE**.
@@ -812,7 +859,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   [/lige([^\p{L}]|$)/iu, 'da'],
   [/ait([^\p{L}]|$)/iu, 'fr'],
   [/(eix|itat)([^\p{L}]|$)/iu, 'ca'],
-  [/(nje|nja|čno|vno)([^\p{L}]|$)/iu, 'sl'],
+  // pas `ninja`.
+  [/(nje|(?<!ni)nja|čno|vno)([^\p{L}]|$)/iu, 'sl'],
   // `iya` a ete retire de cette liste : le turc ecrit `tatlıya`, et le i sans
   // point depouille donne `tatliya`, qui se termine par `iya`. Retirer `iya`
   // coute ZERO ligne sur les neuf bancs et retire une erreur. Gratuit.
@@ -858,7 +906,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // lui seul que le vietnamien produit.
   [/(ould|not|ity|\p{L}day)([^\p{L}]|$)/iu, 'en'],
   [/(eht|ufen)([^\p{L}]|$)/iu, 'de'],
-  [/(nys|uest)([^\p{L}]|$)/iu, 'ca'],
+  // `aquest` et non `-uest` : l'anglais ecrit `quest`, `guest`, `request`.
+  [/(nys|aquest)([^\p{L}]|$)/iu, 'ca'],
   // LE CATALAN EN PLEIN AIR, et le diagnostic qui a dit ou chercher.
   //
   // `porte-partagee-diagnostic.mjs` pose aux portes partagees la question que
@@ -925,7 +974,12 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // pas `iz` : le russe en lettres latines l'ecrit (`ya iz Kazani`).
   [/(^|[^\p{L}])(ima)([^\p{L}]|$)/iu, 'sl'],
   [/(^|[^\p{L}])(tengo|tiempo|mismo)([^\p{L}]|$)/iu, 'es'],
-  [/(^|[^\p{L}])(ele|ela)([^\p{L}]|$)/iu, 'pt'],
+  // L'espagnol rioplatense, que le chat de Kick ecrit beaucoup, ecrit aussi `che`
+  // (`che boludo`) : ses mots a lui votent espagnol et la ligne se tait au lieu de
+  // partir en italien. Retirer `che` aurait coute l'italien entier.
+  [/(^|[^\p{L}])(boludo|boluda|pibe|piba|chabón|chabon|laburo)([^\p{L}]|$)/iu, 'es'],
+  // pas `ele` : c'est le `elles` roumain, deja refuse plus haut pour cette raison.
+  [/(^|[^\p{L}])(ela)([^\p{L}]|$)/iu, 'pt'],
   [/(^|[^\p{L}])joue([^\p{L}]|$)/iu, 'fr'],
   // LA PAIRE MALAIS-INDONESIEN EN PLEIN AIR, et c'est la meme promotion que le
   // catalan, appliquee a la langue la plus basse du tableau.
@@ -968,7 +1022,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // `ste`, `dnes`, `tam` et `tu` sont dehors : le slovene ecrit le premier, le
   // tcheque les trois autres. `kde` et `pri` aussi, le tcheque et le slovene les
   // ecrivent, et seul le corpus les rendait propres.
-  [/(^|[^\p{L}])(sme|môj|zajtra|vonku|práve|správne)([^\p{L}]|$)/iu, 'sk'],
+  // pas `sme` : le slovene l'ecrit (`ne sme`, "il ne doit pas").
+  [/(^|[^\p{L}])(môj|zajtra|vonku|práve|správne)([^\p{L}]|$)/iu, 'sk'],
   // Trois langues de plus, meme crible, memes mots outils : `kui` "quand",
   // `selle` "de ceci" et `mulle` "a moi" pour l estonien ; `tavo` "ton",
   // `reikia` "il faut" et `patinka` "plait" pour le lituanien ; `iyon`, `mong`
@@ -977,7 +1032,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // DEHORS : `oma` est estonien ET finnois, `dito` est un doigt en italien,
   // `hindi` est le tagalog pour "non" et le nom dune langue partout ailleurs,
   // `mo` et `pa` sont trop courts pour appartenir a qui que ce soit.
-  [/(^|[^\p{L}])(kui|selle|mulle)([^\p{L}]|$)/iu, 'et'],
+  // pas `mulle` : le finnois parle l'ecrit (`anna mulle`).
+  [/(^|[^\p{L}])(kui|selle)([^\p{L}]|$)/iu, 'et'],
   [/(^|[^\p{L}])(tavo|reikia|patinka)([^\p{L}]|$)/iu, 'lt'],
   [/(^|[^\p{L}])(iyon|mong|maraming)([^\p{L}]|$)/iu, 'tl'],
   // Quatre langues de plus. `nem` et `egy` sortent du jeu de porte hongrois, ou
@@ -991,8 +1047,10 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // portugais courant, et `nem fodendo` partait avec sl=hu.
   [/(^|[^\p{L}])(egy|mindent)([^\p{L}]|$)/iu, 'hu'],
   [/(^|[^\p{L}])(vsi|dober|svojo|kdor)([^\p{L}]|$)/iu, 'sl'],
-  [/(^|[^\p{L}])(tady|velmi|líbí)([^\p{L}]|$)/iu, 'cs'],
-  [/(^|[^\p{L}])(taas|sinne)([^\p{L}]|$)/iu, 'fi'],
+  // pas `velmi` : le slovaque `veľmi` sans son caron. pas `taas` : l'estonien
+  // l'ecrit aussi, la liste du lexique le disait deja.
+  [/(^|[^\p{L}])(tady|líbí)([^\p{L}]|$)/iu, 'cs'],
+  [/(^|[^\p{L}])(sinne)([^\p{L}]|$)/iu, 'fi'],
   // LES SIX DERNIERES LANGUES QUE LE CRIBLE EN PLEIN AIR N AVAIT PAS VUES, et
   // ce sont les plus hautes du tableau, ce qui explique pourquoi elles etaient
   // passees apres : on cherche d'abord la ou il manque le plus.
@@ -1240,7 +1298,8 @@ const MOTS_SUEDOIS = /(^|[^\p{L}])(jag|och|inte|är|från)([^\p{L}]|$)/iu;
 // cinq mesurent zero du cote danois. Le relancer apres un corpus neuf, pas
 // avant.
 const MOTS_DANO_NORVEGIENS =
-  /(^|[^\p{L}])(jeg|ikke|til|vil|hun|bare|selv|mange|hvem)([^\p{L}]|$)/iu;
+  // pas `bare` : c'est un mot anglais (`bare minimum like always` sortait no).
+  /(^|[^\p{L}])(jeg|ikke|til|vil|hun|selv|mange|hvem)([^\p{L}]|$)/iu;
 
 /** Le tri interieur, appele une fois le suedois ecarte d'une facon ou d'une autre. */
 function norvegienOuDanois(text: string): string | undefined {
@@ -1278,7 +1337,9 @@ function danoisOuNorvegien(text: string): string | undefined {
     if (dn && !sv) return norvegienOuDanois(text);
     return undefined;
   }
-  if (dn && !sv) return norvegienOuDanois(text);
+  // Sans lettre scandinave, les sequences du tri sont aussi de l'anglais (`like`,
+  // `winner`, `their`) : une ligne qui porte un mot que seul l'anglais ecrit se tait.
+  if (dn && !sv && !porteUnMotAnglais(text)) return norvegienOuDanois(text);
   return undefined;
 }
 
@@ -1502,6 +1563,9 @@ const PORTES_PARTAGEES: ReadonlyArray<readonly [RegExp, readonly string[]]> = [
 ];
 
 function porteQuelleLangue(text: string): string | undefined {
+  // Une lettre accentuee dans une ligne anglaise est un nom propre, `pokémon`,
+  // `mbappé`, et le jeu ouvert lisait alors `most` hongrois.
+  if (porteUnMotAnglais(text)) return undefined;
   for (const [porte, langues] of PORTES_PARTAGEES) {
     if (!porte.test(text)) continue;
     const vus = langues.filter((l) => JEUX_DE_PORTE[l]!.test(text));
@@ -1717,7 +1781,8 @@ const MOTS_INDONESIENS =
 // bouge pas.
 // Pas `dah` : l'indonesien familier l'ecrit aussi (`udah`, `dah`).
 const MOTS_MALAIS =
-  /(^|[^\p{L}])(kerana|sahaja|cuba|esok|bilik|mahu|jom|tengok|macam|betul|sikit|jugak|memang|nak|tiada|teruk|nampak|berlaku|tak|weh|lelaki)([^\p{L}]|$)/iu;
+  // pas `betul` ni `memang` : l'indonesien les ecrit tous les jours.
+  /(^|[^\p{L}])(kerana|sahaja|cuba|esok|bilik|mahu|jom|tengok|macam|sikit|jugak|nak|tiada|teruk|nampak|berlaku|tak|weh|lelaki)([^\p{L}]|$)/iu;
 
 function malaisOuIndonesien(text: string): string | undefined {
   if (!MOTS_MALAIS_INDONESIENS.test(text)) return undefined;
@@ -1891,7 +1956,8 @@ const LETTRES_JAWI = /[ڠڤڬڽݢۏ]/u;
  */
 const MOTS_JAWI = /(^|[^\p{L}])(ساي|تيدق|كامو)([^\p{L}]|$)/u;
 
-const MOTS_PERSANS = /(^|[^\p{L}])(است|را|از|او|بود|هر)([^\p{L}]|$)/u;
+// pas `او` : c'est aussi le `ou` arabe ecrit sans hamza.
+const MOTS_PERSANS = /(^|[^\p{L}])(است|را|از|بود|هر)([^\p{L}]|$)/u;
 
 /**
  * L'ARABE DOIT SE NOMMER LUI AUSSI, et c'est ce qui manquait ici.
@@ -1983,7 +2049,9 @@ function arabeDeChat(text: string): boolean {
 
 function arabeOuPersan(text: string): string | undefined {
   if (LETTRES_OURDOUES.test(text)) return undefined;
-  if (LETTRES_JAWI.test(text)) return 'ms';
+  // Le Golfe et le Maghreb ecrivent leur v avec `ڤ` (`ڤيديو حلو`) : un mot arabe
+  // de la ligne l'emporte sur la lettre jawi.
+  if (LETTRES_JAWI.test(text) && !MOTS_ARABES.test(text) && !MOTS_ARABES_CHAT.test(text)) return 'ms';
   if (MOTS_JAWI.test(text)) return 'ms';
   if (LETTRES_PERSANES.test(text)) return 'fa';
   if (MOTS_PERSANS.test(text)) return 'fa';
@@ -2063,7 +2131,9 @@ const ER_BULGARE = /ъ/iu;
 const ARTICLE_BULGARE = /(ът|ата|ята)([^\p{L}]|$)/iu;
 /** L'infinitif russe. Le bulgare n'en a pas, celui de l'ukrainien est -ти. */
 // Pas -ють, qu'aucun infinitif russe ne porte, ni -плять : c'est le pluriel
-// ukrainien (`знають`, `сплять`, `будуть`).
+// ukrainien (`знають`, `сплять`, `будуть`). -ить et -ять restent, bien que la
+// troisieme personne ukrainienne les ecrive (`мама робить`) : les exclure rendait
+// 9 lignes russes muettes et 5 fausses sur le chemin brut, ou franc les reprend.
 const INFINITIF_RUSSE = /(?<!ю|пля|буду)ть([^\p{L}]|$)/iu;
 
 /**
@@ -2117,7 +2187,8 @@ const ADJECTIF_RUSSE = /ый([^\p{L}]|$)/iu;
 // Une ligne bulgare qui les porte porte presque toujours un autre marqueur.
 const UKRAINIEN_OU_BULGARE = /(^|[^\p{L}])ще([^\p{L}]|$)/iu;
 const MOTS_BULGARES =
-  /(^|[^\p{L}])(съм|си|сме|сте|са|какво|кой|кога|къде|защо|много|добре|това|няма|аз|мога|гледа|гледам|искам|този|започва|благодаря|страхотен|поздрави|дошли|се|има|нещо|тя|моля)([^\p{L}]|$)/iu;
+  // pas `много` : le russe l'ecrit pareil (`много денег`).
+  /(^|[^\p{L}])(съм|си|сме|сте|са|какво|кой|кога|къде|защо|добре|това|няма|аз|мога|гледа|гледам|искам|този|започва|благодаря|страхотен|поздрави|дошли|се|има|нещо|тя|моля)([^\p{L}]|$)/iu;
 
 /**
  * Le repli `ru` etait une DEVINETTE posee sur le chemin sans devinette.
@@ -2604,6 +2675,24 @@ function memo(
   return value;
 }
 
+/**
+ * Des formes que deux langues voisines ecrivent, sorties du chemin sur par la
+ * revue linguiste (2026-11-04) et rendues au seul chemin brut, comme le rire :
+ * la plus frequente des deux y devine mieux que franc. Sans elles, les lignes
+ * devenues muettes retombaient sur franc et le brut prenait 19 fausses Tatoeba.
+ */
+const PENCHANTS: ReadonlyArray<readonly [RegExp, string]> = [
+  [/(^|[^\p{L}])taas([^\p{L}]|$)/iu, 'fi'],
+  [/(^|[^\p{L}])ele([^\p{L}]|$)/iu, 'pt'],
+  [/(knya|nmu|anku)([^\p{L}]|$)/iu, 'id'],
+  [/ným([^\p{L}]|$)/iu, 'sk'],
+];
+
+function detectByPenchant(text: string): string | undefined {
+  const langues = new Set(PENCHANTS.filter(([forme]) => forme.test(text)).map(([, l]) => l));
+  return langues.size === 1 ? [...langues][0] : undefined;
+}
+
 export function detectLanguage(text: string): string | undefined {
   const trimmed = text.trim();
   return trimmed.length === 0 ? undefined : memo(DETECT_MEMO, trimmed, detectUncached);
@@ -2640,6 +2729,9 @@ function detectUncached(trimmed: string): string | undefined {
     const rire = detectByShortWords(trimmed, true);
     if (rire) return rire;
   }
+
+  const penche = detectByPenchant(trimmed);
+  if (penche) return penche;
 
   const francCode = franc(trimmed, { minLength: 3 });
   if (francCode === 'und') {
