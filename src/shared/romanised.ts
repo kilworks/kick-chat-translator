@@ -120,9 +120,11 @@ for (const [langue, mots] of Object.entries(MARQUEURS)) {
  * Le finnois finit aussi en -yy, mais apres t, k, s (loytyy, nakyy, pysyy) ou
  * sur trois lettres (syy, myy), d'ou la consonne et la lettre devant elle.
  * Apres t, k, s encore russe si le mot porte ch, sh, zh ou kh, que le finnois
- * n'ecrit pas (chistyy). Le neutre -oe apres consonne et n (krasnoe) aussi.
+ * n'ecrit pas (chistyy). Le neutre -oe apres consonne et n (krasnoe) aussi, et
+ * le genitif -kogo/-togo (takogo), que le slovene ecrit -ega ; kogo seul est
+ * slovene, d'ou deux lettres devant.
  */
-const ADJECTIF_RU = /^(?:\p{L}+[bvmnlpr]yy|\p{L}*[cszk]h\p{L}*yy|\p{L}{2,}[^aeiouy]noe)$/u;
+const ADJECTIF_RU = /^(?:\p{L}+[bvmnlpr]yy|\p{L}*[cszk]h\p{L}*yy|\p{L}{2,}[^aeiouy]noe|\p{L}{2,}[kt]ogo)$/u;
 
 const FAIBLES = new Map<string, string>();
 for (const [langue, mots] of Object.entries(FAIBLES_PAR_LANGUE)) {

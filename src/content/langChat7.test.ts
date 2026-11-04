@@ -39,18 +39,24 @@ describe('le corpus 7, aveugle', () => {
   // regles se jugent sur le corpus 8.
   it('mesure le chemin sur en totaux', () => {
     // avant le rire : 166 / 254 / 5 ; apres : 164 / 256 / 5
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7).total)).toEqual({ right: 165, silent: 258, wrong: 2 });
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7_ROMAN).total)).toEqual({ right: 0, silent: 48, wrong: 2 });
+    // 165 / 258 / 2 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7).total)).toEqual({ right: 163, silent: 261, wrong: 1 });
+    // 0 / 48 / 2 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant le rire : 9 / 11 / 5
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7_LAUGH).total)).toEqual({ right: 9, silent: 15, wrong: 1 });
+    // 9 / 15 / 1 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT7_LAUGH).total)).toEqual({ right: 9, silent: 16, wrong: 0 });
   });
 
   it('mesure le chemin brut en totaux', () => {
     // avant : 261 / 87 / 77
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT7).total)).toEqual({ right: 263, silent: 88, wrong: 74 });
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT7_ROMAN).total)).toEqual({ right: 2, silent: 30, wrong: 18 });
+    // 263 / 88 / 74 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT7).total)).toEqual({ right: 262, silent: 91, wrong: 72 });
+    // 2 / 30 / 18 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT7_ROMAN).total)).toEqual({ right: 2, silent: 32, wrong: 16 });
     // avant le rire : 13 / 4 / 8
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT7_LAUGH).total)).toEqual({ right: 13, silent: 6, wrong: 6 });
+    // 13 / 6 / 6 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT7_LAUGH).total)).toEqual({ right: 13, silent: 7, wrong: 5 });
   });
 
   it('n est lu par aucun autre fichier', () => {

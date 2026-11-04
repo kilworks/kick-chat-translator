@@ -59,7 +59,8 @@ describe('le corpus 5, aveugle', () => {
   });
 
   it('mesure le chemin brut en totaux', () => {
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT5).total)).toEqual({ right: 271, silent: 76, wrong: 78 });
+    // 271 / 76 / 78 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT5).total)).toEqual({ right: 269, silent: 78, wrong: 78 });
     expect(plain(runMatrix(detectLanguage, LANG_CHAT5_ROMAN).total)).toEqual({ right: 4, silent: 33, wrong: 13 });
     // 15 / 2 / 8 avant le rire sans vote du chemin sur
     expect(plain(runMatrix(detectLanguage, LANG_CHAT5_LAUGH).total)).toEqual({ right: 16, silent: 1, wrong: 8 });

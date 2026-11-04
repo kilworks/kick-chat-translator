@@ -60,9 +60,11 @@ describe('le detecteur sur du chat qu il n a jamais vu', () => {
   // ou il l'a ete est exactement ce que le lexique n'arrivait plus a faire.
   it('rappelle un tiers de moins en brut, mais la longueur en explique la moitie', () => {
     // 148 et 61 avant le 2026-11-03, le retrait de `nem` du hongrois.
-    expect(plain(SURE2.total)).toEqual({ right: 147, silent: 113, wrong: 0 });
+    // 147 / 113 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(SURE2.total)).toEqual({ right: 146, silent: 114, wrong: 0 });
     expect(rappel(SURE1.total)).toBe(60);
-    expect(rappel(SURE2.total)).toBe(57);
+    // 57 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(rappel(SURE2.total)).toBe(56);
     // Le facteur confondant, mesure : les deux corpus ne sont pas comparables tels quels.
     const lignes = (c: Record<string, readonly string[]>): string[] => Object.values(c).flat();
     const part = (c: Record<string, readonly string[]>): number =>
@@ -116,7 +118,8 @@ describe('le detecteur sur du chat qu il n a jamais vu', () => {
     expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT, court)).total)).toBe(60);
     expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, court)).total)).toBe(56);
     expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT, long)).total)).toBe(60);
-    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, long)).total)).toBe(57);
+    // 57 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(rappel(runMatrix(confidentLanguage, bande(LANG_CHAT2, long)).total)).toBe(56);
   });
 
   // Le chemin brut perd moins parce qu'il ne depend pas du lexique : franc lit

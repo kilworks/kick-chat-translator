@@ -50,14 +50,16 @@ describe('le corpus 6, aveugle', () => {
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT6).total)).toEqual({ right: 159, silent: 266, wrong: 0 });
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT6_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant : 7 / 9 / 9
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6_LAUGH).total)).toEqual({ right: 9, silent: 16, wrong: 0 });
+    // 9 / 16 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT6_LAUGH).total)).toEqual({ right: 8, silent: 17, wrong: 0 });
   });
 
   it('mesure le chemin brut en totaux', () => {
     expect(plain(runMatrix(detectLanguage, LANG_CHAT6).total)).toEqual({ right: 236, silent: 116, wrong: 73 });
     expect(plain(runMatrix(detectLanguage, LANG_CHAT6_ROMAN).total)).toEqual({ right: 2, silent: 31, wrong: 17 });
     // avant : 7 / 9 / 9
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT6_LAUGH).total)).toEqual({ right: 9, silent: 9, wrong: 7 });
+    // 9 / 9 / 7 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT6_LAUGH).total)).toEqual({ right: 8, silent: 9, wrong: 8 });
   });
 
   it('n est lu par aucun autre fichier', () => {

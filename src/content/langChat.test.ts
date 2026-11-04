@@ -72,7 +72,8 @@ describe('le chemin sur, sur du chat', () => {
   it('se tait sur trois lignes de chat sur quatre', () => {
     // 237 avant le 2026-11-03 : `ezt nem hiszem el` et `nem látok semmit` ne
     // portaient que `nem`, sorti parce que c'est aussi du portugais courant.
-    expect(plain(CHAT_SURE.total)).toEqual({ right: 235, silent: 155, wrong: 0 });
+    // 235 / 155 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(CHAT_SURE.total)).toEqual({ right: 234, silent: 156, wrong: 0 });
     expect(muet(CHAT_SURE.total)).toBe(40);
   });
 
@@ -87,7 +88,8 @@ describe('le chemin sur, sur du chat', () => {
   // vingt-six portes a lettre sont muettes. Une ligne de plus ici, et c'est la
   // direction a retenir pour les langues que le clavier deshabille.
   it('perd un tiers de son rappel quand les diacritiques tombent', () => {
-    expect(plain(NU_SURE.total)).toEqual({ right: 157, silent: 233, wrong: 0 });
+    // 157 / 233 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(NU_SURE.total)).toEqual({ right: 156, silent: 234, wrong: 0 });
     expect(muet(NU_SURE.total)).toBe(60);
   });
 });
@@ -112,7 +114,8 @@ describe('le chemin brut, sur du chat', () => {
   // n'est pas comble, il est court-circuite, et il reapparaitra entier des que
   // le lexique manquera un mot.
   it('se trompe sur plus d une ligne de chat sur quatre', () => {
-    expect(plain(CHAT_BRUT.total)).toEqual({ right: 275, silent: 49, wrong: 66 });
+    // 275 / 49 / 66 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(CHAT_BRUT.total)).toEqual({ right: 274, silent: 50, wrong: 66 });
     const tatoeba = runMatrix(detectLanguage, memesLangues());
     const partChat = CHAT_BRUT.total.wrong / 390;
     const partTatoeba = tatoeba.total.wrong / (26 * 120);
@@ -120,7 +123,8 @@ describe('le chemin brut, sur du chat', () => {
   });
 
   it('empire encore sans diacritiques', () => {
-    expect(plain(NU_BRUT.total)).toEqual({ right: 216, silent: 86, wrong: 88 });
+    // 216 / 86 / 88 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(NU_BRUT.total)).toEqual({ right: 215, silent: 87, wrong: 88 });
   });
 
   // Sept langues ne marquent pas un seul point sur le chemin BRUT, franc compris,

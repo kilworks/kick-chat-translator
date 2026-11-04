@@ -268,7 +268,8 @@ const SHORT_WORD_LANG = new Map<string, string>([
   ['zelo', 'sl'], ['hvala', 'sl'], ['zakaj', 'sl'], ['spet', 'sl'], ['tukaj', 'sl'],
   ['kaj', 'sl'], ['lahko', 'sl'], ['nekaj', 'sl'], ['ampak', 'sl'], ['nisem', 'sl'],
   ['kdaj', 'sl'], ['prav', 'sl'], ['tudi', 'sl'], ['ker', 'sl'], ['zdaj', 'sl'],
-  ['saj', 'sl'], ['vse', 'sl'], ['sva', 'sl'], ['bova', 'sl'],
+  // pas `vse` : le russe en lettres latines et le tcheque sans hacek l'ecrivent.
+  ['saj', 'sl'], ['sva', 'sl'], ['bova', 'sl'],
   ['vedno', 'sl'], ['danes', 'sl'],
 
   ['labai', 'lt'], ['aciu', 'lt'], ['ačiū', 'lt'], ['labas', 'lt'], ['kodel', 'lt'],
@@ -692,7 +693,7 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   [/(^|[^\p{L}])(sunt|fost|foarte|poate|pentru)([^\p{L}]|$)/iu, 'ro'],
   [/(^|[^\p{L}])(seda|siin|keegi|mida)([^\p{L}]|$)/iu, 'et'],
   [/(^|[^\p{L}])(yra|jis)([^\p{L}]|$)/iu, 'lt'],
-  [/(^|[^\p{L}])(nang|ito|wala|alam|kung)([^\p{L}]|$)/iu, 'tl'],
+  [/(^|[^\p{L}])(nang|ito|wala|alam|kung|lahat)([^\p{L}]|$)/iu, 'tl'],
   // TROISIEME LOT, et il PROMEUT des mots qui ne servaient que derriere une
   // porte. `sono` est dans le jeu italien et `lahko zelo zakaj nekaj ampak`
   // dans le jeu slovene, donc ils ne se declenchaient que si une lettre
@@ -909,7 +910,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   //   aqui  c'est `aquí` sans son accent.  hi    c'est le bonjour anglais.
   //   bila  c'est `quand` en malais.       encore  l'anglais l'ecrit aussi.
   //   nå    le danois l ecrit.
-  [/(^|[^\p{L}])(che|tutti|mia)([^\p{L}]|$)/iu, 'it'],
+  // pas `mia` : l'espagnol tape `madre mia` sans accent.
+  [/(^|[^\p{L}])(che|tutti)([^\p{L}]|$)/iu, 'it'],
   // Les verbes irreguliers italiens a diphtongue, `vuoi`, `puoi`, `vuole`, et
   // l'interrogatif `chi`. La diphtongue `uo` elle-meme est impossible en plein
   // air, l'espagnol ecrit `cuota`, le portugais `quota`, le finnois `vuosi`,
@@ -918,7 +920,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // `lei` est dehors bien qu'il mesure exclusif : le norvegien ecrit `lei av`,
   // et le corpus ne le contient pas.
   [/(^|[^\p{L}])(chi|vuoi|puoi|vuole)([^\p{L}]|$)/iu, 'it'],
-  [/(^|[^\p{L}])(iz|ima)([^\p{L}]|$)/iu, 'sl'],
+  // pas `iz` : le russe en lettres latines l'ecrit (`ya iz Kazani`).
+  [/(^|[^\p{L}])(ima)([^\p{L}]|$)/iu, 'sl'],
   [/(^|[^\p{L}])(tengo|tiempo|mismo)([^\p{L}]|$)/iu, 'es'],
   [/(^|[^\p{L}])(ele|ela)([^\p{L}]|$)/iu, 'pt'],
   [/(^|[^\p{L}])joue([^\p{L}]|$)/iu, 'fr'],
@@ -2047,13 +2050,17 @@ const LETTRES_UKRAINIENNES = /[іїєґ]/iu;
 // DEHORS : `треба`, qui est du serbe, et `добре` que le bulgare ecrit aussi,
 // deux lignes bulgares contre une ukrainienne, ce qui est le mauvais sens.
 // `знаю` est russe autant qu'ukrainien.
-const MOTS_UKRAINIENS = /(^|[^\p{L}])(це|дуже|щоб)([^\p{L}]|$)/iu;
+// ця, цей, знову, зараз : sans lettre propre, ni russes (эта, этот, снова, сейчас)
+// ni bulgares (тази, този, пак, сега). `ця мапа проклята` sortait bg.
+const MOTS_UKRAINIENS = /(^|[^\p{L}])(це|дуже|щоб|ця|цей|знову|зараз)([^\p{L}]|$)/iu;
 const LETTRES_RUSSES = /[ыэё]/iu;
 const ER_BULGARE = /ъ/iu;
 /** L'article defini suffixe, que ni le russe ni l'ukrainien n'ont. */
 const ARTICLE_BULGARE = /(ът|ата|ята)([^\p{L}]|$)/iu;
 /** L'infinitif russe. Le bulgare n'en a pas, celui de l'ukrainien est -ти. */
-const INFINITIF_RUSSE = /ть([^\p{L}]|$)/iu;
+// Pas -ють, qu'aucun infinitif russe ne porte, ni -плять : c'est le pluriel
+// ukrainien (`знають`, `сплять`).
+const INFINITIF_RUSSE = /(?<!ю|пля)ть([^\p{L}]|$)/iu;
 
 /**
  * Les mots russes, symetriques de MOTS_BULGARES, et choisis par CONTRASTE.
@@ -2467,7 +2474,7 @@ const MOTS_HINGLISH = new Set([
   // Verbes et mots de tous les jours : `sab kuch haar gaya` n'avait que kuch et
   // sortait nl par `-aar`. Seuls ils ne decident rien, il en faut deux.
   'gaya', 'gayi', 'raha', 'rahi', 'dekh', 'baar', 'phir', 'maza', 'haar', 'pehli',
-  'sab', 'ko',
+  'sab', 'ko', 'fir', 'kal', 'aana', 'sabko', 'bhaiya', 'wala', 'wali',
 ]);
 
 // Trois mots qu'aucune langue latine du produit n'ecrit, assez forts seuls :

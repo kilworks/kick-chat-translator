@@ -460,3 +460,29 @@ describe('les regles lues sur le corpus 6', () => {
     expect(confidentLanguage('good night sab ko')).toBeUndefined();
   });
 });
+
+// Lues sur les corpus 7 et 8 devenus bancs de reglage (2026-11-04) : des mots
+// que deux langues ecrivent pareil, et du lexique qui manquait.
+describe('les regles lues sur les corpus 7 et 8', () => {
+  it('ne prend pas vse et iz du russe en lettres latines pour du slovene', () => {
+    expect(confidentLanguage('opyat slil vse dengi')).not.toBe('sl');
+    expect(confidentLanguage('ya iz Kazani, vsem salam')).not.toBe('sl');
+    expect(confidentLanguage('davno ne videl takogo farta')).not.toBe('sl');
+  });
+
+  it('ne prend pas madre mia pour de l italien', () => {
+    expect(confidentLanguage('madre mia loco')).not.toBe('it');
+  });
+
+  it('laisse le pluriel et les mots ukrainiens a l ukrainien', () => {
+    expect(confidentLanguage('модери сплять')).not.toBe('ru');
+    expect(confidentLanguage('ця мапа проклята')).toBe('uk');
+    expect(confidentLanguage('модер знову спить')).toBe('uk');
+  });
+
+  it('reconnait le tagalog et le hinglish a cote de l anglais', () => {
+    expect(confidentLanguage('good night sa lahat')).not.toBe('en');
+    expect(confidentLanguage('kal fir aana hai, good night sabko')).toBeUndefined();
+    expect(confidentLanguage('bro bhaiya clip bana do ye wala')).toBeUndefined();
+  });
+});

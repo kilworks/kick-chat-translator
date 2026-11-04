@@ -35,16 +35,20 @@ describe('le corpus 8, aveugle', () => {
   // apres celles du corpus 6, qui n'y changent rien. Barre NON tenue : natif 3,
   // romanise 3, rire 0.
   it('mesure le chemin sur en totaux', () => {
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT8).total)).toEqual({ right: 162, silent: 260, wrong: 3 });
+    // 162 / 260 / 3 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT8).total)).toEqual({ right: 165, silent: 260, wrong: 0 });
     // avant les regles des corpus 4 et 5 : 0 / 46 / 4
-    expect(plain(runMatrix(confidentLanguage, LANG_CHAT8_ROMAN).total)).toEqual({ right: 0, silent: 47, wrong: 3 });
+    // 0 / 47 / 3 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(confidentLanguage, LANG_CHAT8_ROMAN).total)).toEqual({ right: 0, silent: 50, wrong: 0 });
     // avant le rire : 9 / 9 / 7 ; apres : 9 / 15 / 1
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT8_LAUGH).total)).toEqual({ right: 9, silent: 16, wrong: 0 });
   });
 
   it('mesure le chemin brut en totaux', () => {
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT8).total)).toEqual({ right: 271, silent: 89, wrong: 65 });
-    expect(plain(runMatrix(detectLanguage, LANG_CHAT8_ROMAN).total)).toEqual({ right: 2, silent: 30, wrong: 18 });
+    // 271 / 89 / 65 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT8).total)).toEqual({ right: 275, silent: 88, wrong: 62 });
+    // 2 / 30 / 18 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
+    expect(plain(runMatrix(detectLanguage, LANG_CHAT8_ROMAN).total)).toEqual({ right: 3, silent: 32, wrong: 15 });
     // avant le rire : 14 / 1 / 10
     expect(plain(runMatrix(detectLanguage, LANG_CHAT8_LAUGH).total)).toEqual({ right: 15, silent: 2, wrong: 8 });
   });

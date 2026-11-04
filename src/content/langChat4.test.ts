@@ -51,9 +51,10 @@ describe('le corpus 4, aveugle', () => {
   it('mesure le chemin sur en totaux', () => {
     // avant : 221 / 196 / 8 ; 218 / 206 / 1 avant le rire sans vote a cote d'un
     // mot inconnu (2026-11-04, regle hors de ce corpus), qui en rend 2 muettes
+    // 216 / 209 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4).total)).toEqual({
-      right: 216,
-      silent: 209,
+      right: 217,
+      silent: 208,
       wrong: 0,
     });
     // avant : 0 / 44 / 6 ; 0 / 46 / 4 apres le tour du 2026-11-03 ; la forme
@@ -74,9 +75,10 @@ describe('le corpus 4, aveugle', () => {
 
   it('mesure le chemin brut en totaux', () => {
     // avant : 291 / 57 / 77
+    // 293 / 60 / 72 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
     expect(plain(runMatrix(detectLanguage, LANG_CHAT4).total)).toEqual({
-      right: 293,
-      silent: 60,
+      right: 294,
+      silent: 59,
       wrong: 72,
     });
     // avant : 3 / 25 / 22 ; 3 / 27 / 20 avant la forme -yy
