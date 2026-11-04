@@ -55,11 +55,12 @@ describe('le corpus 4, aveugle', () => {
       silent: 206,
       wrong: 1,
     });
-    // avant : 0 / 44 / 6
+    // avant : 0 / 44 / 6 ; 0 / 46 / 4 apres le tour du 2026-11-03 ; la forme
+    // -yy de l'adjectif russe (2026-11-04, reglee hors de ce corpus) en prend 2
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4_ROMAN).total)).toEqual({
       right: 0,
-      silent: 46,
-      wrong: 4,
+      silent: 48,
+      wrong: 2,
     });
     // avant : 5 / 17 / 3
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT4_LAUGH).total)).toEqual({
@@ -76,11 +77,11 @@ describe('le corpus 4, aveugle', () => {
       silent: 60,
       wrong: 73,
     });
-    // avant : 3 / 25 / 22
+    // avant : 3 / 25 / 22 ; 3 / 27 / 20 avant la forme -yy
     expect(plain(runMatrix(detectLanguage, LANG_CHAT4_ROMAN).total)).toEqual({
-      right: 3,
+      right: 5,
       silent: 27,
-      wrong: 20,
+      wrong: 18,
     });
     // avant : 14 / 4 / 7
     expect(plain(runMatrix(detectLanguage, LANG_CHAT4_LAUGH).total)).toEqual({

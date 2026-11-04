@@ -36,6 +36,10 @@ describe('le corpus 5, aveugle', () => {
   // La barre, ecrite avant de le mesurer et reprise du corpus 4 : au plus une
   // reponse sure fausse par jeu, 0,7 % en tout. Mesure a son ajout, avant toute
   // regle : 13 sur 500 (2,6 %), 3 natives, 3 romanisees, 7 de rire.
+  //
+  // La premiere regle jugee sur lui, la forme -yy de l'adjectif russe (reglee sur
+  // un banc a part, 8 lignes de 50 passees de `fi` a muet), n'y change RIEN : les
+  // trois russes romanisees fausses n'ont pas cette forme. Lu une fois.
   it('mesure le chemin sur en totaux', () => {
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT5).total)).toEqual({ right: 190, silent: 232, wrong: 3 });
     expect(plain(runMatrix(confidentLanguage, LANG_CHAT5_ROMAN).total)).toEqual({ right: 0, silent: 47, wrong: 3 });

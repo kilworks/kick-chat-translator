@@ -124,3 +124,29 @@ describe('romanisedLanguage, bulgare latinise', () => {
     expect(romanisedLanguage('tuk tuk tuk')).toBeUndefined();
   });
 });
+
+// La terminaison d'adjectif russe -ый/-ий/-ой translitteree -yy, apres une
+// consonne que le finnois ne met pas devant -yy en fin de mot. Mesure avant la
+// regle sur un banc de reglage de 50 lignes ecrit pour elle : 8 lignes ainsi
+// faites sortaient `fi` comme reponse sure, par la regle finnoise `yy`.
+describe('romanisedLanguage, adjectif russe en -yy', () => {
+  it.each([
+    'eto byl novyy rekord',
+    'krasivyy hod',
+    'dobryy vecher',
+    'staryy strim byl luchshe',
+    'zlyy streamer segodnya',
+    'polnyy proval',
+  ])('marque %s comme ru', (texte) => {
+    expect(romanisedLanguage(texte)).toBe('ru');
+  });
+
+  // Le finnois finit en -yy apres t, k, s (loytyy, nakyy, pysyy), et en -yy
+  // seul sur trois lettres (syy, kyy, myy) : rien de cela ne doit sortir ru.
+  it.each(['se loytyy sielta', 'nakyy hyvin', 'pysyy kotona', 'mika syy', 'myy kaiken', 'syntyy uusi'])(
+    'laisse %s au detecteur',
+    (texte) => {
+      expect(romanisedLanguage(texte)).toBeUndefined();
+    },
+  );
+});

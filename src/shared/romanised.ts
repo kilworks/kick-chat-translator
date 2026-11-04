@@ -114,6 +114,14 @@ for (const [langue, mots] of Object.entries(MARQUEURS)) {
   for (const m of mots) TABLE.set(m, langue);
 }
 
+/**
+ * L'adjectif russe translittere : -ый/-ий/-ой ecrit -yy (novyy, dobryy, polnyy).
+ * Une forme plutot qu'une liste, parce que chaque adjectif en est une entree.
+ * Le finnois finit aussi en -yy, mais apres t, k, s (loytyy, nakyy, pysyy) ou
+ * sur trois lettres (syy, myy), d'ou la consonne et la lettre devant elle.
+ */
+const ADJECTIF_RU = /^\p{L}+[bvmnlpr]yy$/u;
+
 const FAIBLES = new Map<string, string>();
 for (const [langue, mots] of Object.entries(FAIBLES_PAR_LANGUE)) {
   for (const m of mots) FAIBLES.set(m, langue);
@@ -133,7 +141,7 @@ export function romanisedLanguage(text: string): string | undefined {
 
   for (const jeton of text.toLowerCase().split(/[^\p{L}]+/u)) {
     if (!jeton) continue;
-    const fort = TABLE.get(jeton);
+    const fort = TABLE.get(jeton) ?? (ADJECTIF_RU.test(jeton) ? 'ru' : undefined);
     if (fort) {
       if (vote && vote !== fort) return undefined;
       vote = fort;

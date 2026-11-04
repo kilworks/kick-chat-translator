@@ -57,11 +57,18 @@ reads dist/, so it serialises behind any build. D touches no code.
   source and sends NB (673971f), two stale statements (0939934). The study's
   `verify-handover-claims.mjs` runs again: 48 of 67, the 19 others are counts
   grown since 2.10.0.
-- [ ] **Corpus 4: the bar is not met.** Written before the change: at most one
-  confident wrong answer per set, 0.7 % overall. Measured 1.2 % (6 of 500),
-  three of them Russian in Latin letters named fi. Read only in totals
-  (`impl/c4totals.mts`), already read twice: the next rule needs a fresh
-  blind set, not this one.
+- [ ] **The blind bar is not met, and corpus 5 says it is further off than
+  corpus 4 did.** Bar written before: at most one confident wrong answer per
+  set, 0.7 % overall. Corpus 4 ended at 1.2 % and was read twice, so blind
+  corpus 5 was written to the same brief (2026-11-04, 1c743c4): 13 of 500
+  (2.6 %) before any rule, 3 native, 3 romanised, **7 of 25 laughter**. The
+  Russian -yy adjective form (tuned on a separate 50-line bench, 10 confident
+  wrong to 2) takes corpus 4 romanised from 4 to 2 and changes nothing on
+  corpus 5. Corpus 5 is now read once in totals. Next: laughter is the largest
+  class; tune it on a bench of its own, then judge on a corpus 6.
+- [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
+  runs on 2026-11-04: extension-load, then green, then translate-cache, then
+  nav-monde, each green when run alone (2 to 3 times). Not traced.
 - [ ] **DeepL changes never observed.** No key on this machine. The batch
   `source_lang` and NB for Norwegian are pinned by tests on the request body
   only; NB as a source code comes from the DeepL list as recalled, not
