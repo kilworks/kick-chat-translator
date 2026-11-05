@@ -28,7 +28,7 @@ import { defaultSettings } from '~/shared/settings';
 /** onDomMessage does not await the translate path, so let it settle before asserting. */
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-/ The option has promised an on-device fallback since it shipped, and a cloud that
+// The option has promised an on-device fallback since it shipped, and a cloud that
 // failed showed an error whatever model was ready. It is the default now.
 describe('TranslationPipeline, cloud first', () => {
   const LINE = 'jestem tutaj dzisiaj';
