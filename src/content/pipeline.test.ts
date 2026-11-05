@@ -25,7 +25,7 @@ import { TranslationPipeline } from './pipeline';
 import { chatLength } from './filters';
 import { inject, markSkipped, showError, showThrottleIndicator } from './injector';
 import { defaultSettings } from '~/shared/settings';
-import { detectLanguage } from './langDetect';
+import { confidentLanguage, detectLanguage } from './langDetect';
 
 const JP = 'これはテストメッセージです';
 const wsMsg = (text: string) => ({ id: '1', text, channel: 'chan', username: 'user', isBot: false });
@@ -551,5 +551,81 @@ describe('TranslationPipeline: names kept as they are', () => {
     await flush();
     expect(await sentText()).toBe('nienawidzę tego [1] bardzo');
     expect(await shown()).toBe('eu odeio isso');
+  });
+});
+
+// Rule R1b, frozen before its sample: 13 lines changed of 577, penalty 8.38 to 2.85,
+// 10 better, 2 worse. Written lines, captured chat stays out of git.
+describe('TranslationPipeline, a line the engine hands back in another language', () => {
+  const LINE = 'gelirsin abi bence';
+  const domMsg = (text: string, channel = 'chan') => {
+    const rowElement = document.createElement('div');
+    const injectionTarget = document.createElement('span');
+    injectionTarget.className = 'font-normal';
+    injectionTarget.textContent = text;
+    rowElement.appendChild(injectionTarget);
+    document.body.appendChild(rowElement);
+    return { rowElement, injectionTarget, id: 'r1', text, channel, username: 'user', isBot: false };
+  };
+  const reader = () =>
+    new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false, localEnabled: false });
+  const answer = (translatedText: string, detectedLang: string) => ({
+    type: 'translate.result',
+    payload: { ok: true, result: { translatedText, detectedLang, provider: 'google', cached: false } },
+  });
+  const asked = () => sendMock.mock.calls.map((c) => c[0]).filter((m) => m?.type === 'translate');
+
+  beforeEach(() => {
+    sendMock.mockReset();
+    vi.mocked(inject).mockClear();
+    sendMock.mockImplementation(async (m: { type: string; payload: { sourceLangHint?: string; text: string } }) =>
+      m.payload?.sourceLangHint === 'tr' ? answer('tu viendras frere je pense', 'tr') : answer(m.payload?.text, 'id'),
+    );
+  });
+
+  it('asks once more in the language of the channel', async () => {
+    const p = reader();
+    p.setChannelLang('chan', 'tr');
+    await p.onDomMessage(domMsg(LINE));
+    await flush();
+    expect(asked().map((m) => m.payload.sourceLangHint)).toEqual([undefined, 'tr']);
+    expect(inject).toHaveBeenCalledTimes(1);
+  });
+
+  it('asks only once, when the channel language hands it back too', async () => {
+    sendMock.mockImplementation(async (m: { payload: { text: string } }) => answer(m.payload?.text, 'id'));
+    const p = reader();
+    p.setChannelLang('chan', 'tr');
+    await p.onDomMessage(domMsg(LINE));
+    await flush();
+    expect(asked()).toHaveLength(2);
+    expect(inject).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['one word', 'gelirsin', 'chan', 'tr'],
+    ['the channel is in the language the engine named', LINE, 'chan', 'id'],
+    ['the channel is in the language of the reader', LINE, 'chan', 'fr'],
+    ['the language belongs to another channel', LINE, 'other', 'tr'],
+  ])('does not ask again: %s', async (_why, line, channel, lang) => {
+    const p = reader();
+    p.setChannelLang('chan', lang);
+    await p.onDomMessage(domMsg(line, channel));
+    await flush();
+    expect(asked()).toHaveLength(1);
+  });
+
+  it('does not ask again on a line the detector named', async () => {
+    const named = 'jestem tutaj dzisiaj';
+    expect(confidentLanguage(named)).toBeDefined();
+    const p = reader();
+    p.setChannelLang('chan', 'tr');
+    await p.onDomMessage(domMsg(named));
+    await flush();
+    expect(asked()).toHaveLength(1);
+  });
+
+  it('is not asked on a line the detector leaves open', () => {
+    expect(confidentLanguage(LINE)).toBeUndefined();
   });
 });
