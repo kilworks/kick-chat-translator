@@ -413,6 +413,7 @@ export class TranslationPipeline {
     // shown while saying something else. `sourceLang` still sizes the context
     // window above, where being wrong costs nothing.
     const outcome = await this.requestCloud(real, this.effTarget, msg.channel, context, false, hint);
+    if ((!outcome || (!outcome.ok && outcome.error.code !== 'channel_budget')) && (await this.answerOnDevice(msg, real, sourceLang, hint))) return;
     if (!outcome) {
       showError(msg.injectionTarget, localised('errTranslateFailed', 'Translation failed'), () => void this.forceRetranslate(msg, real));
       return;
@@ -448,6 +449,23 @@ export class TranslationPipeline {
     // median toward a latency nobody actually waited for a translation through.
     if (__KT_METRICS__) metrics.timing('e2e.cloud', performance.now() - t0);
     if (__KT_METRICS__) metrics.count(outcome.result.cached ? 'cache.sw.hit' : 'cache.sw.miss');
+  }
+
+  /** Cloud-first's fallback, under the same rule as local-first for which lines a model may take. */
+  private async answerOnDevice(msg: IncomingDomMessage, real: string, sourceLang?: string, hint?: string): Promise<boolean> {
+    const source = hint ?? (sourceLang === 'en' ? sourceLang : undefined);
+    if (this.settings.engineMode !== 'cloud-first' || !this.settings.localEnabled || !source || !localEngine.present()) return false;
+    localEngine.noteSeen(source, this.effTarget);
+    if (!localEngine.isReady(source, this.effTarget)) return false;
+    try {
+      const translatedText = await localEngine.translate(source, this.effTarget, real);
+      this.applyTranslation(msg, real, { translatedText, detectedLang: source, provider: 'local' }, { store: true });
+      void send({ type: 'stats.local', payload: { lang: source, chars: real.length } }).catch(() => undefined);
+      return true;
+    } catch (err: unknown) {
+      log.debug('on-device fallback failed', err);
+      return false;
+    }
   }
 
   /**

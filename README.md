@@ -43,8 +43,9 @@ changed in the settings, and a reading language can be remembered per channel.
 - **The extension speaks them too**: settings, popup and chat bar in all 43, picked from a menu with flags
 - **Free out of the box** with Google Translate. Add your own free DeepL key for better European languages;
   MyMemory and Lingva take over when an engine fails
-- **On-device translation** in Chrome and Edge where the browser offers it: 22 ms instead of 1.6 s, and
-  the text never leaves your computer
+- **On-device translation** in Chrome and Edge where the browser offers it, as a fallback by default or
+  first if you pick it: 22 ms instead of 1.6 s and the text never leaves your computer, but measured less
+  accurate than Google on all six languages tested
 - **Filters**: skip bots, mute users or channels, hide lines containing a word, translate only the
   languages you pick
 - **Made for fast chats**: 7TV emotes kept as they are, emoji spam and links stripped before anything is

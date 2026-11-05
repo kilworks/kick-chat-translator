@@ -84,9 +84,11 @@ export const SettingsSchema = z.object({
 
   // Engine strategy.
   // local-first : on-device Chromium Translator when the model is downloaded, else cloud.
-  // cloud-first : always cloud chain; on-device only if cloud fails.
+  // cloud-first : always cloud chain; on-device only if cloud fails. The default since
+  // 2026-11-05: blind judges scored the on-device engine worse than Google on all six
+  // languages it served, 1.38 penalty a line against 0.90 on 454 outputs.
   // local-only  : on-device only, never hit the network.
-  engineMode: z.enum(['local-first', 'cloud-first', 'local-only']).default('local-first'),
+  engineMode: z.enum(['local-first', 'cloud-first', 'local-only']).default('cloud-first'),
   localEnabled: z.boolean().default(true),
 
   providerOrder: ProviderOrderSchema.default(['google', 'mymemory', 'lingva']),

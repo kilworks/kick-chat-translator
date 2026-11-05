@@ -111,6 +111,10 @@ session, seen to painted:
 | `e2e.local` | 8 | 6 ms | **22 ms** | 210 ms |
 | `e2e.cloud` | 200 | 353 ms | **1618 ms** | 2134 ms |
 
+**Superseded on 2026-11-05: `cloud-first` is the default.** Blind judges scored the
+on-device engine worse than Google on all six languages it served (1.38 penalty a line
+against 0.90, 454 outputs). The latency below stays true and is the price paid.
+
 `local-first` as the default is not merely defensible, it is the difference between
 a translation that appears with the message and one that arrives after the reader
 has scrolled past. Everything in the latency section above concerns only the users

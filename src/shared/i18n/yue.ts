@@ -77,8 +77,8 @@ export const yue: Record<string, string> = {
   'available ✓': '可用 ✓',
   'not supported in this browser': '呢個瀏覽器唔支援',
   'Strategy': '策略',
-  'On-device first, cloud fallback (recommended)': '先用裝置端，雲端後備（建議）',
-  'Cloud first, on-device fallback': '先用雲端，裝置端後備',
+  'On-device first, cloud fallback': '先用裝置端，雲端後備',
+  'Cloud first, on-device fallback (recommended)': '先用雲端，裝置端後備（建議）',
   'On-device only (no network, no cloud)': '只用裝置端（唔使連網、唔用雲端）',
   'On-device = local Chromium models: unlimited, instant, private, no rate-limit. Each language needs a one-time model download (click a flag below, or the "Local" chip in chat).':
     '裝置端翻譯用 Chromium 嘅本機模型：無限量、即時、私密，亦冇頻率限制。每種語言要先下載一次模型（㩒下面嘅旗幟，或者聊天室入面嘅「本機」標籤）。',

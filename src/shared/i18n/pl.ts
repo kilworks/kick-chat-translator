@@ -78,9 +78,9 @@ export const pl: Record<string, string> = {
   'available ✓': 'dostępne ✓',
   'not supported in this browser': 'nieobsługiwane w tej przeglądarce',
   'Strategy': 'Strategia',
-  'On-device first, cloud fallback (recommended)':
-    'Najpierw na urządzeniu, potem chmura (zalecane)',
-  'Cloud first, on-device fallback': 'Najpierw chmura, potem na urządzeniu',
+  'On-device first, cloud fallback':
+    'Najpierw na urządzeniu, potem chmura',
+  'Cloud first, on-device fallback (recommended)': 'Najpierw chmura, potem na urządzeniu (zalecane)',
   'On-device only (no network, no cloud)': 'Tylko na urządzeniu (bez sieci i chmury)',
   'On-device = local Chromium models: unlimited, instant, private, no rate-limit. Each language needs a one-time model download (click a flag below, or the "Local" chip in chat).':
     'Tłumaczenie na urządzeniu używa lokalnych modeli Chromium: bez limitów, natychmiast i prywatnie. Każdy język wymaga jednorazowego pobrania modelu (kliknij flagę poniżej lub plakietkę „Lokalnie” na czacie).',
