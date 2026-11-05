@@ -75,4 +75,11 @@ describe('protectNames / restoreNames', () => {
     expect(restoreNames('odeio ⟦1⟧')).toBe('odeio FACEIT');
     expect(restoreNames('odeio ⟦ 1 ⟧ e ⟦9⟧')).toBe('odeio FACEIT e ');
   });
+
+  it('never shows the pieces of a placeholder the engine pulled apart', () => {
+    // MyMemory, 34 of 100 bench lines: the brackets come back around other words.
+    expect(restoreNames("no ⟦1 you can⟧'t kill him")).toBe("no you can't kill him");
+    expect(restoreNames('⟧ no kaiser ⟦1').trim()).toBe('no kaiser');
+    expect(restoreNames("i'm ⟦going to love⟧ my dad")).toBe("i'm going to love my dad");
+  });
 });
