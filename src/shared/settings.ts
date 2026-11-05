@@ -89,6 +89,8 @@ export const SettingsSchema = z.object({
   // languages it served, 1.38 penalty a line against 0.90 on 454 outputs.
   // local-only  : on-device only, never hit the network.
   engineMode: z.enum(['local-first', 'cloud-first', 'local-only']).default('cloud-first'),
+  // Written once the old local-first default has been moved off, see loadSettings.
+  engineModeMoved: z.boolean().default(true),
   localEnabled: z.boolean().default(true),
 
   providerOrder: ProviderOrderSchema.default(['google', 'mymemory', 'lingva']),
@@ -223,8 +225,16 @@ export async function loadSettings(): Promise<Settings> {
   ]);
   const candidate = synced[STORAGE_KEY_SETTINGS];
   const parsed = candidate ? SettingsSchema.safeParse(candidate) : undefined;
-  const base = parsed?.success ? parsed.data : defaultSettings();
+  let base = parsed?.success ? parsed.data : defaultSettings();
   const held = (local[STORAGE_KEY_DEEPL_KEY] as string | undefined) ?? '';
+
+  // local-first was the default until 2026-11-05 and saving any setting wrote it
+  // down, so a stored value says nothing about whether the reader picked it. Moved
+  // once, so picking it afterwards holds. A failed write retries on the next load.
+  if (parsed?.success && (candidate as { engineModeMoved?: unknown }).engineModeMoved !== true) {
+    if (base.engineMode === 'local-first') base = { ...base, engineMode: 'cloud-first' };
+    await chrome.storage.sync.set({ [STORAGE_KEY_SETTINGS]: withoutKey(base) }).catch(() => undefined);
+  }
 
   // Migration from a build that synced the key. Land it locally BEFORE clearing
   // it from sync: if the local write fails, sync still holds the only copy and

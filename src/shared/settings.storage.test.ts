@@ -109,3 +109,55 @@ describe('reset and import', () => {
     expect(syncedBlob()?.targetLang).toBe('ja');
   });
 });
+
+// local-first was the default until 2026-11-05 and saving any setting wrote it down,
+// so a stored value says nothing about whether the reader ever picked it.
+describe('the one move off the old default', () => {
+  const stored = (extra: Record<string, unknown>) =>
+    env.sync.set(STORAGE_KEY_SETTINGS, { ...defaultSettings(), engineModeMoved: undefined, ...extra });
+
+  it('moves a reader still on local-first, and writes it down', async () => {
+    stored({ engineMode: 'local-first', targetLang: 'fr' });
+    const s = await loadSettings();
+    expect(s.engineMode).toBe('cloud-first');
+    expect(s.targetLang).toBe('fr');
+    expect(syncedBlob()).toMatchObject({ engineMode: 'cloud-first', engineModeMoved: true, targetLang: 'fr' });
+  });
+
+  it('happens once: local-first picked afterwards stays', async () => {
+    stored({ engineMode: 'local-first' });
+    await loadSettings();
+    await saveSettings({ engineMode: 'local-first' });
+    expect((await loadSettings()).engineMode).toBe('local-first');
+    expect(syncedBlob()?.engineMode).toBe('local-first');
+  });
+
+  it('never touches local-only, the mode that promises no network', async () => {
+    stored({ engineMode: 'local-only' });
+    expect((await loadSettings()).engineMode).toBe('local-only');
+    expect(syncedBlob()).toMatchObject({ engineMode: 'local-only', engineModeMoved: true });
+  });
+
+  it('keeps the DeepL key out of the blob it writes', async () => {
+    env.local.set(STORAGE_KEY_DEEPL_KEY, 'secret-abc');
+    stored({ engineMode: 'local-first' });
+    expect((await loadSettings()).deeplApiKey).toBe('secret-abc');
+    expect(syncedBlob()?.deeplApiKey).toBe('');
+  });
+
+  it('still answers when the write fails, and moves on the next load', async () => {
+    stored({ engineMode: 'local-first' });
+    env.fail.syncSet = true;
+    expect((await loadSettings()).engineMode).toBe('cloud-first');
+    env.fail.syncSet = false;
+    await loadSettings();
+    expect(syncedBlob()).toMatchObject({ engineMode: 'cloud-first', engineModeMoved: true });
+  });
+
+  it('leaves a fresh install and a reset alone', async () => {
+    expect((await loadSettings()).engineMode).toBe('cloud-first');
+    expect(syncedBlob()).toBeUndefined();
+    expect((await resetSettings()).engineMode).toBe('cloud-first');
+    expect(syncedBlob()?.engineModeMoved).toBe(true);
+  });
+});
