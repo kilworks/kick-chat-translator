@@ -29,7 +29,7 @@ import { confidentLanguage } from './langDetect';
 /** onDomMessage does not await the translate path, so let it settle before asserting. */
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-/ Rule R1b, frozen before its sample: 13 lines changed of 577, penalty 8.38 to 2.85,
+// Rule R1b, frozen before its sample: 13 lines changed of 577, penalty 8.38 to 2.85,
 // 10 better, 2 worse. Written lines, captured chat stays out of git.
 describe('TranslationPipeline, a line the engine hands back in another language', () => {
   const LINE = 'gelirsin abi bence';

@@ -553,5 +553,3 @@ describe('TranslationPipeline: names kept as they are', () => {
     expect(await shown()).toBe('eu odeio isso');
   });
 });
-
-/
