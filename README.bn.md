@@ -7,7 +7,7 @@
 যেকোনো Kick চ্যাট নিজের ভাষায় পড়ো, আর উত্তর দাও চ্যানেলের ভাষায়।<br>
 ফ্রি, অ্যাকাউন্ট লাগে না, কিছু সেটআপ করতে হয় না। 43টি ভাষা, চ্যাটে আর এক্সটেনশনের ভেতরেও।
 
-**[Chrome, Brave বা Edge-এ যোগ করুন](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Firefox-এ যোগ করুন](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Chrome, Brave বা Edge-এ যোগ করুন](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Firefox-এ যোগ করুন](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

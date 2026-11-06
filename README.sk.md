@@ -7,7 +7,7 @@
 Čítaj chat každého streamu na Kicku vo svojom jazyku a odpovedaj v jazyku kanála.<br>
 Zadarmo, bez účtu, nič sa nenastavuje. 43 jazykov, v chate aj v samotnom rozšírení.
 
-**[Pridať do Chrome, Brave alebo Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Pridať do Firefoxu](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Pridať do Chrome, Brave alebo Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Pridať do Firefoxu](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

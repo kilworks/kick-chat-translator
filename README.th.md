@@ -7,7 +7,7 @@
 อ่านแชท Kick ได้ทุกช่องเป็นภาษาของคุณ และตอบกลับเป็นภาษาของช่องนั้น<br>
 ฟรี ไม่ต้องสมัครบัญชี ไม่ต้องตั้งค่าอะไรเลย รองรับ 43 ภาษา ทั้งในแชทและในตัวส่วนขยายเอง
 
-**[เพิ่มลงใน Chrome, Brave หรือ Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[เพิ่มลงใน Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[เพิ่มลงใน Chrome, Brave หรือ Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[เพิ่มลงใน Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

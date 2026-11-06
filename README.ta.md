@@ -7,7 +7,7 @@
 எந்த Kick சாட்டையும் உன் மொழியில் படி, பதிலை சேனலின் மொழியில் சொல்.<br>
 இலவசம், அக்கவுண்ட் வேண்டாம், எதையும் செட்டப் பண்ண வேண்டாம். 43 மொழிகள், சாட்டிலும் எக்ஸ்டென்ஷனிலும்.
 
-**[Chrome, Brave அல்லது Edge-இல் சேர்](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Firefox-இல் சேர்](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Chrome, Brave அல்லது Edge-இல் சேர்](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Firefox-இல் சேர்](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

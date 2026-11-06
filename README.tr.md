@@ -7,7 +7,7 @@
 Herhangi bir Kick yayınının sohbetini kendi dilinde oku, kanalın dilinde yanıt ver.<br>
 Ücretsiz, hesap yok, kurulacak bir şey yok. 43 dil, hem sohbette hem uzantının kendisinde.
 
-**[Chrome, Brave veya Edge'e ekle](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Firefox'a ekle](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Chrome, Brave veya Edge'e ekle](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Firefox'a ekle](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome kullanıcıları](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=kullan%C4%B1c%C4%B1lar&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

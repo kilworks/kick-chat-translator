@@ -7,7 +7,7 @@
 Lies jeden Kick-Chat in deiner eigenen Sprache und antworte in der des Kanals.<br>
 Kostenlos, ohne Konto, nichts einzurichten. 43 Sprachen, im Chat und in der Erweiterung selbst.
 
-**[Zu Chrome, Brave oder Edge hinzufügen](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Zu Firefox hinzufügen](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Zu Chrome, Brave oder Edge hinzufügen](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Zu Firefox hinzufügen](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome-Nutzer](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Nutzer&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

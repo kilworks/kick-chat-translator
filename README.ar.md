@@ -7,7 +7,7 @@
 اقرأ دردشة أي بث على Kick بلغتك، وردّ بلغة القناة.<br>
 مجاني، بلا حساب، ولا شيء يلزم إعداده. 43 لغة، في الدردشة وفي الإضافة نفسها.
 
-**[أضِف إلى Chrome أو Brave أو Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[أضِف إلى Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[أضِف إلى Chrome أو Brave أو Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[أضِف إلى Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

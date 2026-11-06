@@ -7,7 +7,7 @@
 Kick의 어떤 방송 채팅이든 자기 언어로 읽고, 채널의 언어로 답할 수 있습니다.<br>
 무료, 계정 불필요, 따로 설정할 것도 없습니다. 채팅에서도 확장 프로그램 화면에서도 43개 언어.
 
-**[Chrome, Brave, Edge에 추가](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Firefox에 추가](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Chrome, Brave, Edge에 추가](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Firefox에 추가](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
