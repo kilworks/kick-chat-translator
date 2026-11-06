@@ -1,9 +1,5 @@
-La digitazione con le emoticon ora funziona correttamente. Tab completa le emote e le @menzioni di Kick e 7TV invece di inserire la traduzione, le emoticon rimangono nel messaggio quando viene tradotto e l'anteprima non copre più gli elenchi di Kick o il selettore di emote.
+Un pulsante Discord è ora presente nel popup tra Svuota cache e Opzioni e alla fine delle schede delle Opzioni, e apre il server dell'estensione: chiedi aiuto, segnala una traduzione sbagliata, proponi un'idea. La scheda Info rimanda anche a Twitch Chat Translator, la stessa estensione per Twitch.
 
-Le traduzioni sono più accurate: i nomi di marchi e persone (iPhone, YouTube, LeBron) non vengono più eliminati prima della traduzione e le @menzioni rimangono nei messaggi tradotti.
+Meno parole della chat vengono scambiate per la lingua sbagliata: Hinglish, giapponese e russo romanizzati, risate dentro una frase in inglese e altro. Su un nuovo insieme di 500 righe reali di chat, il numero di risposte sbagliate ma sicure è sceso da 17 a 6. Le risposte di una sola parola in cinese, giapponese e coreano ora vengono tradotte, mentre risate, punteggi e voti continuano a essere ignorati.
 
-I filtri sono stati rielaborati: i veri Kick bot vengono ignorati ed è possibile aggiungerne di propri, "Nascondi messaggi contenenti" ora nasconde anche ciò che è già sullo schermo e gli elenchi possono essere digitati nuovamente.
-
-L'estensione è più leggera su ogni pagina Kick e su Chrome il motore integrato sul dispositivo viene nuovamente offerto quando la lingua di destinazione è su Auto.
-
-Nuovo e opzionale: statistiche anonime sull'utilizzo quotidiano, disattivate a meno che tu non dica sì. Non contengono mai i tuoi messaggi, nomi o canali.
+Correzioni: dopo che una riga era passata a un motore di riserva, tutte le successive lo seguivano; ora l'ordine dei tuoi motori torna dopo 60 secondi. I numeri restano corretti nelle traduzioni in cache ("100 subs" e "1000 subs" non condividono più la stessa voce). Le traduzioni integrate funzionano con la punteggiatura e le parole allungate ("holaaa", "merci!"). Con Prima sul dispositivo, una riga che il motore sul dispositivo restituisce invariata ora va al cloud invece di essere scartata. DeepL ora riceve la lingua di origine di un gruppo di messaggi quando è nota.

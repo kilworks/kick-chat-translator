@@ -1,9 +1,5 @@
-Taper avec des émoticônes fonctionne désormais correctement. Tab complète les émotes et @mentions de Kick et 7TV au lieu d'insérer la traduction, les émoticônes restent dans votre message lorsqu'il est traduit et l'aperçu ne couvre plus les listes de Kick ou le sélecteur d'émoticônes.
+Un bouton Discord apparaît dans la fenêtre contextuelle entre Vider le cache et Options, et à la fin des onglets d'Options. Il ouvre le serveur de l'extension : demandez de l'aide, signalez une mauvaise traduction, proposez une idée. L'onglet À propos renvoie aussi vers Twitch Chat Translator, la même extension pour Twitch.
 
-Les traductions sont plus précises : les noms de marques et de personnes (iPhone, YouTube, LeBron) ne sont plus supprimés avant la traduction, et les @mentions restent dans les messages traduits.
+Moins de mots du chat sont pris pour la mauvaise langue : le Hinglish, le japonais et le russe romanisés, les rires au milieu d'une phrase en anglais, et d'autres cas. Sur un nouvel ensemble de 500 vraies lignes de chat, les réponses fausses mais sûres d'elles sont passées de 17 à 6. Les réponses d'un seul mot en chinois, en japonais et en coréen sont maintenant traduites, alors que les rires, les scores et les notes restent ignorés.
 
-Les filtres ont été retravaillés : les vrais bots Kick sont ignorés et vous pouvez ajouter les vôtres, "Masquer les messages contenant" masque désormais également ce qui est déjà à l'écran et les listes peuvent être à nouveau saisies.
-
-L'extension est plus légère sur chaque page Kick, et sur Chrome, le moteur sur l'appareil est à nouveau proposé lorsque la langue cible est sur Auto.
-
-Nouveau et facultatif : statistiques d'utilisation quotidiennes anonymes, désactivées sauf si vous dites oui. Ils ne contiennent jamais vos messages, noms ou chaînes.
+Corrections : quand une ligne passait à un moteur de secours, toutes les suivantes la suivaient ; l'ordre de vos moteurs revient maintenant au bout de 60 secondes. Les nombres restent justes dans les traductions en cache ("100 subs" et "1000 subs" ne partagent plus une même entrée). Les traductions intégrées gèrent la ponctuation et les mots étirés ("holaaa", "merci!"). En mode "sur l'appareil d'abord", une ligne que le moteur sur l'appareil renvoie telle quelle part maintenant vers le cloud au lieu d'être abandonnée. DeepL reçoit maintenant la langue source d'un lot quand elle est connue.
