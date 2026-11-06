@@ -5,6 +5,7 @@ import { sortedLanguages } from '~/shared/languages';
 import { send } from '~/shared/messages';
 import { extractChannelSlug } from '~/content/kickApi';
 import { I18nProvider } from '~/shared/i18nContext';
+import { DiscordLink } from '~/shared/discord';
 import { makeT, resolveUiLocale, isRtlLocale } from '~/shared/i18n';
 import type { ProviderStatus, UsageStats } from '~/shared/types';
 import type { UpdateStatus } from '~/shared/version';
@@ -331,6 +332,7 @@ export function App() {
           >
             {t('Clear cache')}
           </button>
+          <DiscordLink class="kt-btn-ghost flex shrink-0 items-center justify-center !px-1.5 hover:text-[#5865F2]" />
           <button class="kt-btn" onClick={openOptions}>
             {t('Options')}
           </button>
