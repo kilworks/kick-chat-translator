@@ -39,6 +39,7 @@ vi.mock('./kickApi', async (orig) => ({
 vi.mock('./pipeline', () => ({
   TranslationPipeline: class {
     private readonly nom = copie;
+    setChannelLang(): void {}
     updateSettings(): void {}
     reapplyBlocked(): void {}
     recentDecisions(): unknown[] {
