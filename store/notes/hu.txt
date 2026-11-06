@@ -1,9 +1,5 @@
-A hangulatjelekkel való gépelés most megfelelően működik. A Tab kiegészíti a Kick és 7TV hangulatjeleit és @említéseit a fordítás beszúrása helyett, a hangulatjelek az üzenetben maradnak, amikor lefordítják, és az előnézet már nem fedi a Kick listáit vagy az emote-választót.
+Egy Discord gomb került a felugró ablakba a Gyorsítótár törlése és a Beállítások közé, valamint a Beállítások lapjainak végére, és megnyitja a bővítmény szerverét: kérj segítséget, jelents rossz fordítást, vagy javasolj ötletet. A Névjegy lap emellett a Twitch Chat Translatorra is mutat, ugyanarra a bővítményre a Twitchhez.
 
-A fordítások pontosabbak: a márka- és személynevek (iPhone, YouTube, LeBron) már nem kerülnek ki a fordítás előtt, és a @említések a lefordított üzenetekben maradnak.
+Kevesebb csevegőszót olvas a rendszer rossz nyelvként: a Hinglisht, a latin betűs japánt és oroszt, az angol mondaton belüli nevetést és még sok mást. 500 valódi csevegősor új készletén a magabiztos, de téves válaszok száma 17-ről 6-ra csökkent. Az egyszavas kínai, japán és koreai válaszokat mostantól lefordítja, a nevetést, az eredményeket és az értékeléseket pedig továbbra is kihagyja.
 
-Átdolgozták a szűrőket: az igazi Kick botokat figyelmen kívül hagyják, és felveheti a sajátjait, a "Hide üzenetek elrejtése" most azt is elrejti, ami már a képernyőn van, és a listák újra beírhatók.
-
-A bővítmény minden Kick oldalon könnyebb, a Chrome-ban pedig az eszközön lévő motor ismét elérhető, ha a célnyelv az Auto.
-
-Új és opcionális: névtelen napi használati statisztika, hacsak nem mond igent. Soha nem tartalmazzák az Ön üzeneteit, neveit vagy csatornáit.
+Javítások: miután egy sor átkerült egy tartalék motorhoz, minden későbbi sor követte; a motorok sorrendje mostantól 60 másodperc után visszaáll. A számok helyesek maradnak a gyorsítótárazott fordításokban ("100 subs" és "1000 subs" már nem osztozik egy bejegyzésen). A beépített fordítások működnek írásjelekkel és megnyújtott szavakkal is ("holaaa", "merci!"). Az Először az eszközön beállításnál az a sor, amelyet az eszközön lévő motor változatlanul ad vissza, mostantól a felhőbe kerül, nem pedig elvész. A DeepL mostantól megkapja egy köteg forrásnyelvét, ha ismert.

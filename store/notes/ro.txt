@@ -1,9 +1,5 @@
-Tastarea cu emoții funcționează corect acum. Tab completează emotele și @mentiunile lui Kick și 7TV în loc să insereze traducerea, emoțiile rămân în mesajul dvs. când este tradus, iar previzualizarea nu mai acoperă listele lui Kick sau selectorul de emoții.
+Un buton Discord, în fereastra pop-up între Golește cache-ul și Setări și la sfârșitul filelor din Setări, deschide serverul extensiei: cereți ajutor, raportați o traducere greșită, propuneți o idee. Fila Despre trimite și către Twitch Chat Translator, aceeași extensie pentru Twitch.
 
-Traducerile sunt mai precise: numele mărcilor și ale persoanelor (iPhone, YouTube, LeBron) nu mai sunt eliminate înainte de traducere, iar @mențiunile rămân în mesajele traduse.
+Mai puține cuvinte din chat sunt citite ca limba greșită: Hinglish, japoneza și rusa romanizate, râsul într-o propoziție în engleză și altele. Pe un set nou de 500 de rânduri reale de chat, răspunsurile greșite date cu încredere au scăzut de la 17 la 6. Răspunsurile dintr-un singur cuvânt în chineză, japoneză și coreeană sunt acum traduse, în timp ce râsul, scorurile și notele sunt tot ignorate.
 
-Filtrele au fost reproiectate: boții Kick adevărați sunt ignorați și îi puteți adăuga pe ai dvs., „Ascundeți mesajele care conțin” acum ascunde și ceea ce este deja pe ecran, iar listele pot fi introduse din nou.
-
-Extensia este mai ușoară pe fiecare pagină Kick, iar pe Chrome motorul de pe dispozitiv este oferit din nou atunci când limba țintă este pe Auto.
-
-Nou și opțional: statistici anonime de utilizare zilnică, dezactivate dacă nu spui da. Nu conțin niciodată mesajele, numele sau canalele dvs.
+Remedieri: după ce un rând a ajuns la un motor de rezervă, toate rândurile următoare l-au urmat; ordinea motoarelor dvs. revine acum după 60 de secunde. Numerele rămân corecte în traducerile din cache ("100 subs" și "1000 subs" nu mai împart o singură intrare). Traducerile încorporate funcționează cu punctuație și cuvinte prelungite ("holaaa", "merci!"). Cu motorul de pe dispozitiv primul, un rând returnat nemodificat de acesta merge acum în cloud în loc să fie abandonat. DeepL primește acum limba sursă a unui lot când este cunoscută.

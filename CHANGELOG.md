@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-11-06
+
 ### Added
 
 - The About tab links to Twitch Chat Translator, the same extension for Twitch.
+- A Discord button joins the extension's server for help, reports and ideas:
+  in the popup between Clear cache and Options, and at the end of the
+  Options tabs.
 
 ### Fixed
 

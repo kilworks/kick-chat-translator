@@ -213,6 +213,10 @@ error grid. `test/e2e/exclusivity-check.mjs` checks every "only this language wr
 detector against word frequency lists for the 42 languages that have one (OpenSubtitles, kept outside the
 repository), and lists each rule another language also writes.
 
+A line no table recognises is checked against the browser's own detector, `i18n.detectLanguage`: what it reliably
+names wins, a guess of ours stands only if its first choice agrees, otherwise the line has no known language. That
+answer feeds the English skip, the source allowlist and the language flag, never the source sent to the engine.
+
 Interface strings live in `src/shared/i18n/` (popup and options, keyed by the English text) and
 `src/content/i18n/` (chat bar, keyed by id with the English text as the fallback), one file per language;
 tests hold every file to the full key set. Store
