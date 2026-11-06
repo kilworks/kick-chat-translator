@@ -577,3 +577,27 @@ describe('les penchants du chemin brut', () => {
     expect(detectLanguage('ele ganhou')).toBe('pt');
   });
 });
+
+// Trois regles qui nommaient la mauvaise langue sur du vrai chat (2026-11-05). Phrases
+// ecrites pour le test, sur le motif de ce que le chat ecrit : le chat lui-meme reste hors de git.
+describe('les fausses sures du vrai chat', () => {
+  it.each([
+    ['mi a dat un cadou', 'nl'],
+    ['nu s au dat inca', 'nl'],
+    ['miks ajat niin kovaa', 'et'],
+    ['miks et vaan tullu', 'et'],
+    ['ya sen niye gittin', 'tl'],
+    ['koi niye jacce', 'tl'],
+  ])('%s ne sort pas %s', (ligne, faux) => {
+    expect(confidentLanguage(ligne)).not.toBe(faux);
+  });
+
+  it.each([
+    ['dat was echt goed man', 'nl'],
+    ['dat staat er niet', 'nl'],
+    ['sinä olet niya kaibigan', 'tl'],
+    ['tere miks mitte väga', 'et'],
+  ])('%s reste %s', (ligne, juste) => {
+    expect(confidentLanguage(ligne)).toBe(juste);
+  });
+});

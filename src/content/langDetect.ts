@@ -1,5 +1,5 @@
 import { franc } from 'franc-min';
-import { francToIso2 } from '~/shared/languages';
+import { francToIso2, isSupportedLang, normalizeLang } from '~/shared/languages';
 import { isLaughter, laughterLanguage } from '~/shared/laughter';
 import { isArabizi } from '~/shared/arabizi';
 import { romanisedLanguage } from '~/shared/romanised';
@@ -243,7 +243,8 @@ const SHORT_WORD_LANG = new Map<string, string>([
   ['kiitos', 'fi'], ['tosi', 'fi'], ['viela', 'fi'], ['vielä', 'fi'], ['miksi', 'fi'],
   ['kaikki', 'fi'], ['mutta', 'fi'], ['mita', 'fi'], ['mitä', 'fi'],
 
-  ['aitah', 'et'], ['aitäh', 'et'], ['väga', 'et'], ['tere', 'et'], ['miks', 'et'],
+  // pas `miks` : le finnois parle l'ecrit partout (`miks ajat`), cinq lignes sur vrai chat.
+  ['aitah', 'et'], ['aitäh', 'et'], ['väga', 'et'], ['tere', 'et'],
   ['jalle', 'et'], ['jälle', 'et'], ['praegu', 'et'], ['midagi', 'et'],
 
   ['bardzo', 'pl'], ['dzieki', 'pl'], ['dzięki', 'pl'], ['czesc', 'pl'],   ['jeszcze', 'pl'], ['wszystko', 'pl'], ['dlaczego', 'pl'], ['ktos', 'pl'], 
@@ -651,7 +652,8 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   //        `niya` en MOT ; non bornee la sequence voit aussi les formes flechies.
   [/agy/iu, 'hu'],
   // pas devant -or : le present turc tape sans i sans point (`kullaniyorsun`).
-  [/niy(?!or)/iu, 'tl'],
+  // pas devant -e : `niye`, pourquoi en turc, et le bengali romanise (`niye`, `niyen`).
+  [/niy(?!or|e)/iu, 'tl'],
   // LES MOTS OUTILS EXCLUSIFS, et c'est une passe que personne n'avait faite.
   //
   // Le lexique `SHORT_WORD_LANG` est un vocabulaire de CHAT et il est borne a
@@ -1067,7 +1069,9 @@ const LETTRES_EXCLUSIVES: ReadonlyArray<readonly [RegExp, string]> = [
   // exactement ce que le chemin sur ne doit pas faire.
   [/(^|[^\p{L}])(nicht|auf|auch|jetzt|nach|wann)([^\p{L}]|$)/iu, 'de'],
   [/(^|[^\p{L}])(jest|jestem|tego)([^\p{L}]|$)/iu, 'pl'],
-  [/(^|[^\p{L}])(dat|aan|heeft|weer)([^\p{L}]|$)/iu, 'nl'],
+  // `dat` pas apres un auxiliaire roumain : `a dat`, `ai dat`, `au dat`, le participe de donner.
+  // Retire tout court il ajoutait des fausses sur le chemin brut et coutait du neerlandais.
+  [/(^|[^\p{L}])((?<!(?:^|[^\p{L}])(?:a|ai|au|am|or|ati|ați)[^\p{L}]+)dat|aan|heeft|weer)([^\p{L}]|$)/iu, 'nl'],
   [/(^|[^\p{L}])(acest|vrei)([^\p{L}]|$)/iu, 'ro'],
   [/(^|[^\p{L}])kadar([^\p{L}]|$)/iu, 'tr'],
   // Quatrieme groupe, et la difference avec le troisieme est la SOURCE : ces
@@ -1431,7 +1435,7 @@ function danoisOuNorvegien(text: string): string | undefined {
 const JEUX_DE_PORTE: Readonly<Record<string, RegExp>> = {
   fi: /(^|[^\p{L}])(että|mutta|niin|kun|myös|vain|hän|ole|olen|täällä|tänään|mikä|mitä|kaikki|miksi|hänen|meitä|tämän|koskaan)([^\p{L}]|$)/iu,
   sv: /(^|[^\p{L}])(och|inte|är|jag|att|det|som|för|har|med|den|till|hur|här|hon|vill)([^\p{L}]|$)/iu,
-  et: /(^|[^\p{L}])(see|ta|ma|kas|aga|siis|väga|miks|midagi|praegu|kõik|ära|välja)([^\p{L}]|$)/iu,
+  et: /(^|[^\p{L}])(see|ta|ma|kas|aga|siis|väga|midagi|praegu|kõik|ära|välja)([^\p{L}]|$)/iu,
   de: /(^|[^\p{L}])(der|die|das|ich|ist|und|mit|für|ein|eine|sich|nur|aber|noch|wieder)([^\p{L}]|$)/iu,
   cs: /(^|[^\p{L}])(jsem|jsou|není|ještě|vždycky|proč|byl|jako|dobře)([^\p{L}]|$)/iu,
   sk: /(^|[^\p{L}])(som|sú|veľmi|ešte|prečo|vždy|bol|ako|dobre|čo|niečo|chcem)([^\p{L}]|$)/iu,
@@ -2696,6 +2700,35 @@ function detectByPenchant(text: string): string | undefined {
 export function detectLanguage(text: string): string | undefined {
   const trimmed = text.trim();
   return trimmed.length === 0 ? undefined : memo(DETECT_MEMO, trimmed, detectUncached);
+}
+
+/**
+ * The raw answer, checked against the browser's own detector (`i18n.detectLanguage`,
+ * built into Chrome and Firefox, no bytes to ship). What it reliably names wins; a
+ * guess of ours stands only if its first choice agrees; otherwise no answer. A
+ * table answer is never second-guessed, and without the API nothing changes.
+ *
+ * Rule fixed on the real bench's dev half, then read on heldout (700 lines,
+ * right / silent / wrong): today 428 / 156 / 116, Chrome 409 / 276 / 15, Firefox
+ * 506 / 168 / 26. Tatoeba (5040): 4135 / 397 / 508, 4084 / 886 / 70, 4563 / 318 / 159.
+ * The price is on Chrome: more silence, so a reader with a source allowlist loses
+ * the lines it no longer names. Measured on dev, English lines named English go
+ * from 41 of 91 to 34 on Chrome and 49 on Firefox; foreign lines the English skip
+ * would take go from 6 of 620 to 1 and to 11.
+ */
+export async function detectLanguageWithBrowser(text: string): Promise<string | undefined> {
+  const guess = detectLanguage(text);
+  if (confidentLanguage(text) || !globalThis.chrome?.i18n?.detectLanguage) return guess;
+  let answer: chrome.i18n.LanguageDetectionResult;
+  try {
+    answer = await chrome.i18n.detectLanguage(text);
+  } catch {
+    return guess;
+  }
+  const first = answer.languages[0]?.language;
+  const browser = first ? normalizeLang(first) : undefined;
+  if (answer.isReliable && browser && isSupportedLang(browser)) return browser;
+  return guess === browser ? guess : undefined;
 }
 
 function detectUncached(trimmed: string): string | undefined {

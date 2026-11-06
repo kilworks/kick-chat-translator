@@ -3,6 +3,7 @@ import type { Settings } from '~/shared/settings';
 import { defaultSettings } from '~/shared/settings';
 import { send } from '~/shared/messages';
 import { I18nProvider } from '~/shared/i18nContext';
+import { DiscordLink } from '~/shared/discord';
 import { makeT, resolveUiLocale, isRtlLocale, UI_LOCALES, UI_LOCALE_NAMES } from '~/shared/i18n';
 import type { UiLocale } from '~/shared/i18n';
 import { flagClass } from '~/shared/flags';
@@ -121,34 +122,39 @@ export function App() {
             the whole bar to a single tab stop — it took five before — and the
             arrows move between tabs, which is where a keyboard user reaches
             for them. */}
-        <nav
-          role="tablist"
-          aria-label={t('Settings sections')}
-          class="kt-tabs mb-5 flex gap-1 overflow-x-auto border-b border-kick-border"
-          onKeyDown={onTabKey}
-        >
-          {TABS.map((tb) => (
-            <button
-              key={tb.id}
-              id={`tab-${tb.id}`}
-              role="tab"
-              aria-selected={tab === tb.id}
-              aria-controls={`panel-${tb.id}`}
-              tabIndex={tab === tb.id ? 0 : -1}
-              ref={(el) => {
-                tabRefs.current[tb.id] = el as HTMLButtonElement | null;
-              }}
-              class={`shrink-0 whitespace-nowrap px-4 py-2 text-sm border-b-2 transition ${
-                tab === tb.id
-                  ? 'border-kick-primary text-kick-text'
-                  : 'border-transparent text-kick-muted hover:text-kick-text'
-              }`}
-              onClick={() => setTab(tb.id)}
-            >
-              {t(tb.label)}
-            </button>
-          ))}
-        </nav>
+        {/* The Discord link sits on the tab row but outside the tablist: a link
+            inside role=tablist would break the arrow-key pattern above. */}
+        <div class="mb-5 flex items-center border-b border-kick-border">
+          <nav
+            role="tablist"
+            aria-label={t('Settings sections')}
+            class="kt-tabs flex min-w-0 flex-1 gap-1 overflow-x-auto"
+            onKeyDown={onTabKey}
+          >
+            {TABS.map((tb) => (
+              <button
+                key={tb.id}
+                id={`tab-${tb.id}`}
+                role="tab"
+                aria-selected={tab === tb.id}
+                aria-controls={`panel-${tb.id}`}
+                tabIndex={tab === tb.id ? 0 : -1}
+                ref={(el) => {
+                  tabRefs.current[tb.id] = el as HTMLButtonElement | null;
+                }}
+                class={`shrink-0 whitespace-nowrap px-4 py-2 text-sm border-b-2 transition ${
+                  tab === tb.id
+                    ? 'border-kick-primary text-kick-text'
+                    : 'border-transparent text-kick-muted hover:text-kick-text'
+                }`}
+                onClick={() => setTab(tb.id)}
+              >
+                {t(tb.label)}
+              </button>
+            ))}
+          </nav>
+          <DiscordLink class="shrink-0 px-2 py-2 text-kick-muted transition hover:text-[#5865F2]" />
+        </div>
 
         <main
           id={`panel-${tab}`}

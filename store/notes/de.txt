@@ -1,9 +1,5 @@
-Das Tippen mit Emotes funktioniert jetzt ordnungsgemäß. Tab vervollständigt die Emotes und @Erwähnungen von Kick und 7TV, anstatt die Übersetzung einzufügen. Emotes bleiben in Ihrer Nachricht, wenn sie übersetzt wird, und die Vorschau deckt nicht mehr Kicks Listen oder die Emote-Auswahl ab.
+Ein Discord-Button sitzt jetzt im Popup zwischen Cache leeren und Optionen sowie am Ende der Optionen-Tabs und öffnet den Server der Erweiterung: Hilfe holen, eine schlechte Übersetzung melden, eine Idee vorschlagen. Der Tab Über verlinkt außerdem auf Twitch Chat Translator, dieselbe Erweiterung für Twitch.
 
-Übersetzungen sind genauer: Marken- und Personennamen (iPhone, YouTube, LeBron) werden vor der Übersetzung nicht mehr gelöscht und @Erwähnungen bleiben in übersetzten Nachrichten.
+Weniger Chatwörter werden als falsche Sprache gelesen: Hinglish, romanisiertes Japanisch und Russisch, Lachen innerhalb eines englischen Satzes und mehr. Bei einem neuen Satz von 500 echten Chatzeilen sank die Zahl der falschen, aber sicheren Antworten von 17 auf 6. Chinesische, japanische und koreanische Antworten aus nur einem Wort werden jetzt übersetzt, während Lachen, Spielstände und Bewertungen weiterhin übersprungen werden.
 
-Filter wurden überarbeitet: Die echten Kick-Bots werden ignoriert und Sie können Ihre eigenen hinzufügen. „Nachrichten ausblenden mit“ blendet jetzt auch aus, was bereits auf dem Bildschirm ist, und die Listen können erneut eingegeben werden.
-
-Die Erweiterung ist auf jeder Kick-Seite leichter, und in Chrome wird die Übersetzung auf dem Gerät wieder angeboten, wenn die Zielsprache auf „Auto“ steht.
-
-Neu und optional: Anonyme tägliche Nutzungsstatistik, deaktiviert, sofern Sie nicht „Ja“ sagen. Sie enthalten niemals Ihre Nachrichten, Namen oder Kanäle.
+Korrekturen: Nachdem eine Zeile an eine Ersatz-Engine gegangen war, folgten ihr alle späteren Zeilen; Ihre Engine-Reihenfolge kommt jetzt nach 60 Sekunden zurück. Zahlen bleiben in zwischengespeicherten Übersetzungen korrekt ("100 subs" und "1000 subs" teilen sich keinen Eintrag mehr). Die integrierten Übersetzungen kommen mit Satzzeichen und gedehnten Wörtern zurecht ("holaaa", "merci!"). Bei der Einstellung Zuerst auf dem Gerät wird eine Zeile, die die Engine auf dem Gerät unverändert zurückgibt, jetzt an die Cloud weitergereicht statt verworfen. DeepL erhält jetzt die Quellsprache eines Stapels, wenn sie bekannt ist.

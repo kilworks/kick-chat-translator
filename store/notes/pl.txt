@@ -1,9 +1,5 @@
-Pisanie za pomocą emotikonów działa teraz poprawnie. Zakładka uzupełnia emotki i @wzmianki Kick'a i 7TV zamiast wstawiać tłumaczenie, emotikony pozostają w Twojej wiadomości po jej przetłumaczeniu, a podgląd nie obejmuje już list Kick'a ani selektora emotek.
+Przycisk Discord, w oknie podręcznym między Wyczyść pamięć a Opcje oraz na końcu kart Opcje, otwiera serwer rozszerzenia: poproś o pomoc, zgłoś złe tłumaczenie, zaproponuj pomysł. Karta Informacje zawiera też link do Twitch Chat Translator, tego samego rozszerzenia dla Twitcha.
 
-Tłumaczenia są dokładniejsze: nazwy marek i osób (iPhone, YouTube, LeBron) nie są już usuwane przed tłumaczeniem, a @wzmianki pozostają w przetłumaczonych wiadomościach.
+Rzadziej słowa z czatu są odczytywane jako zły język: Hinglish, zromanizowany japoński i rosyjski, śmiech w angielskim zdaniu i nie tylko. Na nowym zestawie 500 prawdziwych linii czatu błędne, pewne odpowiedzi spadły z 17 do 6. Jednowyrazowe odpowiedzi po chińsku, japońsku i koreańsku są teraz tłumaczone, a śmiech, wyniki i oceny nadal są pomijane.
 
-Filtry zostały przerobione: prawdziwe boty wyrzucające są ignorowane i możesz dodawać własne, opcja „Ukryj wiadomości zawierające” ukrywa teraz także to, co jest już na ekranie, a listy można wpisywać ponownie.
-
-Rozszerzenie jest lżejsze na każdej stronie Kick, a w przeglądarce Chrome silnik na urządzeniu jest ponownie oferowany, gdy język docelowy jest ustawiony na Auto.
-
-Nowość i opcjonalna: anonimowe dzienne statystyki użytkowania, wyłączone, chyba że się zgodzisz. Nigdy nie zawierają Twoich wiadomości, nazw ani kanałów.
+Poprawki: gdy jedna linia trafiła do silnika zapasowego, wszystkie kolejne szły za nią; kolejność Twoich silników wraca teraz po 60 sekundach. Liczby pozostają poprawne w tłumaczeniach z pamięci podręcznej ("100 subs" i "1000 subs" nie dzielą już jednego wpisu). Wbudowane tłumaczenia działają z interpunkcją i przeciągniętymi słowami ("holaaa", "merci!"). Gdy najpierw używany jest silnik na urządzeniu, linia zwrócona przez niego bez zmian trafia teraz do chmury zamiast zostać odrzucona. DeepL otrzymuje teraz język źródłowy partii, gdy jest znany.
