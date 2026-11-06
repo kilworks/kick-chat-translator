@@ -221,6 +221,32 @@ describe('interaction', () => {
     expect(groups).toContain('all');
   });
 
+  it('Down from a lone favourite lands on the first language of the full list', () => {
+    const { composer } = makeComposerRow();
+    mountLangChip(composer, state({ favorites: ['fr'] }), noop);
+    document.querySelector<HTMLElement>('#kt-lang-chip')!.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+    );
+    const menu = document.querySelector<HTMLElement>('#kt-lang-menu')!;
+    menu.querySelector<HTMLElement>('.kt-chip-row[data-group="fav"]')!.focus();
+    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    expect(document.activeElement).toBe(menu.querySelector('.kt-chip-row[data-group="all"]'));
+  });
+
+  it('Down from a tile focused without the keyboard keeps that tile s column', () => {
+    const { composer } = makeComposerRow();
+    mountLangChip(composer, state({ favorites: ['ja', 'es', 'pt'] }), noop);
+    document.querySelector<HTMLElement>('#kt-lang-chip')!.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+    );
+    const menu = document.querySelector<HTMLElement>('#kt-lang-menu')!;
+    const rows = [...menu.querySelectorAll<HTMLElement>('.kt-chip-row:not([hidden])')];
+    // auto | ja es pt | 4 5 6 | 7 8 9: tile 6 is the third column.
+    rows[6]!.focus();
+    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    expect(rows.indexOf(document.activeElement as HTMLElement)).toBe(9);
+  });
+
   it('a language never appears twice, favourite or not', () => {
     const { composer } = makeComposerRow();
     mountLangChip(composer, state({ favorites: ['fr'] }), noop);
