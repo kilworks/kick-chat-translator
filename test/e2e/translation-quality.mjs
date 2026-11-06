@@ -2,7 +2,7 @@
  * Translate real chat lines the way the extension does, for a quality grid.
  *
  *   node --import tsx test/e2e/translation-quality.mjs --in <lines.jsonl> --out <outputs.jsonl>
- *        [--engines google,mymemory,local] [--cache <cache.json>] [--profile <dir>] [--channel chrome]
+ *        [--engines google,mymemory,local] [--cache <cache.json>] [--profile <dir>] [--chrome <path to chrome.exe>]
  *
  * Each input line is {id, text, target}. The text goes through the content
  * pipeline's own `prepare` (emote parsing, trimming, skips, the confident source
@@ -65,18 +65,28 @@ const prepare = (text, target) => {
   return pipelines.get(target).prepare(text, { username: '', channel: '', isBot: false }, { dedup: false });
 };
 
-// Chrome's on-device Translator, in the bundled browser, on a page served by the
-// route below so it is a secure context without touching the network. Models
-// stay in the profile folder between runs. Same tags as localEngine.ts `norm`.
-// shortcut: on 2026-11-04 create() crashed the tab under Playwright (Chromium 151
-// and Chrome 157), so this engine has never returned a line; retry on a new build.
+// Chrome's on-device Translator, on a page served by the route below so it is a
+// secure context without touching the network. Models stay in the profile folder
+// between runs. Same tags as localEngine.ts `norm`.
+// Chrome is started by hand and joined over CDP: launched by Playwright, its flags
+// leave the on-device APIs unavailable (measured 2026-11-04, Chrome 157).
 const tag = (c) => ({ 'zh-tw': 'zh-Hant', 'zh-hant': 'zh-Hant' })[c.toLowerCase()] ?? c.toLowerCase().split('-')[0];
 let page;
 const pairs = new Map();
 async function onDevice(src, tgt, text) {
   if (!page) {
     const { chromium } = await import('./playwright.mjs');
-    const browser = await chromium.launchPersistentContext(arg('--profile', OUT + '.profile'), { headless: false, ...(arg('--channel') ? { channel: arg('--channel') } : {}) });
+    const { spawn } = await import('node:child_process');
+    const port = 9346;
+    const chrome = spawn(arg('--chrome', 'C:/Program Files/Google/Chrome/Application/chrome.exe'), [`--user-data-dir=${arg('--profile', OUT + '.profile')}`, `--remote-debugging-port=${port}`, '--no-first-run', '--no-default-browser-check', 'about:blank'], { stdio: 'ignore' });
+    process.on('exit', () => chrome.kill());
+    let joined;
+    for (let i = 0; i < 30 && !joined; i++) {
+      await pause(1000);
+      joined = await chromium.connectOverCDP(`http://127.0.0.1:${port}`).catch(() => undefined);
+    }
+    if (!joined) throw Object.assign(new Error('Chrome did not open its debugging port'), { code: 'no_model' });
+    const browser = joined.contexts()[0];
     page = browser.pages()[0] ?? (await browser.newPage());
     await page.route('https://kct-bench.test/**', (r) => r.fulfill({ contentType: 'text/html', body: '<button id="go">go</button>' }));
     await page.goto('https://kct-bench.test/');
@@ -107,7 +117,7 @@ const capped = new Set();
 for (const engine of engines) {
   const [provider, gap] = ENGINES[engine];
   for (const line of lines) {
-    const p = prepare(line.text, line.target);
+    const p = await prepare(line.text, line.target);
     const row = { id: line.id, engine, target: line.target };
     if (typeof p === 'string') {
       out.push({ ...row, skipped: p || 'gate' });

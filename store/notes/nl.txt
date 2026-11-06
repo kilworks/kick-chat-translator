@@ -1,9 +1,5 @@
-Typen met emotes werkt nu naar behoren. Tab voltooit de emotes en @mentions van Kick en 7TV in plaats van de vertaling in te voegen, emotes blijven in je bericht wanneer het vertaald is, en het voorbeeld dekt niet langer de lijsten van Kick of de emotekiezer.
+Er staat nu één Discord-knop in de popup tussen Cache wissen en Opties en aan het eind van de tabbladen van Opties. Die opent de server van de extensie: vraag om hulp, meld een slechte vertaling of stel een idee voor. Het tabblad Over verwijst ook naar Twitch Chat Translator, dezelfde extensie voor Twitch.
 
-Vertalingen zijn nauwkeuriger: merk- en persoonsnamen (iPhone, YouTube, LeBron) worden niet langer verwijderd voordat ze worden vertaald, en @vermeldingen blijven in vertaalde berichten.
+Minder chatwoorden worden als de verkeerde taal gelezen: Hinglish, geromaniseerd Japans en Russisch, gelach midden in een Engelse zin en meer. Op een nieuwe set van 500 echte chatregels daalden de foute maar stellige antwoorden van 17 naar 6. Chinese, Japanse en Koreaanse antwoorden van één woord worden nu vertaald, terwijl gelach, scores en beoordelingen nog steeds worden overgeslagen.
 
-De filters zijn herwerkt: de echte Kick-bots worden genegeerd en je kunt je eigen bots toevoegen, "Verberg berichten met" verbergt nu ook wat al op het scherm staat, en de lijsten kunnen opnieuw worden ingetypt.
-
-De extensie is op elke Kick-pagina lichter en in Chrome wordt de on-device-engine opnieuw aangeboden wanneer de doeltaal op Auto staat.
-
-Nieuw en optioneel: anonieme dagelijkse gebruiksstatistieken, uitgeschakeld tenzij u ja zegt. Ze bevatten nooit uw berichten, namen of kanalen.
+Fixes: nadat één regel naar een reserve-engine was gegaan, volgden alle latere regels; je engine-volgorde komt nu na 60 seconden terug. Getallen blijven juist in gecachete vertalingen ("100 subs" en "1000 subs" delen geen item meer). De ingebouwde vertalingen werken met leestekens en uitgerekte woorden ("holaaa", "merci!"). Met Eerst op het apparaat gaat een regel die de engine op het apparaat ongewijzigd teruggeeft nu naar de cloud in plaats van te worden weggegooid. DeepL krijgt nu de brontaal van een batch mee als die bekend is.

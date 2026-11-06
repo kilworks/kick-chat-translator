@@ -378,7 +378,10 @@ async function main(): Promise<void> {
 
     // Auto-detect the channel's chat language (Kick API) → the compose target in
     // 'auto' mode, so the user writes in the channel's language with no setup.
-    void fetchChannelLangIso(slug).then((lang) => compose.setChannelLang(lang));
+    void fetchChannelLangIso(slug).then((lang) => {
+      compose.setChannelLang(lang);
+      pipeline.setChannelLang(slug, lang);
+    });
   }
 
   // Compose preview is independent of the incoming-translation master switch, so
