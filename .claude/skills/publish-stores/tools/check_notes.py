@@ -28,7 +28,7 @@ for code in codes:
         bad.append(f"{code}: CRLF")
     if len(paras) != n_par:
         bad.append(f"{code}: {len(paras)} paragraphs, en has {n_par}")
-    if re.search("[–—‘’“”]", t):
+    if re.search("[" + "".join(map(chr, (0x2013, 0x2014, 0x2018, 0x2019, 0x201C, 0x201D))) + "]", t):
         bad.append(f"{code}: dash or curly quote")
     for s in sorted(keep):
         if s not in t:
