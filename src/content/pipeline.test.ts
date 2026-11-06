@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Headless the pipeline: stub the DOM/runtime side-effecting modules so we can drive
 // the message path and assert on what gets dispatched to the service worker.
@@ -25,7 +25,7 @@ import { TranslationPipeline } from './pipeline';
 import { chatLength } from './filters';
 import { inject, markSkipped, showError, showThrottleIndicator } from './injector';
 import { defaultSettings } from '~/shared/settings';
-import { detectLanguage } from './langDetect';
+import { detectLanguage, detectLanguageWithBrowser } from './langDetect';
 
 const JP = 'これはテストメッセージです';
 const wsMsg = (text: string) => ({ id: '1', text, channel: 'chan', username: 'user', isBot: false });
@@ -421,6 +421,55 @@ describe('TranslationPipeline — English chat abbreviations', () => {
   it('leaves the shorthand alone when no language is sure of the line', async () => {
     await reader('fr').onWebSocketMessage(wsMsg('pqp lag assim ja era'));
     expect(sentText()).toBe('pqp lag assim ja era');
+  });
+});
+
+describe('TranslationPipeline, the browser detector behind the raw answer', () => {
+  const detect = vi.fn();
+  const line = 'mano isso foi muito bom hoje';
+
+  beforeEach(() => {
+    sendMock.mockReset();
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: false, error: { code: 'x', message: 'x' } } });
+    detect.mockReset();
+    vi.stubGlobal('chrome', { i18n: { detectLanguage: detect, getMessage: () => '', getUILanguage: () => 'en' } });
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+  const reader = (sourceLangAllowlist: string[]) =>
+    new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false, sourceLangAllowlist });
+  const asked = () => sendMock.mock.calls.filter((c) => c[0]?.type === 'translate').length;
+
+  it('lets a reliable browser answer decide the source allowlist', async () => {
+    detect.mockResolvedValue({ isReliable: true, languages: [{ language: 'pl', percentage: 99 }] });
+    await reader(['pl']).onWebSocketMessage(wsMsg(line));
+    expect(asked()).toBe(1);
+    await reader(['ru']).onWebSocketMessage(wsMsg(line));
+    expect(asked()).toBe(1);
+  });
+
+  it('keeps the old answer when the browser has no detector', async () => {
+    vi.unstubAllGlobals();
+    const withoutBrowser = await detectLanguageWithBrowser(line);
+    expect(withoutBrowser).toBe(detectLanguage(line));
+  });
+
+  it('does not put a reason on a row the scroller gave to another message', async () => {
+    const rowElement = document.createElement('div');
+    const injectionTarget = document.createElement('div');
+    const body = document.createElement('span');
+    body.className = 'font-normal';
+    body.textContent = line;
+    rowElement.append(body, injectionTarget);
+    document.body.appendChild(rowElement);
+    vi.mocked(markSkipped).mockClear();
+    detect.mockImplementation(async () => {
+      body.textContent = 'another message';
+      return { isReliable: true, languages: [{ language: 'ru', percentage: 99 }] };
+    });
+    await reader(['pl']).onDomMessage({ rowElement, injectionTarget, id: 'r1', text: line, channel: 'c', username: 'u', isBot: false });
+    expect(vi.mocked(markSkipped)).not.toHaveBeenCalled();
   });
 });
 
