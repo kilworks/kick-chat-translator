@@ -7,7 +7,7 @@
 Đọc chat Kick bằng tiếng của bạn, và trả lời bằng tiếng của kênh.<br>
 Miễn phí, không cần tài khoản, không phải cài đặt gì. 43 ngôn ngữ, cả trong chat lẫn trong chính tiện ích.
 
-**[Thêm vào Chrome, Brave hoặc Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Thêm vào Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Thêm vào Chrome, Brave hoặc Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Thêm vào Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

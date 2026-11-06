@@ -7,7 +7,7 @@
 Skaityk bet kurios Kick transliacijos pokalbį savo kalba ir atsakyk kanalo kalba.<br>
 Nemokama, be paskyros, nieko nereikia nustatinėti. 43 kalbos, ir pokalbyje, ir pačiame plėtinyje.
 
-**[Pridėti prie Chrome, Brave ar Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Pridėti prie Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Pridėti prie Chrome, Brave ar Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Pridėti prie Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

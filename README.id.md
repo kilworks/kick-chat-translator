@@ -7,7 +7,7 @@
 Baca chat Kick mana pun dalam bahasamu, dan balas dalam bahasa channel-nya.<br>
 Gratis, tanpa akun, tanpa setelan apa pun. 43 bahasa, di chat maupun di ekstensinya sendiri.
 
-**[Tambahkan ke Chrome, Brave, atau Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Tambahkan ke Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Tambahkan ke Chrome, Brave, atau Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Tambahkan ke Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

@@ -7,7 +7,7 @@
 Loe mis tahes Kicki voo vestlust oma keeles ja vasta kanali keeles.<br>
 Tasuta, kontot pole vaja, midagi pole vaja seadistada. 43 keelt, nii vestluses kui ka laienduses endas.
 
-**[Lisa Chrome'i, Braveri või Edge'i](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Lisa Firefoxi](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[Lisa Chrome'i, Braveri või Edge'i](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Lisa Firefoxi](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)

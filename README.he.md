@@ -7,7 +7,7 @@
 קרא את הצ'אט של כל שידור ב-Kick בשפה שלך, והגב בשפה של הערוץ.<br>
 חינם, בלי חשבון, בלי שום הגדרה. 43 שפות, בצ'אט ובתוסף עצמו.
 
-**[הוסף ל-Chrome, ל-Brave או ל-Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[הוסף ל-Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)**
+**[הוסף ל-Chrome, ל-Brave או ל-Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[הוסף ל-Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![משתמשי Chrome](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
