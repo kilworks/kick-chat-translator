@@ -1,9 +1,5 @@
-Psaní pomocí emocí nyní funguje správně. Tab doplní Kickovy a 7TV emoce a @zmínky místo vložení překladu, emoce zůstanou ve vaší zprávě, když je přeložena, a náhled již nepokrývá Kickovy seznamy ani výběr emocí.
+Tlačítko Discord je nově v místním okně mezi Vymazat mezipaměť a Možnosti a na konci karet Možností. Otevře server rozšíření: požádejte o pomoc, nahlaste špatný překlad nebo navrhněte nápad. Karta O rozšíření také odkazuje na Twitch Chat Translator, stejné rozšíření pro Twitch.
 
-Překlady jsou přesnější: jména značek a lidí (iPhone, YouTube, LeBron) se již před překladem nevynechávají a @zmínky zůstávají v přeložených zprávách.
+Méně slov z chatu se čte jako špatný jazyk: Hinglish, romanizovaná japonština a ruština, smích uvnitř anglické věty a další. Na nové sadě 500 skutečných řádků chatu klesl počet sebejistých špatných odpovědí ze 17 na 6. Jednoslovné odpovědi v čínštině, japonštině a korejštině se nyní překládají, zatímco smích, skóre a hodnocení se stále přeskakují.
 
-Filtry byly přepracovány: skuteční Kick boti jsou ignorováni a můžete přidat své vlastní, „Skrýt zprávy obsahující“ nyní také skryje to, co je již na obrazovce, a seznamy lze znovu zadat.
-
-Rozšíření je na každé stránce Kick světlejší a v prohlížeči Chrome se engine na zařízení znovu nabízí, když je cílový jazyk nastaven na Auto.
-
-Nové a volitelné: anonymní denní statistiky využití, pokud neřeknete ano, jsou vypnuté. Nikdy neobsahují vaše zprávy, jména nebo kanály.
+Opravy: poté, co jeden řádek skončil u záložního enginu, ho následovaly všechny další řádky; pořadí vašich enginů se nyní vrátí po 60 sekundách. Čísla zůstávají správná v překladech z mezipaměti ("100 subs" a "1000 subs" už nesdílejí jednu položku). Vestavěné překlady si poradí s interpunkcí a protaženými slovy ("holaaa", "merci!"). Při nastavení Nejdřív v zařízení se řádek, který engine v zařízení vrátil beze změny, nyní pošle do cloudu místo zahození. DeepL nyní dostává zdrojový jazyk dávky, pokud je znám.

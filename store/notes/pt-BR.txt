@@ -1,9 +1,5 @@
-Digitar com emotes funciona corretamente agora. Tab completa os emotes e @menções do Kick e 7TV em vez de inserir a tradução, os emotes permanecem na sua mensagem quando ela é traduzida e a visualização não cobre mais as listas do Kick ou o seletor de emotes.
+Um botão do Discord, no pop-up entre Limpar cache e Opções e no final das abas de Opções, abre o servidor da extensão: peça ajuda, relate uma tradução ruim, sugira uma ideia. A aba Sobre também tem um link para o Twitch Chat Translator, a mesma extensão para a Twitch.
 
-As traduções são mais precisas: nomes de marcas e pessoas (iPhone, YouTube, LeBron) não são mais eliminados antes da tradução e as @menções permanecem nas mensagens traduzidas.
+Menos palavras do chat são lidas como o idioma errado: Hinglish, japonês e russo romanizados, risadas dentro de uma frase em inglês e mais. Em um novo conjunto de 500 linhas reais de chat, as respostas erradas com alta confiança caíram de 17 para 6. Respostas de uma palavra em chinês, japonês e coreano agora são traduzidas, enquanto risadas, placares e notas continuam sendo ignorados.
 
-Os filtros foram reformulados: os bots reais do Kick são ignorados e você pode adicionar os seus próprios, "Ocultar mensagens contendo" agora também oculta o que já está na tela, e as listas podem ser digitadas novamente.
-
-A extensão é mais leve em todas as páginas do Kick, e no Chrome o mecanismo no dispositivo é oferecido novamente quando o idioma de destino está no Auto.
-
-Novo e opcional: estatísticas de uso diário anônimas, desativadas, a menos que você diga sim. Eles nunca contêm suas mensagens, nomes ou canais.
+Correções: depois que uma linha foi para um mecanismo de reserva, todas as linhas seguintes o acompanhavam; agora a ordem dos seus mecanismos volta após 60 segundos. Os números continuam corretos nas traduções em cache ("100 subs" e "1000 subs" não dividem mais uma entrada). As traduções integradas funcionam com pontuação e palavras alongadas ("holaaa", "merci!"). Com o dispositivo primeiro, uma linha que o mecanismo no dispositivo devolve sem alteração agora vai para a nuvem em vez de ser descartada. O DeepL agora recebe o idioma de origem de um lote quando ele é conhecido.

@@ -1,9 +1,5 @@
-Å skrive med følelser fungerer som det skal nå. Tab fullfører Kicks og 7TVs emotes og @mentions i stedet for å sette inn oversettelsen, emotes blir i meldingen når den oversettes, og forhåndsvisningen dekker ikke lenger Kicks lister eller følelsesvelgeren.
+En Discord-knapp, i popup-vinduet mellom Tøm hurtigbuffer og Innstillinger og på slutten av fanene i Innstillinger, åpner utvidelsens server: be om hjelp, rapporter en dårlig oversettelse, foreslå en idé. Fanen Om lenker også til Twitch Chat Translator, den samme utvidelsen for Twitch.
 
-Oversettelser er mer nøyaktige: merkevare- og personnavn (iPhone, YouTube, LeBron) blir ikke lenger utelatt før oversettelse, og @omtaler forblir i oversatte meldinger.
+Færre chatord leses som feil språk: Hinglish, romanisert japansk og russisk, latter midt i en engelsk setning og mer. På et nytt sett med 500 ekte chatlinjer gikk feil svar med høy sikkerhet fra 17 til 6. Enordssvar på kinesisk, japansk og koreansk blir nå oversatt, mens latter, resultater og vurderinger fortsatt hoppes over.
 
-Filtre ble omarbeidet: de virkelige Kick-robotene blir ignorert og du kan legge til dine egne, "Skjul meldinger som inneholder" skjuler nå også det som allerede er på skjermen, og listene kan skrives inn igjen.
-
-Utvidelsen er lettere på hver Kick-side, og på Chrome tilbys motoren på enheten igjen når målspråket er på Auto.
-
-Nytt og valgfritt: anonym daglig bruksstatistikk, slått av med mindre du sier ja. Den inneholder aldri meldingene, navnene eller kanalene dine.
+Rettelser: etter at én linje gikk til en reservemotor, fulgte alle senere linjer etter; rekkefølgen på motorene dine kommer nå tilbake etter 60 sekunder. Tall forblir riktige i bufrede oversettelser ("100 subs" og "1000 subs" deler ikke lenger en oppføring). Innebygde oversettelser fungerer med tegnsetting og utstrakte ord ("holaaa", "merci!"). Med enheten først går en linje som motoren på enheten gir tilbake uendret, nå til skyen i stedet for å bli droppet. DeepL får nå kildespråket for en gruppe når det er kjent.

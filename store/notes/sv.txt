@@ -1,9 +1,5 @@
-Att skriva med emotes fungerar korrekt nu. Tab slutför Kicks och 7TV:s emotes och @omnämnanden istället för att infoga översättningen, emotes stannar i ditt meddelande när det översätts, och förhandsvisningen täcker inte längre Kicks listor eller emoteväljaren.
+En Discord-knapp, i popup-fönstret mellan Rensa cache och Inställningar och i slutet av flikarna i Inställningar, öppnar tilläggets server: be om hjälp, rapportera en dålig översättning, föreslå en idé. Fliken Om länkar också till Twitch Chat Translator, samma tillägg för Twitch.
 
-Översättningar är mer exakta: varumärken och personers namn (iPhone, YouTube, LeBron) tas inte längre bort före översättning, och @omnämnanden stannar kvar i översatta meddelanden.
+Färre chattord läses som fel språk: Hinglish, romaniserad japanska och ryska, skratt inuti en engelsk mening och mer. På en ny uppsättning med 500 riktiga chattrader sjönk felaktiga säkra svar från 17 till 6. Enordssvar på kinesiska, japanska och koreanska översätts nu, medan skratt, resultat och betyg fortfarande hoppas över.
 
-Filtren omarbetades: de riktiga Kick-botarna ignoreras och du kan lägga till dina egna, "Dölj meddelanden som innehåller" döljer nu också det som redan finns på skärmen, och listorna kan skrivas in igen.
-
-Tillägget är lättare på varje Kick-sida, och på Chrome erbjuds motorn på enheten igen när målspråket är på Auto.
-
-Nytt och valfritt: anonym daglig användningsstatistik, avstängd om du inte säger ja. De innehåller aldrig dina meddelanden, namn eller kanaler.
+Rättelser: när en rad hade gått till en reservmotor följde alla senare rader efter; ordningen på dina motorer kommer nu tillbaka efter 60 sekunder. Siffror förblir rätta i cachade översättningar ("100 subs" och "1000 subs" delar inte längre en post). Inbyggda översättningar fungerar med skiljetecken och utdragna ord ("holaaa", "merci!"). Med enheten först går en rad som motorn på enheten lämnar tillbaka oförändrad nu till molnet i stället för att kastas. DeepL får nu källspråket för en sats när det är känt.

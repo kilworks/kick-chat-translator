@@ -1,9 +1,5 @@
-Typing with emotes works properly now. Tab completes Kick's and 7TV's emotes and @mentions instead of inserting the translation, emotes stay in your message when it is translated, and the preview no longer covers Kick's lists or the emote picker.
+A Discord button, in the popup between Clear cache and Options and at the end of the Options tabs, opens the extension's server: ask for help, report a bad translation, suggest an idea. The About tab also links to Twitch Chat Translator, the same extension for Twitch.
 
-Translations are more accurate: brand and people names (iPhone, YouTube, LeBron) are no longer dropped before translating, and @mentions stay in translated messages.
+Fewer chat words are read as the wrong language: Hinglish, romanised Japanese and Russian, laughter inside an English sentence and more. On a new set of 500 real chat lines, wrong confident answers went from 17 to 6. One-word Chinese, Japanese and Korean replies are now translated, while laughter, scores and ratings are still skipped.
 
-Filters were reworked: the real Kick bots are ignored and you can add your own, "Hide messages containing" now also hides what is already on screen, and the lists can be typed in again.
-
-The extension is lighter on every Kick page, and on Chrome the on-device engine is offered again when the target language is on Auto.
-
-New and optional: anonymous daily usage statistics, off unless you say yes. They never contain your messages, names or channels.
+Fixes: after one line went to a backup engine, every later line followed it; your engine order now comes back after 60 seconds. Numbers stay right in cached translations ("100 subs" and "1000 subs" no longer share an entry). Built-in translations work with punctuation and stretched words ("holaaa", "merci!"). With on-device first, a line the on-device engine hands back unchanged now goes to the cloud instead of being dropped. DeepL now receives the source language of a batch when it is known.
