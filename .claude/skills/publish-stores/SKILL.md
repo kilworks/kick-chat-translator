@@ -22,6 +22,19 @@ description: Ship a release to the Chrome Web Store and addons.mozilla.org. A ta
 
 Secrets, in the repository's Actions settings: `CWS_SERVICE_ACCOUNT_JSON`, `CWS_PUBLISHER_ID`, `AMO_JWT_ISSUER`, `AMO_JWT_SECRET`. The same credentials live in `~/.config/kick-chat-translator/` for the scripts run by hand.
 
+## Fast path, as run for 3.4.0 (2026-11-06, about 40 minutes from "prépare une update" to both stores)
+
+Work in a worktree so the main checkout (other sessions, other branches) stays untouched: `git worktree add -b <branch> ../kct-<topic> origin/master`, then `npm ci` in it.
+
+1. `gh pr list`; merge what must ship (`gh pr view <n> --json mergeStateStatus`: BEHIND -> `gh pr update-branch <n>`, wait CI, `gh pr merge <n> --merge`; auto-merge is disabled on this repository).
+2. `git fetch && git checkout -b release/X.Y.Z origin/master`, `npm version X.Y.Z --no-git-tag-version`, in CHANGELOG add `## [X.Y.Z] - <date>` under `## [Unreleased]`.
+3. Notes: write `<scratchpad>/notes/en.txt` by hand from the Unreleased section (plain paragraphs, store users' words). Fill `tools/notes-brief.md` (replace `<notes-dir>`, `<repo>`), two Sonnet agents in parallel, 14 languages each (the list = `ls store/notes`). Then `python .claude/skills/publish-stores/tools/check_notes.py <notes-dir> store/notes` and check the register against the previous note yourself (fr, de, es slipped to tu/du/tú in 3.4.0). Copy into `store/notes/`.
+4. `npm run release:check`, `npm run package:all`, `npm run stores:payloads -- <scratchpad>/stores`, `npm run stores:preflight -- --html release/preflight.html`, `node scripts/stores/cws.mjs status` (no revision in review, or `cancel` first).
+5. Commit "Release X.Y.Z", PR, CI green, merge, `git checkout --detach origin/master`, `git tag -a vX.Y.Z -m "Release X.Y.Z" && git push origin vX.Y.Z`, `gh run watch <id>`. Expect: Chrome PENDING_REVIEW X.Y.Z, AMO `POST .../versions/ -> 201` "unreviewed", GitHub release with three zips.
+6. UI change in the release: `tools/layout-probe.mjs` on the change and on master (both builds), all 43 locales, then look at the screenshots.
+
+Never `prettier --write` a whole file here (master is not prettier-clean). If the classifier refuses a merge or a tag kil asked for: memory `auto-mode-blocks`.
+
 ## Versioning
 
 - **A version exists only when it ships to the stores.** Number, tag and GitHub release are created together by the Release workflow. Work in between stays on master under `## [Unreleased]` in CHANGELOG, with no bump and no tag.
