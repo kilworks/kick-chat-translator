@@ -106,4 +106,18 @@ describe('la table elle-meme', () => {
       expect(f.motif.source.endsWith('$')).toBe(true);
     }
   });
+
+  it('repond vite sur une longue repetition qui finit mal', () => {
+    // Une vraie ligne de chat, 73 K puis un caractere invisible, ne rendait jamais
+    // la main : `k{2,}(?:[a-jl-z]?k{2,})*` essaie toutes les coupes. Un motif pareil
+    // gele l'onglet de tout le monde dans le chat, a la demande de n'importe qui.
+    const lettres = ['k', 'j', 'h', 'a', 'e', 's', 'x', 'w', '5', 'q', 'l', 'ㅋ', 'ㅎ', 'ก', 'х', 'ه', 'ה', '哈', 'ハ'];
+    for (const f of LAUGHTER_FORMS) {
+      for (const l of lettres) {
+        const t0 = performance.now();
+        f.motif.test(`${l.repeat(42)}!`);
+        expect(performance.now() - t0, `${f.motif.source} sur ${l}`).toBeLessThan(100);
+      }
+    }
+  });
 });

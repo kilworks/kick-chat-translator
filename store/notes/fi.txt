@@ -1,9 +1,5 @@
-Hymiöillä kirjoittaminen toimii nyt oikein. Välilehti täydentää Kickin ja 7TV:n hymiöt ja @maininnat käännöksen lisäämisen sijaan, hymiöt pysyvät viestissäsi, kun se käännetään, eikä esikatselu enää kata Kickin luetteloita tai hymiövalitsinta.
+Discord-painike on nyt ponnahdusikkunassa Tyhjennä välimuisti- ja Asetukset-kohdan välissä sekä Asetusten välilehtien lopussa, ja se avaa laajennuksen palvelimen: pyydä apua, ilmoita huonosta käännöksestä tai ehdota ideaa. Tietoja-välilehti linkittää myös Twitch Chat Translatoriin, samaan laajennukseen Twitchille.
 
-Käännökset ovat tarkempia: tuotemerkkien ja ihmisten nimiä (iPhone, YouTube, LeBron) ei enää pudoteta ennen käännöstä, ja @maininnat pysyvät käännetyissä viesteissä.
+Harvempi chatin sana luetaan väärällä kielellä: Hinglish, latinalaisin kirjaimin kirjoitettu japani ja venäjä, nauru englanninkielisen lauseen sisällä ja muuta. Uudella 500 oikean chat-rivin joukolla vääriä mutta varmoja vastauksia oli 6 aiemman 17:n sijaan. Yhden sanan kiinankieliset, japaninkieliset ja korealaiset vastaukset käännetään nyt, kun taas nauru, pisteet ja arvosanat ohitetaan edelleen.
 
-Suodattimet uusittiin: todellisia Kick-botteja ei huomioida ja voit lisätä omia, "Piilota sisältävät viestit" piilottaa nyt myös sen, mikä on jo näytöllä, ja listat voidaan kirjoittaa uudelleen.
-
-Laajennus on kevyempi jokaisella Kick-sivulla, ja Chromessa laitteen sisäistä käännöstä tarjotaan taas, kun kohdekieli on Auto.
-
-Uusi ja valinnainen: anonyymit päivittäiset käyttötilastot pois päältä, ellet sano kyllä. Ne eivät koskaan sisällä viestejäsi, nimiäsi tai kanaviasi.
+Korjaukset: kun yksi rivi oli mennyt varamoottorille, kaikki seuraavat rivit seurasivat sitä; moottorien järjestys palaa nyt 60 sekunnin kuluttua. Numerot pysyvät oikein välimuistissa olevissa käännöksissä ("100 subs" ja "1000 subs" eivät enää jaa samaa merkintää). Sisäänrakennetut käännökset toimivat välimerkkien ja venytettyjen sanojen kanssa ("holaaa", "merci!"). Kun laitteella ensin -asetus on käytössä, rivi, jonka laitteen moottori palauttaa muuttumattomana, menee nyt pilveen sen sijaan, että se hylättäisiin. DeepL saa nyt erän lähdekielen, kun se tiedetään.

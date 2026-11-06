@@ -160,6 +160,17 @@ reads dist/, so it serialises behind any build. D touches no code.
   outputs: 2.82 against 2.45, serious 31.2 % against 23.1 %, p50 452 ms, p95
   1229 ms, so point 8 stops here. Open for a decision: on-device first is the
   default mode and the worse engine on every source language measured.
+- [x] **Browser detector behind the raw answer; retransliteration dropped
+  (2026-11-04, phase C).** Point 7: `i18n.detectLanguage`, rule fixed on dev.
+  Heldout, 700 lines, right / silent / wrong: today 428 / 156 / 116, Chrome
+  409 / 276 / 15, Firefox 506 / 168 / 26; heldout read twice in totals, no change
+  between. Tatoeba wrong 508, 70, 159. Content script p95 0.1 ms and 1 ms. Costs:
+  Chrome quieter, so allowlist readers lose lines; Firefox foreign lines taken by
+  the English skip 6 to 11 of 620 on dev. Measured on recorded answers, no live
+  chat yet. Compose still uses franc. Point 5: no code. 3 captures hold no real
+  Russian, Ukrainian or Bulgarian sentence in Latin letters, and the Arabizi
+  prototype swaps untranslated lines for fluent false ones (serious 27 to 26,
+  mistranslated 1 to 23, 15 real lines, Google).
 - [ ] **e2e: one gate out of 42 fails at random under 24 parallel.** Four full
   runs on 2026-11-04: extension-load, then green, then translate-cache, then
   nav-monde, each green when run alone (2 to 3 times). Not traced.

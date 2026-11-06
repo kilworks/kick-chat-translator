@@ -117,7 +117,7 @@ const capped = new Set();
 for (const engine of engines) {
   const [provider, gap] = ENGINES[engine];
   for (const line of lines) {
-    const p = prepare(line.text, line.target);
+    const p = await prepare(line.text, line.target);
     const row = { id: line.id, engine, target: line.target };
     if (typeof p === 'string') {
       out.push({ ...row, skipped: p || 'gate' });

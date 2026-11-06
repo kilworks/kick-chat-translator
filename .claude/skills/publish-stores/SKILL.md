@@ -22,6 +22,19 @@ description: Ship a release to the Chrome Web Store and addons.mozilla.org. A ta
 
 Secrets, in the repository's Actions settings: `CWS_SERVICE_ACCOUNT_JSON`, `CWS_PUBLISHER_ID`, `AMO_JWT_ISSUER`, `AMO_JWT_SECRET`. The same credentials live in `~/.config/kick-chat-translator/` for the scripts run by hand.
 
+## Fast path, as run for 3.4.0 (2026-11-06, about 40 minutes from "prépare une update" to both stores)
+
+Work in a worktree so the main checkout (other sessions, other branches) stays untouched: `git worktree add -b <branch> ../kct-<topic> origin/master`, then `npm ci` in it.
+
+1. `gh pr list`; merge what must ship (`gh pr view <n> --json mergeStateStatus`: BEHIND -> `gh pr update-branch <n>`, wait CI, `gh pr merge <n> --merge`; auto-merge is disabled on this repository).
+2. `git fetch && git checkout -b release/X.Y.Z origin/master`, `npm version X.Y.Z --no-git-tag-version`, in CHANGELOG add `## [X.Y.Z] - <date>` under `## [Unreleased]`.
+3. Notes: write `<scratchpad>/notes/en.txt` by hand from the Unreleased section (plain paragraphs, store users' words). Fill `tools/notes-brief.md` (replace `<notes-dir>`, `<repo>`), two Sonnet agents in parallel, 14 languages each (the list = `ls store/notes`). Then `python .claude/skills/publish-stores/tools/check_notes.py <notes-dir> store/notes` and check the register against the previous note yourself (fr, de, es slipped to tu/du/tú in 3.4.0). Copy into `store/notes/`.
+4. `npm run release:check`, `npm run package:all`, `npm run stores:payloads -- <scratchpad>/stores`, `npm run stores:preflight -- --html release/preflight.html`, `node scripts/stores/cws.mjs status` (no revision in review, or `cancel` first).
+5. Commit "Release X.Y.Z", PR, CI green, merge, `git checkout --detach origin/master`, `git tag -a vX.Y.Z -m "Release X.Y.Z" && git push origin vX.Y.Z`, `gh run watch <id>`. Expect: Chrome PENDING_REVIEW X.Y.Z, AMO `POST .../versions/ -> 201` "unreviewed", GitHub release with three zips.
+6. UI change in the release: `tools/layout-probe.mjs` on the change and on master (both builds), all 43 locales, then look at the screenshots.
+
+Never `prettier --write` a whole file here (master is not prettier-clean). If the classifier refuses a merge or a tag kil asked for: memory `auto-mode-blocks`.
+
 ## Versioning
 
 - **A version exists only when it ships to the stores.** Number, tag and GitHub release are created together by the Release workflow. Work in between stays on master under `## [Unreleased]` in CHANGELOG, with no bump and no tag.
@@ -282,3 +295,21 @@ kil counted more than four passes over the 42 Chrome languages in one day. Each 
 6. **Translation at scale (43 languages, 84 catalogues).** Sonnet agents, three languages each, one brief file plus a checker script in the scratchpad (`check-ui.mjs`, `check-chat.mjs`: exact keys, placeholders, no dash, not left in English). What went wrong: a session limit killed half of them mid-file (state on disk read back with the checkers, the rest relaunched); agents overwrote each other's helper scripts in the shared scratchpad (now: helpers named with their language codes); German shipped the chip as "Local" because its agent died before aligning it (the coverage test's English-identical list caught it).
 7. **AMO "33/34", the fa summary.** AMO drops Persian's zero-width non-joiner from the summary too, not only from the description; the listing was stored. Both readbacks (`amo.mjs`, `verify.mjs`) now set ZWNJ aside in the summary. A red AMO step with `POST .../versions/ -> 201` and one locale "differentes" is this class: compare that locale with the API before rerunning anything.
 8. **Submission checked on the dashboard, not assumed.** `cws-listing.mjs status` reads the "État" tab and the submit button. On 3.2.0, pasting before the tag and letting the workflow publish gave "en attente d'examen" with the button greyed out: no click needed.
+
+## Journal: Discord link, 2026-11-06 (PR #52, not released)
+
+Asked by kil: "une petite update", a Discord logo between Clear cache and Options in the popup and in the Options menu, the 43 READMEs left alone.
+
+- **The invite.** None existed; the server bot created a permanent one on `#welcome` (`POST /channels/<welcome>/invites` with `max_age 0, max_uses 0, unique true`), `https://discord.gg/x3AvjdmAUk`. It lives once, as `DISCORD_URL` in `src/shared/constants.ts`. How to manage the server: user skill `chat-translator-discord`.
+- **The code.** `src/shared/discord.tsx` (`DiscordLink`, the Simple Icons mark, CC0, `fill=currentColor`, `aria-label` and `title` "Discord", no i18n key: a proper name, like the Twitch Chat Translator link in About). Popup: a third footer child, `kt-btn-ghost shrink-0 !px-1.5`, hover in Discord blurple. Options: the tab row became a flex wrapper holding the tablist and the link **outside** `role=tablist`, so the arrow-key roving tabindex still only walks the six tabs; the wrapper took the border and the margin.
+- **Never `prettier --write` a whole file here.** master is not prettier-clean: on `popup/App.tsx` it rewrote 40 lines nobody touched. Files restored from git, the edits redone by hand.
+- **Layout measured in all 43 interface languages, with a baseline.** A Playwright probe on the built `dist` (same server and `chrome` shim as `test/e2e/measure-popup.mjs`, `UX_KIT` set): footer children on one row, footer not overflowing, link the middle child, popup height, options link on the tab row and the tablist not scrolling; then the same probe on a master build. Baseline already had Greek and Tamil "Clear cache" on two lines. First version: 8 failures (bg, ca, el, sk, sl, ta wrap; el and ru tab rows scroll by 4 and 6 px). Padding cut to `!px-1.5` (popup) and `px-2` (options): only sk is new, on two lines like el and ta. The popup body is a fixed 340 px.
+- **Popup over 600 px, found on the way, not caused by the link:** with compose on, stats shown and the usage question answered, bg 611 (footer on one row), el 633 and ta 631 (footers already two lines on master); sk reaches 606 with the link. `measure-popup.mjs` covers 10 languages only, so none of them is seen by it.
+- **Release order.** master holds 34 commits since 3.3.0 in `## [Unreleased]`, and PR #46 (the kkkk catastrophic backtracking) must be merged before any release. The Discord link ships with that, not on its own.
+
+## Journal: 3.4.0, 2026-11-06
+
+- **Shipped:** #46 (kkkk freeze) and #52 (Discord link) merged, release PR #53 (bump with `npm version 3.4.0 --no-git-tag-version`, CHANGELOG dated, `store/notes/` in 29 languages, READMEs left alone on kil's order). Preflight: no permission, no Chrome description changed, nothing by hand. Tag `v3.4.0` on the merge commit; the Release workflow went green in one run: Chrome PENDING_REVIEW 3.4.0, AMO `POST .../versions/ -> 201` file "unreviewed", GitHub release with the three zips.
+- **Before tagging, `cws.mjs status`:** only a PUBLISHED revision, nothing in review, so no `cancel` needed.
+- **Notes translated by two Sonnet agents** (14 languages each, brief + checker in the scratchpad: three paragraphs, no dash, no curly quote, the quoted examples kept, UI labels read from `src/shared/i18n/<ui>.ts`). They switched fr, de and es to the informal register although the brief said to follow the previous note: check the register against the previous note (`du/Sie`, `tu/vous`, `tú/usted`) before copying the files in.
+- **The auto mode classifier refused `gh pr merge` on the release PR** ([Merge Without Review]) even after kil's go in chat. Lifted by `autoMode.allow` rules kil added himself by running a scratchpad script with `!` (memory `auto-mode-blocks`). The PR branch had also been BEHIND master after #46 merged: `gh pr update-branch <n>` then wait for CI; auto-merge is disabled on this repository.

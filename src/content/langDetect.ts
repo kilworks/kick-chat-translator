@@ -1,5 +1,5 @@
 import { franc } from 'franc-min';
-import { francToIso2 } from '~/shared/languages';
+import { francToIso2, isSupportedLang, normalizeLang } from '~/shared/languages';
 import { isLaughter, laughterLanguage } from '~/shared/laughter';
 import { isArabizi } from '~/shared/arabizi';
 import { romanisedLanguage } from '~/shared/romanised';
@@ -2696,6 +2696,35 @@ function detectByPenchant(text: string): string | undefined {
 export function detectLanguage(text: string): string | undefined {
   const trimmed = text.trim();
   return trimmed.length === 0 ? undefined : memo(DETECT_MEMO, trimmed, detectUncached);
+}
+
+/**
+ * The raw answer, checked against the browser's own detector (`i18n.detectLanguage`,
+ * built into Chrome and Firefox, no bytes to ship). What it reliably names wins; a
+ * guess of ours stands only if its first choice agrees; otherwise no answer. A
+ * table answer is never second-guessed, and without the API nothing changes.
+ *
+ * Rule fixed on the real bench's dev half, then read on heldout (700 lines,
+ * right / silent / wrong): today 428 / 156 / 116, Chrome 409 / 276 / 15, Firefox
+ * 506 / 168 / 26. Tatoeba (5040): 4135 / 397 / 508, 4084 / 886 / 70, 4563 / 318 / 159.
+ * The price is on Chrome: more silence, so a reader with a source allowlist loses
+ * the lines it no longer names. Measured on dev, English lines named English go
+ * from 41 of 91 to 34 on Chrome and 49 on Firefox; foreign lines the English skip
+ * would take go from 6 of 620 to 1 and to 11.
+ */
+export async function detectLanguageWithBrowser(text: string): Promise<string | undefined> {
+  const guess = detectLanguage(text);
+  if (confidentLanguage(text) || !globalThis.chrome?.i18n?.detectLanguage) return guess;
+  let answer: chrome.i18n.LanguageDetectionResult;
+  try {
+    answer = await chrome.i18n.detectLanguage(text);
+  } catch {
+    return guess;
+  }
+  const first = answer.languages[0]?.language;
+  const browser = first ? normalizeLang(first) : undefined;
+  if (answer.isReliable && browser && isSupportedLang(browser)) return browser;
+  return guess === browser ? guess : undefined;
 }
 
 function detectUncached(trimmed: string): string | undefined {

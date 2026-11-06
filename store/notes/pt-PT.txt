@@ -1,9 +1,5 @@
-Digitar com emotes funciona agora corretamente. O tab completa os emotes e @menções do Kick e 7TV em vez de inserir a tradução, os emotes permanecem na sua mensagem quando esta é traduzida e a pré-visualização já não cobre as listas do Kick ou o selector de emotes.
+Um botão Discord, no popup entre Limpar cache e Opções e no fim dos separadores de Opções, abre o servidor da extensão: peça ajuda, comunique uma tradução errada, sugira uma ideia. O separador Acerca também tem uma ligação para o Twitch Chat Translator, a mesma extensão para a Twitch.
 
-As traduções são mais precisas: os nomes das marcas e das pessoas (iPhone, YouTube, LeBron) já não são eliminados antes da tradução e as @menções permanecem nas mensagens traduzidas.
+Menos palavras do chat são lidas como o idioma errado: Hinglish, japonês e russo romanizados, risos dentro de uma frase em inglês e mais. Num novo conjunto de 500 linhas reais de chat, as respostas erradas com muita confiança desceram de 17 para 6. As respostas de uma só palavra em chinês, japonês e coreano passam a ser traduzidas, enquanto risos, resultados e classificações continuam a ser ignorados.
 
-Os filtros foram reformulados: os bots reais do Kick são ignorados e pode adicionar os seus próprios, "Ocultar mensagens contendo" agora também oculta o que já está no ecrã, e as listas podem ser digitadas novamente.
-
-A extensão é mais leve em todas as páginas Kick, e no Chrome o motor no dispositivo é novamente oferecido quando o idioma de destino está no Auto.
-
-Novo e opcional: estatísticas de utilização diária anónimas, desativadas, a menos que diga que sim. Nunca contêm as suas mensagens, nomes ou canais.
+Correções: depois de uma linha ir para um motor de reserva, todas as seguintes iam atrás; agora a ordem dos seus motores volta ao fim de 60 segundos. Os números mantêm-se corretos nas traduções em cache ("100 subs" e "1000 subs" já não partilham uma entrada). As traduções integradas funcionam com pontuação e palavras alongadas ("holaaa", "merci!"). Com o dispositivo em primeiro lugar, uma linha que o motor no dispositivo devolve sem alterações vai agora para a nuvem em vez de ser descartada. O DeepL passa a receber o idioma de origem de um lote quando é conhecido.

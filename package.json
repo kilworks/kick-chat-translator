@@ -1,6 +1,6 @@
 {
   "name": "kick-chat-translator",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "private": true,
   "description": "Free live chat translator for Kick: read any stream's chat in your language and reply in the channel's. No account, no setup.",
   "license": "MIT",
