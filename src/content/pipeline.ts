@@ -10,7 +10,7 @@ import { mentionsOf, parseKickContent } from './emoteParser';
 import { countUsage } from './usage';
 import { spellOutAbbreviations, spellOutForLanguage } from './abbreviations';
 import { extractMessageText, findAllRows } from './selectors';
-import { confidentLanguage, detectLanguage } from './langDetect';
+import { confidentLanguage, detectLanguageWithBrowser } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
 import { isContextCritical } from '~/shared/langTiers';
 import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, isSameLanguageAsTarget, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, trimForEngine } from './filters';
@@ -162,12 +162,16 @@ export class TranslationPipeline {
     return this.settings.targetLang === 'auto' ? resolveBrowserLang() : this.settings.targetLang;
   }
 
-  /** Cheap filters + a single franc-min call. Returns undefined to skip. */
-  private prepare(
+  /**
+   * Cheap filters + one detection. Everything before the detection stays
+   * synchronous, so the dedup slot is claimed in arrival order. Returns the
+   * reason to skip as a string.
+   */
+  private async prepare(
     rawText: string,
     meta: { username: string; channel: string; isBot: boolean },
     opts: { dedup: boolean } = { dedup: true },
-  ): Prepared | string {
+  ): Promise<Prepared | string> {
     // An empty reason means "skipped, but there is nothing worth telling this
     // line about": the two gates below are about the whole tab, not the message.
     if (!this.settings.enabled) return '';
@@ -200,7 +204,7 @@ export class TranslationPipeline {
     if (isNoise(realText)) return localised('skipNoise', 'it is only emoji, symbols or laughter'); // kkkk / rsrs / xd / digits
     if (isSlangOnly(realText)) return localised('skipSlang', 'it is only chat slang'); // poggers / copium / kekw …
 
-    const detected = detectLanguage(realText);
+    const detected = await detectLanguageWithBrowser(realText);
     // Three exits can end a line for "already readable", and they are not the
     // same event: two of them decide here without asking anyone, the third is
     // the service answering after the call was made. Each says which it is, or
@@ -275,7 +279,7 @@ export class TranslationPipeline {
 
   async onWebSocketMessage(msg: IncomingWsMessage): Promise<void> {
     if (this.settings.engineMode === 'local-only') return;
-    const prepared = this.prepare(msg.text, msg, { dedup: false });
+    const prepared = await this.prepare(msg.text, msg, { dedup: false });
     if (typeof prepared === 'string') return;
     // Same source hint as the display path. The warm pass usually reaches the
     // worker first, so the answer it caches is the one the reader sees, and a
@@ -303,14 +307,18 @@ export class TranslationPipeline {
     const blocked = this.settings.enabled && hasBlockedKeyword(msg.text, this.settings);
     (msg.rowElement as HTMLElement).style.display = blocked ? 'none' : '';
     if (blocked) return;
-    const prepared = this.prepare(msg.text, msg);
+    const rowText = extractMessageText(msg.rowElement);
+    const prepared = await this.prepare(msg.text, msg);
+    // The detection can take a few milliseconds on Firefox, long enough for the
+    // scroller to hand this row to another message, whose reason this is not.
+    const sameRow = extractMessageText(msg.rowElement) === rowText;
     if (typeof prepared === 'string') {
-      this.skip(msg, prepared);
+      if (sameRow) this.skip(msg, prepared);
       return;
     }
     // This line is going to be translated, so drop any reason left on it by the
     // message that used this row before the virtual scroller recycled it.
-    this.skip(msg, '');
+    if (sameRow) this.skip(msg, '');
     const { real, detected, hint } = prepared;
     const target = this.effTarget;
 

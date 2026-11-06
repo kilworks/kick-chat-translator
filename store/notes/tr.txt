@@ -1,9 +1,5 @@
-İfadelerle yazmak artık düzgün çalışıyor. Sekme, çeviriyi eklemek yerine Kick'in ve 7TV'nin ifadelerini ve @bahsetmelerini tamamlar, ifadeler çevrildiğinde mesajınızda kalır ve önizleme artık Kick'in listelerini veya ifade seçiciyi kapsamaz.
+Bir Discord düğmesi, açılır pencerede Önbelleği temizle ile Seçenekler arasında ve Seçenekler sekmelerinin sonunda, uzantının sunucusunu açar: yardım iste, kötü bir çeviriyi bildir, bir fikir öner. Hakkında sekmesi ayrıca Twitch için aynı uzantı olan Twitch Chat Translator'a bağlanır.
 
-Çeviriler daha doğru: marka ve kişi adları (iPhone, YouTube, LeBron) artık çeviriden önce atlanmıyor ve @bahisler çevrilmiş mesajlarda kalıyor.
+Sohbet kelimelerinin yanlış dil olarak okunması azaldı: Hinglish, Latin harfli Japonca ve Rusça, İngilizce bir cümlenin içindeki kahkaha ve daha fazlası. 500 gerçek sohbet satırından oluşan yeni bir sette, kendinden emin yanlış cevaplar 17'den 6'ya düştü. Tek kelimelik Çince, Japonca ve Korece yanıtlar artık çevriliyor; kahkahalar, skorlar ve puanlar ise hâlâ atlanıyor.
 
-Filtreler yeniden düzenlendi: gerçek Kick botları göz ardı edildi ve siz kendi filtrenizi ekleyebilirsiniz, "İçeren mesajları gizle" seçeneği artık ekranda görünenleri de gizler ve listeler yeniden yazılabilir.
-
-Uzantı her Kick sayfasında daha hafiftir ve Chrome'da, hedef dil Otomatik olduğunda cihaz içi motor yeniden sunulur.
-
-Yeni ve isteğe bağlı: anonim günlük kullanım istatistikleri, siz evet demediğiniz sürece kapalı. Hiçbir zaman mesajlarınızı, adlarınızı veya kanallarınızı içermezler.
+Düzeltmeler: bir satır yedek motora gittikten sonra sonraki tüm satırlar da onu izliyordu; motor sıran artık 60 saniye sonra geri geliyor. Sayılar önbellekteki çevirilerde doğru kalır ("100 subs" ve "1000 subs" artık aynı kaydı paylaşmaz). Yerleşik çeviriler noktalama ve uzatılmış kelimelerle çalışır ("holaaa", "merci!"). Önce cihaz içi seçildiğinde, cihaz içi motorun değiştirmeden geri verdiği satır artık atılmak yerine buluta gider. DeepL artık bir toplu işin kaynak dilini, biliniyorsa alıyor.

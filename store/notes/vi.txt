@@ -1,9 +1,5 @@
-Tính năng gõ bằng biểu tượng cảm xúc hiện đã hoạt động bình thường. Tab hoàn thành các biểu tượng cảm xúc và @đề cập của Kick và 7TV thay vì chèn bản dịch, các biểu tượng cảm xúc vẫn ở trong tin nhắn của bạn khi nó được dịch và bản xem trước không còn bao gồm danh sách của Kick hoặc bộ chọn biểu tượng cảm xúc.
+Một nút Discord, trong cửa sổ bật lên giữa "Xóa bộ nhớ đệm" và "Cài đặt" và ở cuối các tab Cài đặt, mở máy chủ của tiện ích: nhờ trợ giúp, báo bản dịch sai, đề xuất ý tưởng. Tab Giới thiệu cũng có liên kết đến Twitch Chat Translator, cùng tiện ích đó cho Twitch.
 
-Bản dịch chính xác hơn: tên thương hiệu và tên người (iPhone, YouTube, LeBron) không còn bị loại bỏ trước khi dịch và các @đề cập vẫn ở trong tin nhắn đã dịch.
+Ít từ trong chat bị nhận nhầm ngôn ngữ hơn: Hinglish, tiếng Nhật và tiếng Nga viết bằng chữ La-tinh, tiếng cười trong câu tiếng Anh và hơn thế nữa. Trên một bộ 500 dòng chat thật mới, số câu trả lời sai nhưng tự tin giảm từ 17 xuống 6. Các câu trả lời một từ bằng tiếng Trung, Nhật và Hàn nay được dịch, còn tiếng cười, tỷ số và điểm đánh giá vẫn bị bỏ qua.
 
-Các bộ lọc đã được làm lại: các bot Kick thực sự bị bỏ qua và bạn có thể thêm các bộ lọc của riêng mình, "Ẩn tin nhắn có chứa" giờ đây cũng ẩn những gì đã có trên màn hình và danh sách có thể được nhập lại.
-
-Tiện ích mở rộng nhẹ hơn trên mọi trang Kick và trên Chrome, công cụ trên thiết bị sẽ được cung cấp lại khi ngôn ngữ đích ở chế độ Tự động.
-
-Mới và tùy chọn: số liệu thống kê sử dụng hàng ngày ẩn danh, tắt trừ khi bạn đồng ý. Chúng không bao giờ chứa tin nhắn, tên hoặc kênh của bạn.
+Sửa lỗi: sau khi một dòng chuyển sang công cụ dự phòng, mọi dòng sau đó đều theo nó; thứ tự công cụ của bạn nay được khôi phục sau 60 giây. Con số vẫn đúng trong bản dịch đã lưu đệm ("100 subs" và "1000 subs" không còn dùng chung một mục). Bản dịch tích hợp hoạt động với dấu câu và từ kéo dài ("holaaa", "merci!"). Khi ưu tiên trên thiết bị, dòng mà công cụ trên thiết bị trả lại nguyên vẹn nay được chuyển lên đám mây thay vì bị bỏ. DeepL nay nhận ngôn ngữ nguồn của một lô khi đã biết.

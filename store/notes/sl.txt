@@ -1,9 +1,5 @@
-Tipkanje s čustvi zdaj deluje pravilno. Zavihek dopolni čustva in @omembe Kicka in 7TV, namesto da bi vstavil prevod, čustva ostanejo v vašem sporočilu, ko je prevedeno, predogled pa ne zajema več Kickovih seznamov ali izbirnika čustev.
+Gumb Discord v pojavnem oknu med Počisti predpomnilnik in Nastavitve ter na koncu zavihkov Nastavitve odpre strežnik razširitve: prosite za pomoč, sporočite slab prevod, predlagajte idejo. Zavihek O razširitvi vodi tudi do Twitch Chat Translator, iste razširitve za Twitch.
 
-Prevodi so natančnejši: imena blagovnih znamk in oseb (iPhone, YouTube, LeBron) pred prevajanjem niso več izpuščena, @omembe pa ostanejo v prevedenih sporočilih.
+Manj besed iz klepeta se prebere kot napačen jezik: Hinglish, romanizirana japonščina in ruščina, smeh znotraj angleškega stavka in drugo. Na novem naboru 500 resničnih vrstic klepeta so se napačni samozavestni odgovori zmanjšali s 17 na 6. Enobesedni odgovori v kitajščini, japonščini in korejščini so zdaj prevedeni, smeh, rezultati in ocene pa se še vedno preskočijo.
 
-Filtri so bili predelani: pravi Kick boti so prezrti in lahko dodate svoje, "Skrij sporočila, ki vsebujejo" zdaj tudi skrije, kar je že na zaslonu, in sezname je mogoče znova vnesti.
-
-Razširitev je lažja na vsaki strani Kick, v Chromu pa je mehanizem v napravi znova na voljo, ko je ciljni jezik nastavljen na Auto.
-
-Novo in neobvezno: anonimna dnevna statistika uporabe, izklopljena, razen če rečete da. Nikoli ne vsebujejo vaših sporočil, imen ali kanalov.
+Popravki: ko je ena vrstica šla v rezervni mehanizem, so ji sledile vse naslednje; vrstni red vaših mehanizmov se zdaj vrne po 60 sekundah. Številke ostanejo pravilne v predpomnjenih prevodih ("100 subs" in "1000 subs" si ne delita več vnosa). Vgrajeni prevodi delujejo z ločili in raztegnjenimi besedami ("holaaa", "merci!"). Če je najprej na vrsti mehanizem v napravi, gre vrstica, ki jo ta vrne nespremenjeno, zdaj v oblak in ni več zavržena. DeepL zdaj prejme izvorni jezik serije, kadar je znan.
