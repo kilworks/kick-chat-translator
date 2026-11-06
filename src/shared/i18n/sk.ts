@@ -78,9 +78,9 @@ export const sk: Record<string, string> = {
   'available ✓': 'dostupné ✓',
   'not supported in this browser': 'v tomto prehliadači nie je podporované',
   'Strategy': 'Stratégia',
-  'On-device first, cloud fallback (recommended)':
-    'Najprv v zariadení, potom cloud (odporúčané)',
-  'Cloud first, on-device fallback': 'Najprv cloud, potom v zariadení',
+  'On-device first, cloud fallback':
+    'Najprv v zariadení, potom cloud',
+  'Cloud first, on-device fallback (recommended)': 'Najprv cloud, potom v zariadení (odporúčané)',
   'On-device only (no network, no cloud)': 'Iba v zariadení (bez siete a cloudu)',
   'On-device = local Chromium models: unlimited, instant, private, no rate-limit. Each language needs a one-time model download (click a flag below, or the "Local" chip in chat).':
     'Preklad v zariadení používa lokálne modely Chromium: bez obmedzení, okamžite a súkromne. Každý jazyk vyžaduje jednorazové stiahnutie modelu (klikni na vlajku nižšie alebo na štítok „Lokálny“ v chate).',

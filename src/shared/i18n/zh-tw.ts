@@ -77,8 +77,8 @@ export const zh_tw: Record<string, string> = {
   'available ✓': '可用 ✓',
   'not supported in this browser': '此瀏覽器不支援',
   'Strategy': '策略',
-  'On-device first, cloud fallback (recommended)': '優先使用裝置端，雲端備援（建議）',
-  'Cloud first, on-device fallback': '優先使用雲端，裝置端備援',
+  'On-device first, cloud fallback': '優先使用裝置端，雲端備援',
+  'Cloud first, on-device fallback (recommended)': '優先使用雲端，裝置端備援（建議）',
   'On-device only (no network, no cloud)': '僅使用裝置端（不連網、不用雲端）',
   'On-device = local Chromium models: unlimited, instant, private, no rate-limit. Each language needs a one-time model download (click a flag below, or the "Local" chip in chat).':
     '裝置端翻譯使用 Chromium 的本機模型：不限量、即時、私密，也沒有頻率限制。每種語言需要先下載一次模型（點一下下方的旗幟，或聊天室中的「本機」標籤）。',

@@ -128,10 +128,10 @@ export const sv: Record<string, string> = {
     'stöds inte i den här webbläsaren',
   'Strategy':
     'Strategi',
-  'On-device first, cloud fallback (recommended)':
-    'Först på enheten, molnet som reserv (rekommenderas)',
-  'Cloud first, on-device fallback':
-    'Först molnet, enheten som reserv',
+  'On-device first, cloud fallback':
+    'Först på enheten, molnet som reserv',
+  'Cloud first, on-device fallback (recommended)':
+    'Först molnet, enheten som reserv (rekommenderas)',
   'On-device only (no network, no cloud)':
     'Bara på enheten (inget nätverk, inget moln)',
   'On-device = local Chromium models: unlimited, instant, private, no rate-limit. Each language needs a one-time model download (click a flag below, or the "Local" chip in chat).':

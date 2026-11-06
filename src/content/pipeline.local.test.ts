@@ -34,7 +34,7 @@ const domMsg = (text: string) => {
 };
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 const reader = (extra: Partial<Settings> = {}) =>
-  new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false, ...extra });
+  new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false, engineMode: 'local-first', ...extra });
 const localSource = () => local.translate.mock.calls[0]?.[0] as string | undefined;
 
 /**
