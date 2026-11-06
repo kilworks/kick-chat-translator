@@ -1,9 +1,5 @@
-Escribir con emoticones ahora funciona correctamente. Tab completa los emoticones y las @menciones de Kick y 7TV en lugar de insertar la traducción, los emoticones permanecen en su mensaje cuando se traduce y la vista previa ya no cubre las listas de Kick ni el selector de emoticones.
+Hay un botón de Discord en la ventana emergente, entre Borrar caché y Opciones, y al final de las pestañas de Opciones. Abre el servidor de la extensión: pida ayuda, avise de una mala traducción o proponga una idea. La pestaña Acerca de también enlaza con Twitch Chat Translator, la misma extensión para Twitch.
 
-Las traducciones son más precisas: los nombres de marcas y personas (iPhone, YouTube, LeBron) ya no se eliminan antes de traducir, y las @menciones permanecen en los mensajes traducidos.
+Se leen menos palabras del chat con el idioma equivocado: Hinglish, japonés y ruso romanizados, risas dentro de una frase en inglés y más. En un nuevo conjunto de 500 líneas reales de chat, las respuestas erróneas con mucha seguridad bajaron de 17 a 6. Las respuestas de una sola palabra en chino, japonés y coreano ahora se traducen, mientras que las risas, los resultados y las puntuaciones se siguen omitiendo.
 
-Los filtros fueron reelaborados: los bots Kick reales se ignoran y usted puede agregar los suyos propios. "Ocultar mensajes que contienen" ahora también oculta lo que ya está en la pantalla y las listas se pueden escribir nuevamente.
-
-La extensión es más ligera en cada página de Kick y en Chrome, el motor del dispositivo se ofrece nuevamente cuando el idioma de destino está en Auto.
-
-Nuevo y opcional: estadísticas de uso diario anónimas, desactivadas a menos que digas que sí. Nunca contienen sus mensajes, nombres o canales.
+Correcciones: cuando una línea pasaba a un motor de respaldo, todas las siguientes lo seguían; ahora el orden de sus motores vuelve a los 60 segundos. Los números se mantienen correctos en las traducciones en caché ("100 subs" y "1000 subs" ya no comparten entrada). Las traducciones integradas funcionan con signos de puntuación y palabras alargadas ("holaaa", "merci!"). Con la opción Primero en el dispositivo, una línea que el motor del dispositivo devuelve sin cambios ahora va a la nube en lugar de descartarse. DeepL ahora recibe el idioma de origen de un lote cuando se conoce.
