@@ -118,6 +118,12 @@ export const CHROME_STORE_URL = `https://chromewebstore.google.com/detail/kick-c
 /** Permanent invite to the extension's Discord server (shared with Twitch Chat Translator), lands in #welcome. */
 export const DISCORD_URL = 'https://discord.gg/x3AvjdmAUk';
 
+/** The sister extension, the same translator for Twitch chat: named in the About tab. */
+export const TWITCH_EXTENSION_URLS = {
+  chrome: 'https://chromewebstore.google.com/detail/twitch-chat-translator/cbfmiinjkceibkpdodaegnmpbeiempib',
+  firefox: 'https://addons.mozilla.org/firefox/addon/twitch-chat-translator-pkkls/',
+} as const;
+
 export const GITHUB_LATEST_RELEASE_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
 export const UPDATE_CHECK_TTL_MS = 6 * 60 * 60_000; // 6h
 
