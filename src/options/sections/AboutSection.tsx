@@ -3,6 +3,7 @@ import type { ProviderStatus, UsageStats } from '~/shared/types';
 import { useT } from '~/shared/i18nContext';
 import { LANGUAGES } from '~/shared/languages';
 import type { Settings } from '~/shared/settings';
+import { TWITCH_EXTENSION_URLS } from '~/shared/constants';
 import { Check } from '../components/Check';
 
 const estFirefox = (): boolean => {
@@ -160,9 +161,9 @@ export function AboutSection({
             href="https://github.com/Pkkls/kick-chat-translator/issues"
             label={t('Report an issue')}
           />
-          {/* Nom propre, pas de cle i18n : le meme projet pour Twitch. */}
+          {/* Nom propre, pas de cle i18n : le meme projet pour Twitch, sur le store du navigateur. */}
           <Lien
-            href="https://github.com/kilworks/twitch-chat-translator"
+            href={estFirefox() ? TWITCH_EXTENSION_URLS.firefox : TWITCH_EXTENSION_URLS.chrome}
             label="Twitch Chat Translator"
           />
         </ul>

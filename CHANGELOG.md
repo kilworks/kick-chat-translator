@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-11-08
+
+### Changed
+
+- **Cloud first is the default engine mode.** Blind judges scored the on-device
+  engine worse than Google on all six languages it served (penalty per line
+  1.38 against 0.90 on 454 outputs). Readers still on the old default,
+  on-device first, move to cloud first once; on-device only is never touched,
+  and picking on-device first again holds. For them, text the on-device model
+  used to handle now goes to the translation provider.
+- **Cloud first falls back to a ready on-device model** when the cloud fails,
+  as its label promised; it showed an error before.
+- The About tab sends Twitch Chat Translator to its store page (Chrome Web
+  Store or Firefox Add-ons, by browser) instead of the GitHub repository.
+
+### Fixed
+
+- **A line the engine hands back unchanged is asked again** with the channel's
+  language as the source, when no source hint was sent, the line has at least
+  two words, and the channel's language differs from the one the engine named
+  and from the reader's.
+- **Lines no table recognises are checked against the browser's own language
+  detector** (`i18n.detectLanguage`, Chrome and Firefox): a reliable browser
+  answer wins, our guess stands only when the browser agrees.
+- **Three rules no longer name the wrong language with certainty**: `niye`
+  (Turkish, romanised Bengali) is no longer Tagalog, `dat` after a Romanian
+  auxiliary is no longer Dutch, and `miks` is no longer a sure word.
+- **No stray brackets through MyMemory.** When MyMemory pulled a protected
+  name's placeholder apart, its pieces could show in the translation.
+
 ## [3.4.0] - 2026-11-06
 
 ### Added
