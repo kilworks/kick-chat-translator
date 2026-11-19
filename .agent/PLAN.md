@@ -37,6 +37,13 @@ D. store listing        store/
                         screenshots
    blocked on kil for review and submission
 
+UI COMFORT PASS (feat/ui-comfort), phase 0, sets named before spawning
+  P0-1 snapshots          test/e2e/snapshot.mjs (+ new test/e2e helper)
+  P0-2 popup height       test/e2e/measure-popup.mjs
+  P1-2 measurement        src/content/engineMode.combos.test.ts (new)
+  facts                   read-only
+   disjoint; i18n (keys.json, src/shared/i18n/*.ts) stays root-only
+
 A and B do not intersect and can run at once. C touches only harness files but
 reads dist/, so it serialises behind any build. D touches no code.
 ```
@@ -1570,3 +1577,52 @@ reads dist/, so it serialises behind any build. D touches no code.
 - [x] Both store listings at ten languages each, 31 fields inside their limits.
 - [x] AMO reviewer notes with a byte-reproducible build, verified by two
   consecutive runs producing one SHA-256.
+
+---
+
+## UI comfort pass (feat/ui-comfort, 2026-11-19)
+
+Born from P0-1 (the snapshots now render all six tabs) and from work on the
+surfaces touched this pass. Counted in the pass report.
+
+- [ ] **Options spacing under 8px, now visible on every tab** (`verify_spacing`,
+  kit 3.1.1): label to control 7.5px for 8 controls on Display (Translate
+  everything to, Text size, Line spacing, Font, Density, Accent colour, Chat
+  theme, Write my messages in) and 3 on Providers; 6px between the 68 source
+  language chips on Filters and the model chips on Providers; 7.9px under the
+  "Always ignored" hint on Filters. Extends P2-16 to the options page (phase 2).
+- [ ] **The rate-limit indicator in the chat bar is an emoji** (`⏳`,
+  `src/content/injector.ts`, `showThrottleIndicator`). The UI carries no emoji
+  by rule; a lucide icon from the kit's set replaces it.
+- [x] **Em dash as the empty value on the About tab** (now `-`) (`valeur={... '—'}`,
+  `AboutSection.tsx`, 3 occurrences). The UI carries no em dash by rule.
+- [ ] **P1-7, language half: a source-language allowlist is still silent on the
+  bar and in the popup.** The channel half is shown (bar label and tooltip,
+  popup card with a link to `#filters`). Languages are decided per line; showing
+  it needs a count of recent `lang_not_allowed` drops sent to the bar, the
+  decision log behind `recentDecisions()` already holds them.
+- [k] **Validate the popup direction** before phase 2 (options, chat): before
+  and after captures in `scratchpad/ui/popup/` (ignored), listed in the pass
+  report.
+- [k] **DeepL's free figure is not stated on one official page.** Support
+  search results give 500,000 characters a month for the API Free plan, and the
+  same support site says that plan can no longer be bought, replaced by a
+  Developer plan of 1,000,000 characters that do not reset. The options no
+  longer quote a figure ("Free keys end with :fx."). Putting one back needs a
+  decision on which plan the hint speaks to.
+- [k] **`local-only` with on-device off is migrated to on-device on.** That pair
+  translated nothing (`engineMode.combos.test.ts`); the migration keeps the "no
+  network" promise. A Firefox reader with that pair still gets nothing (no
+  on-device API) and is not told so.
+- [ ] **The popup sits at exactly 600px in one language, usual state** (ta or
+  th, measure-popup 2026-11-19). Every state fits in all 43 languages, with no
+  margin left there: the next string that grows in that language overflows.
+- [ ] **Design critique of the popup, items left after the first fixes**
+  (design-critic, 2026-11-19, verdict fix-then-ship; #1 to #4, #6, #7 and #10
+  done): one-size hierarchy (h1 at 14px like the select text, inner and outer
+  spacing both 12px); the update link's title is English and carries a `⬆`
+  glyph inside a translated string; `.kt-label` keeps `uppercase
+  tracking-wider` in Arabic, where letter spacing breaks the joining; Clear
+  cache gives no feedback when pressed.
+- [ ] **Text under 12px left on the options page** (P2-7, phase 2): the popup is
+  at 0, the options still carry `text-[10px]` and `text-[11px]`.
