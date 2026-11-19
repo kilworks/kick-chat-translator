@@ -443,5 +443,4 @@ export const sv: Record<string, string> = {
   "Always ignored:": "Ignoreras alltid:",
   "Other bots to ignore": "Andra bottar att ignorera",
   "one bot name per line": "ett bottnamn per rad",
-  "Work in progress": "Arbete pågår",
 };

@@ -275,5 +275,4 @@ export const sk: Record<string, string> = {
   "Always ignored:": "Vždy ignorovaní:",
   "Other bots to ignore": "Ďalší boti na ignorovanie",
   "one bot name per line": "jedno meno bota na riadok",
-  "Work in progress": "Prebiehajúca práca",
 };

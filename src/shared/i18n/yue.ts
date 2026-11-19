@@ -269,5 +269,4 @@ export const yue: Record<string, string> = {
   "Always ignored:": "一定唔理：",
   "Other bots to ignore": "其他要唔理嘅機械人",
   "one bot name per line": "每行一個機械人名",
-  "Work in progress": "開發中",
 };

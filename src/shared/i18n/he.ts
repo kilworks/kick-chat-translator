@@ -228,5 +228,4 @@ export const he: Record<string, string> = {
   "Always ignored:": "תמיד מתעלמים מ:",
   "Other bots to ignore": "בוטים נוספים להתעלמות",
   "one bot name per line": "שם בוט אחד בכל שורה",
-  "Work in progress": "עבודה בעיצומה",
 };

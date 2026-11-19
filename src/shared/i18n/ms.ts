@@ -228,5 +228,4 @@ export const ms: Record<string, string> = {
   "Always ignored:": "Sentiasa diabaikan:",
   "Other bots to ignore": "Bot lain untuk diabaikan",
   "one bot name per line": "satu nama bot setiap baris",
-  "Work in progress": "Kerja sedang berjalan",
 };

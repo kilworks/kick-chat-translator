@@ -228,5 +228,4 @@ export const ar: Record<string, string> = {
   "Always ignored:": "متجاهلة دائمًا:",
   "Other bots to ignore": "بوتات أخرى للتجاهل",
   "one bot name per line": "اسم بوت في كل سطر",
-  "Work in progress": "العمل قيد التقدم",
 };

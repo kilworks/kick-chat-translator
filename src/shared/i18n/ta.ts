@@ -228,5 +228,4 @@ export const ta: Record<string, string> = {
   "Always ignored:": "எப்போதும் புறக்கணிக்கப்படுவை:",
   "Other bots to ignore": "புறக்கணிக்க வேண்டிய பிற பாட்கள்",
   "one bot name per line": "ஒரு வரிக்கு ஒரு பாட் பெயர்",
-  "Work in progress": "வேலை நடந்து கொண்டிருக்கிறது",
 };

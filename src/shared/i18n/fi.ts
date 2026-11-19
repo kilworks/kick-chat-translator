@@ -228,5 +228,4 @@ export const fi: Record<string, string> = {
   "Always ignored:": "Aina ohitetaan:",
   "Other bots to ignore": "Muut ohitettavat botit",
   "one bot name per line": "yksi botin nimi riviä kohden",
-  "Work in progress": "Työ käynnissä",
 };

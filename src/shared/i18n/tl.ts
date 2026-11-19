@@ -228,5 +228,4 @@ export const tl: Record<string, string> = {
   "Always ignored:": "Laging hindi pinapansin:",
   "Other bots to ignore": "Iba pang bot na hindi papansinin",
   "one bot name per line": "isang pangalan ng bot bawat linya",
-  "Work in progress": "Kasalukuyang ginagawa",
 };

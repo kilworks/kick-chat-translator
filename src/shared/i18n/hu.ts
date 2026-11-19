@@ -228,5 +228,4 @@ export const hu: Record<string, string> = {
   "Always ignored:": "Mindig figyelmen kívül hagyva:",
   "Other bots to ignore": "További figyelmen kívül hagyandó botok",
   "one bot name per line": "soronként egy bot neve",
-  "Work in progress": "Munka folyamatban",
 };

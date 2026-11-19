@@ -228,5 +228,4 @@ export const no: Record<string, string> = {
   "Always ignored:": "Ignoreres alltid:",
   "Other bots to ignore": "Andre roboter som skal ignoreres",
   "one bot name per line": "ett robotnavn per linje",
-  "Work in progress": "Arbeid pågår",
 };

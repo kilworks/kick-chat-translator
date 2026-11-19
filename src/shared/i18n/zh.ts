@@ -269,5 +269,4 @@ export const zh: Record<string, string> = {
   "Always ignored:": "始终忽略：",
   "Other bots to ignore": "其他要忽略的机器人",
   "one bot name per line": "每行一个机器人名称",
-  "Work in progress": "开发中",
 };

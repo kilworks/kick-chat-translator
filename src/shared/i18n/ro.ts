@@ -228,5 +228,4 @@ export const ro: Record<string, string> = {
   "Always ignored:": "Ignorați mereu:",
   "Other bots to ignore": "Alți boți de ignorat",
   "one bot name per line": "un nume de bot pe linie",
-  "Work in progress": "Lucrări în curs",
 };

@@ -228,5 +228,4 @@ export const hi: Record<string, string> = {
   "Always ignored:": "हमेशा अनदेखे:",
   "Other bots to ignore": "अनदेखा करने के लिए अन्य बॉट",
   "one bot name per line": "हर पंक्ति में एक बॉट का नाम",
-  "Work in progress": "कार्य प्रगति पर है",
 };

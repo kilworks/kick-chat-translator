@@ -228,5 +228,4 @@ export const nl: Record<string, string> = {
   "Always ignored:": "Altijd genegeerd:",
   "Other bots to ignore": "Andere bots om te negeren",
   "one bot name per line": "één botnaam per regel",
-  "Work in progress": "Werk in uitvoering",
 };

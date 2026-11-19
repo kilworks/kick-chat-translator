@@ -228,5 +228,4 @@ export const bn: Record<string, string> = {
   "Always ignored:": "সবসময় উপেক্ষিত:",
   "Other bots to ignore": "উপেক্ষা করার অন্য বট",
   "one bot name per line": "প্রতি লাইনে একটি বটের নাম",
-  "Work in progress": "কাজ চলছে",
 };

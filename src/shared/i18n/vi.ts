@@ -228,5 +228,4 @@ export const vi: Record<string, string> = {
   "Always ignored:": "Luôn bỏ qua:",
   "Other bots to ignore": "Các bot khác cần bỏ qua",
   "one bot name per line": "mỗi dòng một tên bot",
-  "Work in progress": "Công việc đang được tiến hành",
 };

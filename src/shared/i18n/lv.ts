@@ -228,5 +228,4 @@ export const lv: Record<string, string> = {
   "Always ignored:": "Vienmēr ignorēti:",
   "Other bots to ignore": "Citi ignorējamie roboti",
   "one bot name per line": "viens robota vārds rindā",
-  "Work in progress": "Notiek darbs",
 };

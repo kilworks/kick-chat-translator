@@ -228,5 +228,4 @@ export const bg: Record<string, string> = {
   "Always ignored:": "Винаги пропускани:",
   "Other bots to ignore": "Други ботове за пропускане",
   "one bot name per line": "по едно име на бот на ред",
-  "Work in progress": "Работата е в ход",
 };

@@ -228,5 +228,4 @@ export const el: Record<string, string> = {
   "Always ignored:": "Πάντα παραβλέπονται:",
   "Other bots to ignore": "Άλλα bot προς παράβλεψη",
   "one bot name per line": "ένα όνομα bot ανά γραμμή",
-  "Work in progress": "Εργασίες σε εξέλιξη",
 };

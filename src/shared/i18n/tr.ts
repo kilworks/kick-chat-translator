@@ -228,5 +228,4 @@ export const tr: Record<string, string> = {
   "Always ignored:": "Her zaman yok sayılanlar:",
   "Other bots to ignore": "Yok sayılacak diğer botlar",
   "one bot name per line": "her satıra bir bot adı",
-  "Work in progress": "Çalışma devam ediyor",
 };

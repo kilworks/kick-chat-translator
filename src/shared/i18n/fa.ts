@@ -228,5 +228,4 @@ export const fa: Record<string, string> = {
   "Always ignored:": "همیشه نادیده گرفته می‌شوند:",
   "Other bots to ignore": "ربات‌های دیگر برای نادیده گرفتن",
   "one bot name per line": "در هر خط نام یک ربات",
-  "Work in progress": "کار در حال انجام است",
 };

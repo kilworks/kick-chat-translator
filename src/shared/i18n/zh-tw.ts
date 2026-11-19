@@ -269,5 +269,4 @@ export const zh_tw: Record<string, string> = {
   "Always ignored:": "一律忽略：",
   "Other bots to ignore": "其他要忽略的機器人",
   "one bot name per line": "每行一個機器人名稱",
-  "Work in progress": "開發中",
 };

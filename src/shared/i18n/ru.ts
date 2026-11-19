@@ -228,5 +228,4 @@ export const ru: Record<string, string> = {
   "Always ignored:": "Всегда игнорируются:",
   "Other bots to ignore": "Другие боты для игнорирования",
   "one bot name per line": "по одному имени бота в строке",
-  "Work in progress": "Работа в процессе",
 };

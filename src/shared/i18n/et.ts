@@ -228,5 +228,4 @@ export const et: Record<string, string> = {
   "Always ignored:": "Alati eiratud:",
   "Other bots to ignore": "Muud eiratavad robotid",
   "one bot name per line": "üks roboti nimi rea kohta",
-  "Work in progress": "Töö pooleli",
 };

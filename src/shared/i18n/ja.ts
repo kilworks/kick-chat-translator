@@ -228,5 +228,4 @@ export const ja: Record<string, string> = {
   "Always ignored:": "常に無視：",
   "Other bots to ignore": "無視するほかのボット",
   "one bot name per line": "1行に1つのボット名",
-  "Work in progress": "開発中",
 };

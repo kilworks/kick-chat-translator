@@ -228,5 +228,4 @@ export const ko: Record<string, string> = {
   "Always ignored:": "항상 무시:",
   "Other bots to ignore": "무시할 다른 봇",
   "one bot name per line": "한 줄에 봇 이름 하나",
-  "Work in progress": "작업 진행 중",
 };

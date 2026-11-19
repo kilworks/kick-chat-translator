@@ -228,5 +228,4 @@ export const ca: Record<string, string> = {
   "Always ignored:": "Sempre ignorats:",
   "Other bots to ignore": "Altres bots a ignorar",
   "one bot name per line": "un nom de bot per línia",
-  "Work in progress": "Treball en curs",
 };

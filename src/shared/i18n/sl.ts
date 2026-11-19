@@ -228,5 +228,4 @@ export const sl: Record<string, string> = {
   "Always ignored:": "Vedno prezrti:",
   "Other bots to ignore": "Drugi roboti za prezrtje",
   "one bot name per line": "eno ime robota na vrstico",
-  "Work in progress": "Delo v teku",
 };
