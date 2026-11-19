@@ -1648,3 +1648,5 @@ surfaces touched this pass. Counted in the pass report.
 - [ ] Sticky preview and the short-viewport fallback were checked by class only, not at 400% zoom in a real browser.
 - [ ] Switch forced-colors and busy focus: not seen in a real browser.
 - [ ] Translations of the 27 phase 2 keys: model-written, no native review.
+- [ ] The 42 localised READMEs still list Providers first and the DeepL key as always there in their Settings section (English fixed in phase 3); left for the existing [k] entry on localised READMEs.
+- [ ] `screenshots/japanese-chat.jpg` is tracked but shown nowhere (readme-drift HIDDEN, older than this pass): delete or show, kil's call.

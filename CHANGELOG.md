@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **The settings open on Display**, where the language and the look are. The
+  popup's "order in options" link still lands on Providers.
+- **Every on/off setting is a switch** that applies at once, in the settings and
+  in the popup alike.
+- **Font, density, chat theme and accent colour show their choices** as buttons
+  and named colour swatches instead of drop-down lists, all usable from the
+  keyboard. The style preview stays in view while you change them.
+- **Two settings that were checkboxes with "(off = ...)" are now plain two-way
+  choices**: what clicking the compose preview does, and which key swaps in the
+  translation. Saved choices are kept.
+- **Each translation engine says its state in words**: Ready, or Paused with the
+  reason and when it comes back. The DeepL card appears once DeepL is in the
+  order or a key is saved, and the key is hidden until you show it.
+- **The source language allowlist is a set of tick chips**, so an empty list no
+  longer reads as "nothing is translated", and it no longer scrolls inside the
+  page.
+- **Plainer words** on Providers, Advanced and Display, and no settings text
+  smaller than 12px.
+- **The popup** shows one main button per state, puts the version in the footer,
+  and hides the provider list on first run and while it asks about usage
+  statistics. Every state fits without a scrollbar in all 43 interface
+  languages.
+
+### Fixed
+
+- **A channel left out by your channel lists now says so**: the chat bar reads
+  "Not translated here" and the popup offers a way to Filters, instead of the
+  translations silently stopping.
+- **The engine settings can no longer contradict each other**: on-device only
+  keeps on-device translation on, and a profile saved with both is repaired once.
+- **Glossary lines written with `->` or `=>` work**, and lines the glossary
+  cannot read are listed under it.
+- The About tab no longer claims there is no tracking; it says anonymous counts
+  are sent only if you opt in.
+- The settings tab bar wraps on narrow windows instead of overlapping the
+  Discord link, and the interface language button shows a flag or a globe
+  next to "Auto".
+
 ## [3.5.0] - 2026-11-08
 
 ### Changed

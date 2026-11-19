@@ -107,11 +107,14 @@ the cloud chain takes over and nothing breaks.
 
 ## Settings
 
-Click the gear on the chat bar, or right-click the extension icon and choose Options.
+Click the gear on the chat bar, or right-click the extension icon and choose Options. The page opens on
+Display.
 
-- **Providers**: engine order, your DeepL key, and the mode: on-device first, cloud first, or on-device only
 - **Display**: target language, display style, original text and language badge, text size, line spacing,
-  typeface, accent colour, chat theme, the compose preview and what clicking it does
+  typeface, density, accent colour, chat theme, the compose preview, what clicking it does and which key
+  swaps in the translation
+- **Providers**: engine order with each engine's state, the mode (on-device first, cloud first, or
+  on-device only), and your DeepL key once DeepL is in the order
 - **Filters**: bots, users, channels, keywords, source languages, and a glossary of replacements
 - **Advanced**: cache size and lifetime, concurrent requests, a per-channel rate limit, backup and restore
 - **Activity**: messages translated, cache hits, every language seen in chat, and why each of the last 50
