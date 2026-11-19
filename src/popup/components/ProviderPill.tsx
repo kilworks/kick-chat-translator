@@ -14,19 +14,23 @@ interface Props {
 
 export function ProviderPill({ status }: Props) {
   const t = useT();
-  const tone = status.available
-    ? 'border-kick-primary/40 text-kick-primary bg-kick-primary/10'
-    : 'border-red-500/30 text-red-300 bg-red-500/10';
+  // A status, not a control: no border or fill that reads as a button. The
+  // dot and the colour of the name carry the state.
+  const tone = status.available ? 'text-kick-text' : 'text-red-300';
   const label = LABELS[status.id] ?? status.id;
   return (
     <span
-      class={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] ${tone}`}
+      class={`inline-flex items-center gap-1.5 text-xs ${tone}`}
       title={status.lastError ?? (status.available ? t('available') : t('unavailable'))}
     >
+      {/* Not colour alone: a down engine gets a hollow ring, and the state is
+          read out, not left to a hover-only title. */}
       <span
-        class={`h-1.5 w-1.5 rounded-full ${status.available ? 'bg-kick-primary' : 'bg-red-400'}`}
+        aria-hidden="true"
+        class={`h-2 w-2 rounded-full ${status.available ? 'bg-kick-primary' : 'border-2 border-red-400'}`}
       />
       {label}
+      <span class="sr-only">{status.available ? t('available') : t('unavailable')}</span>
     </span>
   );
 }

@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const it: Record<string, string> = {
+  barBlocked: 'Non tradotto qui',
+  barBlockedTipBlack: 'Questo canale è tra i tuoi canali bloccati (Opzioni, Filtri)',
+  barBlockedTipWhite: 'Questo canale non è tra i tuoi canali consentiti (Opzioni, Filtri)',
+  barCount: 'Tradotti in questa pagina: $N$',
   barLangDir: 'La chat degli altri spettatori, tradotta per te',
   barOff: 'Traduzione disattivata',
   barOn: 'Traduzione in corso',

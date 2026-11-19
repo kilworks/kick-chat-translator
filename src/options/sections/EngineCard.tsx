@@ -77,12 +77,33 @@ export function EngineCard({ settings, onPatch }: Props) {
         </span>
       </div>
 
+      {/* One concept, two fields: the switch comes first and drives the
+          strategy, so "on-device only" with on-device off (which translated
+          nothing, engineMode.combos.test.ts) cannot be made here. Browsers
+          without the API keep both as they were. */}
+      <div class="kt-setting">
+        <Check
+          checked={settings.localEnabled}
+          onChange={(v) => onPatch({ localEnabled: v })}
+          label={t('Enable on-device translation')}
+          disabled={present && settings.engineMode === 'local-only'}
+          hint={
+            present && settings.engineMode === 'local-only'
+              ? t('Stays on while the strategy is on-device only.')
+              : undefined
+          }
+          reverse
+        />
+      </div>
+
       <div class="kt-row">
-        <label class="kt-label">{t('Strategy')}</label>
+        <label class="kt-label" for="kt-engine-mode">{t('Strategy')}</label>
         <select
+          id="kt-engine-mode"
           aria-label={t('Strategy')}
           class="kt-select"
           value={settings.engineMode}
+          disabled={present && !settings.localEnabled}
           onChange={(e) =>
             onPatch({ engineMode: (e.target as HTMLSelectElement).value as Settings['engineMode'] })
           }
@@ -92,19 +113,12 @@ export function EngineCard({ settings, onPatch }: Props) {
           <option value="local-only">{t('On-device only (no network, no cloud)')}</option>
         </select>
         <p class="text-[11px] text-kick-muted">
-          {t(
-            'On-device = local Chromium models: unlimited, instant, private, no rate-limit. Each language needs a one-time model download (click a flag below, or the "Local" chip in chat).',
-          )}
+          {present && !settings.localEnabled
+            ? t('On-device is off, so the cloud engines translate everything.')
+            : t(
+                'On-device = local Chromium models: unlimited, instant, private, no rate-limit. Each language needs a one-time model download (click a flag below, or the "Local" chip in chat).',
+              )}
         </p>
-      </div>
-
-      <div class="kt-setting">
-        <Check
-          checked={settings.localEnabled}
-          onChange={(v) => onPatch({ localEnabled: v })}
-          label={t('Enable on-device translation')}
-          reverse
-        />
       </div>
 
       {present && (

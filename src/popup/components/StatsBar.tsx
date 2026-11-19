@@ -12,7 +12,9 @@ export function StatsBar({ stats }: Props) {
 
   return (
     <div class="flex flex-col gap-2 pt-1">
-      <div class="grid grid-cols-3 gap-2 text-center">
+      {/* Columns sized by their content: equal thirds wrapped a long label
+          (Greek "cache", two words) onto a second line and the popup to 604px. */}
+      <div class="flex justify-between gap-2 text-center">
         <Stat label={t('requests')} value={stats.totalRequests} />
         <Stat label={t('cache')} value={`${hitRate}%`} />
         <Stat
@@ -44,7 +46,7 @@ function Stat({
   return (
     <div class="flex flex-col">
       <span class={`text-base font-semibold ${color}`}>{value}</span>
-      <span class="text-[10px] uppercase tracking-wide text-kick-muted">{label}</span>
+      <span class="text-xs uppercase text-kick-muted">{label}</span>
     </div>
   );
 }

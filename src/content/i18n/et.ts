@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const et: Record<string, string> = {
+  barBlocked: 'Siin ei tõlgita',
+  barBlockedTipBlack: 'See kanal on sinu blokeeritud kanalite loendis (Seaded, Filtrid)',
+  barBlockedTipWhite: 'See kanal ei ole sinu lubatud kanalite loendis (Seaded, Filtrid)',
+  barCount: 'Tõlgitud sellel lehel: $N$',
   barLangDir: 'Teiste vaatajate vestlus, sinu jaoks tõlgitud',
   barOff: 'Tõlge väljas',
   barOn: 'Tõlge sees',

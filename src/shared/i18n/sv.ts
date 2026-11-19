@@ -4,8 +4,6 @@ export const sv: Record<string, string> = {
     'inställningar',
   'saved':
     'sparat',
-  'ready':
-    'redo',
   'Providers':
     'Tjänster',
   'Display':
@@ -18,8 +16,6 @@ export const sv: Record<string, string> = {
     'Aktivitet',
   'About':
     'Om',
-  'Kick Chat Translator listens to chat in real time and translates non-English (or non-target-language) messages right under the original. No tracking, no account, fully open-source.':
-    'Kick Chat Translator följer chatten i realtid och översätter meddelanden som inte är på engelska (eller på målspråket) direkt under originalet. Ingen spårning, inget konto, helt öppen källkod.',
   'Links':
     'Länkar',
   'GitHub repository':
@@ -84,8 +80,6 @@ export const sv: Record<string, string> = {
     'Förhandsvisning när du skriver',
   'Translate everything to':
     'Översätt allt till',
-  'Auto (your browser language)':
-    'Auto (webbläsarens språk)',
   'Auto reads incoming chat in your own language, detected from the browser.':
     'Auto läser inkommande chatt på ditt eget språk, hämtat från webbläsaren.',
   'Write my messages in':
@@ -158,10 +152,8 @@ export const sv: Record<string, string> = {
     'Blockerade kanaler',
   'User blocklist':
     'Blockerade användare',
-  'Cloud fallback chain':
-    'Reservkedja i molnet',
-  'Used when on-device is off or a language pair isn\'t downloaded. Providers are tried in order; failing ones are temporarily skipped (exponential cooldown).':
-    'Används när översättning på enheten är avstängd eller språkparet inte är nedladdat. Tjänsterna provas i ordning, och de som fallerar hoppas tillfälligt över (med exponentiellt växande väntetid).',
+  'Cloud engines':
+    'Molnmotorer',
   'ok':
     'ok',
   'down':
@@ -172,8 +164,8 @@ export const sv: Record<string, string> = {
     'DeepL (bäst kvalitet, kräver nyckel)',
   'MyMemory (free, ~1000/day)':
     'MyMemory (gratis, ca 1 000/dag)',
-  'Lingva (LibreTranslate front, configurable)':
-    'Lingva (gränssnitt för LibreTranslate, konfigurerbart)',
+  'Lingva (Google Translate front end, configurable)':
+    'Lingva (Google Translate-gränssnitt, konfigurerbart)',
   'API key':
     'API-nyckel',
   'Plan':
@@ -362,8 +354,8 @@ export const sv: Record<string, string> = {
     'Alltid ljust',
   'Remember a reading language per channel':
     'Kom ihåg lässpråk per kanal',
-  'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, no tracking, open source.':
-    'Kick Chat Translator läser chatten när meddelandena kommer och lägger en översättning under varje meddelande, på det språk du läser. Det översätter också det du skriver innan du skickar. Inget konto, ingen spårning, öppen källkod.',
+  'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.':
+    'Kick Chat Translator läser chatten när meddelandena kommer och lägger en översättning under varje meddelande, på det språk du läser. Det översätter också det du skriver innan du skickar. Inget konto, öppen källkod, och anonym statistik bara om du säger ja.',
   'Version':
     'Version',
   'Languages':
@@ -430,8 +422,8 @@ export const sv: Record<string, string> = {
     'Öppna en Kick-kanal: chatten översätts när meddelandena kommer.',
   'Open Kick':
     'Öppna Kick',
-  'Free plan: 1,000,000 characters a month. Free keys end with :fx.':
-    'Gratisabonnemang: 1 000 000 tecken per månad. Gratisnycklar slutar på :fx.',
+  'Free keys end with :fx.':
+    'Gratisnycklar slutar på :fx.',
   'Get a key:':
     'Skaffa en nyckel:',
   "Help improve Kick Chat Translator?": "Vill du hjälpa till att förbättra Kick Chat Translator?",
@@ -443,4 +435,13 @@ export const sv: Record<string, string> = {
   "Always ignored:": "Ignoreras alltid:",
   "Other bots to ignore": "Andra bottar att ignorera",
   "one bot name per line": "ett bottnamn per rad",
+  'Ignored, write them as word -> replacement:': 'Ignoreras, skriv dem som ord -> ersättning:',
+  'Stays on while the strategy is on-device only.': 'Förblir på så länge strategin bara är på enheten.',
+  'On-device is off, so the cloud engines translate everything.': 'Översättning på enheten är avstängd, så molnmotorerna översätter allt.',
+  'Not used: the strategy above is on-device only.': 'Används inte: strategin ovan är bara på enheten.',
+  'Tried in this order. One that fails is skipped for a while.': 'Provas i den här ordningen. En som fallerar hoppas över ett tag.',
+  'Tried first, in this order. One that fails is skipped for a while. On-device steps in when they all fail.': 'Provas först, i den här ordningen. En som fallerar hoppas över ett tag. Översättning på enheten tar över om alla fallerar.',
+  'Used when on-device cannot translate a line, in this order. One that fails is skipped for a while.': 'Används när översättning på enheten inte klarar en rad, i den här ordningen. En som fallerar hoppas över ett tag.',
+  'Not translated: this channel is on your blocked list.': 'Inte översatt: den här kanalen finns på din blockeringslista.',
+  'Not translated: this channel is not on your allowed list.': 'Inte översatt: den här kanalen finns inte på din lista över tillåtna.',
 };

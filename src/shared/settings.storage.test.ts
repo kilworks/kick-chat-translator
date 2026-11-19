@@ -161,3 +161,28 @@ describe('the one move off the old default', () => {
     expect(syncedBlob()?.engineModeMoved).toBe(true);
   });
 });
+
+// "On-device only" with on-device switched off translated nothing at all
+// (engineMode.combos.test.ts). The mode is the stronger promise, no network,
+// so it is the switch that follows, and every other pair stays as saved.
+describe('the contradictory engine pair', () => {
+  const stored = (extra: Record<string, unknown>) =>
+    env.sync.set(STORAGE_KEY_SETTINGS, { ...defaultSettings(), ...extra });
+
+  it('turns on-device back on under local-only, and writes it down', async () => {
+    stored({ engineMode: 'local-only', localEnabled: false, targetLang: 'fr' });
+    const s = await loadSettings();
+    expect(s).toMatchObject({ engineMode: 'local-only', localEnabled: true, targetLang: 'fr' });
+    expect(syncedBlob()).toMatchObject({ engineMode: 'local-only', localEnabled: true });
+  });
+
+  it('leaves the five other pairs exactly as saved', async () => {
+    for (const engineMode of ['local-first', 'cloud-first', 'local-only'] as const) {
+      for (const localEnabled of [true, false]) {
+        if (engineMode === 'local-only' && !localEnabled) continue;
+        stored({ engineMode, localEnabled });
+        expect(await loadSettings()).toMatchObject({ engineMode, localEnabled });
+      }
+    }
+  });
+});

@@ -7,6 +7,7 @@ import { useT } from '~/shared/i18nContext';
 import { Check } from '../components/Check';
 import { flagClass } from '~/shared/flags';
 import { KICK_BOTS } from '~/shared/constants';
+import { ignoredGlossaryLines } from '~/shared/glossary';
 
 interface Props {
   settings: Settings;
@@ -245,11 +246,18 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
           id="kt-glossary"
           label={t('Glossary')}
           hideLabel
-          placeholder={`${t('one rule per line, in the form word→replacement')}\n草→lol\nkusa→lol`}
+          placeholder={`${t('one rule per line, in the form word→replacement')}\n草→lol\nkusa->lol`}
           value={settings.glossary}
           parse={toLines}
           onCommit={(v) => onPatch({ glossary: v })}
         />
+        {/* A line without an arrow used to be dropped without a word. */}
+        {ignoredGlossaryLines(settings.glossary).length > 0 && (
+          <p role="status" class="text-xs text-red-300">
+            {t('Ignored, write them as word -> replacement:')}{' '}
+            <span class="font-mono">{ignoredGlossaryLines(settings.glossary).join(', ')}</span>
+          </p>
+        )}
       </section>
     </>
   );

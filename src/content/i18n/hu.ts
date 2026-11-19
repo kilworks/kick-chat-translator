@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const hu: Record<string, string> = {
+  barBlocked: 'Itt nincs fordítva',
+  barBlockedTipBlack: 'Ez a csatorna a letiltottak listáján van (Beállítások, Szűrők)',
+  barBlockedTipWhite: 'Ez a csatorna nincs az engedélyezettek listáján (Beállítások, Szűrők)',
+  barCount: 'Lefordítva ezen az oldalon: $N$',
   barLangDir: 'A többi néző csevegése, lefordítva neked',
   barOff: 'Fordítás kikapcsolva',
   barOn: 'Fordítás folyamatban',

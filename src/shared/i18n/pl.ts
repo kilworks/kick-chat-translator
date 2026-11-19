@@ -2,15 +2,12 @@
 export const pl: Record<string, string> = {
   'options & preferences': 'opcje i preferencje',
   'saved': 'zapisano',
-  'ready': 'gotowe',
   'Providers': 'Dostawcy',
   'Display': 'Wyświetlanie',
   'Filters': 'Filtry',
   'Advanced': 'Zaawansowane',
   'Activity': 'Aktywność',
   'About': 'Informacje',
-  'Kick Chat Translator listens to chat in real time and translates non-English (or non-target-language) messages right under the original. No tracking, no account, fully open-source.':
-    'Kick Chat Translator śledzi czat na żywo i tłumaczy wiadomości nieangielskie (lub w innym języku niż docelowy) tuż pod oryginałem. Bez śledzenia, bez konta, w pełni open source.',
   'Links': 'Linki',
   'GitHub repository': 'Repozytorium GitHub',
   'Privacy policy': 'Polityka prywatności',
@@ -51,7 +48,6 @@ export const pl: Record<string, string> = {
   'Display style': 'Styl wyświetlania',
   'Compose preview': 'Podgląd pisanej wiadomości',
   'Translate everything to': 'Tłumacz wszystko na',
-  'Auto (your browser language)': 'Automatycznie (język przeglądarki)',
   'Auto reads incoming chat in your own language, detected from the browser.':
     'Tryb automatyczny pokazuje czat w Twoim języku, wykrytym na podstawie przeglądarki.',
   'Write my messages in': 'Tłumacz moje wiadomości na',
@@ -97,16 +93,14 @@ export const pl: Record<string, string> = {
   'Channel allowlist (only translate on these)': 'Dozwolone kanały (tłumacz tylko na nich)',
   'Channel blocklist': 'Zablokowane kanały',
   'User blocklist': 'Zablokowani użytkownicy',
-  'Cloud fallback chain': 'Zapasowi dostawcy w chmurze',
-  "Used when on-device is off or a language pair isn't downloaded. Providers are tried in order; failing ones are temporarily skipped (exponential cooldown).":
-    'Używani, gdy tłumaczenie na urządzeniu jest wyłączone lub nie pobrano danej pary języków. Dostawcy są wywoływani po kolei; ci, którzy zawodzą, są chwilowo pomijani (z coraz dłuższą przerwą).',
+  'Cloud engines': 'Silniki w chmurze',
   'ok': 'OK',
   'down': 'nie działa',
   'Google Translate (free, no key)': 'Google Translate (za darmo, bez klucza)',
   'DeepL (best quality, needs key)': 'DeepL (najlepsza jakość, wymaga klucza)',
   'MyMemory (free, ~1000/day)': 'MyMemory (za darmo, ok. 1000 dziennie)',
-  'Lingva (LibreTranslate front, configurable)':
-    'Lingva (nakładka na LibreTranslate, konfigurowalna)',
+  'Lingva (Google Translate front end, configurable)':
+    'Lingva (nakładka na Google Translate, konfigurowalna)',
   'API key': 'Klucz API',
   'Plan': 'Plan',
   'Free (api-free.deepl.com)': 'Darmowy (api-free.deepl.com)',
@@ -217,8 +211,8 @@ export const pl: Record<string, string> = {
   'Always dark': 'Zawsze ciemny',
   'Always light': 'Zawsze jasny',
   'Remember a reading language per channel': 'Zapamiętuj język czytania osobno dla każdego kanału',
-  'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, no tracking, open source.':
-    'Kick Chat Translator czyta czat na bieżąco i pod każdą wiadomością wstawia tłumaczenie na język, w którym czytasz. Tłumaczy też to, co piszesz, zanim to wyślesz. Bez konta, bez śledzenia, open source.',
+  'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.':
+    'Kick Chat Translator czyta czat na bieżąco i pod każdą wiadomością wstawia tłumaczenie na język, w którym czytasz. Tłumaczy też to, co piszesz, zanim to wyślesz. Bez konta, open source, a anonimowe statystyki tylko wtedy, gdy się zgodzisz.',
   'Version': 'Wersja',
   'Languages': 'Języki',
   'Providers ready': 'Gotowi dostawcy',
@@ -263,8 +257,8 @@ export const pl: Record<string, string> = {
   'Open a Kick channel: its chat is translated as it arrives.':
     'Otwórz kanał na Kick: jego czat jest tłumaczony na bieżąco.',
   'Open Kick': 'Otwórz Kick',
-  'Free plan: 1,000,000 characters a month. Free keys end with :fx.':
-    'Plan darmowy: 1 000 000 znaków miesięcznie. Darmowe klucze kończą się na :fx.',
+  'Free keys end with :fx.':
+    'Darmowe klucze kończą się na :fx.',
   'Get a key:': 'Zdobądź klucz:',
   "Help improve Kick Chat Translator?": "Pomożesz ulepszyć Kick Chat Translator?",
   "Once a day, anonymous counts: engines used, errors, speed. Never your messages, names or channels.": "Raz dziennie anonimowe liczniki: użyte silniki, błędy, szybkość. Nigdy twoje wiadomości, nazwy ani kanały.",
@@ -275,4 +269,13 @@ export const pl: Record<string, string> = {
   "Always ignored:": "Zawsze ignorowane:",
   "Other bots to ignore": "Inne boty do ignorowania",
   "one bot name per line": "jedna nazwa bota na wiersz",
+  'Ignored, write them as word -> replacement:': 'Ignorowane, zapisz je jako słowo -> zamiennik:',
+  'Stays on while the strategy is on-device only.': 'Pozostaje włączone, dopóki strategia to tylko na urządzeniu.',
+  'On-device is off, so the cloud engines translate everything.': 'Tłumaczenie na urządzeniu jest wyłączone, więc wszystko tłumaczą silniki w chmurze.',
+  'Not used: the strategy above is on-device only.': 'Nieużywane: strategia powyżej to tylko na urządzeniu.',
+  'Tried in this order. One that fails is skipped for a while.': 'Próbowane w tej kolejności. Ten, który zawodzi, jest na jakiś czas pomijany.',
+  'Tried first, in this order. One that fails is skipped for a while. On-device steps in when they all fail.': 'Próbowane najpierw, w tej kolejności. Ten, który zawodzi, jest na jakiś czas pomijany. Gdy zawiodą wszystkie, włącza się tłumaczenie na urządzeniu.',
+  'Used when on-device cannot translate a line, in this order. One that fails is skipped for a while.': 'Używane, gdy tłumaczenie na urządzeniu nie poradzi sobie z wierszem, w tej kolejności. Ten, który zawodzi, jest na jakiś czas pomijany.',
+  'Not translated: this channel is on your blocked list.': 'Nie przetłumaczono: ten kanał jest na twojej liście zablokowanych.',
+  'Not translated: this channel is not on your allowed list.': 'Nie przetłumaczono: tego kanału nie ma na twojej liście dozwolonych.',
 };

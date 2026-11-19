@@ -236,6 +236,14 @@ export async function loadSettings(): Promise<Settings> {
     await chrome.storage.sync.set({ [STORAGE_KEY_SETTINGS]: withoutKey(base) }).catch(() => undefined);
   }
 
+  // "On-device only" with on-device switched off skipped every line. The mode is
+  // the stronger promise (no network), so the switch follows it; the options
+  // page no longer lets the pair be made. No flag: the pair is never valid.
+  if (base.engineMode === 'local-only' && !base.localEnabled) {
+    base = { ...base, localEnabled: true };
+    await chrome.storage.sync.set({ [STORAGE_KEY_SETTINGS]: withoutKey(base) }).catch(() => undefined);
+  }
+
   // Migration from a build that synced the key. Land it locally BEFORE clearing
   // it from sync: if the local write fails, sync still holds the only copy and
   // the next load retries; if the clear fails, the key is briefly in both places

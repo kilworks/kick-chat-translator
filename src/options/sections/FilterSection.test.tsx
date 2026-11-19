@@ -87,3 +87,24 @@ describe('source language allowlist', () => {
     expect(rows(el)).toHaveLength(LANGUAGES.length);
   });
 });
+
+// A glossary line without an arrow used to vanish without a word.
+describe('glossary', () => {
+  it('names the lines it cannot read, and only those', () => {
+    host = document.createElement('div');
+    document.body.appendChild(host);
+    const settings = { ...defaultSettings(), glossary: ['kusa->lol', 'kusa=lol'] };
+    render(<FilterSection settings={settings} onPatch={() => {}} />, host);
+    const status = [...host.querySelectorAll('[role=status]')].find((n) => n.textContent?.includes('kusa'));
+    expect(status?.textContent).toContain('kusa=lol');
+    expect(status?.textContent).not.toContain('kusa->lol');
+  });
+
+  it('says nothing when every line reads', () => {
+    host = document.createElement('div');
+    document.body.appendChild(host);
+    const settings = { ...defaultSettings(), glossary: ['kusa->lol', '草→lol'] };
+    render(<FilterSection settings={settings} onPatch={() => {}} />, host);
+    expect(host.textContent).not.toContain('word -> replacement:');
+  });
+});

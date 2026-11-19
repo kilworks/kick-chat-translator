@@ -4,6 +4,7 @@ import { defaultSettings } from '~/shared/settings';
 import { sortedLanguages } from '~/shared/languages';
 import { send } from '~/shared/messages';
 import { extractChannelSlug } from '~/content/kickApi';
+import { channelBlockedBy } from '~/content/filters';
 import { I18nProvider } from '~/shared/i18nContext';
 import { DiscordLink } from '~/shared/discord';
 import { makeT, resolveUiLocale, isRtlLocale } from '~/shared/i18n';
@@ -92,11 +93,21 @@ export function App() {
   }
 
   const pausedHere = settings.enabled && !!channel && settings.pausedChannels.includes(channel);
+  // A channel list that keeps this channel out, said here with the way to it:
+  // the Advanced tab's own advice was "reset everything" when this happened.
+  const blockedHere = settings.enabled && !!channel && !pausedHere ? channelBlockedBy(settings, channel) : undefined;
   // Quelqu'un qui n'a encore rien traduit, et qui ouvre le popup ailleurs que
   // sur Kick : des reglages ne lui disent pas quoi faire. Un historique vide
   // distingue un nouvel installe d'un habitue un jour calme.
   const firstRun =
     !onKick && !!stats && stats.totalRequests === 0 && !(stats.history?.length ?? 0);
+
+  const asking = !settings.usageStatsAsked && !pausedHere && !firstRun && !blockedHere;
+  // One green button per state: the action this state is about takes it, and
+  // Options steps down to a ghost while that action is on screen. The stats
+  // question has no green of its own (equal answers), so Options steps down
+  // there too and the question is the one thing in focus.
+  const otherPrimary = firstRun || pausedHere || !!blockedHere;
 
   function openOptions() {
     void chrome.runtime.openOptionsPage();
@@ -109,12 +120,9 @@ export function App() {
           <div class="flex h-6 w-6 items-center justify-center rounded bg-kick-primary text-kick-dark font-black text-sm">
             K
           </div>
-          <div class="flex flex-col">
-            <span class="text-sm font-semibold text-kick-text">Kick Chat Translator</span>
-            <span class="text-[10px] text-kick-muted">
-              v{chrome.runtime.getManifest().version} · {savedAt ? t('saved') : t('ready')}
-            </span>
-          </div>
+          {/* The version line moved to the footer: "ready" told nothing, and
+              the row cost 16px in a popup measured to the pixel. */}
+          <h1 class="text-sm font-semibold text-kick-text">Kick Chat Translator</h1>
           <div class="ms-auto">
             <Toggle
               checked={settings.enabled}
@@ -142,21 +150,46 @@ export function App() {
           </section>
         )}
 
+        {blockedHere && (
+          <section class="kt-card flex items-center justify-between gap-2" role="status">
+            <span class="text-xs text-kick-text">
+              {blockedHere === 'channel_blacklisted'
+                ? t('Not translated: this channel is on your blocked list.')
+                : t('Not translated: this channel is not on your allowed list.')}
+            </span>
+            <button
+              type="button"
+              class="kt-btn shrink-0"
+              onClick={() =>
+                void chrome.tabs.create({ url: chrome.runtime.getURL('src/options/index.html#filters') })
+              }
+            >
+              {t('Filters')}
+            </button>
+          </section>
+        )}
+
         {/* Asked once, opt-in. Firefox asks in its own install prompt, and the
             worker records that answer as usageStatsAsked, so this never shows there. */}
         {/* Compact on purpose: the popup has a 600px budget (measure-popup) and
             this takes the stats block's place. Not asked while paused, where
             there is no block to give up; it waits for the next opening. */}
-        {!settings.usageStatsAsked && !pausedHere && (
+        {/* Not on a first run either: "Open Kick" is the one thing to do then,
+            and the two cards together overflowed 600px (649 to 681px). */}
+        {asking && (
           <section
-            class="kt-card flex items-center gap-2 !py-2"
+            class="kt-card flex flex-col gap-2 !py-2"
             aria-label={t('Help improve Kick Chat Translator?')}
           >
-            <span class="text-xs text-kick-muted">
+            <span class="text-xs text-kick-text">
               {t('Once a day, anonymous counts: engines used, errors, speed. Never your messages, names or channels.')}
             </span>
-            <div class="flex shrink-0 flex-col gap-1">
-              <button class="kt-btn" onClick={() => void patchMany({ usageStats: true, usageStatsAsked: true })}>
+            {/* Same weight for both answers: a filled "Share" next to a ghost
+                "No thanks" pushed the reader toward yes. Under the text, not
+                beside it: beside it, Tamil wrapped the sentence over 12 lines
+                (760px popup). */}
+            <div class="flex flex-wrap gap-2">
+              <button class="kt-btn-ghost" onClick={() => void patchMany({ usageStats: true, usageStatsAsked: true })}>
                 {t('Share')}
               </button>
               <button class="kt-btn-ghost" onClick={() => void patchMany({ usageStats: false, usageStatsAsked: true })}>
@@ -177,7 +210,7 @@ export function App() {
 
         {update?.updateAvailable && (
           <a
-            class="kt-btn flex items-center justify-center gap-1.5 text-xs font-semibold no-underline"
+            class={`${otherPrimary ? 'kt-btn-ghost' : 'kt-btn'} flex items-center justify-center gap-1.5 text-xs font-semibold no-underline`}
             href={update.releaseUrl}
             target="_blank"
             rel="noreferrer"
@@ -203,9 +236,10 @@ export function App() {
             ))}
           </select>
 
-          <div class="flex gap-2">
-            <div class="flex-1">
-              <label class="kt-label mb-1 block">{t('Display')}</label>
+          {/* 16px above, 8px below: the label belongs to the select under it,
+              not to the language picker it used to sit midway from. */}
+          <div class="pt-2">
+            <label class="kt-label mb-2 block">{t('Display')}</label>
               <select
                 aria-label={t('Display')}
                 class="kt-select"
@@ -222,10 +256,9 @@ export function App() {
                 <option value="replace">{t('Replace')}</option>
                 <option value="hover">{t('On hover')}</option>
               </select>
-            </div>
           </div>
 
-          <div class="flex items-center gap-2 pt-1">
+          <div class="flex items-center gap-2">
             <Toggle
               checked={settings.showOriginal}
               onChange={(v) => void patch('showOriginal', v)}
@@ -245,11 +278,13 @@ export function App() {
 
         <section class="kt-card flex flex-col gap-2">
           <div class="flex items-center justify-between">
+            {/* The heading is the switch's visible name: a second "Enable" next
+                to the header's own one said nothing new and wrapped the
+                heading onto two lines in bg, el and ta. */}
             <span class="kt-label">{t('Translate what I type')}</span>
             <Toggle
               checked={settings.composeEnabled}
               onChange={(v) => void patch('composeEnabled', v)}
-              label={t('Enable')}
               srLabel={t('Translate what I type')}
             />
           </div>
@@ -281,19 +316,27 @@ export function App() {
           )}
         </section>
 
+        {/* Not on a first run: nothing has been translated yet, so the engines
+            have no status to report, and the card pushed the popup past its
+            600px budget (measure-popup, first-run state). Not while the stats
+            question is asked either, a one-time state that already gives up
+            the day's numbers: with both, Tamil measured 648px. */}
+        {!firstRun && !asking && (
         <section class="kt-card flex flex-col gap-2">
           <div class="flex items-center justify-between">
             <span class="kt-label">{t('Providers')}</span>
-            <span class="text-[10px] text-kick-muted">{t('order in options')}</span>
+            <button type="button" class="kt-link" onClick={openOptions}>
+              {t('order in options')}
+            </button>
           </div>
-          <div class="flex flex-wrap gap-1.5">
+          <div class="flex flex-wrap gap-x-3 gap-y-2">
             {providers.map((p) => (
               <ProviderPill key={p.id} status={p} />
             ))}
           </div>
           {deepl?.configured && deepl.limit > 0 && (
             <div class="pt-1">
-              <div class="flex items-center justify-between text-[10px] text-kick-muted">
+              <div class="flex items-center justify-between text-xs text-kick-muted">
                 <span>{t('DeepL quota')}</span>
                 <span>
                   {fmtK(deepl.count)} / {fmtK(deepl.limit)} (
@@ -309,6 +352,7 @@ export function App() {
             </div>
           )}
         </section>
+        )}
 
         {/* A la place de la ligne de pause, pas en plus : avec les deux, le popup
           par defaut mesure 654px contre 600 de plafond et defile. Les chiffres
@@ -316,27 +360,49 @@ export function App() {
         {/* The usage question takes the stats block's place the one time it is
             asked: added on top it pushed the popup past its 600px budget in
             every language (measure-popup, 685 to 752px). */}
-        {settings.popupShowsStats && stats && !pausedHere && !firstRun && settings.usageStatsAsked && (
+        {settings.popupShowsStats && stats && !pausedHere && !blockedHere && !firstRun && settings.usageStatsAsked && (
           <section class="kt-card">
             <span class="kt-label">{t('Today')}</span>
             <StatsBar stats={stats} />
           </section>
         )}
 
-        <footer class="flex items-center justify-between gap-2">
+        <footer class="flex items-center gap-2">
+          {/* Maintenance, so an icon beside Discord rather than a labelled
+              button on the main row. The Advanced tab carries it too. */}
           <button
-            class="kt-btn-ghost"
+            type="button"
+            class="kt-btn-ghost flex shrink-0 items-center justify-center !px-1.5"
+            aria-label={t('Clear cache')}
+            title={t('Clear cache')}
             onClick={() => {
               send({ type: 'cache.clear' }).catch(() => undefined);
             }}
           >
-            {t('Clear cache')}
+            <svg width="18" height="18" aria-hidden="true">
+              <use href="#i-trash" />
+            </svg>
           </button>
-          <DiscordLink class="kt-btn-ghost flex shrink-0 items-center justify-center !px-1.5 hover:text-[#5865F2]" />
-          <button class="kt-btn" onClick={openOptions}>
+          {/* 16px from the trash: a cache wipe next to a link invites a mis-tap. */}
+          <DiscordLink class="kt-btn-ghost ms-2 flex shrink-0 items-center justify-center !px-1.5 hover:text-[#5865F2]" />
+          <span class="truncate text-xs text-kick-muted" role="status">
+            v{chrome.runtime.getManifest().version}
+            {savedAt ? ` · ${t('saved')}` : ''}
+          </span>
+          <button class={`ms-auto ${otherPrimary || asking || update?.updateAvailable ? 'kt-btn-ghost' : 'kt-btn'}`} onClick={openOptions}>
             {t('Options')}
           </button>
         </footer>
+        {/* lucide "trash", verbatim from the kit's icons.js. */}
+        <svg width="0" height="0" class="absolute" aria-hidden="true">
+          <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+          </symbol>
+        </svg>
       </div>
     </I18nProvider>
   );

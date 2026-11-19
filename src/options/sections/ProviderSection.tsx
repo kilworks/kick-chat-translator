@@ -10,7 +10,7 @@ const PROVIDER_LABELS: Record<CloudProviderId, string> = {
   google: 'Google Translate (free, no key)',
   deepl: 'DeepL (best quality, needs key)',
   mymemory: 'MyMemory (free, ~1000/day)',
-  lingva: 'Lingva (LibreTranslate front, configurable)',
+  lingva: 'Lingva (Google Translate front end, configurable)',
 };
 
 interface Props {
@@ -88,17 +88,29 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
 
   const all: CloudProviderId[] = ['google', 'deepl', 'mymemory', 'lingva'];
 
+  // What the list is for follows the strategy above. It used to say "used when
+  // on-device is off" while the default, cloud first, sends every line to it
+  // first. Same rule as the pipeline (engineMode.combos.test.ts).
+  const local = settings.localEnabled && 'Translator' in self;
+  const cloudRole =
+    settings.engineMode === 'local-only'
+      ? t('Not used: the strategy above is on-device only.')
+      : !local
+        ? t('Tried in this order. One that fails is skipped for a while.')
+        : settings.engineMode === 'cloud-first'
+          ? t('Tried first, in this order. One that fails is skipped for a while. On-device steps in when they all fail.')
+          : t('Used when on-device cannot translate a line, in this order. One that fails is skipped for a while.');
+
   return (
     <>
       <EngineCard settings={settings} onPatch={onPatch} />
 
       <section class="kt-card">
-        <h2 class="kt-section mb-3">{t('Cloud fallback chain')}</h2>
-        <p class="text-xs text-kick-muted mb-3">
-          {t(
-            "Used when on-device is off or a language pair isn't downloaded. Providers are tried in order; failing ones are temporarily skipped (exponential cooldown).",
-          )}
-        </p>
+        <h2 class="kt-section mb-3">{t('Cloud engines')}</h2>
+        <p class="text-xs text-kick-muted mb-3">{cloudRole}</p>
+        {/* Unused under "on-device only": greyed out rather than hidden, so the
+            order is still there when the strategy changes back. */}
+        <fieldset disabled={settings.engineMode === 'local-only'} class="m-0 min-w-0 border-0 p-0 disabled:opacity-60">
         <ul class="flex flex-col gap-1.5">
           {settings.providerOrder.map((id, i) => {
             const status = providers.find((p) => p.id === id);
@@ -149,6 +161,7 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
               </button>
             ))}
         </div>
+        </fieldset>
       </section>
 
       <section class="kt-card space-y-3">
@@ -169,7 +182,7 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
             onInput={(e) => onPatch({ deeplApiKey: (e.target as HTMLInputElement).value.trim() })}
           />
           <p class="text-[11px] text-kick-muted">
-            {t('Free plan: 1,000,000 characters a month. Free keys end with :fx.')} {t('Get a key:')}{' '}
+            {t('Free keys end with :fx.')} {t('Get a key:')}{' '}
             <a
               class="text-kick-primary underline"
               href="https://www.deepl.com/pro#developer"

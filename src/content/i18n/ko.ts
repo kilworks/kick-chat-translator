@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const ko: Record<string, string> = {
+  barBlocked: '여기서는 번역 안 함',
+  barBlockedTipBlack: '이 채널은 차단 목록에 있습니다(옵션, 필터)',
+  barBlockedTipWhite: '이 채널은 허용 목록에 없습니다(옵션, 필터)',
+  barCount: '이 페이지에서 번역됨: $N$',
   barLangDir: '다른 시청자의 채팅을 내 언어로 번역',
   barOff: '번역 꺼짐',
   barOn: '번역 중',

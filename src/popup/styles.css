@@ -52,7 +52,16 @@
     outline-offset: 1px;
   }
   .kt-label {
-    @apply text-[11px] uppercase tracking-wider text-kick-muted;
+    @apply text-xs uppercase tracking-wider text-kick-muted;
+  }
+  /* A text action: the underline carries it. Not green, which belongs to the
+     one primary button of each state. */
+  .kt-link {
+    @apply rounded text-xs text-kick-text underline underline-offset-2 hover:no-underline;
+  }
+  .kt-link:focus-visible {
+    outline: 2px solid var(--kt-green);
+    outline-offset: 2px;
   }
   .kt-btn {
     @apply rounded-md bg-kick-primary px-3 py-1.5 text-sm font-semibold text-kick-dark hover:brightness-95 transition;

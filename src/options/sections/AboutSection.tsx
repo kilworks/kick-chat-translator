@@ -76,7 +76,7 @@ export function AboutSection({
           <h2 class="kt-section mb-1">{t('About')}</h2>
           <p class="text-sm leading-relaxed text-kick-muted">
             {t(
-              'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, no tracking, open source.',
+              'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.',
             )}
           </p>
         </div>
@@ -85,15 +85,15 @@ export function AboutSection({
             oblige a aller la chercher dans chrome://extensions au moment ou on
             veut signaler un probleme. */}
         <dl class="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
-          <Fait terme={t('Version')} valeur={version || '—'} />
+          <Fait terme={t('Version')} valeur={version || '-'} />
           <Fait terme={t('Languages')} valeur={String(langues)} />
           <Fait
             terme={t('Providers ready')}
-            valeur={providers === undefined ? '—' : `${dispo.length}/${providers.length}`}
+            valeur={providers === undefined ? '-' : `${dispo.length}/${providers.length}`}
           />
           <Fait
             terme={t('Messages translated')}
-            valeur={stats ? stats.totalRequests.toLocaleString() : '—'}
+            valeur={stats ? stats.totalRequests.toLocaleString() : '-'}
           />
         </dl>
       </section>

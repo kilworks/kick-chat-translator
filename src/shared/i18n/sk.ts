@@ -2,15 +2,12 @@
 export const sk: Record<string, string> = {
   'options & preferences': 'možnosti a predvoľby',
   'saved': 'uložené',
-  'ready': 'pripravené',
   'Providers': 'Poskytovatelia',
   'Display': 'Zobrazenie',
   'Filters': 'Filtre',
   'Advanced': 'Rozšírené',
   'Activity': 'Aktivita',
   'About': 'O rozšírení',
-  'Kick Chat Translator listens to chat in real time and translates non-English (or non-target-language) messages right under the original. No tracking, no account, fully open-source.':
-    'Kick Chat Translator sleduje chat v reálnom čase a priamo pod originálom prekladá správy, ktoré nie sú po anglicky (alebo v cieľovom jazyku). Bez sledovania, bez účtu, úplne open source.',
   'Links': 'Odkazy',
   'GitHub repository': 'Repozitár na GitHube',
   'Privacy policy': 'Zásady ochrany osobných údajov',
@@ -51,7 +48,6 @@ export const sk: Record<string, string> = {
   'Display style': 'Štýl zobrazenia',
   'Compose preview': 'Ukážka písanej správy',
   'Translate everything to': 'Všetko prekladať do',
-  'Auto (your browser language)': 'Automaticky (jazyk prehliadača)',
   'Auto reads incoming chat in your own language, detected from the browser.':
     'Automaticky zobrazuje prichádzajúci chat vo tvojom jazyku, ktorý sa zistí z prehliadača.',
   'Write my messages in': 'Moje správy prekladať do',
@@ -97,16 +93,14 @@ export const sk: Record<string, string> = {
   'Channel allowlist (only translate on these)': 'Povolené kanály (prekladať len na nich)',
   'Channel blocklist': 'Blokované kanály',
   'User blocklist': 'Blokovaní používatelia',
-  'Cloud fallback chain': 'Záložní poskytovatelia v cloude',
-  "Used when on-device is off or a language pair isn't downloaded. Providers are tried in order; failing ones are temporarily skipped (exponential cooldown).":
-    'Použijú sa, keď je preklad v zariadení vypnutý alebo nie je stiahnutá dvojica jazykov. Poskytovatelia sa skúšajú postupne; tí, ktorí zlyhávajú, sa dočasne preskakujú (s postupne dlhšou pauzou).',
+  'Cloud engines': 'Cloudové prekladače',
   'ok': 'OK',
   'down': 'nefunguje',
   'Google Translate (free, no key)': 'Google Translate (zadarmo, bez kľúča)',
   'DeepL (best quality, needs key)': 'DeepL (najlepšia kvalita, vyžaduje kľúč)',
   'MyMemory (free, ~1000/day)': 'MyMemory (zadarmo, cca 1000 denne)',
-  'Lingva (LibreTranslate front, configurable)':
-    'Lingva (rozhranie pre LibreTranslate, nastaviteľné)',
+  'Lingva (Google Translate front end, configurable)':
+    'Lingva (rozhranie pre Google Translate, nastaviteľné)',
   'API key': 'Kľúč API',
   'Plan': 'Plán',
   'Free (api-free.deepl.com)': 'Zadarmo (api-free.deepl.com)',
@@ -217,8 +211,8 @@ export const sk: Record<string, string> = {
   'Always dark': 'Vždy tmavý',
   'Always light': 'Vždy svetlý',
   'Remember a reading language per channel': 'Pamätať si jazyk čítania pre každý kanál osobitne',
-  'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, no tracking, open source.':
-    'Kick Chat Translator číta chat, ako prichádza, a pod každú správu doplní preklad do jazyka, v ktorom čítaš. Prekladá aj to, čo píšeš, skôr než to odošleš. Bez účtu, bez sledovania, open source.',
+  'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.':
+    'Kick Chat Translator číta chat, ako prichádza, a pod každú správu doplní preklad do jazyka, v ktorom čítaš. Prekladá aj to, čo píšeš, skôr než to odošleš. Bez účtu, open source, a anonymné štatistiky len ak to povolíš.',
   'Version': 'Verzia',
   'Languages': 'Jazyky',
   'Providers ready': 'Pripravení poskytovatelia',
@@ -263,8 +257,8 @@ export const sk: Record<string, string> = {
   'Open a Kick channel: its chat is translated as it arrives.':
     'Otvor kanál na Kick: jeho chat sa prekladá, ako prichádza.',
   'Open Kick': 'Otvoriť Kick',
-  'Free plan: 1,000,000 characters a month. Free keys end with :fx.':
-    'Plán zadarmo: 1 000 000 znakov mesačne. Kľúče zadarmo končia na :fx.',
+  'Free keys end with :fx.':
+    'Kľúče zadarmo končia na :fx.',
   'Get a key:': 'Získať kľúč:',
   "Help improve Kick Chat Translator?": "Pomôžeš vylepšiť Kick Chat Translator?",
   "Once a day, anonymous counts: engines used, errors, speed. Never your messages, names or channels.": "Raz denne anonymné počty: použité služby, chyby, rýchlosť. Nikdy tvoje správy, mená ani kanály.",
@@ -275,4 +269,13 @@ export const sk: Record<string, string> = {
   "Always ignored:": "Vždy ignorovaní:",
   "Other bots to ignore": "Ďalší boti na ignorovanie",
   "one bot name per line": "jedno meno bota na riadok",
+  'Ignored, write them as word -> replacement:': 'Ignorujú sa, zapíš ich ako slovo -> náhrada:',
+  'Stays on while the strategy is on-device only.': 'Zostáva zapnuté, kým je stratégia len v zariadení.',
+  'On-device is off, so the cloud engines translate everything.': 'Preklad v zariadení je vypnutý, takže všetko prekladajú cloudové prekladače.',
+  'Not used: the strategy above is on-device only.': 'Nepoužíva sa: stratégia vyššie je len v zariadení.',
+  'Tried in this order. One that fails is skipped for a while.': 'Skúšajú sa v tomto poradí. Ten, ktorý zlyhá, sa na čas preskočí.',
+  'Tried first, in this order. One that fails is skipped for a while. On-device steps in when they all fail.': 'Skúšajú sa ako prvé, v tomto poradí. Ten, ktorý zlyhá, sa na čas preskočí. Keď zlyhajú všetky, nastúpi preklad v zariadení.',
+  'Used when on-device cannot translate a line, in this order. One that fails is skipped for a while.': 'Použijú sa, keď preklad v zariadení nezvládne riadok, v tomto poradí. Ten, ktorý zlyhá, sa na čas preskočí.',
+  'Not translated: this channel is on your blocked list.': 'Nepreložené: tento kanál je na tvojom zozname blokovaných.',
+  'Not translated: this channel is not on your allowed list.': 'Nepreložené: tento kanál nie je na tvojom zozname povolených.',
 };

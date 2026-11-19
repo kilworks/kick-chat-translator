@@ -2,7 +2,7 @@
  * UI internationalization for the popup + options page.
  *
  * Strategy: the English string IS the lookup key (gettext-style). Components keep
- * readable English in the JSX via `t('Cloud fallback chain')`; the catalog in
+ * readable English in the JSX via `t('Cloud engines')`; the catalog in
  * `i18n.messages.ts` maps that English string to each non-English locale. English
  * needs no catalog (the key is the message), and any missing translation falls back
  * to the English key — so the UI is never blank.

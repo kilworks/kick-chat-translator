@@ -2,15 +2,12 @@
 export const cs: Record<string, string> = {
   'options & preferences': 'možnosti a předvolby',
   'saved': 'uloženo',
-  'ready': 'připraveno',
   'Providers': 'Poskytovatelé',
   'Display': 'Zobrazení',
   'Filters': 'Filtry',
   'Advanced': 'Pokročilé',
   'Activity': 'Aktivita',
   'About': 'O rozšíření',
-  'Kick Chat Translator listens to chat in real time and translates non-English (or non-target-language) messages right under the original. No tracking, no account, fully open-source.':
-    'Kick Chat Translator sleduje chat v reálném čase a přímo pod originálem překládá zprávy, které nejsou anglicky (nebo v cílovém jazyce). Bez sledování, bez účtu, plně open source.',
   'Links': 'Odkazy',
   'GitHub repository': 'Repozitář na GitHubu',
   'Privacy policy': 'Zásady ochrany osobních údajů',
@@ -51,7 +48,6 @@ export const cs: Record<string, string> = {
   'Display style': 'Styl zobrazení',
   'Compose preview': 'Náhled psané zprávy',
   'Translate everything to': 'Vše překládat do',
-  'Auto (your browser language)': 'Automaticky (jazyk prohlížeče)',
   'Auto reads incoming chat in your own language, detected from the browser.':
     'Automaticky zobrazuje příchozí chat ve tvém jazyce, který se zjistí z prohlížeče.',
   'Write my messages in': 'Mé zprávy překládat do',
@@ -97,16 +93,14 @@ export const cs: Record<string, string> = {
   'Channel allowlist (only translate on these)': 'Povolené kanály (překládat jen na nich)',
   'Channel blocklist': 'Blokované kanály',
   'User blocklist': 'Blokovaní uživatelé',
-  'Cloud fallback chain': 'Záložní poskytovatelé v cloudu',
-  "Used when on-device is off or a language pair isn't downloaded. Providers are tried in order; failing ones are temporarily skipped (exponential cooldown).":
-    'Použijí se, když je překlad v zařízení vypnutý nebo není stažená dvojice jazyků. Poskytovatelé se zkouší popořadě; ti, kteří selhávají, se dočasně přeskakují (s postupně delší pauzou).',
+  'Cloud engines': 'Cloudové překladače',
   'ok': 'OK',
   'down': 'nefunguje',
   'Google Translate (free, no key)': 'Google Translate (zdarma, bez klíče)',
   'DeepL (best quality, needs key)': 'DeepL (nejlepší kvalita, vyžaduje klíč)',
   'MyMemory (free, ~1000/day)': 'MyMemory (zdarma, cca 1000 denně)',
-  'Lingva (LibreTranslate front, configurable)':
-    'Lingva (rozhraní pro LibreTranslate, nastavitelné)',
+  'Lingva (Google Translate front end, configurable)':
+    'Lingva (rozhraní pro Google Translate, nastavitelné)',
   'API key': 'Klíč API',
   'Plan': 'Tarif',
   'Free (api-free.deepl.com)': 'Zdarma (api-free.deepl.com)',
@@ -217,8 +211,8 @@ export const cs: Record<string, string> = {
   'Always dark': 'Vždy tmavý',
   'Always light': 'Vždy světlý',
   'Remember a reading language per channel': 'Pamatovat si jazyk čtení pro každý kanál zvlášť',
-  'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, no tracking, open source.':
-    'Kick Chat Translator čte chat, jak přichází, a pod každou zprávu doplní překlad do jazyka, ve kterém čteš. Překládá i to, co píšeš, než to odešleš. Bez účtu, bez sledování, open source.',
+  'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.':
+    'Kick Chat Translator čte chat, jak přichází, a pod každou zprávu doplní překlad do jazyka, ve kterém čteš. Překládá i to, co píšeš, než to odešleš. Bez účtu, open source, a anonymní statistiky jen když to povolíš.',
   'Version': 'Verze',
   'Languages': 'Jazyky',
   'Providers ready': 'Připravení poskytovatelé',
@@ -263,8 +257,8 @@ export const cs: Record<string, string> = {
   'Open a Kick channel: its chat is translated as it arrives.':
     'Otevři kanál na Kick: jeho chat se překládá, jak přichází.',
   'Open Kick': 'Otevřít Kick',
-  'Free plan: 1,000,000 characters a month. Free keys end with :fx.':
-    'Tarif zdarma: 1 000 000 znaků měsíčně. Klíče zdarma končí na :fx.',
+  'Free keys end with :fx.':
+    'Klíče zdarma končí na :fx.',
   'Get a key:': 'Získat klíč:',
   "Help improve Kick Chat Translator?": "Pomůžeš vylepšit Kick Chat Translator?",
   "Once a day, anonymous counts: engines used, errors, speed. Never your messages, names or channels.": "Jednou denně anonymní počty: použité služby, chyby, rychlost. Nikdy tvoje zprávy, jména ani kanály.",
@@ -275,4 +269,13 @@ export const cs: Record<string, string> = {
   "Always ignored:": "Vždy ignorováni:",
   "Other bots to ignore": "Další boti k ignorování",
   "one bot name per line": "jedno jméno bota na řádek",
+  'Ignored, write them as word -> replacement:': 'Ignorují se, zapiš je jako slovo -> náhrada:',
+  'Stays on while the strategy is on-device only.': 'Zůstává zapnuté, dokud je strategie jen v zařízení.',
+  'On-device is off, so the cloud engines translate everything.': 'Překlad v zařízení je vypnutý, takže vše překládají cloudové překladače.',
+  'Not used: the strategy above is on-device only.': 'Nepoužívá se: strategie výše je jen v zařízení.',
+  'Tried in this order. One that fails is skipped for a while.': 'Zkoušejí se v tomto pořadí. Ten, který selže, se na čas přeskočí.',
+  'Tried first, in this order. One that fails is skipped for a while. On-device steps in when they all fail.': 'Zkoušejí se jako první, v tomto pořadí. Ten, který selže, se na čas přeskočí. Když selžou všechny, nastoupí překlad v zařízení.',
+  'Used when on-device cannot translate a line, in this order. One that fails is skipped for a while.': 'Použijí se, když překlad v zařízení nezvládne řádek, v tomto pořadí. Ten, který selže, se na čas přeskočí.',
+  'Not translated: this channel is on your blocked list.': 'Nepřeloženo: tento kanál je na tvém seznamu blokovaných.',
+  'Not translated: this channel is not on your allowed list.': 'Nepřeloženo: tento kanál není na tvém seznamu povolených.',
 };

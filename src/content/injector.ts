@@ -11,6 +11,8 @@ import {
 } from './langMenu';
 import { findChatPanel } from './selectors';
 import { msg } from './msg';
+import { channelBlockedBy } from './filters';
+import { extractChannelSlug } from './kickApi';
 
 const STYLE_ID = 'kt-inject-style';
 const TRANS_CLASS = 'kt-translation';
@@ -657,7 +659,7 @@ export function mountFloatingBar(container: Element, settings: Settings, h: Floa
   });
   bar.appendChild(opts);
 
-  setBarEnabled(bar, label, settings.enabled, settings.targetLang);
+  setBarEnabled(bar, label, settings.enabled, settings.targetLang, blockedHere(settings));
 
   bar.addEventListener('click', (e) => {
     const t = e.target as Node;
@@ -678,8 +680,26 @@ export function mountFloatingBar(container: Element, settings: Settings, h: Floa
   host.insertBefore(bar, host.firstChild);
 }
 
-function setBarEnabled(bar: HTMLElement, label: HTMLElement, enabled: boolean, lang: string): void {
+type Blocked = 'channel_blacklisted' | 'channel_not_whitelisted';
+
+function blockedHere(settings: Settings): Blocked | null {
+  const channel = extractChannelSlug(location.pathname);
+  return (channel && channelBlockedBy(settings, channel)) || null;
+}
+
+function setBarEnabled(
+  bar: HTMLElement,
+  label: HTMLElement,
+  enabled: boolean,
+  lang: string,
+  // Omitted by the callers that only change the language or the switch: the
+  // channel did not change, so what the last settings said still holds.
+  given?: Blocked | null,
+): void {
   bar.dataset.enabled = String(enabled);
+  const blocked = given === undefined ? (bar.dataset.blocked as Blocked | undefined) : (given ?? undefined);
+  if (blocked) bar.dataset.blocked = blocked;
+  else delete bar.dataset.blocked;
   bar.dataset.lang = lang;
   // Measured on a live channel: "Translating → EN" took 133px of a 420px bar,
   // a third of it, and the "→ EN" half repeated the language menu sitting right
@@ -690,7 +710,15 @@ function setBarEnabled(bar: HTMLElement, label: HTMLElement, enabled: boolean, l
   label.textContent = enabled
     ? msg('barOn', 'Translating')
     : msg('barOff', 'Translation off');
-  label.title = enabled
+  // A channel list that keeps this channel out is said where the reader looks,
+  // with the place to change it, instead of "Translating" over a plain chat.
+  if (enabled && blocked) {
+    label.textContent = msg('barBlocked', 'Not translated here');
+    label.title =
+      blocked === 'channel_blacklisted'
+        ? msg('barBlockedTipBlack', 'This channel is on your blocked list (Options, Filters)')
+        : msg('barBlockedTipWhite', 'This channel is not on your allowed list (Options, Filters)');
+  } else label.title = enabled
     ? lang === 'auto'
       ? msg('barOnTipAuto', 'Reading chat in $LANG$ (auto)', [shown.toUpperCase()])
       : msg('barOnTip', 'Reading chat in $LANG$', [shown.toUpperCase()])
@@ -711,7 +739,7 @@ function setBarEnabled(bar: HTMLElement, label: HTMLElement, enabled: boolean, l
 export function updateFloatingBar(settings: Settings): void {
   const bar = findBar();
   const label = bar?.querySelector<HTMLElement>('.kt-float-label');
-  if (bar && label) setBarEnabled(bar, label, settings.enabled, settings.targetLang);
+  if (bar && label) setBarEnabled(bar, label, settings.enabled, settings.targetLang, blockedHere(settings));
   // The language button carries the code and its flag, so a change made
   // anywhere else (the options page, the chip) has to reach it too.
   if (bar) langPainters.get(bar)?.(settings.targetLang);
@@ -763,6 +791,9 @@ export function incrementFloatingCount(): void {
   const n = Number(count.dataset.n ?? '0') + 1;
   count.dataset.n = String(n);
   count.textContent = `· ${n}`;
+  const label = msg('barCount', 'Translated on this page: $N$', [String(n)]);
+  count.title = label;
+  count.setAttribute('aria-label', label);
   count.style.display = '';
 }
 

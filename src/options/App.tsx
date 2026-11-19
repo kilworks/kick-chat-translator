@@ -34,7 +34,12 @@ export function App() {
   const [settings, setSettings] = useState<Settings>(defaultSettings());
   const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const [stats, setStats] = useState<UsageStats | undefined>(undefined);
-  const [tab, setTab] = useState<Tab>('providers');
+  // `#filters` and the like open on that tab: the popup links straight to the
+  // setting that explains why a channel is not translated.
+  const [tab, setTab] = useState<Tab>(() => {
+    const asked = location.hash.slice(1);
+    return TABS.some((tb) => tb.id === asked) ? (asked as Tab) : 'providers';
+  });
   const [savedAt, setSavedAt] = useState<number | undefined>(undefined);
   const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
 

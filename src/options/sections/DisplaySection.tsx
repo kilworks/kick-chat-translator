@@ -34,7 +34,7 @@ export function DisplaySection({ settings, onPatch }: Props) {
             value={settings.targetLang}
             onChange={(e) => onPatch({ targetLang: (e.target as HTMLSelectElement).value })}
           >
-            <option value="auto">{t('Auto (your browser language)')}</option>
+            <option value="auto">{t('Auto (your language)')}</option>
             {langs.map((l) => (
               <option key={l.code} value={l.code}>
                 {l.name}

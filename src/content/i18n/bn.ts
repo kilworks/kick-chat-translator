@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const bn: Record<string, string> = {
+  barBlocked: 'এখানে অনুবাদ হয়নি',
+  barBlockedTipBlack: 'চ্যানেলটি আপনার ব্লক তালিকায় আছে (সেটিংস, ফিল্টার)',
+  barBlockedTipWhite: 'চ্যানেলটি আপনার অনুমোদিত তালিকায় নেই (সেটিংস, ফিল্টার)',
+  barCount: 'এই পেজে অনুবাদ হয়েছে: $N$',
   barLangDir: 'অন্য দর্শকদের চ্যাট, আপনার জন্য অনুবাদ করা',
   barOff: 'অনুবাদ বন্ধ',
   barOn: 'অনুবাদ চলছে',

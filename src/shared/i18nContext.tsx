@@ -7,7 +7,7 @@ const TContext = createContext<TFunc>((key) => key);
 
 export const I18nProvider = TContext.Provider;
 
-/** Translate hook: `const t = useT();` then `t('Cloud fallback chain')`. */
+/** Translate hook: `const t = useT();` then `t('Cloud engines')`. */
 export function useT(): TFunc {
   return useContext(TContext);
 }
