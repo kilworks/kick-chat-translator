@@ -1651,3 +1651,7 @@ surfaces touched this pass. Counted in the pass report.
 - [ ] The 42 localised READMEs still list Providers first and the DeepL key as always there in their Settings section (English fixed in phase 3); left for the existing [k] entry on localised READMEs.
 - [ ] `screenshots/japanese-chat.jpg` is tracked but shown nowhere (readme-drift HIDDEN, older than this pass): delete or show, kil's call.
 - [k] **Live smoke of the UI comfort pass on kick.com was not run**: Claude in Chrome was not connected in the session (2026-11-19). To do in Brave, read only: chat bar, language panel, one incoming translation, compose preview visible without sending; then the options (Display landing, switches, segmented controls) and the popup.
+- [ ] P3-1 language panel: endonyms (Deutsch, Japanese in its own script) next to the localised name, and a filter that finds either. Not done in this pass (chat surface, P3 only if cheap).
+- [ ] P3-2 compose preview: a first-use hint for Tab, the glyph alone announces it today. Not done.
+- [ ] P3-3 composer chip drawn dotted against the bar chip's solid line reads as "empty". Not done.
+- [ ] P3-4 rest: channel and user lists stay "one per line" textareas with a monospace placeholder (the inner scroll of the language grid is gone).
