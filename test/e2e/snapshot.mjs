@@ -30,7 +30,8 @@ const TYPES = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/htm
 const srv = http.createServer((q, r) => {
   const f = path.join(DIST, decodeURIComponent(q.url.split('?')[0]));
   fs.readFile(f, (e, d) => {
-    if (e) { r.writeHead(404); r.end(); return; }
+    // Name the missing file: the browser's 404 console line carries no URL.
+    if (e) { console.error(`404 ${q.url}`); r.writeHead(404); r.end(); return; }
     r.writeHead(200, { 'Content-Type': TYPES[path.extname(f)] ?? 'application/octet-stream' });
     r.end(d);
   });
