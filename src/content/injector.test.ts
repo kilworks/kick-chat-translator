@@ -341,6 +341,35 @@ describe('injector artifacts', () => {
       expect(live.querySelector('.kt-float-count')?.textContent).toBe('· 1');
     });
 
+    // A forgotten allowlist left the bar reading "Translating" over a chat
+    // where no line was translated.
+    it('says when a channel list keeps this channel out, and where to change it', () => {
+      history.pushState(null, '', '/kt-test-channel');
+      try {
+        const host = twoPanels();
+        mountFloatingBar(host, { ...defaultSettings(), enabled: true, whitelistChannels: ['kt-other'] }, barHandlers());
+        const label = document.querySelectorAll('#kt-floating-bar')[1]!.querySelector<HTMLElement>('.kt-float-label')!;
+        expect(label.textContent).toBe('Not translated here');
+        expect(label.title).toContain('not on your allowed list');
+        // Control: the same bar on an allowed channel says it translates.
+        updateFloatingBar({ ...defaultSettings(), enabled: true, whitelistChannels: ['kt-test-channel'] });
+        expect(label.textContent).toBe('Translating');
+      } finally {
+        history.pushState(null, '', '/');
+      }
+    });
+
+    // `· 12` alone said nothing, to the eye or to a screen reader.
+    it('names what the counter counts', () => {
+      const host = twoPanels();
+      mountFloatingBar(host, { ...defaultSettings(), enabled: true, targetLang: 'fr' }, barHandlers());
+      incrementFloatingCount();
+      incrementFloatingCount();
+      const count = document.querySelectorAll('#kt-floating-bar')[1]!.querySelector<HTMLElement>('.kt-float-count')!;
+      expect(count.title).toBe('Translated on this page: 2');
+      expect(count.getAttribute('aria-label')).toBe('Translated on this page: 2');
+    });
+
     // Teardown is the one place that stays document wide, so it cannot strand a
     // copy in the panel that is off screen.
     it('takes every copy away when it unmounts', () => {

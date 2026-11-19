@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const vi: Record<string, string> = {
+  barBlocked: 'Không dịch ở đây',
+  barBlockedTipBlack: 'Kênh này nằm trong danh sách kênh chặn của bạn (Cài đặt, Bộ lọc)',
+  barBlockedTipWhite: 'Kênh này không có trong danh sách kênh cho phép của bạn (Cài đặt, Bộ lọc)',
+  barCount: 'Đã dịch trên trang này: $N$',
   barLangDir: 'Chat của những người xem khác, đã dịch cho bạn',
   barOff: 'Đã tắt dịch',
   barOn: 'Đang dịch',

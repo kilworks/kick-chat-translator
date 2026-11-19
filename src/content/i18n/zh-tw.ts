@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const zh_tw: Record<string, string> = {
+  barBlocked: '此處不翻譯',
+  barBlockedTipBlack: '此頻道在你的封鎖清單中（選項，篩選）',
+  barBlockedTipWhite: '此頻道不在你的允許清單中（選項，篩選）',
+  barCount: '本頁已翻譯：$N$',
   barLangDir: '其他觀眾的聊天內容，已為你翻譯',
   barOff: '翻譯已關閉',
   barOn: '翻譯中',

@@ -37,6 +37,26 @@ D. store listing        store/
                         screenshots
    blocked on kil for review and submission
 
+UI COMFORT PASS (feat/ui-comfort), phase 0, sets named before spawning
+  P0-1 snapshots          test/e2e/snapshot.mjs (+ new test/e2e helper)
+  P0-2 popup height       test/e2e/measure-popup.mjs
+  P1-2 measurement        src/content/engineMode.combos.test.ts (new)
+  facts                   read-only
+   disjoint; i18n (keys.json, src/shared/i18n/*.ts) stays root-only
+
+UI COMFORT PASS, phase 2, sets named before spawning
+  A switch       src/shared/Switch.tsx (new), src/options/components/Check.tsx,
+                 src/popup/components/Toggle.tsx, their tests,
+                 src/options/styles.css                     P2-4, P2-16, P2-7 (css)
+  B display      src/options/sections/DisplaySection.tsx (+test),
+                 src/options/components/Segmented.tsx (new)  P2-5, P2-6, P2-8, P2-7
+  C providers    src/options/sections/ProviderSection.tsx, EngineCard.tsx
+                 (+tests)                                    P2-8, P2-10, P2-11, P2-7
+  D shell        src/options/App.tsx, App.tabs.test.tsx       P2-9, P2-13, P2-15
+  E other tabs   AdvancedSection, FilterSection, AboutSection, DebugSection,
+                 UsageTrend (+tests)                         P2-8, P2-7
+   disjoint; keys.json and the catalogues stay root-only, children return keys
+
 A and B do not intersect and can run at once. C touches only harness files but
 reads dist/, so it serialises behind any build. D touches no code.
 ```
@@ -1570,3 +1590,68 @@ reads dist/, so it serialises behind any build. D touches no code.
 - [x] Both store listings at ten languages each, 31 fields inside their limits.
 - [x] AMO reviewer notes with a byte-reproducible build, verified by two
   consecutive runs producing one SHA-256.
+
+---
+
+## UI comfort pass (feat/ui-comfort, 2026-11-19)
+
+Born from P0-1 (the snapshots now render all six tabs) and from work on the
+surfaces touched this pass. Counted in the pass report.
+
+- [ ] **Options spacing under 8px, now visible on every tab** (`verify_spacing`,
+  kit 3.1.1): label to control 7.5px for 8 controls on Display (Translate
+  everything to, Text size, Line spacing, Font, Density, Accent colour, Chat
+  theme, Write my messages in) and 3 on Providers; 6px between the 68 source
+  language chips on Filters and the model chips on Providers; 7.9px under the
+  "Always ignored" hint on Filters. Extends P2-16 to the options page (phase 2).
+- [ ] **The rate-limit indicator in the chat bar is an emoji** (`⏳`,
+  `src/content/injector.ts`, `showThrottleIndicator`). The UI carries no emoji
+  by rule; a lucide icon from the kit's set replaces it.
+- [x] **Em dash as the empty value on the About tab** (now `-`) (`valeur={... '—'}`,
+  `AboutSection.tsx`, 3 occurrences). The UI carries no em dash by rule.
+- [ ] **P1-7, language half: a source-language allowlist is still silent on the
+  bar and in the popup.** The channel half is shown (bar label and tooltip,
+  popup card with a link to `#filters`). Languages are decided per line; showing
+  it needs a count of recent `lang_not_allowed` drops sent to the bar, the
+  decision log behind `recentDecisions()` already holds them.
+- [k] **Validate the popup direction** before phase 2 (options, chat): before
+  and after captures in `scratchpad/ui/popup/` (ignored), listed in the pass
+  report.
+- [k] **DeepL's free figure is not stated on one official page.** Support
+  search results give 500,000 characters a month for the API Free plan, and the
+  same support site says that plan can no longer be bought, replaced by a
+  Developer plan of 1,000,000 characters that do not reset. The options no
+  longer quote a figure ("Free keys end with :fx."). Putting one back needs a
+  decision on which plan the hint speaks to.
+- [k] **`local-only` with on-device off is migrated to on-device on.** That pair
+  translated nothing (`engineMode.combos.test.ts`); the migration keeps the "no
+  network" promise. A Firefox reader with that pair still gets nothing (no
+  on-device API) and is not told so.
+- [ ] **The popup sits at exactly 600px in one language, usual state** (ta or
+  th, measure-popup 2026-11-19). Every state fits in all 43 languages, with no
+  margin left there: the next string that grows in that language overflows.
+- [ ] **Design critique of the popup, items left after the first fixes**
+  (design-critic, 2026-11-19, verdict fix-then-ship; #1 to #4, #6, #7 and #10
+  done): one-size hierarchy (h1 at 14px like the select text, inner and outer
+  spacing both 12px); the update link's title is English and carries a `⬆`
+  glyph inside a translated string; `.kt-label` keeps `uppercase
+  tracking-wider` in Arabic, where letter spacing breaks the joining; Clear
+  cache gives no feedback when pressed.
+- [ ] **Text under 12px left on the options page** (P2-7, phase 2): the popup is
+  at 0, the options still carry `text-[10px]` and `text-[11px]`.
+
+### Phase 2 done (options), left open
+- [ ] EngineCard download chips: name reads "JA" plus a glyph, state only in title and opacity; give each an aria-label ("Download Japanese") and aria-disabled when unavailable (needs new keys).
+- [ ] "Download languages -> AUTO" prints the raw target code when the target is auto; show the resolved language name.
+- [ ] DeepL "Show key" keeps one label, state carried by aria-pressed only; "Hide key" needs a new key.
+- [ ] Display: segmented groups hug the left, switches the right; a shared column would line the card up (critic minor).
+- [ ] Sticky preview and the short-viewport fallback were checked by class only, not at 400% zoom in a real browser.
+- [ ] Switch forced-colors and busy focus: not seen in a real browser.
+- [ ] Translations of the 27 phase 2 keys: model-written, no native review.
+- [ ] The 42 localised READMEs still list Providers first and the DeepL key as always there in their Settings section (English fixed in phase 3); left for the existing [k] entry on localised READMEs.
+- [ ] `screenshots/japanese-chat.jpg` is tracked but shown nowhere (readme-drift HIDDEN, older than this pass): delete or show, kil's call.
+- [k] **Live smoke of the UI comfort pass on kick.com was not run**: Claude in Chrome was not connected in the session (2026-11-19). To do in Brave, read only: chat bar, language panel, one incoming translation, compose preview visible without sending; then the options (Display landing, switches, segmented controls) and the popup.
+- [ ] P3-1 language panel: endonyms (Deutsch, Japanese in its own script) next to the localised name, and a filter that finds either. Not done in this pass (chat surface, P3 only if cheap).
+- [ ] P3-2 compose preview: a first-use hint for Tab, the glyph alone announces it today. Not done.
+- [ ] P3-3 composer chip drawn dotted against the bar chip's solid line reads as "empty". Not done.
+- [ ] P3-4 rest: channel and user lists stay "one per line" textareas with a monospace placeholder (the inner scroll of the language grid is gone).

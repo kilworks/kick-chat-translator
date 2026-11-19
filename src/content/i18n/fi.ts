@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const fi: Record<string, string> = {
+  barBlocked: 'Ei käännetä täällä',
+  barBlockedTipBlack: 'Tämä kanava on estolistallasi (Asetukset, Suodattimet)',
+  barBlockedTipWhite: 'Tämä kanava ei ole sallittujen listallasi (Asetukset, Suodattimet)',
+  barCount: 'Käännetty tällä sivulla: $N$',
   barLangDir: 'Muiden katsojien chat, käännettynä sinulle',
   barOff: 'Käännös pois päältä',
   barOn: 'Käännetään',

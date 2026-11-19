@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const ro: Record<string, string> = {
+  barBlocked: 'Netradus aici',
+  barBlockedTipBlack: 'Acest canal este în canalele tale blocate (Setări, Filtre)',
+  barBlockedTipWhite: 'Acest canal nu este în canalele tale permise (Setări, Filtre)',
+  barCount: 'Traduse pe această pagină: $N$',
   barLangDir: 'Chatul celorlalți spectatori, tradus pentru tine',
   barOff: 'Traducere dezactivată',
   barOn: 'Se traduce',

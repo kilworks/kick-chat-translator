@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const he: Record<string, string> = {
+  barBlocked: 'לא מתורגם כאן',
+  barBlockedTipBlack: 'הערוץ הזה ברשימת הערוצים החסומים שלך (אפשרויות, מסננים)',
+  barBlockedTipWhite: 'הערוץ הזה לא ברשימת הערוצים המותרים שלך (אפשרויות, מסננים)',
+  barCount: 'תורגמו בדף הזה: $N$',
   barLangDir: "הצ'אט של שאר הצופים, מתורגם בשבילך",
   barOff: 'התרגום כבוי',
   barOn: 'מתרגם',

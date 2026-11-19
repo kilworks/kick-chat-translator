@@ -58,7 +58,7 @@
      heritait donc du corps de texte et une note de bas de carte s'affichait
      aussi grosse que le contenu qu'elle commente. */
   .kt-hint {
-    @apply text-[11px] leading-relaxed text-kick-muted;
+    @apply text-xs leading-relaxed text-kick-muted;
   }
 
   .kt-tabs {
@@ -97,9 +97,11 @@
   .kt-textarea { @apply w-full min-h-[76px] resize-y rounded-md border border-kick-border bg-kick-surface px-3 py-2 text-sm text-kick-text outline-none focus:border-kick-primary placeholder:text-kick-muted font-mono leading-relaxed; border-color: var(--kt-edge); }
   .kt-textarea:hover:not(:disabled) { border-color: var(--kt-edge-strong); }
   .kt-textarea:focus-visible { outline: 2px solid var(--kt-green); outline-offset: 1px; }
-  .kt-label { @apply text-[11px] uppercase tracking-wider text-kick-muted; }
+  .kt-label { @apply text-xs uppercase tracking-wider text-kick-muted; }
   .kt-btn { @apply rounded-md bg-kick-primary px-3 py-2 text-sm font-semibold text-kick-dark hover:brightness-95 transition; }
   .kt-btn-ghost { @apply rounded-md border border-kick-stroke bg-transparent px-3 py-2 text-sm font-medium text-kick-text hover:bg-kick-surface transition; }
+  .kt-btn-ghost:disabled, .kt-btn-ghost[aria-disabled='true'] { opacity: 0.4; cursor: not-allowed; }
+  .kt-btn-ghost:disabled:hover, .kt-btn-ghost[aria-disabled='true']:hover { background: transparent; }
   /* Structure carried by rhythm, not by outlines.
      Measured on the rendered pages: the card fill separates from the page at
      1.09:1 and its border at 1.18:1, so neither edge was visible. That is not
@@ -126,7 +128,7 @@
   /* Un interrupteur de la taille d'une etiquette, pour les listes de chaines.
      aria-pressed porte l'etat, donc la couleur n'en est pas le seul porteur. */
   .kt-chip-toggle {
-    @apply shrink-0 rounded border border-kick-stroke px-2 py-0.5 text-[10px] text-kick-muted transition hover:border-kick-primary hover:text-kick-text;
+    @apply shrink-0 rounded border border-kick-stroke px-2 py-0.5 text-xs text-kick-muted transition hover:border-kick-primary hover:text-kick-text;
   }
   .kt-chip-toggle.is-on {
     @apply border-kick-primary bg-kick-primary/10 text-kick-primary;
@@ -140,122 +142,17 @@
   .kt-card-lead {
     @apply rounded-lg bg-kick-surface p-6;
   }
-  .kt-row { @apply flex flex-col gap-1.5; }
+  /* 8px between a label and its control: gap-1.5 measured 7.5px. */
+  .kt-row { @apply flex flex-col gap-2; }
 }
 
 @layer components {
-  /* ─── Checkbox ────────────────────────────────────────────────────────────
-     A real <input> underneath keeps the native keyboard behaviour, the focus
-     ring the browser already knows how to place, and the accessibility tree.
-     Everything visible is drawn on the sibling .kt-check-box, which is
-     pointer-events:none so the click always reaches the input.
-
-     Why not accent-color: it paints a white tick on the brand green, which
-     measures 1.37:1. The tick has to be dark on that green (14.11:1), and
-     accent-color gives no say in it. */
+  /* Boolean settings render the shared switch (src/shared/switch.css). The
+     whole label is the target: WCAG 2.5.8 measures what activates, and the
+     20px rail alone would miss the 24px floor. */
   .kt-check {
-    @apply relative inline-flex cursor-pointer items-center gap-2.5 select-none;
-    /* The drawn box is 18px, but the target is the whole label — that is what
-       receives the click. WCAG 2.5.8 measures what activates, not what is
-       painted, and 18px of height would miss the 24px floor. The automated
-       target gate does not catch this: the real input is transparent, so it
-       counts zero targets on this page. */
     min-block-size: 24px;
   }
-  .kt-check input {
-    /* Stretched to the label's own height so keyboard focus and pointer land on
-       the same rectangle the eye reads as the control. */
-    @apply absolute inset-y-0 w-[18px] cursor-pointer opacity-0;
-    margin: 0;
-  }
-  .kt-check-box {
-    @apply pointer-events-none grid h-[18px] w-[18px] flex-none place-items-center rounded;
-    border: 1.5px solid var(--kt-edge);
-    background: transparent;
-    transition:
-      border-color 0.15s ease,
-      background 0.15s ease;
-  }
-  .kt-check-box svg {
-    @apply h-[11px] w-[11px];
-    stroke: var(--kt-ink);
-    stroke-width: 2.4;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    fill: none;
-  }
-  /* Both glyphs live in one <svg> and are toggled by state, so the check and
-     the dash cannot drift apart in weight the way an SVG tick beside a CSS
-     rectangle does. */
-  .kt-check-box .tick,
-  .kt-check-box .dash {
-    opacity: 0;
-  }
-
-  /* 1 · hover */
-  .kt-check:hover input:not(:disabled) + .kt-check-box {
-    border-color: var(--kt-edge-strong);
-  }
-  /* 2 · pressed */
-  .kt-check input:active:not(:disabled) + .kt-check-box {
-    border-color: var(--kt-edge-strong);
-    transform: scale(0.94);
-  }
-  /* 3 · focus — the ring sits on the drawn box, since the input is invisible */
-  .kt-check input:focus-visible + .kt-check-box {
-    outline: 2px solid var(--kt-green);
-    outline-offset: 2px;
-  }
-  /* 4 · checked */
-  .kt-check input:checked + .kt-check-box {
-    background: var(--kt-green);
-    border-color: var(--kt-green);
-  }
-  .kt-check input:checked + .kt-check-box .tick {
-    opacity: 1;
-  }
-  /* 5 · indeterminate */
-  .kt-check input:indeterminate + .kt-check-box {
-    background: var(--kt-green);
-    border-color: var(--kt-green);
-  }
-  .kt-check input:indeterminate + .kt-check-box .tick {
-    opacity: 0;
-  }
-  .kt-check input:indeterminate + .kt-check-box .dash {
-    opacity: 1;
-  }
-  /* 6 · disabled — exempt from contrast, but still has to read as unavailable */
-  .kt-check:has(input:disabled) {
-    @apply cursor-not-allowed;
-  }
-  .kt-check input:disabled + .kt-check-box {
-    border-color: var(--kt-line);
-    background: transparent;
-  }
-  .kt-check input:disabled:checked + .kt-check-box {
-    background: var(--kt-green-bed);
-    border-color: var(--kt-green-bed);
-  }
-  .kt-check:has(input:disabled) .kt-check-label {
-    @apply text-kick-muted/75;
-  }
-  /* 7 · busy */
-  .kt-check[data-busy='true'] .kt-check-box {
-    border-color: var(--kt-green);
-    animation: kt-check-wait 1s ease-in-out infinite;
-  }
-  @keyframes kt-check-wait {
-    50% {
-      border-color: var(--kt-edge);
-    }
-  }
-  /* 8 · invalid */
-  .kt-check input[aria-invalid='true'] + .kt-check-box {
-    border-color: var(--kt-danger);
-  }
-
-
 
   /* ─── Select ──────────────────────────────────────────────────────────────
      appearance:none already, so the only thing the browser still draws is the
@@ -296,20 +193,6 @@
   }
   .kt-input:disabled {
     @apply cursor-not-allowed opacity-60;
-  }
-}
-
-@layer components {
-  /* Settings rows keep the control on the right, where it has always been.
-     Only the paint order changes; the input still carries the label, so the
-     accessibility tree and the tab order are untouched. */
-  .kt-check-reverse {
-    @apply w-full justify-between;
-    flex-direction: row-reverse;
-  }
-  .kt-check-reverse input {
-    inset-inline-end: 0;
-    inset-inline-start: auto;
   }
 }
 

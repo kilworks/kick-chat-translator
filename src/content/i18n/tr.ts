@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const tr: Record<string, string> = {
+  barBlocked: 'Burada çevrilmiyor',
+  barBlockedTipBlack: 'Bu kanal engellenenler listende (Seçenekler, Filtreler)',
+  barBlockedTipWhite: 'Bu kanal izin verilenler listende değil (Seçenekler, Filtreler)',
+  barCount: 'Bu sayfada çevrilen: $N$',
   barLangDir: 'Diğer izleyicilerin sohbeti, senin için çevrildi',
   barOff: 'Çeviri kapalı',
   barOn: 'Çevriliyor',

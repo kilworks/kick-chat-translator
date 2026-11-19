@@ -24,7 +24,7 @@ const filter = (el: HTMLElement) =>
 // Scoped to the grid: the section also carries two toggle rows of its own,
 // and counting those made the list look two entries longer than it is.
 const grid = (el: HTMLElement) => el.querySelector<HTMLElement>('.grid.grid-cols-3')!;
-const rows = (el: HTMLElement) => grid(el).querySelectorAll('.kt-check');
+const rows = (el: HTMLElement) => grid(el).querySelectorAll('button[aria-pressed]');
 
 async function type(el: HTMLElement, value: string) {
   const f = filter(el);
@@ -34,10 +34,34 @@ async function type(el: HTMLElement, value: string) {
 }
 
 /**
- * The allowlist listed all 42 languages inside a 260px scroll box — the same
+ * The allowlist listed all 42 languages inside a 260px scroll box, the same
  * "walk the list" problem the chip's menu had, and it takes the same answer.
  */
 describe('source language allowlist', () => {
+  // P3-4: a scroll box inside a long page traps the wheel; the filter field
+  // already shortens the list, so the grid takes its full height.
+  it('does not scroll inside the page', () => {
+    expect(grid(mount()).className).not.toMatch(/overflow|max-h/);
+  });
+
+  // A set, not applied-at-once settings: a row of OFF switches read as "not translated".
+  it('draws each language as a toggle chip with a tick, not a switch', () => {
+    const el = mount();
+    expect(grid(el).querySelector('[role=switch], input[type=checkbox]')).toBeNull();
+    let patched: string[] | undefined;
+    render(null, el);
+    render(
+      <FilterSection settings={{ ...defaultSettings(), sourceLangAllowlist: ['ja'] }} onPatch={(p) => (patched = p.sourceLangAllowlist)} />,
+      el,
+    );
+    const on = [...rows(el)].filter((b) => b.getAttribute('aria-pressed') === 'true');
+    expect(on).toHaveLength(1);
+    expect(on[0]!.querySelector('use[href="#i-check"]')).not.toBeNull();
+    expect(grid(el).querySelectorAll('use[href="#i-check"]')).toHaveLength(1);
+    (([...rows(el)].find((b) => b.getAttribute('aria-pressed') === 'false')) as HTMLElement).click();
+    expect(patched).toHaveLength(2);
+  });
+
   it('offers every language before anything is typed', () => {
     const el = mount();
     expect(rows(el)).toHaveLength(LANGUAGES.length);
@@ -85,5 +109,26 @@ describe('source language allowlist', () => {
     await type(el, 'fr');
     await type(el, '');
     expect(rows(el)).toHaveLength(LANGUAGES.length);
+  });
+});
+
+// A glossary line without an arrow used to vanish without a word.
+describe('glossary', () => {
+  it('names the lines it cannot read, and only those', () => {
+    host = document.createElement('div');
+    document.body.appendChild(host);
+    const settings = { ...defaultSettings(), glossary: ['kusa->lol', 'kusa=lol'] };
+    render(<FilterSection settings={settings} onPatch={() => {}} />, host);
+    const status = [...host.querySelectorAll('[role=status]')].find((n) => n.textContent?.includes('kusa'));
+    expect(status?.textContent).toContain('kusa=lol');
+    expect(status?.textContent).not.toContain('kusa->lol');
+  });
+
+  it('says nothing when every line reads', () => {
+    host = document.createElement('div');
+    document.body.appendChild(host);
+    const settings = { ...defaultSettings(), glossary: ['kusa->lol', '草→lol'] };
+    render(<FilterSection settings={settings} onPatch={() => {}} />, host);
+    expect(host.textContent).not.toContain('word -> replacement:');
   });
 });

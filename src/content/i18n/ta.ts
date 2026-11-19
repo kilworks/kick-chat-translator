@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const ta: Record<string, string> = {
+  barBlocked: 'இங்கே மொழிபெயர்க்கப்படவில்லை',
+  barBlockedTipBlack: 'இந்தச் சேனல் உங்கள் தடுப்புப்பட்டியலில் உள்ளது (விருப்பங்கள், வடிகட்டிகள்)',
+  barBlockedTipWhite: 'இந்தச் சேனல் உங்கள் அனுமதிப்பட்டியலில் இல்லை (விருப்பங்கள், வடிகட்டிகள்)',
+  barCount: 'இந்தப் பக்கத்தில் மொழிபெயர்த்தவை: $N$',
   barLangDir: 'மற்ற பார்வையாளர்களின் அரட்டை, உங்களுக்காக மொழிபெயர்க்கப்பட்டது',
   barOff: 'மொழிபெயர்ப்பு முடக்கம்',
   barOn: 'மொழிபெயர்க்கிறது',

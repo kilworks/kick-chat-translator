@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const lv: Record<string, string> = {
+  barBlocked: 'Šeit netiek tulkots',
+  barBlockedTipBlack: 'Šis kanāls ir tavā bloķēto kanālu sarakstā (Iestatījumi, Filtri)',
+  barBlockedTipWhite: 'Šī kanāla nav tavā atļauto kanālu sarakstā (Iestatījumi, Filtri)',
+  barCount: 'Iztulkots šajā lapā: $N$',
   barLangDir: 'Citu skatītāju čats, tulkots tev',
   barOff: 'Tulkošana izslēgta',
   barOn: 'Tulkošana ieslēgta',

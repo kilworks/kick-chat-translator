@@ -43,19 +43,35 @@ export function isSlangOnly(text: string): boolean {
   return tokens.every(isSlangToken);
 }
 
+// U+2192 is not on most keyboards, so the typed arrows count too. A lone `=`
+// does not: it is too common inside the text itself.
+const GLOSSARY_SEP = /→|->|=>/;
+
+function parseGlossaryEntry(entry: string): { from: string; to: string } | undefined {
+  const m = GLOSSARY_SEP.exec(entry);
+  if (!m) return undefined;
+  const from = entry.slice(0, m.index).trim();
+  if (!from) return undefined;
+  return { from, to: entry.slice(m.index + m[0].length).trim() };
+}
+
+/** The non-empty lines the glossary cannot read, shown back to the reader. */
+export function ignoredGlossaryLines(entries: string[]): string[] {
+  return entries.filter((e) => e.trim() && !parseGlossaryEntry(e));
+}
+
 /**
  * Apply user-defined glossary replacements to a translated string.
- * Each entry is "source→replacement". Case-insensitive word boundary replace.
+ * Each entry is "source→replacement" (or `->`, `=>`). Case-insensitive word
+ * boundary replace.
  */
 export function applyUserGlossary(text: string, entries: string[]): string {
   if (entries.length === 0) return text;
   let out = text;
   for (const entry of entries) {
-    const sep = entry.indexOf('→');
-    if (sep < 1) continue;
-    const from = entry.slice(0, sep).trim();
-    const to = entry.slice(sep + 1).trim();
-    if (!from) continue;
+    const parsed = parseGlossaryEntry(entry);
+    if (!parsed) continue;
+    const { from, to } = parsed;
     try {
       // \b is ASCII-only, so anchoring both ends unconditionally made every
       // non-ASCII term ("草→lol", "привет→hi", "café→coffee") match nothing.

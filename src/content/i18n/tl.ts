@@ -1,5 +1,9 @@
 /** Chat and floating-bar strings. This file is the source, edit it by hand; msg.coverage.test.ts holds it to every msg() call. */
 export const tl: Record<string, string> = {
+  barBlocked: 'Hindi isinalin dito',
+  barBlockedTipBlack: 'Nasa blocklist mo ang channel na ito (Mga setting, Mga filter)',
+  barBlockedTipWhite: 'Wala sa allowlist mo ang channel na ito (Mga setting, Mga filter)',
+  barCount: 'Naisalin sa page na ito: $N$',
   barLangDir: 'Chat ng ibang viewer, isinalin para sa iyo',
   barOff: 'Naka-off ang pagsasalin',
   barOn: 'Isinasalin',

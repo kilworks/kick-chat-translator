@@ -12,7 +12,7 @@ Free, no account, nothing to set up. 43 languages, in the chat and in the extens
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Firefox Add-on](https://img.shields.io/amo/v/kick-chat-translator?label=Firefox%20Add-on&color=53fc18)](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)
-[![CI](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml)
+[![CI](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [Français](README.fr.md) · [Español](README.es.md) · [Português (Portugal)](README.pt-PT.md) · [Português (Brasil)](README.pt-BR.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Svenska](README.sv.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Українська](README.uk.md) · [Türkçe](README.tr.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [ไทย](README.th.md) · [Tiếng Việt](README.vi.md) · [Bahasa Indonesia](README.id.md) · [हिन्दी](README.hi.md) · [Suomi](README.fi.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Ελληνικά](README.el.md) · [Magyar](README.hu.md) · [Български](README.bg.md) · [Català](README.ca.md) · [Slovenščina](README.sl.md) · [Eesti](README.et.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [فارسی](README.fa.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Bahasa Melayu](README.ms.md) · [Filipino](README.tl.md) · [粵語](README.yue.md)
@@ -77,7 +77,7 @@ Store copies update themselves.
 <details>
 <summary>Install by hand, from a release zip</summary>
 
-Download the zip for your browser from [Releases](https://github.com/Pkkls/kick-chat-translator/releases/latest) and unzip it.
+Download the zip for your browser from [Releases](https://github.com/kilworks/kick-chat-translator/releases/latest) and unzip it.
 
 - Chrome, Brave, Edge (`…-chromium.zip`): open `chrome://extensions`, turn on Developer mode, click Load unpacked, pick the folder.
 - Firefox 121+ (`…-firefox.zip`): open `about:debugging#/runtime/this-firefox`, click Load Temporary Add-on, pick `manifest.json`.
@@ -107,11 +107,14 @@ the cloud chain takes over and nothing breaks.
 
 ## Settings
 
-Click the gear on the chat bar, or right-click the extension icon and choose Options.
+Click the gear on the chat bar, or right-click the extension icon and choose Options. The page opens on
+Display.
 
-- **Providers**: engine order, your DeepL key, and the mode: on-device first, cloud first, or on-device only
 - **Display**: target language, display style, original text and language badge, text size, line spacing,
-  typeface, accent colour, chat theme, the compose preview and what clicking it does
+  typeface, density, accent colour, chat theme, the compose preview, what clicking it does and which key
+  swaps in the translation
+- **Providers**: engine order with each engine's state, the mode (on-device first, cloud first, or
+  on-device only), and your DeepL key once DeepL is in the order
 - **Filters**: bots, users, channels, keywords, source languages, and a glossary of replacements
 - **Advanced**: cache size and lifetime, concurrent requests, a per-channel rate limit, backup and restore
 - **Activity**: messages translated, cache hits, every language seen in chat, and why each of the last 50
@@ -144,7 +147,7 @@ already in the reading language. If the tab shows nothing at all, the extension 
 please open an issue.
 
 **The green bar disappeared.**
-Refresh the page. If it happens again, open an [issue](https://github.com/Pkkls/kick-chat-translator/issues)
+Refresh the page. If it happens again, open an [issue](https://github.com/kilworks/kick-chat-translator/issues)
 with the channel and what you did before.
 
 **How do I get better translations?**
@@ -162,7 +165,7 @@ the 43.
 Yes, the same way as on live streams.
 
 **It broke after a Kick update.**
-Kick sometimes changes how its chat is built. Open an [issue](https://github.com/Pkkls/kick-chat-translator/issues)
+Kick sometimes changes how its chat is built. Open an [issue](https://github.com/kilworks/kick-chat-translator/issues)
 and it gets patched.
 
 **Is this made by Kick?**
@@ -170,19 +173,22 @@ No. It is an independent open-source project, not affiliated with Kick.
 
 ## What's new
 
-In 3.2.0:
+Coming in the next update:
 
-- The settings, the popup and the chat bar speak all 43 languages the extension translates into, not 10, with Hebrew and Persian right to left like Arabic
-- The ten languages it already spoke were rewritten to read as written in that language, not word for word from English
-- The interface language menu shows each language's flag and works with the keyboard
+- The settings open on Display, every on/off setting is a switch, and fonts, density, chat theme and accent colour show their choices as buttons and swatches
+- Each translation engine says whether it is ready or paused, and why
+- A channel your lists leave out says "Not translated here" instead of going quiet
+- The popup fits without a scrollbar in all 43 interface languages
+
+In 3.5.0, cloud first became the default engine mode, and lines the engine hands back unchanged are asked again with the channel's language.
 
 Every release, with what changed and the measurement behind it:
-[Releases](https://github.com/Pkkls/kick-chat-translator/releases) and [CHANGELOG.md](CHANGELOG.md).
+[Releases](https://github.com/kilworks/kick-chat-translator/releases) and [CHANGELOG.md](CHANGELOG.md).
 
 ## Development
 
 ```bash
-git clone https://github.com/Pkkls/kick-chat-translator.git
+git clone https://github.com/kilworks/kick-chat-translator.git
 cd kick-chat-translator
 npm ci
 npm run release:check    # typecheck, lint, unit tests, build: the gate every package goes through
@@ -229,10 +235,6 @@ Stack: Manifest V3, Vite, TypeScript, Preact, Tailwind.
 ## Related projects
 
 - [Twitch Chat Translator](https://github.com/kilworks/twitch-chat-translator), the same extension for Twitch chat
-- [kick-ad-blocker](https://github.com/Pkkls/kick-ad-blocker), blocks Kick's pre-roll and overlay ads
-- [kick-core](https://github.com/Pkkls/kick-core), the realtime gateway client shared across these extensions
-- [kickbus](https://github.com/Pkkls/kickbus), official Kick webhooks relayed to local bots over SSE
-- [kick-drops-miner](https://github.com/Pkkls/kick-drops-miner), Windows app that progresses Kick drop watch-time
 
 ## License
 

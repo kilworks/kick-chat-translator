@@ -17,8 +17,20 @@ export function shouldDropByUserOrChannel(meta: MessageMeta, settings: Settings)
     return 'bot';
   }
   if (settings.blacklistUsers.some((u) => foldCase(u) === user)) return 'user_blacklisted';
-  if (settings.blacklistChannels.includes(meta.channel)) return 'channel_blacklisted';
-  if (settings.whitelistChannels.length > 0 && !settings.whitelistChannels.includes(meta.channel)) {
+  return channelBlockedBy(settings, meta.channel);
+}
+
+/**
+ * Whether a channel list keeps a whole channel from being translated. Shared by
+ * the line filter and by the bar and popup, which have to say so: a forgotten
+ * allowlist used to leave the bar reading "Translating" over an untouched chat.
+ */
+export function channelBlockedBy(
+  settings: Settings,
+  channel: string,
+): 'channel_blacklisted' | 'channel_not_whitelisted' | undefined {
+  if (settings.blacklistChannels.includes(channel)) return 'channel_blacklisted';
+  if (settings.whitelistChannels.length > 0 && !settings.whitelistChannels.includes(channel)) {
     return 'channel_not_whitelisted';
   }
   return undefined;

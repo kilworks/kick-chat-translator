@@ -1,28 +1,30 @@
 {
-  "genere": "2026-11-04T00:02:16.786Z",
+  "genere": "2026-11-19T22:30:11.670Z",
   "parQui": ".agent/state.mjs",
   "avertissement": "Genere. Ne pas editer a la main : la prochaine passe ecrase. La version commitee decrit l'etat d'AVANT le commit qui la porte, puisque la fin de passe genere puis commite : git.head y pointe le commit precedent et git.arbrePropre y est faux. Relancer `node .agent/state.mjs` avant de lire, ce que le prompt demande deja en premier.",
   "git": {
     "remotesEnDouble": [],
-    "branche": "feat/corpus5-ru-translit",
-    "head": "1c743c4396cf6ee29cdec63608af7f3aaff04bd9",
-    "sujet": "Add blind chat corpus 5, measured in totals before any rule it judges",
+    "branche": "feat/ui-comfort",
+    "head": "60b532caef524423dc463a831e902c30e4aec25a",
+    "sujet": "Refresh README captures and changelog for the UI comfort pass",
     "arbrePropre": false,
-    "fichiersModifies": 9,
-    "dernierTag": "v3.3.0",
-    "decrit": "v3.3.0-6-g1c743c4",
+    "fichiersModifies": 7,
+    "dernierTag": "v3.5.0",
+    "decrit": "v3.5.0-7-g60b532c",
     "remotes": {
       "origin": "https://github.com/kilworks/kick-chat-translator.git"
     },
     "ecarts": {
       "origin": {
-        "note": "pas de origin/feat/corpus5-ru-translit connu localement"
+        "derriere": 0,
+        "devant": 0,
+        "aJour": true
       }
     }
   },
   "versions": {
-    "packageJson": "3.3.0",
-    "distManifest": "3.3.0",
+    "packageJson": "3.5.0",
+    "distManifest": "3.5.0",
     "accordent": true,
     "note": null
   },
@@ -171,7 +173,7 @@
       "poids-notes",
       "audit-fiche"
     ],
-    "harnaisSurDisque": 82,
+    "harnaisSurDisque": 86,
     "orphelins": [
       "a11y",
       "anglais-essai",
@@ -187,6 +189,7 @@
       "collision-clavier",
       "compose-kick-live",
       "compose-scenarios",
+      "exclusivity-check",
       "feuille",
       "flag-render",
       "flags-preview",
@@ -221,12 +224,15 @@
       "porte-partagee-diagnostic",
       "probe-row-space",
       "readme-rendu",
+      "real-bench",
       "session-check",
       "shlyokavitsa",
       "shlyokavitsa-bout-en-bout",
       "store-shots",
       "store-shots-fixture",
       "store-shots-lines",
+      "translation-quality",
+      "translation-score",
       "translit-grille",
       "translit-horsdico",
       "translit-reel",
@@ -234,67 +240,54 @@
       "unanimite",
       "variante"
     ],
-    "nbOrphelins": 60,
+    "nbOrphelins": 64,
     "note": "Les portes live ouvrent un navigateur sur kick.com et ne sont dans aucun runner. Un orphelin n est pas forcement un defaut ; un orphelin qui couvre du code livre en est un."
   },
   "releaseGithub": {
     "depot": "kilworks/kick-chat-translator",
     "http": 200,
-    "tag": "v3.3.0",
-    "publiee": "2026-10-16T19:15:39Z",
+    "tag": "v3.5.0",
+    "publiee": "2026-11-08T21:23:24Z",
     "assets": [
       {
-        "nom": "kick-chat-translator-3.3.0-chromium.zip",
-        "octets": 448844
+        "nom": "kick-chat-translator-3.5.0-chromium.zip",
+        "octets": 453984
       },
       {
-        "nom": "kick-chat-translator-3.3.0-firefox.zip",
-        "octets": 448795
+        "nom": "kick-chat-translator-3.5.0-firefox.zip",
+        "octets": 453936
       },
       {
-        "nom": "kick-chat-translator-3.3.0-source.zip",
-        "octets": 3740880
+        "nom": "kick-chat-translator-3.5.0-source.zip",
+        "octets": 3905626
       }
     ]
   },
   "paquetsContreRelease": {
-    "compares": 2,
-    "ecarts": [
-      {
-        "fichier": "kick-chat-translator-3.3.0-chromium.zip",
-        "local": 448823,
-        "publie": 448844,
-        "delta": -21
-      },
-      {
-        "fichier": "kick-chat-translator-3.3.0-firefox.zip",
-        "local": 448774,
-        "publie": 448795,
-        "delta": -21
-      }
-    ],
-    "note": "un zip local porte un numero publie sans etre ce build : ne pas le soumettre, republier ou le supprimer"
+    "compares": 0,
+    "ecarts": [],
+    "note": null
   },
   "boutiques": {
     "note": "Lu sur les pages, jamais recopie. Une version de boutique change sans commit : la valeur commitee ici decrit l'instant de la generation et rien d'autre.",
     "chrome": {
       "id": "nkkjmbkmacbdkboijmnhjnblcaiclhni",
       "http": 200,
-      "version": "3.3.0",
-      "maj": "October 17, 2026",
-      "utilisateurs": 212
+      "version": "3.5.0",
+      "maj": "November 9, 2026",
+      "utilisateurs": 252
     },
     "amo": {
       "slug": "kick-chat-translator",
       "http": 200,
-      "version": "3.3.0",
-      "relue": "2026-10-16T19:21:41Z",
-      "utilisateurs": 9,
+      "version": "3.5.0",
+      "relue": "2026-11-08T21:26:49Z",
+      "utilisateurs": 16,
       "statut": "public"
     }
   },
   "boutiquesContreVersion": {
-    "versionLocale": "3.3.0",
+    "versionLocale": "3.5.0",
     "chrome": "a jour",
     "amo": "a jour",
     "note": "Un retard n'est pas un defaut : soumettre est du ressort de kil. Ce champ existe pour qu'on cesse de citer un chiffre de tete."
@@ -310,10 +303,14 @@
       "**A real chat capture, once, so the frequencies stop being guesses.**",
       "**Emote picker dodge: only the Kick-specific half is still blocked.** The",
       "**Native review of the store text.** 8 languages of 10 on the Chrome side",
-      "**Store submissions.** The 2.10.0 archives exist and are published on"
+      "**Store submissions.** The 2.10.0 archives exist and are published on",
+      "**Validate the popup direction** before phase 2 (options, chat): before",
+      "**DeepL's free figure is not stated on one official page.** Support",
+      "**`local-only` with on-device off is migrated to on-device on.** That pair",
+      "**Live smoke of the UI comfort pass on kick.com was not run**: Claude in Chrome was not connected in the session (2026-11-19). To do in Brave, read only: chat bar, language panel, one incoming translation, compose preview visible without sending; then the options (Display landing, switches, segmented controls) and the popup."
     ],
-    "nbBloques": 10,
-    "nbOuverts": 5,
-    "nbFaits": 120
+    "nbBloques": 14,
+    "nbOuverts": 19,
+    "nbFaits": 127
   }
 }

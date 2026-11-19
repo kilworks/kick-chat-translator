@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'preact';
 import { act } from 'preact/test-utils';
 import { defaultSettings, type Settings } from '~/shared/settings';
@@ -6,14 +7,14 @@ import { DisplaySection } from './DisplaySection';
 
 const SAMPLE = '¿alguien más está viendo esto?';
 
-function mount(patch: Partial<Settings>): HTMLElement {
+function mount(patch: Partial<Settings>, onPatch: (p: Partial<Settings>) => void = () => undefined): HTMLElement {
   const root = document.createElement('div');
   document.body.appendChild(root);
   // act flushes the effect synchronously for a sync callback; the thenable it
   // hands back is only useful for async ones, so it is deliberately dropped.
   void act(() => {
     render(
-      <DisplaySection settings={{ ...defaultSettings(), ...patch }} onPatch={() => undefined} />,
+      <DisplaySection settings={{ ...defaultSettings(), ...patch }} onPatch={onPatch} />,
       root,
     );
   });
@@ -122,5 +123,122 @@ describe('keep-original while Replace is selected', () => {
     const root = mount({ displayStyle: style });
     expect(keepOriginal(root)!.disabled).toBe(false);
     expect(root.textContent).not.toContain('The Replace style always hides it.');
+  });
+});
+
+const group = (root: HTMLElement, name: string) =>
+  [...root.querySelectorAll<HTMLElement>('[role=radiogroup]')].find(
+    (g) => document.getElementById(g.getAttribute('aria-labelledby') ?? '')?.textContent === name,
+  );
+
+// Three to five choices behind a <select> cost a click and hide the options.
+describe('small sets are shown as choices, not dropdowns', () => {
+  it.each([
+    ['Font', 5],
+    ['Density', 3],
+    ['Chat theme', 3],
+    ['Accent colour', 4],
+    ['Clicking the preview', 2],
+    ['Key that swaps in the translation', 2],
+  ])('%s is a radio group of %i', (name, n) => {
+    const root = mount({});
+    const g = group(root, name);
+    expect(g, `no radio group named ${name}`).toBeDefined();
+    expect(g!.querySelectorAll('[role=radio]')).toHaveLength(n);
+  });
+
+  it('leaves the language pickers as the only dropdowns', () => {
+    expect(mount({}).querySelectorAll('select')).toHaveLength(2);
+  });
+
+  it('names each accent swatch by its colour and reports the pick', () => {
+    const onPatch = vi.fn();
+    const root = mount({ accent: 'kick' }, onPatch);
+    const swatches = [...group(root, 'Accent colour')!.querySelectorAll<HTMLElement>('[role=radio]')];
+    expect(swatches.map((s) => s.getAttribute('aria-label'))).toEqual(['Kick green', 'Cyan', 'Violet', 'Amber']);
+    swatches[2]!.click();
+    expect(onPatch).toHaveBeenCalledWith({ accent: 'violet' });
+  });
+
+  it('maps the compose choices onto their stored values', () => {
+    const onPatch = vi.fn();
+    const root = mount({ composeInsertMode: 'insert', composeInsertKey: 'tab-and-enter' }, onPatch);
+    const pick = (name: string, label: string) =>
+      [...group(root, name)!.querySelectorAll<HTMLElement>('[role=radio]')].find((r) => r.textContent === label)!.click();
+    pick('Clicking the preview', 'Copies it');
+    expect(onPatch).toHaveBeenCalledWith({ composeInsertMode: 'copy' });
+    pick('Key that swaps in the translation', 'Ctrl/Cmd+Enter only');
+    expect(onPatch).toHaveBeenCalledWith({ composeInsertKey: 'ctrl-enter' });
+    expect(onPatch).toHaveBeenCalledTimes(2);
+  });
+
+  it('maps the compose choices back the other way', () => {
+    const onPatch = vi.fn();
+    const root = mount({ composeInsertMode: 'copy', composeInsertKey: 'ctrl-enter' }, onPatch);
+    const pick = (name: string, label: string) =>
+      [...group(root, name)!.querySelectorAll<HTMLElement>('[role=radio]')].find((r) => r.textContent === label)!.click();
+    pick('Clicking the preview', 'Puts it in the chat box');
+    expect(onPatch).toHaveBeenLastCalledWith({ composeInsertMode: 'insert' });
+    pick('Key that swaps in the translation', 'Tab or Ctrl/Cmd+Enter');
+    expect(onPatch).toHaveBeenLastCalledWith({ composeInsertKey: 'tab-and-enter' });
+    expect(onPatch).toHaveBeenCalledTimes(2);
+  });
+});
+
+// The settings that change the preview sat below it and changed out of view.
+describe('preview stays in view', () => {
+  it('is pinned at the top of its card, above every setting it shows', () => {
+    const root = mount({});
+    const preview = root.querySelector<HTMLElement>('[data-kt-preview]');
+    expect(preview, 'no pinned preview').not.toBeNull();
+    expect(preview!.classList.contains('sticky')).toBe(true);
+    expect(preview!.classList.contains('bg-kick-surface')).toBe(true);
+    // No hard cut under it, and no 43% of a 400% zoom viewport.
+    expect(preview!.classList.contains('border-b')).toBe(true);
+    expect(preview!.classList.contains('border-kick-stroke')).toBe(true);
+    expect(preview!.className).toContain('[@media(max-height:500px)]:static');
+    const card = preview!.closest('section')!;
+    const first = card.querySelector('button, input, select');
+    expect(preview!.compareDocumentPosition(first!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
+describe('style cards state', () => {
+  const cards = (root: HTMLElement) =>
+    [...root.querySelectorAll<HTMLElement>('button[aria-pressed]')];
+
+  it('presses only the chosen card and ticks it', () => {
+    const root = mount({ displayStyle: 'inline' });
+    const c = cards(root);
+    expect(c.map((b) => b.getAttribute('aria-pressed'))).toEqual(['false', 'true', 'false', 'false']);
+    expect(c.map((b) => b.querySelector('use')?.getAttribute('href') ?? null)).toEqual([null, '#i-card-check', null, null]);
+    expect(root.querySelector('symbol#i-card-check path')?.getAttribute('d')).toBe('M20 6 9 17l-5-5');
+  });
+});
+
+describe('labels are tied to their control', () => {
+  it('every label has a for that resolves to a control', () => {
+    const root = mount({});
+    const labels = [...root.querySelectorAll('label.kt-label')];
+    expect(labels.length).toBeGreaterThanOrEqual(4);
+    for (const l of labels) {
+      const f = l.getAttribute('for');
+      expect(f, l.textContent ?? '').toBeTruthy();
+      expect(document.getElementById(f!)).not.toBeNull();
+    }
+  });
+});
+
+describe('plain words', () => {
+  it('drops the warning and the "(off = ...)" phrasing', () => {
+    const text = mount({}).textContent ?? '';
+    expect(text).not.toContain('may still change');
+    expect(text).not.toContain('(off =');
+    expect(text).not.toContain('(toggle live)');
+  });
+
+  it('keeps meaningful text at 12px or more', () => {
+    const src = readFileSync('src/options/sections/DisplaySection.tsx', 'utf8');
+    expect(src.match(/text-\[(9|10|11)px\]/g)).toBeNull();
   });
 });

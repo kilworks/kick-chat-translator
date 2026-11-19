@@ -91,6 +91,9 @@ for (const charge of [false, true]) {
         showSourceBadge: true,
         showProviderBadge: false,
         showFloatingBar: true,
+        // Real settings always carry the channel lists (zod defaults); the bar reads them (P1-7).
+        blacklistChannels: [],
+        whitelistChannels: [],
       };
       const { mountFloatingBar, updateFloatingBar, showThrottleIndicator, updateLocalChip } =
         window.Injector;

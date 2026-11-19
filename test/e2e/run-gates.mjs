@@ -189,7 +189,8 @@ const flag = (name, fallback) => {
  * cores, which is the cautious-looking default, leaves 6.4s on the table.
  *
  * 16.8s is within 1.9s of the floor, which is the longest single gate:
- * measure-popup loads the popup in ten languages and takes 14.9s on its own.
+ * measure-popup loads the popup in all 43 languages and six states, 56.2s on
+ * its own (2026-11-19; ten languages and 14.9s before).
  * Nothing above this line can go faster than that, so splitting the gates
  * themselves would buy seconds for real complexity.
  */

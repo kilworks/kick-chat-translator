@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useId, useState } from 'preact/hooks';
 import type { Settings } from '~/shared/settings';
 import { useT } from '~/shared/i18nContext';
 import { flagClass } from '~/shared/flags';
@@ -27,6 +27,7 @@ export function EngineCard({ settings, onPatch }: Props) {
   const t = useT();
   const present = ctor() !== undefined;
   const [probe, setProbe] = useState<Record<string, string>>({});
+  const dlId = useId();
   const [busy, setBusy] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -71,48 +72,64 @@ export function EngineCard({ settings, onPatch }: Props) {
       <div class="flex items-center justify-between">
         <h2 class="kt-section">{t('Engine')}</h2>
         <span
-          class={`text-[11px] font-medium ${present ? 'text-kick-primary' : 'text-kick-muted'}`}
+          class={`text-xs font-medium ${present ? 'text-kick-primary' : 'text-kick-muted'}`}
         >
-          {`${t('on-device:')} ${present ? t('available ✓') : t('not supported in this browser')}`}
+          {present ? t('On-device: ready') : t('On-device: not in this browser')}
         </span>
       </div>
 
-      <div class="kt-row">
-        <label class="kt-label">{t('Strategy')}</label>
-        <select
-          aria-label={t('Strategy')}
-          class="kt-select"
-          value={settings.engineMode}
-          onChange={(e) =>
-            onPatch({ engineMode: (e.target as HTMLSelectElement).value as Settings['engineMode'] })
-          }
-        >
-          <option value="local-first">{t('On-device first, cloud fallback')}</option>
-          <option value="cloud-first">{t('Cloud first, on-device fallback (recommended)')}</option>
-          <option value="local-only">{t('On-device only (no network, no cloud)')}</option>
-        </select>
-        <p class="text-[11px] text-kick-muted">
-          {t(
-            'On-device = local Chromium models: unlimited, instant, private, no rate-limit. Each language needs a one-time model download (click a flag below, or the "Local" chip in chat).',
-          )}
-        </p>
-      </div>
-
+      {/* One concept, two fields: the switch comes first and drives the
+          strategy, so "on-device only" with on-device off (which translated
+          nothing, engineMode.combos.test.ts) cannot be made here. Browsers
+          without the API keep both as they were. */}
       <div class="kt-setting">
         <Check
           checked={settings.localEnabled}
           onChange={(v) => onPatch({ localEnabled: v })}
           label={t('Enable on-device translation')}
+          disabled={present && settings.engineMode === 'local-only'}
+          hint={
+            present && settings.engineMode === 'local-only'
+              ? t('Stays on while the strategy is on-device only.')
+              : undefined
+          }
           reverse
         />
       </div>
 
+      <div class="kt-row">
+        <label class="kt-label" for="kt-engine-mode">{t('Strategy')}</label>
+        <select
+          id="kt-engine-mode"
+          aria-label={t('Strategy')}
+          class="kt-select"
+          value={settings.engineMode}
+          disabled={present && !settings.localEnabled}
+          onChange={(e) =>
+            onPatch({ engineMode: (e.target as HTMLSelectElement).value as Settings['engineMode'] })
+          }
+        >
+          <option value="local-first">{t('On-device first, cloud if needed')}</option>
+          <option value="cloud-first">{t('Cloud first, on-device if needed (recommended)')}</option>
+          <option value="local-only">{t('On-device only (nothing sent online)')}</option>
+        </select>
+        <p class="text-xs text-kick-muted">
+          {!present
+            ? t('This browser cannot translate on your computer, so the cloud engines translate everything.')
+            : !settings.localEnabled
+              ? t('On-device is off, so the cloud engines translate everything.')
+              : t(
+                  'On-device translates on your computer: free, fast, private, no daily limit. Each language is a one-time download: pick it below, or "Local" in the chat.',
+                )}
+        </p>
+      </div>
+
       {present && (
         <div>
-          <label class="kt-label mb-1 block">
-            {`${t('Download models →')} ${settings.targetLang.toUpperCase()}`}
-          </label>
-          <div class="flex flex-wrap gap-1.5">
+          <span id={dlId} class="kt-label mb-2 block">
+            {`${t('Download languages →')} ${settings.targetLang.toUpperCase()}`}
+          </span>
+          <div role="group" aria-labelledby={dlId} class="flex flex-wrap gap-2">
             {COMMON_SOURCES.filter((s) => s !== settings.targetLang).map((s) => {
               const st = probe[s] ?? 'unknown';
               const ready = st === 'available';
@@ -126,7 +143,7 @@ export function EngineCard({ settings, onPatch }: Props) {
                       ? 'border-kick-primary/50 bg-kick-primary/10 text-kick-primary cursor-default'
                       : st === 'unavailable'
                         ? // 50% opacity measured 2.76:1, which WCAG lets pass for a disabled
-                          // control — except the label IS the information here: it names
+                          // control, except the label IS the information here: it names
                           // which language pair has no model. 75% keeps AA on both
                           // grounds (4.62 on a card, 4.85 on the page) and still reads
                           // as unavailable next to the enabled ones.

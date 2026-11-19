@@ -224,7 +224,8 @@ await sw.evaluate(
   async ([read, ui]) => {
     const KEY = 'kt.settings.v2';
     const cur = (await chrome.storage.sync.get(KEY))[KEY] ?? {};
-    await chrome.storage.sync.set({ [KEY]: { ...cur, targetLang: read, uiLang: ui } });
+    // The usual popup, not the one-time consent card: the README promises providers and counts.
+    await chrome.storage.sync.set({ [KEY]: { ...cur, targetLang: read, uiLang: ui, usageStatsAsked: true } });
   },
   [READ, UI],
 );

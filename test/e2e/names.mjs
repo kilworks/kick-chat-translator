@@ -23,7 +23,7 @@ import { chromium } from './playwright.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SURFACES = [
   ['popup', path.join(HERE, 'popup.html')],
-  ...['providers', 'display', 'filters', 'advanced', 'debug', 'about'].map((t) => [
+  ...['providers', 'display', 'filters', 'advanced', 'activity', 'about'].map((t) => [
     t,
     path.join(HERE, 'options', `${t}.html`),
   ]),

@@ -23,9 +23,8 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'display', label: 'Display' },
   { id: 'filters', label: 'Filters' },
   { id: 'advanced', label: 'Advanced' },
-  // Ce que cet onglet montre n'est pas du deboguage : c'est le total des
-  // messages traduits, ce que le cache a evite et les langues vues. L'appeler
-  // Debug disait au lecteur que ce n'etait pas pour lui.
+  // Not debugging: the total of translated messages, what the cache saved and
+  // the languages seen. Calling it Debug told the reader it was not for them.
   { id: 'activity', label: 'Activity' },
   { id: 'about', label: 'About' },
 ];
@@ -34,7 +33,14 @@ export function App() {
   const [settings, setSettings] = useState<Settings>(defaultSettings());
   const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const [stats, setStats] = useState<UsageStats | undefined>(undefined);
-  const [tab, setTab] = useState<Tab>('providers');
+  // `#filters` and the like open on that tab: the popup links straight to the
+  // setting that explains why a channel is not translated. Without a hash the
+  // page lands on Display, where the language and the look are: a newcomer's
+  // first question, where Providers is the most technical tab.
+  const [tab, setTab] = useState<Tab>(() => {
+    const asked = location.hash.slice(1);
+    return TABS.some((tb) => tb.id === asked) ? (asked as Tab) : 'display';
+  });
   const [savedAt, setSavedAt] = useState<number | undefined>(undefined);
   const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
 
@@ -72,12 +78,14 @@ export function App() {
     if (!keys.includes(e.key)) return;
     e.preventDefault();
     const i = TABS.findIndex((x) => x.id === tab);
+    // Left and right are mirrored in a right-to-left interface, as in Segmented.
+    const fwd = getComputedStyle(e.currentTarget as HTMLElement).direction === 'rtl' ? 'ArrowLeft' : 'ArrowRight';
     const next =
       e.key === 'Home'
         ? 0
         : e.key === 'End'
           ? TABS.length - 1
-          : (i + (e.key === 'ArrowRight' ? 1 : -1) + TABS.length) % TABS.length;
+          : (i + (e.key === fwd ? 1 : -1) + TABS.length) % TABS.length;
     const id = TABS[next]!.id;
     setTab(id);
     requestAnimationFrame(() => tabRefs.current[id]?.focus());
@@ -103,11 +111,6 @@ export function App() {
             <h1 class="text-2xl font-bold tracking-tight">Kick Chat Translator</h1>
             <p class="text-xs text-kick-muted">
               v{chrome.runtime.getManifest().version} · {t('options & preferences')}
-              {/* kil, 2026-10-16: the options say they are still being reworked
-                  (Filters was redone the same day), the store listings do not. */}
-              <span class="ms-2 rounded border border-kick-stroke px-1.5 py-px text-[10px] uppercase tracking-wider">
-                {t('Work in progress')}
-              </span>
             </p>
           </div>
           <div class="ms-auto flex items-center gap-3">
@@ -119,16 +122,18 @@ export function App() {
         {/* The APG tabs pattern, which this was missing entirely: without
             role=tab and aria-selected a screen reader announces six unrelated
             buttons and cannot say which one is showing. Roving tabindex keeps
-            the whole bar to a single tab stop — it took five before — and the
+            the whole bar to a single tab stop (it took five before), and the
             arrows move between tabs, which is where a keyboard user reaches
             for them. */}
         {/* The Discord link sits on the tab row but outside the tablist: a link
-            inside role=tablist would break the arrow-key pattern above. */}
+            inside role=tablist would break the arrow-key pattern above. The
+            tabs wrap rather than scroll: a scrolled-out tab still sat under
+            the link at 320 and 414px (verify_overflow). */}
         <div class="mb-5 flex items-center border-b border-kick-border">
           <nav
             role="tablist"
             aria-label={t('Settings sections')}
-            class="kt-tabs flex min-w-0 flex-1 gap-1 overflow-x-auto"
+            class="kt-tabs flex min-w-0 flex-1 flex-wrap gap-2"
             onKeyDown={onTabKey}
           >
             {TABS.map((tb) => (
@@ -137,7 +142,7 @@ export function App() {
                 id={`tab-${tb.id}`}
                 role="tab"
                 aria-selected={tab === tb.id}
-                aria-controls={`panel-${tb.id}`}
+                aria-controls={tab === tb.id ? `panel-${tb.id}` : undefined}
                 tabIndex={tab === tb.id ? 0 : -1}
                 ref={(el) => {
                   tabRefs.current[tb.id] = el as HTMLButtonElement | null;
@@ -156,7 +161,8 @@ export function App() {
           <DiscordLink class="shrink-0 px-2 py-2 text-kick-muted transition hover:text-[#5865F2]" />
         </div>
 
-        <main
+        <main>
+        <div
           id={`panel-${tab}`}
           role="tabpanel"
           aria-labelledby={`tab-${tab}`}
@@ -180,6 +186,7 @@ export function App() {
           {tab === 'about' && (
             <AboutSection stats={stats} providers={providers} settings={settings} onPatch={patch} />
           )}
+        </div>
         </main>
       </div>
     </I18nProvider>
@@ -245,8 +252,10 @@ function UiLangPicker({ value, onPick }: { value: Settings['uiLang']; onPick: (v
   };
 
   const label = (l: Settings['uiLang']) => (l === 'auto' ? 'Auto' : UI_LOCALE_NAMES[l]);
+  // Auto shows the flag of the language it resolved to: an empty box in front
+  // of "Auto" read as a missing flag.
   const flag = (l: Settings['uiLang']) => {
-    const c = l === 'auto' ? undefined : uiFlag(l);
+    const c = uiFlag(l === 'auto' ? resolveUiLocale('auto') : l);
     return c ? <span class={`${c} shrink-0`} aria-hidden="true" /> : <span class="inline-block w-[1.33em] shrink-0" />;
   };
 
