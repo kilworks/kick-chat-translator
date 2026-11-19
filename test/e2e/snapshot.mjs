@@ -28,6 +28,8 @@ const OUT = process.argv.includes('--out')
 const TYPES = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
 
 const srv = http.createServer((q, r) => {
+  // CI's Chromium asks for a favicon on its own; its 404 failed the console check.
+  if (q.url === '/favicon.ico') { r.writeHead(204); r.end(); return; }
   const f = path.join(DIST, decodeURIComponent(q.url.split('?')[0]));
   fs.readFile(f, (e, d) => {
     // Name the missing file: the browser's 404 console line carries no URL.
