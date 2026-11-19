@@ -216,6 +216,60 @@ function makeMenu(): HTMLElement {
  */
 export const MENU_COLS = 3;
 
+/**
+ * The grid's lines, as indices of the visible options, the way CSS lays them out.
+ *
+ * `full` takes a line of its own (the auto entry), `break` ends the current
+ * line without being an option (the rule after the favourites, so the full
+ * list starts at column 0 again). Index arithmetic missed both: with one
+ * favourite, Down from it landed on the third language instead of the first.
+ */
+export function gridLines(cells: readonly ('tile' | 'full' | 'break')[], cols: number): number[][] {
+  const lines: number[][] = [];
+  let line: number[] = [];
+  let n = 0;
+  const flush = (): void => {
+    if (line.length) lines.push(line);
+    line = [];
+  };
+  for (const c of cells) {
+    if (c === 'break') {
+      flush();
+    } else if (c === 'full') {
+      flush();
+      lines.push([n++]);
+    } else {
+      line.push(n++);
+      if (line.length === cols) flush();
+    }
+  }
+  flush();
+  return lines;
+}
+
+/**
+ * Where an arrow key goes from option `from`. Up and Down keep the column the
+ * user last chose with Left/Right (`col`), so passing through the one-entry
+ * auto line or a short last line does not drift them sideways. Everything wraps.
+ */
+export function gridMove(
+  lines: readonly number[][],
+  from: number,
+  key: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight',
+  col: number,
+): { to: number; col: number } {
+  const total = lines.reduce((s, l) => s + l.length, 0);
+  if (total === 0) return { to: -1, col };
+  if (key === 'ArrowLeft' || key === 'ArrowRight') {
+    const to = (from + (key === 'ArrowRight' ? 1 : -1) + total) % total;
+    const line = lines.find((l) => l.includes(to))!;
+    return { to, col: line.indexOf(to) };
+  }
+  const li = lines.findIndex((l) => l.includes(from));
+  const next = lines[(li + (key === 'ArrowDown' ? 1 : -1) + lines.length) % lines.length]!;
+  return { to: next[Math.min(col, next.length - 1)]!, col };
+}
+
 export function matchesQuery(name: string, code: string, query: string): boolean {
   const fold = (s: string): string =>
     s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -522,31 +576,33 @@ export function mountLangChip(composer: HTMLElement, state: ChipState, h: ChipHa
     chip.removeEventListener('keydown', onKey);
   });
 
+  // Column the user last picked with Left/Right, kept across Up/Down. Only
+  // while the focus is where the last arrow put it: a click or a focus set by
+  // code starts from the tile's own column (chip-live caught Down from the
+  // third column landing on the first).
+  let wantCol = 0;
+  let movedTo: HTMLElement | undefined;
   const onMenuKey = (e: KeyboardEvent): void => {
-    const rows = Array.from(menu.querySelectorAll<HTMLElement>('.kt-chip-row:not([hidden])'));
-    const i = rows.indexOf(document.activeElement as HTMLElement);
-    // Wrapping move through the visible tiles. Down/Up jump a whole grid row,
-    // Left/Right step one tile, which is what a grid of options is expected to
-    // do. The auto entry spans the full width, so a vertical jump that lands
-    // near it is off by a tile or two; clamping keeps every tile reachable and
-    // that is what matters here.
-    // ponytail: index arithmetic, not true 2D tracking. A real roving
-    // tabindex with a remembered column is the upgrade if the off-by-a-tile
-    // near the auto row ever bites.
-    const go = (delta: number): void => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      // Read off the DOM in grid order, rows and the visible separator alike,
+      // so the lines match what CSS draws: see gridLines.
+      const cells = Array.from(
+        menu.querySelectorAll<HTMLElement>('.kt-chip-row:not([hidden]), .kt-chip-sep:not([hidden])'),
+      );
+      const rows = cells.filter((c) => c.classList.contains('kt-chip-row'));
       if (rows.length === 0) return;
       e.preventDefault();
+      const lines = gridLines(
+        cells.map((c) => (c.classList.contains('kt-chip-sep') ? 'break' : c.dataset.group === 'auto' ? 'full' : 'tile')),
+        MENU_COLS,
+      );
+      const i = rows.indexOf(document.activeElement as HTMLElement);
       const from = i < 0 ? 0 : i;
-      rows[((from + delta) % rows.length + rows.length) % rows.length]?.focus();
-    };
-    if (e.key === 'ArrowDown') {
-      go(MENU_COLS);
-    } else if (e.key === 'ArrowUp') {
-      go(-MENU_COLS);
-    } else if (e.key === 'ArrowRight') {
-      go(1);
-    } else if (e.key === 'ArrowLeft') {
-      go(-1);
+      if (rows[from] !== movedTo) wantCol = lines.find((l) => l.includes(from))!.indexOf(from);
+      const r = gridMove(lines, from, e.key, wantCol);
+      wantCol = r.col;
+      movedTo = rows[r.to];
+      movedTo?.focus();
     } else if (e.key === 'Escape') {
       e.preventDefault();
       close(); // close() brings the focus back
