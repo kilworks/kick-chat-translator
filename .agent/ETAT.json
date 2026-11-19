@@ -1,22 +1,24 @@
 {
-  "genere": "2026-11-19T21:45:59.622Z",
+  "genere": "2026-11-19T22:30:11.670Z",
   "parQui": ".agent/state.mjs",
   "avertissement": "Genere. Ne pas editer a la main : la prochaine passe ecrase. La version commitee decrit l'etat d'AVANT le commit qui la porte, puisque la fin de passe genere puis commite : git.head y pointe le commit precedent et git.arbrePropre y est faux. Relancer `node .agent/state.mjs` avant de lire, ce que le prompt demande deja en premier.",
   "git": {
     "remotesEnDouble": [],
     "branche": "feat/ui-comfort",
-    "head": "6a22ec5f9614701f0cf919ed8862e80b4996d262",
-    "sujet": "Make the popup and the options say what is true, and fit the popup (P0-2, P1-1 to P1-4, P1-6, P1-7, P2-1 to P2-3, P2-7, P2-12, P2-14, P2-16)",
+    "head": "60b532caef524423dc463a831e902c30e4aec25a",
+    "sujet": "Refresh README captures and changelog for the UI comfort pass",
     "arbrePropre": false,
-    "fichiersModifies": 8,
+    "fichiersModifies": 7,
     "dernierTag": "v3.5.0",
-    "decrit": "v3.5.0-4-g6a22ec5",
+    "decrit": "v3.5.0-7-g60b532c",
     "remotes": {
       "origin": "https://github.com/kilworks/kick-chat-translator.git"
     },
     "ecarts": {
       "origin": {
-        "note": "pas de origin/feat/ui-comfort connu localement"
+        "derriere": 0,
+        "devant": 0,
+        "aJour": true
       }
     }
   },
@@ -304,10 +306,11 @@
       "**Store submissions.** The 2.10.0 archives exist and are published on",
       "**Validate the popup direction** before phase 2 (options, chat): before",
       "**DeepL's free figure is not stated on one official page.** Support",
-      "**`local-only` with on-device off is migrated to on-device on.** That pair"
+      "**`local-only` with on-device off is migrated to on-device on.** That pair",
+      "**Live smoke of the UI comfort pass on kick.com was not run**: Claude in Chrome was not connected in the session (2026-11-19). To do in Brave, read only: chat bar, language panel, one incoming translation, compose preview visible without sending; then the options (Display landing, switches, segmented controls) and the popup."
     ],
-    "nbBloques": 13,
-    "nbOuverts": 10,
+    "nbBloques": 14,
+    "nbOuverts": 19,
     "nbFaits": 127
   }
 }

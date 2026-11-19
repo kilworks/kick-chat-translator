@@ -1650,3 +1650,4 @@ surfaces touched this pass. Counted in the pass report.
 - [ ] Translations of the 27 phase 2 keys: model-written, no native review.
 - [ ] The 42 localised READMEs still list Providers first and the DeepL key as always there in their Settings section (English fixed in phase 3); left for the existing [k] entry on localised READMEs.
 - [ ] `screenshots/japanese-chat.jpg` is tracked but shown nowhere (readme-drift HIDDEN, older than this pass): delete or show, kil's call.
+- [k] **Live smoke of the UI comfort pass on kick.com was not run**: Claude in Chrome was not connected in the session (2026-11-19). To do in Brave, read only: chat bar, language panel, one incoming translation, compose preview visible without sending; then the options (Display landing, switches, segmented controls) and the popup.
