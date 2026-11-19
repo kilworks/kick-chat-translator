@@ -18,6 +18,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 // Playwright lives with the UX kit, not in this project, and ESM resolves bare
 // imports from the importing file upward — never from the working directory.
 import { chromium } from './playwright.mjs';
+import { build } from 'esbuild';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(HERE, '../../dist');
@@ -41,7 +42,17 @@ await new Promise((r) => srv.listen(8873, r));
 // after the header was fixed to stop hardcoding one.
 const MANIFEST = JSON.parse(fs.readFileSync(path.join(DIST, 'manifest.json'), 'utf8'));
 
+// Every key the schema defines, from the schema itself: a hand-typed list went
+// stale when translatedLineHeight was added, and the Display tab threw on it.
+const settingsJs = await build({
+  entryPoints: [path.resolve(HERE, '../../src/shared/settings.ts')],
+  bundle: true, format: 'esm', platform: 'neutral', write: false, logLevel: 'silent',
+});
+const { defaultSettings } = await import(
+  'data:text/javascript;base64,' + Buffer.from(settingsJs.outputFiles[0].text).toString('base64'));
+
 const SETTINGS = {
+  ...defaultSettings(),
   __version: MANIFEST.version,
   enabled: true, targetLang: 'auto', displayStyle: 'below', showOriginal: true,
   showSourceBadge: true, showProviderBadge: false, showFloatingBar: true,
@@ -58,8 +69,24 @@ const SETTINGS = {
 
 const browser = await chromium.launch();
 
+/**
+ * The first page error or console error stops the run. A stub that throws
+ * leaves React to unmount the card that called it, and the gates then audit a
+ * page with sections missing and report it clean: Filters once rendered no
+ * section at all and every gate fed by it stayed green.
+ */
+function failOnErrors(page, where) {
+  const fail = (what) => {
+    console.error(`${where}: ${what}`);
+    process.exit(1);
+  };
+  page.on('pageerror', (e) => fail(`pageerror: ${e.message}`));
+  page.on('console', (m) => { if (m.type() === 'error') fail(`console.error: ${m.text()}`); });
+}
+
 async function open(url, width, height) {
   const page = await browser.newPage({ viewport: { width, height }, colorScheme: 'dark' });
+  failOnErrors(page, url);
   await page.addInitScript((settings) => {
     const noop = { addListener() {}, removeListener() {} };
     const reply = (m) => {
@@ -80,11 +107,14 @@ async function open(url, width, height) {
       if (t === 'deepl.usage') return { type: 'deepl', payload: { configured: false, count: 0, limit: 0 } };
       return { type: 'ok' };
     };
+    const area = { get: async () => ({}), set: async () => {}, remove: async () => {} };
     globalThis.chrome = {
-      runtime: { getManifest: () => ({ version: settings.__version }), openOptionsPage() {}, lastError: undefined,
+      runtime: { id: 'snapshot', getManifest: () => ({ version: settings.__version }), openOptionsPage() {}, lastError: undefined,
         onMessage: noop, getURL: (p) => p,
         sendMessage: (m, cb) => { const r = reply(m); if (typeof cb === 'function') { cb(r); return; } return Promise.resolve(r); } },
-      storage: { sync: { get: async () => ({}), set: async () => {} }, local: { get: async () => ({}), set: async () => {} }, onChanged: noop },
+      storage: { sync: area, local: area, onChanged: noop },
+      permissions: { contains: async () => false, request: async () => false, remove: async () => true },
+      tabs: { query: async () => [], sendMessage: async () => undefined },
       i18n: { getUILanguage: () => 'en', getMessage: () => '' },
     };
   }, SETTINGS);
@@ -143,14 +173,40 @@ const popup = await open('http://localhost:8873/src/popup/index.html', 380, 700)
 console.log('popup.html', await freeze(popup, path.join(OUT, 'popup.html')));
 await popup.close();
 
-const TABS = ['providers', 'display', 'filters', 'advanced', 'debug', 'about'];
-fs.mkdirSync(path.join(OUT, 'options'), { recursive: true });
-for (const id of TABS) {
+/**
+ * Tab ids from src/options/App.tsx, with the number of section headings the real
+ * build renders in each (dist loaded as an extension, h2 and h3 in the tab
+ * panel). A wrong id used to be skipped in silence: 'debug' froze the Providers
+ * panel under another name and the Activity tab was never audited. Activity
+ * counts 2: the real build shows 1 on a fresh profile, and Usage joins it once
+ * there are stats, which this stub serves.
+ */
+const TABS = { providers: 4, display: 3, filters: 4, advanced: 4, activity: 2, about: 3 };
+const OPTIONS = path.join(OUT, 'options');
+fs.mkdirSync(OPTIONS, { recursive: true });
+// rtl-surfaces audits every file here: a stale page from an old tab id would be
+// measured as if it were current.
+for (const f of fs.readdirSync(OPTIONS)) if (f.endsWith('.html')) fs.rmSync(path.join(OPTIONS, f));
+const wrong = [];
+for (const [id, want] of Object.entries(TABS)) {
   const page = await open('http://localhost:8873/src/options/index.html', 900, 1200);
   const tab = page.locator(`#tab-${id}`);
-  if (await tab.count()) { await tab.click(); await page.waitForTimeout(500); }
-  console.log(`options/${id}.html`, await freeze(page, path.join(OUT, 'options', `${id}.html`)));
+  if (!(await tab.count())) { wrong.push(`${id}: no #tab-${id} in the page`); await page.close(); continue; }
+  await tab.click();
+  await page.waitForTimeout(500);
+  const heads = await page.evaluate((tabId) => {
+    const panel = document.querySelector(`[role=tabpanel][aria-labelledby="tab-${tabId}"]`);
+    return panel ? [...panel.querySelectorAll('h2,h3')].map((h) => h.textContent.trim()) : null;
+  }, id);
+  if (!heads) wrong.push(`${id}: no tab panel labelled by #tab-${id}`);
+  else if (heads.length !== want) wrong.push(`${id}: ${heads.length} section headings, real build has ${want} (${heads.join(' | ') || 'none'})`);
+  console.log(`options/${id}.html`, await freeze(page, path.join(OPTIONS, `${id}.html`)), `[${heads?.join(' | ') ?? ''}]`);
   await page.close();
+}
+if (wrong.length) {
+  console.error(`ECHEC: ${wrong.length} tab(s) not fully rendered`);
+  for (const w of wrong) console.error(`  ${w}`);
+  process.exit(1);
 }
 
 await browser.close();
