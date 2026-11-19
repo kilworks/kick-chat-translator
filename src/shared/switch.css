@@ -1,0 +1,142 @@
+/* One on/off switch for the popup and the options page.
+
+   Plain CSS rather than Tailwind utilities: the Tailwind content globs cover
+   src/popup and src/options only, so classes written in src/shared would never
+   be generated. Every value asks src/shared/theme.css.
+
+   Measured on the popup before it became shared: rail 36x20, knob 16x16 inset
+   2px, 8px between rail and text. Kept to the pixel, the popup height budget is
+   measured to it. */
+.kt-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+/* The control after its label: settings rows have always put it on the right.
+   Only the paint order changes, the input still carries the name. */
+.kt-switch[data-reverse] {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  inline-size: 100%;
+}
+
+/* Visually hidden, never display:none: it keeps focus, Space and the
+   accessibility tree. The ring is drawn on the rail instead. */
+.kt-switch-input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Off: #60666d family, 3:1 against page and card (WCAG 1.4.11). */
+.kt-switch-rail {
+  position: relative;
+  flex: none;
+  display: inline-block;
+  inline-size: 36px;
+  block-size: 20px;
+  border-radius: 9999px;
+  background: var(--kt-edge);
+  transition: background-color var(--kt-dur) ease;
+}
+/* White on the dark rail. On the green it turns dark: white there was 1.37:1
+   and the knob vanished exactly when the switch was on. */
+.kt-switch-knob {
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 2px;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 9999px;
+  background: var(--kt-text);
+  transition:
+    inset-inline-start var(--kt-dur) ease,
+    background-color var(--kt-dur) ease;
+}
+
+/* hover */
+.kt-switch:not([data-disabled]):not([data-busy]):hover .kt-switch-rail {
+  background: var(--kt-edge-strong);
+}
+/* checked */
+.kt-switch-input:checked + .kt-switch-rail {
+  background: var(--kt-green);
+}
+.kt-switch:not([data-disabled]):not([data-busy]):hover .kt-switch-input:checked + .kt-switch-rail {
+  background: var(--kt-green-edge);
+}
+.kt-switch-input:checked + .kt-switch-rail .kt-switch-knob {
+  inset-inline-start: 18px;
+  background: var(--kt-ink);
+}
+/* focus-visible */
+.kt-switch-input:focus-visible + .kt-switch-rail {
+  outline: 2px solid var(--kt-green);
+  outline-offset: 2px;
+}
+/* invalid: the ring in the danger colour; the caller's hint says why, so the
+   colour is never the only carrier. */
+.kt-switch-input[aria-invalid='true'] + .kt-switch-rail {
+  outline: 2px solid var(--kt-danger);
+  outline-offset: 2px;
+}
+/* invalid and focused: still a different ring, wider and further out. */
+.kt-switch-input[aria-invalid='true']:focus-visible + .kt-switch-rail {
+  outline: 3px solid var(--kt-green);
+  outline-offset: 4px;
+}
+/* disabled */
+.kt-switch[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+/* busy: a change in flight. The input stays focusable (aria-disabled) and the
+   change is refused in the component; the rail just reads as held. */
+.kt-switch[data-busy] {
+  cursor: progress;
+}
+.kt-switch[data-busy] .kt-switch-rail {
+  opacity: 0.5;
+}
+
+.kt-switch-text {
+  display: flex;
+  min-inline-size: 0;
+  flex-direction: column;
+}
+.kt-switch-hint {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--kt-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kt-switch-rail,
+  .kt-switch-knob {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .kt-switch-rail {
+    border: 1px solid CanvasText;
+  }
+  .kt-switch-knob {
+    background: CanvasText;
+  }
+  .kt-switch-input:checked + .kt-switch-rail {
+    background: Highlight;
+  }
+  .kt-switch-input:checked + .kt-switch-rail .kt-switch-knob {
+    background: CanvasText;
+  }
+}

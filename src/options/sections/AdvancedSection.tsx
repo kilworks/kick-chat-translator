@@ -74,7 +74,7 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
     <>
       <section class="kt-card space-y-3">
         <h2 class="kt-section">{t('Connection')}</h2>
-        <p class="text-[11px] text-kick-muted">
+        <p class="text-xs text-kick-muted">
           {t('Whether a Kick tab keeps translating once you look away.')}
         </p>
         {/* A div, not a label: Check renders its own <label>, and nesting one
@@ -92,7 +92,7 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
 
       <section class="kt-card space-y-4">
         <h2 class="kt-section">{t('Cache & performance')}</h2>
-        <p class="text-[11px] text-kick-muted">
+        <p class="text-xs text-kick-muted">
           {t(
             'Reusing past translations, and how hard the engines are pushed on a busy chat. The defaults suit most channels.',
           )}
@@ -117,12 +117,12 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
           }
         />
         <Row
-          label={t('Cache TTL (hours)')}
-          hint={t('After this, entries expire.')}
+          label={t('Keep translations for (hours)')}
+          hint={t('Older translations are dropped and fetched again when needed.')}
           live={plusVieille}
           input={
             <input
-              aria-label={t('Cache TTL (hours)')}
+              aria-label={t('Keep translations for (hours)')}
               type="number"
               class="kt-input"
               min={1}
@@ -136,7 +136,7 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
         />
         <Row
           label={t('Concurrent translations')}
-          hint={t('In-flight provider requests.')}
+          hint={t('How many messages are translated at the same time.')}
           live={
             reseau === undefined
               ? undefined
@@ -158,7 +158,9 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
         />
         <Row
           label={t('Per-channel budget (req/min)')}
-          hint={t('Hard cap to avoid hammering providers on fast chats.')}
+          hint={t(
+            'Upper limit for one channel, so a fast chat does not overload the translation service.',
+          )}
           live={
             stats === undefined
               ? undefined
@@ -184,7 +186,7 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
 
       <section class="kt-card space-y-3">
         <h2 class="kt-section">{t('Backup')}</h2>
-        <p class="text-[11px] text-kick-muted">
+        <p class="text-xs text-kick-muted">
           {t('Save your configuration to a JSON file, or restore it on another browser.')}
         </p>
         <div class="flex gap-2">
@@ -208,7 +210,7 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
             }}
           />
         </div>
-        {importFailed && <p class="text-[11px] text-red-400">{t('Invalid settings file')}</p>}
+        {importFailed && <p class="text-xs text-red-400">{t('Invalid settings file')}</p>}
       </section>
 
       <section class="kt-card space-y-3">
@@ -265,9 +267,9 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
             {confirmResetAll ? t('click again to confirm') : t('Reset all settings to defaults')}
           </button>
         </div>
-        <p class="text-[11px] text-kick-muted">
+        <p class="text-xs text-kick-muted">
           {t(
-            '"Reset all settings" restores defaults. Use it if translations stop appearing because a filter (channel allowlist or source-language allowlist) was left active.',
+            '"Reset all settings" puts every setting back to its default.',
           )}
         </p>
       </section>
@@ -300,9 +302,9 @@ function Row({
     <div class="grid grid-cols-[1fr,140px] gap-3 items-start">
       <div>
         <div class="text-sm">{label}</div>
-        <div class="text-[11px] text-kick-muted">{hint}</div>
+        <div class="text-xs text-kick-muted">{hint}</div>
         {live !== undefined && (
-          <div role="status" class="mt-1 text-[11px] tabular-nums text-kick-primary">
+          <div role="status" class="mt-1 text-xs tabular-nums text-kick-primary">
             {live}
           </div>
         )}

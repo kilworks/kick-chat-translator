@@ -61,3 +61,37 @@ describe('without the on-device API (Firefox)', () => {
     expect(select.disabled).toBe(false);
   });
 });
+
+describe('plain words (P2-7, P2-8)', () => {
+  afterEach(() => {
+    delete (self as unknown as { Translator?: unknown }).Translator;
+  });
+
+  it('explains on-device without jargon and without tiny text', () => {
+    (self as unknown as { Translator?: unknown }).Translator = { availability: async () => 'available' };
+    mount({ localEnabled: true, engineMode: 'cloud-first' });
+    const text = host!.textContent ?? '';
+    expect(text).not.toMatch(/Chromium|rate-limit|models/i);
+    expect(text).toContain('on your computer');
+    expect(host!.innerHTML).not.toMatch(/text-\[(9|10|11)px\]/);
+  });
+
+  it('promises nothing local where the browser has no on-device engine', () => {
+    mount({ localEnabled: false, engineMode: 'cloud-first' });
+    const text = host!.textContent ?? '';
+    expect(text).not.toContain('download');
+    expect(text).toContain('cloud engines translate everything');
+  });
+});
+
+describe('download chips group', () => {
+  it('names the group instead of an orphan label', () => {
+    (self as unknown as { Translator?: unknown }).Translator = { availability: async () => 'available' };
+    mount({});
+    const g = host!.querySelector('[role=group]')!;
+    const name = host!.querySelector(`#${CSS.escape(g.getAttribute('aria-labelledby')!)}`);
+    expect(name?.textContent).toContain('Download languages');
+    expect([...host!.querySelectorAll('label')].some((l) => l.textContent?.includes('Download languages'))).toBe(false);
+    delete (self as unknown as { Translator?: unknown }).Translator;
+  });
+});

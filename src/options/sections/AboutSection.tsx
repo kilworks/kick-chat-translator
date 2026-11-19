@@ -175,7 +175,7 @@ export function AboutSection({
 function Fait({ terme, valeur }: { terme: string; valeur: string }) {
   return (
     <div>
-      <dt class="text-[11px] text-kick-muted">{terme}</dt>
+      <dt class="text-xs text-kick-muted">{terme}</dt>
       <dd class="mt-0.5 text-lg font-semibold tabular-nums leading-none text-kick-text">
         {valeur}
       </dd>

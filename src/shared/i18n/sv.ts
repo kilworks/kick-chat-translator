@@ -50,18 +50,10 @@ export const sv: Record<string, string> = {
     'Max antal poster i cachen',
   'Larger = more hits across sessions, more disk space.':
     'Större = fler träffar mellan sessioner, mer diskutrymme.',
-  'Cache TTL (hours)':
-    'Cachens livslängd (timmar)',
-  'After this, entries expire.':
-    'Därefter upphör posterna att gälla.',
   'Concurrent translations':
     'Samtidiga översättningar',
-  'In-flight provider requests.':
-    'Pågående förfrågningar till tjänsterna.',
   'Per-channel budget (req/min)':
     'Budget per kanal (förfr./min)',
-  'Hard cap to avoid hammering providers on fast chats.':
-    'Hård gräns så att tjänsterna inte överbelastas i snabba chattar.',
   'Clear translation cache':
     'Rensa översättningscachen',
   'Reset usage stats':
@@ -70,8 +62,6 @@ export const sv: Record<string, string> = {
     'Återställ alla inställningar',
   'click again to confirm':
     'klicka igen för att bekräfta',
-  '"Reset all settings" restores defaults. Use it if translations stop appearing because a filter (channel allowlist or source-language allowlist) was left active.':
-    '"Återställ alla inställningar" sätter tillbaka standardvärdena. Använd det om översättningar slutat visas för att ett filter (kanallista eller lista över källspråk) har blivit kvar.',
   'Translation target':
     'Översättningsspråk',
   'Display style':
@@ -98,8 +88,6 @@ export const sv: Record<string, string> = {
     'I en liten etikett efter originaltexten.',
   'Replace':
     'Ersätt',
-  'Show floating bar at top of chat (toggle live)':
-    'Visa flytande list överst i chatten (ändras direkt)',
   'Keep original text visible':
     'Behåll originaltexten synlig',
   'Show source language badge':
@@ -108,32 +96,14 @@ export const sv: Record<string, string> = {
     'Visa vilken tjänst som användes',
   'Enable compose preview':
     'Aktivera förhandsvisning',
-  'Click inserts into the chat box (off = copy to clipboard instead)':
-    'Klick infogar i chattfältet (av = kopiera till urklipp i stället)',
   'Translate what you type before sending. A live preview appears above the chat box; click it to drop the translation in. Uses the same engine and providers as incoming chat.':
     'Översätt det du skriver innan du skickar. En förhandsvisning uppdateras ovanför chattfältet medan du skriver, och med ett klick lägger du in översättningen. Använder samma motor och tjänster som inkommande chatt.',
   'Engine':
     'Motor',
-  'on-device:':
-    'på enheten:',
-  'available ✓':
-    'tillgänglig ✓',
-  'not supported in this browser':
-    'stöds inte i den här webbläsaren',
   'Strategy':
     'Strategi',
-  'On-device first, cloud fallback':
-    'Först på enheten, molnet som reserv',
-  'Cloud first, on-device fallback (recommended)':
-    'Först molnet, enheten som reserv (rekommenderas)',
-  'On-device only (no network, no cloud)':
-    'Bara på enheten (inget nätverk, inget moln)',
-  'On-device = local Chromium models: unlimited, instant, private, no rate-limit. Each language needs a one-time model download (click a flag below, or the "Local" chip in chat).':
-    'På enheten = lokala Chromium-modeller: obegränsat, direkt, privat och utan hastighetsbegränsning. Varje språk kräver en engångsnedladdning av en modell (klicka på en flagga nedan eller på chipet "Lokal" i chatten).',
   'Enable on-device translation':
     'Aktivera översättning på enheten',
-  'Download models →':
-    'Ladda ned modeller →',
   'General':
     'Allmänt',
   'Source languages allowlist':
@@ -154,10 +124,6 @@ export const sv: Record<string, string> = {
     'Blockerade användare',
   'Cloud engines':
     'Molnmotorer',
-  'ok':
-    'ok',
-  'down':
-    'nere',
   'Google Translate (free, no key)':
     'Google Translate (gratis, ingen nyckel)',
   'DeepL (best quality, needs key)':
@@ -174,10 +140,6 @@ export const sv: Record<string, string> = {
     'Gratis (api-free.deepl.com)',
   'Pro (api.deepl.com)':
     'Pro (api.deepl.com)',
-  'Smart budget routing':
-    'Smart budgetstyrning',
-  'Spend DeepL only on the European languages it clearly wins at; other targets (Japanese, Arabic, Hindi…) use the free engines first, so your DeepL quota lasts much longer.':
-    'Använd DeepL bara för de europeiska språk där det tydligt är bäst. Andra målspråk (japanska, arabiska, hindi …) går först till de gratis motorerna, så din DeepL-kvot räcker mycket längre.',
   'Lingva instance':
     'Lingva-instans',
   'Custom URL (optional)':
@@ -306,8 +268,6 @@ export const sv: Record<string, string> = {
     'Bara när du pekar på raden. Sparar kvot.',
   'recommended':
     'rekommenderas',
-  'The recommended style is the most tested. The other three may still change.':
-    'Den rekommenderade stilen är den mest testade. De andra tre kan fortfarande ändras.',
   'Text size':
     'Textstorlek',
   'Line spacing':
@@ -324,8 +284,6 @@ export const sv: Record<string, string> = {
     'Monospace',
   'High legibility':
     'Hög läsbarhet',
-  'Tab swaps my message for its translation (off = Ctrl/Cmd+Enter only)':
-    'Tab byter ut mitt meddelande mot översättningen (av = bara Ctrl/Cmd+Enter)',
   'Density':
     'Täthet',
   'Compact':
@@ -444,4 +402,31 @@ export const sv: Record<string, string> = {
   'Used when on-device cannot translate a line, in this order. One that fails is skipped for a while.': 'Används när översättning på enheten inte klarar en rad, i den här ordningen. En som fallerar hoppas över ett tag.',
   'Not translated: this channel is on your blocked list.': 'Inte översatt: den här kanalen finns på din blockeringslista.',
   'Not translated: this channel is not on your allowed list.': 'Inte översatt: den här kanalen finns inte på din lista över tillåtna.',
+  'Keep translations for (hours)': 'Behåll översättningar i (timmar)',
+  'Older translations are dropped and fetched again when needed.': 'Äldre översättningar tas bort och hämtas igen vid behov.',
+  'How many messages are translated at the same time.': 'Hur många meddelanden som översätts samtidigt.',
+  'Upper limit for one channel, so a fast chat does not overload the translation service.': 'Övre gräns för en kanal, så att en snabb chatt inte överbelastar översättningstjänsten.',
+  '"Reset all settings" puts every setting back to its default.': '"Återställ alla inställningar" sätter tillbaka alla inställningar till standardvärdena.',
+  'On-device: ready': 'På enheten: klart',
+  'On-device: not in this browser': 'På enheten: inte i den här webbläsaren',
+  'On-device first, cloud if needed': 'Först på enheten, molnet vid behov',
+  'Cloud first, on-device if needed (recommended)': 'Först molnet, enheten vid behov (rekommenderas)',
+  'On-device only (nothing sent online)': 'Bara på enheten (inget skickas online)',
+  'This browser cannot translate on your computer, so the cloud engines translate everything.': 'Den här webbläsaren kan inte översätta på din dator, så molnmotorerna översätter allt.',
+  'On-device translates on your computer: free, fast, private, no daily limit. Each language is a one-time download: pick it below, or "Local" in the chat.': 'Översättning på enheten sker på din dator: gratis, snabbt, privat och utan dagsgräns. Varje språk laddas ned en gång: välj det nedan eller "Lokal" i chatten.',
+  'Download languages →': 'Ladda ned språk →',
+  'Ready': 'Redo',
+  'Paused, back in {n} min': 'Pausad, tillbaka om {n} min',
+  'Needs a key': 'Behöver en nyckel',
+  'Paused': 'Pausad',
+  'Show key': 'Visa nyckel',
+  'Save DeepL for European languages': 'Spara DeepL till europeiska språk',
+  'DeepL is used only for European languages, where it is best. Other languages (Japanese, Arabic, Hindi...) use the free engines first, so your DeepL allowance lasts longer.': 'DeepL används bara för europeiska språk, där det är bäst. Andra språk (japanska, arabiska, hindi...) går först till de gratis motorerna, så din DeepL-kvot räcker längre.',
+  'Show the floating bar at the top of chat': 'Visa den flytande listen överst i chatten',
+  'Clicking the preview': 'Klick på förhandsvisningen',
+  'Puts it in the chat box': 'Lägger in den i chattfältet',
+  'Copies it': 'Kopierar den',
+  'Key that swaps in the translation': 'Tangent som byter in översättningen',
+  'Tab or Ctrl/Cmd+Enter': 'Tab eller Ctrl/Cmd+Enter',
+  'Ctrl/Cmd+Enter only': 'Bara Ctrl/Cmd+Enter',
 };

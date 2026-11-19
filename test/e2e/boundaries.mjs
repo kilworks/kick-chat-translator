@@ -71,9 +71,17 @@ for (const [name, file] of SURFACES) {
       if (parseFloat(cs.borderTopWidth) <= 0) continue;
       // A disabled control is exempt from contrast requirements.
       if (el.disabled) continue;
+      // A transparent border reads as rgb(0,0,0) once its alpha is dropped: the
+      // visible edge is then the control's own fill (a colour swatch), or nothing.
+      const alpha = (v) => { const m = (v.match(/[\d.]+/g) ?? []).map(Number); return m.length > 3 ? m[3] : 1; };
+      let edge = cs.borderTopColor;
+      if (alpha(edge) === 0) {
+        if (alpha(cs.backgroundColor) < 1) continue;
+        edge = cs.backgroundColor;
+      }
       out.push({
         what: String(el.className).split(' ').slice(0, 2).join('.') || el.tagName.toLowerCase(),
-        border: px(cs.borderTopColor),
+        border: px(edge),
         ground: ground(el),
       });
     }

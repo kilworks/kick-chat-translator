@@ -94,7 +94,7 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
         <div class="grid grid-cols-[1fr,140px] gap-3 items-start">
           <div>
             <div class="text-sm">{t('Minimum message length')}</div>
-            <div class="text-[11px] text-kick-muted">
+            <div class="text-xs text-kick-muted">
               {t(
                 'Shorter messages are left alone. Raise it to spend less provider quota on busy chats.',
               )}
@@ -143,7 +143,15 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
           value={langQuery}
           onInput={(e) => setLangQuery((e.target as HTMLInputElement).value)}
         />
-        <div class="grid grid-cols-3 gap-1.5 max-h-[260px] overflow-auto pe-1">
+        {/* lucide check, verbatim from the kit's icons.js. */}
+        <svg width="0" height="0" class="absolute" aria-hidden="true">
+          <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6 9 17l-5-5" />
+          </symbol>
+        </svg>
+        {/* A set, not a list of settings: toggle chips read as "include this
+            one", where a row of OFF switches read as "not translated". */}
+        <div class="grid grid-cols-3 gap-2">
           {shown.length === 0 && (
             <p role="status" class="col-span-3 py-2 text-xs text-kick-muted">
               {t('No language matches')}
@@ -152,48 +160,38 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
           {shown.map((l) => {
             const checked = settings.sourceLangAllowlist.includes(l.code);
             return (
-              <div
+              <button
                 key={l.code}
-                class={`rounded-md border px-2 py-1 text-xs transition ${
+                type="button"
+                aria-pressed={checked}
+                class={`flex min-h-8 min-w-0 items-center gap-2 rounded border px-2 py-1 text-start text-xs transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kick-primary ${
                   checked
-                    ? 'border-kick-primary bg-kick-primary/10'
-                    : 'border-kick-stroke bg-kick-dark/30'
+                    ? 'border-kick-primary bg-kick-primary/15 text-kick-text'
+                    : 'border-kick-stroke text-kick-muted hover:bg-kick-dark/40'
                 }`}
+                onClick={() => {
+                  const next = new Set(settings.sourceLangAllowlist);
+                  if (next.has(l.code)) next.delete(l.code);
+                  else next.add(l.code);
+                  onPatch({ sourceLangAllowlist: [...next] });
+                }}
               >
-                <Check
-                  checked={checked}
-                  onChange={() => {
-                    const next = new Set(settings.sourceLangAllowlist);
-                    if (next.has(l.code)) next.delete(l.code);
-                    else next.add(l.code);
-                    onPatch({ sourceLangAllowlist: [...next] });
-                  }}
-                  label={
-                    <span class="flex min-w-0 items-center gap-2">
-                      {/* Le drapeau dessine, comme dans le chat. Les regles
-                          vivent maintenant dans src/shared/flags.css, que les
-                          deux feuilles importent. Les deux lettres restent le
-                          repli des langues sans drapeau : un drapeau nomme un
-                          pays et pas une langue, il en manque. */}
-                      {flagClass(l.code) ? (
-                        <span class={`${flagClass(l.code)!} shrink-0`} />
-                      ) : (
-                        <span class="shrink-0 font-mono text-[10px] tracking-wider text-kick-muted">
-                          {l.code.toUpperCase()}
-                        </span>
-                      )}
-                      <span class="truncate text-kick-muted">{l.name}</span>
-                      {/* Ce que cette langue a reellement represente. Sans ce
-                          nombre, cocher une case est un pari. */}
-                      {(vues[l.code] ?? 0) > 0 && (
-                        <span class="ms-auto shrink-0 tabular-nums text-[10px] text-kick-primary">
-                          {vues[l.code]}
-                        </span>
-                      )}
-                    </span>
-                  }
-                />
-              </div>
+                {flagClass(l.code) ? (
+                  <span class={`${flagClass(l.code)!} shrink-0`} aria-hidden="true" />
+                ) : (
+                  <span class="shrink-0 font-mono text-xs tracking-wider">{l.code.toUpperCase()}</span>
+                )}
+                <span class="truncate">{l.name}</span>
+                {/* What this language actually amounted to in the chat. */}
+                {(vues[l.code] ?? 0) > 0 && (
+                  <span class="ms-auto shrink-0 tabular-nums text-xs text-kick-primary">{vues[l.code]}</span>
+                )}
+                {checked && (
+                  <svg class={`h-4 w-4 shrink-0 text-kick-primary ${(vues[l.code] ?? 0) > 0 ? '' : 'ms-auto'}`} aria-hidden="true">
+                    <use href="#i-check" />
+                  </svg>
+                )}
+              </button>
             );
           })}
         </div>
@@ -237,7 +235,7 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
 
       <section class="kt-card space-y-3">
         <h2 class="kt-section">{t('Glossary')}</h2>
-        <p class="text-[11px] text-kick-muted">
+        <p class="text-xs text-kick-muted">
           {t(
             'Words the engines keep getting wrong for your channels. Each line replaces the left side with the right side, after translating.',
           )}

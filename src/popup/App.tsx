@@ -325,7 +325,11 @@ export function App() {
         <section class="kt-card flex flex-col gap-2">
           <div class="flex items-center justify-between">
             <span class="kt-label">{t('Providers')}</span>
-            <button type="button" class="kt-link" onClick={openOptions}>
+            <button
+              type="button"
+              class="kt-link"
+              onClick={() => void chrome.tabs.create({ url: chrome.runtime.getURL('src/options/index.html#providers') })}
+            >
               {t('order in options')}
             </button>
           </div>

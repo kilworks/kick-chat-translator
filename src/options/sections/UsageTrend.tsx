@@ -67,8 +67,8 @@ export function UsageTrend({ stats }: { stats: UsageStats }) {
                       style={{ height: `${pct}%` }}
                     />
                   </div>
-                  <div class="text-[11px] tabular-nums text-kick-text">{pct}%</div>
-                  <div class="text-[10px] tabular-nums text-kick-muted">
+                  <div class="text-xs tabular-nums text-kick-text">{pct}%</div>
+                  <div class="text-xs tabular-nums text-kick-muted">
                     {d.day.slice(5).replace('-', '/')}
                   </div>
                 </div>
@@ -105,7 +105,7 @@ function Figure({ value, label }: { value: string; label: string }) {
   return (
     <div>
       <div class="text-2xl font-semibold tabular-nums leading-none text-kick-text">{value}</div>
-      <div class="mt-1 text-[11px] text-kick-muted">{label}</div>
+      <div class="mt-1 text-xs text-kick-muted">{label}</div>
     </div>
   );
 }

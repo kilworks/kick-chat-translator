@@ -44,6 +44,19 @@ UI COMFORT PASS (feat/ui-comfort), phase 0, sets named before spawning
   facts                   read-only
    disjoint; i18n (keys.json, src/shared/i18n/*.ts) stays root-only
 
+UI COMFORT PASS, phase 2, sets named before spawning
+  A switch       src/shared/Switch.tsx (new), src/options/components/Check.tsx,
+                 src/popup/components/Toggle.tsx, their tests,
+                 src/options/styles.css                     P2-4, P2-16, P2-7 (css)
+  B display      src/options/sections/DisplaySection.tsx (+test),
+                 src/options/components/Segmented.tsx (new)  P2-5, P2-6, P2-8, P2-7
+  C providers    src/options/sections/ProviderSection.tsx, EngineCard.tsx
+                 (+tests)                                    P2-8, P2-10, P2-11, P2-7
+  D shell        src/options/App.tsx, App.tabs.test.tsx       P2-9, P2-13, P2-15
+  E other tabs   AdvancedSection, FilterSection, AboutSection, DebugSection,
+                 UsageTrend (+tests)                         P2-8, P2-7
+   disjoint; keys.json and the catalogues stay root-only, children return keys
+
 A and B do not intersect and can run at once. C touches only harness files but
 reads dist/, so it serialises behind any build. D touches no code.
 ```
@@ -1626,3 +1639,12 @@ surfaces touched this pass. Counted in the pass report.
   cache gives no feedback when pressed.
 - [ ] **Text under 12px left on the options page** (P2-7, phase 2): the popup is
   at 0, the options still carry `text-[10px]` and `text-[11px]`.
+
+### Phase 2 done (options), left open
+- [ ] EngineCard download chips: name reads "JA" plus a glyph, state only in title and opacity; give each an aria-label ("Download Japanese") and aria-disabled when unavailable (needs new keys).
+- [ ] "Download languages -> AUTO" prints the raw target code when the target is auto; show the resolved language name.
+- [ ] DeepL "Show key" keeps one label, state carried by aria-pressed only; "Hide key" needs a new key.
+- [ ] Display: segmented groups hug the left, switches the right; a shared column would line the card up (critic minor).
+- [ ] Sticky preview and the short-viewport fallback were checked by class only, not at 400% zoom in a real browser.
+- [ ] Switch forced-colors and busy focus: not seen in a real browser.
+- [ ] Translations of the 27 phase 2 keys: model-written, no native review.

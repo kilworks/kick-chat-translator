@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useId, useRef, useState } from 'preact/hooks';
 import type { CloudProviderId, Settings } from '~/shared/settings';
 import { send } from '~/shared/messages';
 import type { ProviderStatus } from '~/shared/types';
@@ -12,6 +12,15 @@ const PROVIDER_LABELS: Record<CloudProviderId, string> = {
   mymemory: 'MyMemory (free, ~1000/day)',
   lingva: 'Lingva (Google Translate front end, configurable)',
 };
+
+/** What a row says about its provider, in words, so colour is never the only cue. */
+function statusText(t: (k: string) => string, s: ProviderStatus, hasKey: boolean): string {
+  if (s.available) return t('Ready');
+  const left = s.cooldownLeftSec ?? 0;
+  if (left > 0) return t('Paused, back in {n} min').replace('{n}', String(Math.ceil(left / 60)));
+  if (s.id === 'deepl' && !hasKey) return t('Needs a key');
+  return t('Paused');
+}
 
 interface Props {
   settings: Settings;
@@ -63,6 +72,24 @@ function DeeplQuota({ configured }: { configured: boolean }) {
 
 export function ProviderSection({ settings, providers, onPatch }: Props) {
   const t = useT();
+  const [showKey, setShowKey] = useState(false);
+  const hasKey = settings.deeplApiKey !== '';
+  const last = settings.providerOrder.length - 1;
+  const keyId = useId();
+  const planId = useId();
+  const list = useRef<HTMLUListElement>(null);
+  const refocus = useRef<string | undefined>(undefined);
+  // Show the DeepL card once, then keep it: clearing the key must not unmount
+  // the field being edited.
+  const deeplWanted = settings.providerOrder.includes('deepl') || hasKey;
+  const [deeplShown, setDeeplShown] = useState(deeplWanted);
+  if (deeplWanted && !deeplShown) setDeeplShown(true);
+  // The row moves in the DOM and the browser may drop focus: put it back on the
+  // button that was pressed, which is aria-disabled (still focusable) at an end.
+  useEffect(() => {
+    if (refocus.current) list.current?.querySelector<HTMLElement>(`[data-move="${refocus.current}"]`)?.focus();
+    refocus.current = undefined;
+  }, [settings.providerOrder]);
 
   function move(id: CloudProviderId, dir: -1 | 1) {
     const order = [...settings.providerOrder];
@@ -73,6 +100,7 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
     const tmp = order[idx];
     const other = order[swap];
     if (tmp === undefined || other === undefined) return;
+    refocus.current = `${id}:${dir}`;
     order[idx] = other;
     order[swap] = tmp;
     onPatch({ providerOrder: order });
@@ -108,10 +136,23 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
       <section class="kt-card">
         <h2 class="kt-section mb-3">{t('Cloud engines')}</h2>
         <p class="text-xs text-kick-muted mb-3">{cloudRole}</p>
+        {/* lucide chevron-up, chevron-down and x, verbatim from the kit's icons.js. */}
+        <svg width="0" height="0" class="absolute" aria-hidden="true">
+          <symbol id="i-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m18 15-6-6-6 6" />
+          </symbol>
+          <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6" />
+          </symbol>
+          <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </symbol>
+        </svg>
         {/* Unused under "on-device only": greyed out rather than hidden, so the
             order is still there when the strategy changes back. */}
         <fieldset disabled={settings.engineMode === 'local-only'} class="m-0 min-w-0 border-0 p-0 disabled:opacity-60">
-        <ul class="flex flex-col gap-1.5">
+        <ul ref={list} class="flex flex-col gap-1.5">
           {settings.providerOrder.map((id, i) => {
             const status = providers.find((p) => p.id === id);
             return (
@@ -122,31 +163,41 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
                 </span>
                 {status && (
                   <span
-                    class={`shrink-0 text-[10px] font-medium uppercase ${status.available ? 'text-kick-primary' : 'text-red-300'}`}
+                    class={`shrink-0 text-xs font-medium ${status.available ? 'text-kick-primary' : 'text-red-300'}`}
+                    title={status.lastError}
                   >
-                    {status.available ? t('ok') : t('down')}
+                    {statusText(t, status, hasKey)}
+                  </span>
+                )}
+                {status && !status.available && status.lastError && (
+                  <span class="min-w-0 max-w-[9rem] shrink truncate text-xs text-kick-muted">
+                    {status.lastError}
                   </span>
                 )}
                 <button
-                  class="kt-btn-ghost kt-btn-icon text-xs"
+                  class="kt-btn-ghost kt-btn-icon text-xs aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
                   aria-label={`${t('Move up')}: ${t(PROVIDER_LABELS[id])}`}
+                  data-move={`${id}:-1`}
+                  aria-disabled={i === 0}
                   onClick={() => move(id, -1)}
                 >
-                  <span aria-hidden="true">↑</span>
+                  <svg width="16" height="16" aria-hidden="true"><use href="#i-chevron-up" /></svg>
                 </button>
                 <button
-                  class="kt-btn-ghost kt-btn-icon text-xs"
+                  class="kt-btn-ghost kt-btn-icon text-xs aria-disabled:cursor-not-allowed aria-disabled:opacity-40"
                   aria-label={`${t('Move down')}: ${t(PROVIDER_LABELS[id])}`}
+                  data-move={`${id}:1`}
+                  aria-disabled={i === last}
                   onClick={() => move(id, +1)}
                 >
-                  <span aria-hidden="true">↓</span>
+                  <svg width="16" height="16" aria-hidden="true"><use href="#i-chevron-down" /></svg>
                 </button>
                 <button
                   class="kt-btn-ghost kt-btn-icon text-xs"
                   aria-label={`${t('Remove')}: ${t(PROVIDER_LABELS[id])}`}
                   onClick={() => toggle(id)}
                 >
-                  <span aria-hidden="true">✕</span>
+                  <svg width="16" height="16" aria-hidden="true"><use href="#i-x" /></svg>
                 </button>
               </li>
             );
@@ -164,24 +215,38 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
         </fieldset>
       </section>
 
+      {/* Only once DeepL is in the chain, or a key was already saved. */}
+      {deeplShown && (
       <section class="kt-card space-y-3">
         <h2 class="kt-section">DeepL</h2>
         {/* LE QUOTA, ICI. Il etait demande par le popup et par lui seul, donc
             invisible sur la page ou se reglent la cle, le plan et le budget.
             Regler un pourcentage de quota sans voir le quota est le meme
             aveuglement que plafonner un cache sans voir ce qu'il contient. */}
-        <DeeplQuota configured={settings.deeplApiKey !== ''} />
+        <DeeplQuota configured={hasKey} />
         <div class="kt-row">
-          <label class="kt-label">{t('API key')}</label>
-          <input
-            aria-label={t('API key')}
-            class="kt-input font-mono"
-            type="password"
-            value={settings.deeplApiKey}
+          <label class="kt-label" for={keyId}>{t('API key')}</label>
+          <div class="flex items-center gap-2">
+            <input
+              id={keyId}
+              aria-label={t('API key')}
+              class="kt-input font-mono"
+              type={showKey ? 'text' : 'password'}
+              value={settings.deeplApiKey}
             placeholder="••••••••-••••-••••-••••-••••••••••••:fx"
-            onInput={(e) => onPatch({ deeplApiKey: (e.target as HTMLInputElement).value.trim() })}
-          />
-          <p class="text-[11px] text-kick-muted">
+              onInput={(e) => onPatch({ deeplApiKey: (e.target as HTMLInputElement).value.trim() })}
+            />
+            {/* Text, not an eye glyph: the kit's icons.js has no eye or eye-off. */}
+            <button
+              type="button"
+              class="kt-btn-ghost shrink-0 text-xs"
+              aria-pressed={showKey}
+              onClick={() => setShowKey((v) => !v)}
+            >
+              {t('Show key')}
+            </button>
+          </div>
+          <p class="text-xs text-kick-muted">
             {t('Free keys end with :fx.')} {t('Get a key:')}{' '}
             <a
               class="text-kick-primary underline"
@@ -195,8 +260,9 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
           </p>
         </div>
         <div class="kt-row">
-          <label class="kt-label">{t('Plan')}</label>
+          <label class="kt-label" for={planId}>{t('Plan')}</label>
           <select
+            id={planId}
             aria-label={t('Plan')}
             class="kt-select"
             value={settings.deeplPlan}
@@ -211,14 +277,15 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
         <Check
           checked={settings.deeplSmartRouting}
           onChange={(v) => onPatch({ deeplSmartRouting: v })}
-          label={t('Smart budget routing')}
+          label={t('Save DeepL for European languages')}
         />
-        <p class="text-[11px] text-kick-muted -mt-2">
+        <p class="text-xs text-kick-muted -mt-2">
           {t(
-            'Spend DeepL only on the European languages it clearly wins at; other targets (Japanese, Arabic, Hindi…) use the free engines first, so your DeepL quota lasts much longer.',
+            'DeepL is used only for European languages, where it is best. Other languages (Japanese, Arabic, Hindi...) use the free engines first, so your DeepL allowance lasts longer.',
           )}
         </p>
       </section>
+      )}
 
       <section class="kt-card space-y-3">
         <h2 class="kt-section">{t('Lingva instance')}</h2>
@@ -236,7 +303,7 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
               onPatch({ lingvaInstance: (e.target as HTMLInputElement).value.trim() })
             }
           />
-          <p class="text-[11px] text-kick-muted">
+          <p class="text-xs text-kick-muted">
             {t('Leave blank to use the default public instance.')}
           </p>
         </div>

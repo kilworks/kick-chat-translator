@@ -58,7 +58,8 @@ const SETTINGS = {
   showSourceBadge: true, showProviderBadge: false, showFloatingBar: true,
   showComposerChip: true, composeEnabled: true, composeTargetLang: 'auto',
   composeInsertMode: 'insert', popupShowsStats: true, uiLang: 'en',
-  providerOrder: ['google', 'lingva', 'mymemory'], favoriteLangs: ['ja', 'es'],
+  providerOrder: ['google', 'deepl', 'lingva', 'mymemory'], // DeepL in the chain: its card only renders then (P2-11), and the gates must see it.
+  favoriteLangs: ['ja', 'es'],
   deeplApiKey: '', deeplPlan: 'free', engineMode: 'local-first', localEnabled: true,
   minTextLength: 3, ignoreEnglish: true, ignoreBots: true, blacklistUsers: [],
   blacklistChannels: [], whitelistChannels: [], sourceLangAllowlist: [], glossary: [],
