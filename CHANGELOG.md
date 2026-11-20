@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.1] - 2026-11-20
+
 ### Added
 
 - **The chat bar shows when your source language allowlist is holding lines
