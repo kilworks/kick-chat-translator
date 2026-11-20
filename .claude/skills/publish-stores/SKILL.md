@@ -313,3 +313,11 @@ Asked by kil: "une petite update", a Discord logo between Clear cache and Option
 - **Before tagging, `cws.mjs status`:** only a PUBLISHED revision, nothing in review, so no `cancel` needed.
 - **Notes translated by two Sonnet agents** (14 languages each, brief + checker in the scratchpad: three paragraphs, no dash, no curly quote, the quoted examples kept, UI labels read from `src/shared/i18n/<ui>.ts`). They switched fr, de and es to the informal register although the brief said to follow the previous note: check the register against the previous note (`du/Sie`, `tu/vous`, `tú/usted`) before copying the files in.
 - **The auto mode classifier refused `gh pr merge` on the release PR** ([Merge Without Review]) even after kil's go in chat. Lifted by `autoMode.allow` rules kil added himself by running a scratchpad script with `!` (memory `auto-mode-blocks`). The PR branch had also been BEHIND master after #46 merged: `gh pr update-branch <n>` then wait for CI; auto-merge is disabled on this repository.
+
+## Journal: 3.6.0 cancelled, 3.6.1 shipped, 2026-11-20
+
+- **Cancelling a pushed tag**: Chrome `node scripts/stores/cws.mjs cancel` (back to the published version); AMO auto-approves within minutes, so disable the version through the API (`PATCH /api/v5/addons/addon/kick-chat-translator/versions/{id}/` with `{"is_disabled": true}`, JWT from `~/.config/kick-chat-translator/amo-api.json`); GitHub release back to draft. The number is burned on AMO: the next release takes the next patch.
+- **Notes of a cancelled version stay true** for store users (they never got it): keep the 29 localised notes and append the new items to `store/notes/en.txt` only.
+- **Bump with `npm version X.Y.Z --no-git-tag-version`**: a sed on package.json leaves package-lock.json on the old number.
+- **Master is protected and auto-merge is off**: `gh pr merge` is refused while required checks run. `gh pr checks N --watch` then merge; `--auto` errors.
+- **Shortest path that worked** (about 15 min to both stores): branch `release/X`, bump + CHANGELOG `## [X] - date` under Unreleased + en note, `node scripts/stores/preflight.mjs`, PR, wait checks, merge, `git tag vX && git push origin vX`, `gh run watch`, then `cws.mjs status` (PENDING_REVIEW) and the AMO versions list (unreviewed).
