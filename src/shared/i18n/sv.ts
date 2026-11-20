@@ -146,8 +146,6 @@ export const sv: Record<string, string> = {
     'Egen URL (valfritt)',
   'Leave blank to use the default public instance.':
     'Lämna tomt för att använda den offentliga standardinstansen.',
-  '⬆ Update available':
-    '⬆ Uppdatering tillgänglig',
   'Target language':
     'Målspråk',
   'Translate what I type':
@@ -429,4 +427,19 @@ export const sv: Record<string, string> = {
   'Key that swaps in the translation': 'Tangent som byter in översättningen',
   'Tab or Ctrl/Cmd+Enter': 'Tab eller Ctrl/Cmd+Enter',
   'Ctrl/Cmd+Enter only': 'Bara Ctrl/Cmd+Enter',
+  'Hide key': 'Dölj nyckel',
+  'Download {lang}': 'Ladda ned {lang}',
+  'Downloading {lang}': 'Laddar ned {lang}',
+  '{lang}, downloaded': '{lang}, nedladdad',
+  '{lang}, not available': '{lang}, ej tillgänglig',
+  'Spaces and commas also separate names.': 'Mellanslag och kommatecken skiljer också namn åt.',
+  'Each line is one word or phrase.': 'Varje rad är ett ord eller en fras.',
+  'Update available': 'Uppdatering tillgänglig',
+  'Version {current} installed, {latest} available': 'Version {current} installerad, {latest} tillgänglig',
+  'Cache cleared': 'Cachen rensad',
+  '{list}: some recent lines were not translated.': '{list}: några av de senaste raderna översattes inte.',
+  '{lang}: download failed, try again': '{lang}: nedladdningen misslyckades, försök igen',
+  'Text': 'Text',
+  'Colour and theme': 'Färg och tema',
+  'In the chat': 'I chatten',
 };

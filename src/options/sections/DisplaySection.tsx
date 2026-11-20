@@ -1,4 +1,5 @@
 import { useEffect, useRef, useMemo, useId } from 'preact/hooks';
+import type { ComponentChildren } from 'preact';
 import type { Settings } from '~/shared/settings';
 import { sortedLanguages } from '~/shared/languages';
 import { resolveUiLocale } from '~/shared/i18n';
@@ -100,112 +101,120 @@ export function DisplaySection({ settings, onPatch }: Props) {
           />
         </div>
 
-        <RangeRow
-          label={t('Text size')}
-          value={settings.translatedFontScale}
-          min={0.8}
-          max={1.4}
-          step={0.05}
-          format={(v) => `${Math.round(v * 100)}%`}
-          onChange={(v) => onPatch({ translatedFontScale: v })}
-        />
-        <RangeRow
-          label={t('Line spacing')}
-          value={settings.translatedLineHeight}
-          min={1.2}
-          max={2}
-          step={0.05}
-          format={(v) => v.toFixed(2)}
-          onChange={(v) => onPatch({ translatedLineHeight: v })}
-        />
-        <Segmented
-          label={t('Font')}
-          value={settings.translatedFont}
-          options={[
-            { value: 'inherit', label: t("Kick's own") },
-            { value: 'system', label: t('System') },
-            { value: 'serif', label: t('Serif') },
-            { value: 'mono', label: t('Monospace') },
-            { value: 'readable', label: t('High legibility') },
-          ]}
-          onChange={(v) => onPatch({ translatedFont: v as Settings['translatedFont'] })}
-        />
+        {/* Three groups under small heads: 13 rows of one weight gave no sign
+            of where the text settings end and the in-chat switches begin. */}
+        <SettingGroup title={t('Text')}>
+          <RangeRow
+            label={t('Text size')}
+            value={settings.translatedFontScale}
+            min={0.8}
+            max={1.4}
+            step={0.05}
+            format={(v) => `${Math.round(v * 100)}%`}
+            onChange={(v) => onPatch({ translatedFontScale: v })}
+          />
+          <RangeRow
+            label={t('Line spacing')}
+            value={settings.translatedLineHeight}
+            min={1.2}
+            max={2}
+            step={0.05}
+            format={(v) => v.toFixed(2)}
+            onChange={(v) => onPatch({ translatedLineHeight: v })}
+          />
+          <Segmented
+            label={t('Font')}
+            value={settings.translatedFont}
+            options={[
+              { value: 'inherit', label: t("Kick's own") },
+              { value: 'system', label: t('System') },
+              { value: 'serif', label: t('Serif') },
+              { value: 'mono', label: t('Monospace') },
+              { value: 'readable', label: t('High legibility') },
+            ]}
+            onChange={(v) => onPatch({ translatedFont: v as Settings['translatedFont'] })}
+          />
 
-        <Segmented
-          label={t('Density')}
-          value={settings.translatedDensity}
-          options={[
-            { value: 'compact', label: t('Compact') },
-            { value: 'normal', label: t('Normal') },
-            { value: 'roomy', label: t('Roomy') },
-          ]}
-          onChange={(v) => onPatch({ translatedDensity: v as Settings['translatedDensity'] })}
-        />
+          <Segmented
+            label={t('Density')}
+            value={settings.translatedDensity}
+            options={[
+              { value: 'compact', label: t('Compact') },
+              { value: 'normal', label: t('Normal') },
+              { value: 'roomy', label: t('Roomy') },
+            ]}
+            onChange={(v) => onPatch({ translatedDensity: v as Settings['translatedDensity'] })}
+          />
+        </SettingGroup>
 
-        {/* The dark-scheme accent values of src/shared/theme.css. */}
-        <Segmented
-          swatch
-          label={t('Accent colour')}
-          value={settings.accent}
-          options={[
-            { value: 'kick', label: t('Kick green'), color: 'rgb(83 252 24)' },
-            { value: 'cyan', label: t('Cyan'), color: 'rgb(5 179 214)' },
-            { value: 'violet', label: t('Violet'), color: 'rgb(190 146 252)' },
-            { value: 'amber', label: t('Amber'), color: 'rgb(229 147 6)' },
-          ]}
-          onChange={(v) => onPatch({ accent: v as Settings['accent'] })}
-        />
-        {/* Eteint par defaut : allume, la langue change toute seule en changeant
-            de chaine, ce qui est ce qu'on veut quand on l'a demande et une
-            surprise sinon. Sur une chaine inconnue rien ne bouge, sans quoi
-            chaque nouvelle chaine effacerait le choix qu'on vient de faire. */}
-        <ToggleRow
-          checked={settings.rememberChannelLang}
-          onChange={(v) => onPatch({ rememberChannelLang: v })}
-          label={t('Remember a reading language per channel')}
-        />
-        <Segmented
-          label={t('Chat theme')}
-          value={settings.chatScheme}
-          options={[
-            { value: 'auto', label: t('Follow Kick') },
-            { value: 'dark', label: t('Always dark') },
-            { value: 'light', label: t('Always light') },
-          ]}
-          onChange={(v) => onPatch({ chatScheme: v as Settings['chatScheme'] })}
-        />
+        <SettingGroup title={t('Colour and theme')}>
+          {/* The dark-scheme accent values of src/shared/theme.css. */}
+          <Segmented
+            swatch
+            label={t('Accent colour')}
+            value={settings.accent}
+            options={[
+              { value: 'kick', label: t('Kick green'), color: 'rgb(83 252 24)' },
+              { value: 'cyan', label: t('Cyan'), color: 'rgb(5 179 214)' },
+              { value: 'violet', label: t('Violet'), color: 'rgb(190 146 252)' },
+              { value: 'amber', label: t('Amber'), color: 'rgb(229 147 6)' },
+            ]}
+            onChange={(v) => onPatch({ accent: v as Settings['accent'] })}
+          />
+          <Segmented
+            label={t('Chat theme')}
+            value={settings.chatScheme}
+            options={[
+              { value: 'auto', label: t('Follow Kick') },
+              { value: 'dark', label: t('Always dark') },
+              { value: 'light', label: t('Always light') },
+            ]}
+            onChange={(v) => onPatch({ chatScheme: v as Settings['chatScheme'] })}
+          />
+        </SettingGroup>
 
-        <ToggleRow
-          checked={settings.showFloatingBar}
-          onChange={(v) => onPatch({ showFloatingBar: v })}
-          label={t('Show the floating bar at the top of chat')}
-        />
-        <ToggleRow
-          checked={settings.showComposerChip}
-          onChange={(v) => onPatch({ showComposerChip: v })}
-          label={t('Show the quick language button in chat')}
-        />
-        <ToggleRow
-          checked={settings.showOriginal}
-          onChange={(v) => onPatch({ showOriginal: v })}
-          label={t('Keep original text visible')}
-          disabled={settings.displayStyle === 'replace'}
-          hint={
-            settings.displayStyle === 'replace'
-              ? t('The Replace style always hides it.')
-              : undefined
-          }
-        />
-        <ToggleRow
-          checked={settings.showSourceBadge}
-          onChange={(v) => onPatch({ showSourceBadge: v })}
-          label={t('Show source language badge')}
-        />
-        <ToggleRow
-          checked={settings.showProviderBadge}
-          onChange={(v) => onPatch({ showProviderBadge: v })}
-          label={t('Show which provider was used')}
-        />
+        <SettingGroup title={t('In the chat')}>
+          {/* Eteint par defaut : allume, la langue change toute seule en changeant
+              de chaine, ce qui est ce qu'on veut quand on l'a demande et une
+              surprise sinon. Sur une chaine inconnue rien ne bouge, sans quoi
+              chaque nouvelle chaine effacerait le choix qu'on vient de faire. */}
+          <ToggleRow
+            checked={settings.rememberChannelLang}
+            onChange={(v) => onPatch({ rememberChannelLang: v })}
+            label={t('Remember a reading language per channel')}
+          />
+          <ToggleRow
+            checked={settings.showFloatingBar}
+            onChange={(v) => onPatch({ showFloatingBar: v })}
+            label={t('Show the floating bar at the top of chat')}
+          />
+          <ToggleRow
+            checked={settings.showComposerChip}
+            onChange={(v) => onPatch({ showComposerChip: v })}
+            label={t('Show the quick language button in chat')}
+          />
+          <ToggleRow
+            checked={settings.showOriginal}
+            onChange={(v) => onPatch({ showOriginal: v })}
+            label={t('Keep original text visible')}
+            disabled={settings.displayStyle === 'replace'}
+            hint={
+              settings.displayStyle === 'replace'
+                ? t('The Replace style always hides it.')
+                : undefined
+            }
+          />
+          <ToggleRow
+            checked={settings.showSourceBadge}
+            onChange={(v) => onPatch({ showSourceBadge: v })}
+            label={t('Show source language badge')}
+          />
+          <ToggleRow
+            checked={settings.showProviderBadge}
+            onChange={(v) => onPatch({ showProviderBadge: v })}
+            label={t('Show which provider was used')}
+          />
+        </SettingGroup>
       </section>
 
       <section class="kt-card space-y-3">
@@ -351,6 +360,19 @@ function StylePreview({ settings }: { settings: Settings }) {
  * onInput et non onChange : le reglage doit se voir pendant qu'on tire le
  * curseur, sinon il faut le lacher pour savoir ou on en est.
  */
+/** A run of settings under a small head, set apart from the next run by space. */
+function SettingGroup({ title, children }: { title: string; children: ComponentChildren }) {
+  const id = useId();
+  return (
+    <div role="group" aria-labelledby={id} class="space-y-3 pt-3">
+      <h3 id={id} class="kt-label">
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
+
 function RangeRow({
   label,
   value,
@@ -370,11 +392,11 @@ function RangeRow({
 }) {
   const id = useId();
   return (
-    <div class="kt-row">
-      <label class="kt-label" for={id}>
+    <div class="kt-row-inline">
+      <label class="text-sm text-kick-text" for={id}>
         {label}
       </label>
-      <div class="flex items-center gap-2">
+      <div class="ms-auto flex items-center gap-2">
         {/* Unstyled, a range is Chrome's blue, the only blue in the product,
             and 16 pixels tall where WCAG 2.5.8 asks for 24. */}
         <input
@@ -421,7 +443,8 @@ function StyleCard({
       }`}
       onClick={onClick}
     >
-      <div class="flex items-center gap-2">
+      {/* Wraps: at 320px the badge ran out of its card over the next one. */}
+      <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
         <span class="text-sm font-semibold">{label}</span>
         {/* Not colour alone: the chosen card carries a tick. */}
         {active && (

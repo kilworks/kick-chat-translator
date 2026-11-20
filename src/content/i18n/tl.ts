@@ -5,6 +5,7 @@ export const tl: Record<string, string> = {
   barBlockedTipWhite: 'Wala sa allowlist mo ang channel na ito (Mga setting, Mga filter)',
   barCount: 'Naisalin sa page na ito: $N$',
   barLangDir: 'Chat ng ibang viewer, isinalin para sa iyo',
+  barLangFilterTip: 'Allowlist ng orihinal na wika: $N$ sa huling 10 linya ang hindi isinalin (Mga setting, Mga filter)',
   barOff: 'Naka-off ang pagsasalin',
   barOn: 'Isinasalin',
   barOnTip: 'Binabasa ang chat sa $LANG$',

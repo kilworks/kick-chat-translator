@@ -47,6 +47,7 @@ import {
   unmountComposePreview,
   updateComposePreview,
   setComposeInsertKey,
+  noteComposeInserted,
 } from './composeUi';
 
 const log = rootLogger.child('compose');
@@ -432,6 +433,7 @@ export class ComposeController {
     if (!this.composer || !this.lastTranslation) return;
     insertIntoComposer(this.composer, this.lastTranslation, this.settings.composeInsertMode);
     countUsage('compose_insert');
+    noteComposeInserted();
     // The preview did its job — hide it (the synthetic insert doesn't re-fire `input`).
     this.dismiss();
   }

@@ -5,6 +5,7 @@ export const sv: Record<string, string> = {
   barBlockedTipWhite: 'Den här kanalen finns inte på din lista över tillåtna (Inställningar, Filter)',
   barCount: 'Översatt på den här sidan: $N$',
   barLangDir: 'Chatten från andra tittare, översatt åt dig',
+  barLangFilterTip: 'Tillåtna källspråk: $N$ av de senaste 10 raderna översattes inte (Inställningar, Filter)',
   barOff: 'Översättning avstängd',
   barOn: 'Översätter',
   barOnTip: 'Läser chatten på $LANG$',

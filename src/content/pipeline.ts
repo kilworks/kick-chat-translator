@@ -14,7 +14,7 @@ import { confidentLanguage, detectLanguageWithBrowser } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
 import { isContextCritical } from '~/shared/langTiers';
 import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, isSameLanguageAsTarget, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, trimForEngine } from './filters';
-import { HANDLED_SELECTOR, inject, incrementFloatingCount, armHoverTranslate, markSkipped, removeAllArtifacts, showError, showLoading, showThrottleIndicator, showToast, updateActiveProvider } from './injector';
+import { HANDLED_SELECTOR, inject, incrementFloatingCount, armHoverTranslate, markSkipped, removeAllArtifacts, showError, showLangBlocked, showLoading, showThrottleIndicator, showToast, updateActiveProvider } from './injector';
 import { localEngine } from './localEngine';
 import { memCache } from './memcache';
 import { msg as localised } from './msg';
@@ -73,6 +73,16 @@ const DROP_REASON: Record<string, string> = {
 /** How many decisions the Debug tab can look back over. */
 const DECISION_LOG_MAX = 50;
 
+/**
+ * The allowlist is said once it left LANG_BLOCKED_MIN of the last
+ * LANG_BLOCKED_WINDOW lines that reached it, and stays said until a whole
+ * window goes by without one. A run that reset on every allowed line made the
+ * bar and the popup flip on each line of a mixed chat.
+ */
+export const LANG_BLOCKED_MIN = 3;
+// The bar's text says "10" (injector.ts, barLangFilterTip): change both together.
+export const LANG_BLOCKED_WINDOW = 10;
+
 const CONTEXT_LINES = 2;
 // Pro-drop, no-person-marking sources (ja/ko/zh/vi/th/ar) drop the subject; feeding
 // more prior dialogue lets DeepL's `context` infer the right person ("he", not "I").
@@ -92,6 +102,18 @@ export class TranslationPipeline {
    */
   private decisions: Decision[] = [];
 
+  /**
+   * The last lines of this chat that reached the source-language allowlist,
+   * true where it dropped one. Recorded where the allowlist decides, not where a
+   * line gets painted: in hover mode an allowed line is only armed, and a line
+   * it lets through can still be skipped later for another reason. Nothing is
+   * stored anywhere.
+   */
+  private langWindow: boolean[] = [];
+  private langChannel = '';
+  private langOn = false;
+  private langShown = 0;
+
   private note(text: string, outcome: string): void {
     // Kept whole enough to be readable in full on hover. Still bounded, because
     // this text comes from a page we do not control.
@@ -99,9 +121,43 @@ export class TranslationPipeline {
     if (this.decisions.length > DECISION_LOG_MAX) this.decisions.shift();
   }
 
+  /** One line reached the allowlist on `channel`; `dropped` when it was left. */
+  private langMark(channel: string, dropped: boolean): void {
+    if (channel !== this.langChannel) this.resetLangBlocked(channel);
+    this.langWindow.push(dropped);
+    if (this.langWindow.length > LANG_BLOCKED_WINDOW) this.langWindow.shift();
+    const drops = this.langWindow.filter(Boolean).length;
+    if (drops >= LANG_BLOCKED_MIN) this.langOn = true;
+    else if (drops === 0) this.langOn = false;
+    this.pushLangBlocked();
+  }
+
+  /**
+   * Start over: another channel (called on the route itself, so a page with no
+   * chat never keeps the last channel's count), or a changed allowlist.
+   */
+  resetLangBlocked(channel = this.langChannel): void {
+    this.langChannel = channel;
+    this.langWindow = [];
+    this.langOn = false;
+    this.pushLangBlocked();
+  }
+
   /** Newest first, for the Debug tab. */
   recentDecisions(): Decision[] {
     return [...this.decisions].reverse();
+  }
+
+  /** What the bar shows and the popup asks for: 0, or how many of the window the allowlist left. */
+  langBlockedCount(): number {
+    return this.langOn ? this.langWindow.filter(Boolean).length : 0;
+  }
+
+  private pushLangBlocked(): void {
+    const n = this.langBlockedCount();
+    if (n === this.langShown) return;
+    this.langShown = n;
+    showLangBlocked(n);
   }
 
   /**
@@ -134,6 +190,8 @@ export class TranslationPipeline {
   updateSettings(next: Settings): void {
     const before = this.settings;
     this.settings = next;
+    // A changed allowlist makes the window it produced meaningless: start over.
+    if (before.sourceLangAllowlist.join(',') !== next.sourceLangAllowlist.join(',')) this.resetLangBlocked();
     if (before.enabled !== next.enabled || before.blockedKeywords.join('\n') !== next.blockedKeywords.join('\n')) {
       this.reapplyBlocked();
     }
@@ -318,6 +376,11 @@ export class TranslationPipeline {
     // The detection can take a few milliseconds on Firefox, long enough for the
     // scroller to hand this row to another message, whose reason this is not.
     const sameRow = extractMessageText(msg.rowElement) === rowText;
+    // Both drops are the allowlist's doing: lang_unknown only fires when one is set.
+    const byLang = prepared === DROP_REASON.lang_not_allowed || prepared === DROP_REASON.lang_unknown;
+    if (byLang || (typeof prepared !== 'string' && this.settings.sourceLangAllowlist.length > 0)) {
+      this.langMark(msg.channel, byLang);
+    }
     if (typeof prepared === 'string') {
       if (sameRow) this.skip(msg, prepared);
       return;

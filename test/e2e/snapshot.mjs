@@ -185,7 +185,8 @@ await popup.close();
  * counts 2: the real build shows 1 on a fresh profile, and Usage joins it once
  * there are stats, which this stub serves.
  */
-const TABS = { providers: 4, display: 3, filters: 4, advanced: 4, activity: 2, about: 3 };
+// Display: 3 cards (h2) plus the Text, Colour and theme, In the chat groups (h3).
+const TABS = { providers: 4, display: 6, filters: 4, advanced: 4, activity: 2, about: 3 };
 const OPTIONS = path.join(OUT, 'options');
 fs.mkdirSync(OPTIONS, { recursive: true });
 // rtl-surfaces audits every file here: a stale page from an old tab id would be

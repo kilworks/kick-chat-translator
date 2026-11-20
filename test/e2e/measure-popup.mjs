@@ -25,6 +25,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from './playwright.mjs';
+import { build } from 'esbuild';
 
 /**
  * playwright is not a dependency of this extension: it belongs to the UX kit
@@ -85,13 +86,33 @@ const STATES = {
   // to 664px).
   blocked: { url: 'https://kick.com/kt-pause', asked: false, paused: false, fresh: false, blocked: true, needs: ['filters'], bans: ['ask'] },
   blockedasked: { url: 'https://kick.com/kt-pause', asked: true, paused: false, fresh: false, blocked: true, needs: ['filters'] },
+  // The language allowlist left lines of this chat untranslated: one line with
+  // a link to its Options card, on top of the usual cards (a working allowlist
+  // gives nothing up), and beside the stats question when that is asked.
+  langblocked: { url: 'https://kick.com/kt-pause', asked: true, paused: false, fresh: false, langBlocked: 4, needs: ['langs'] },
+  langblockedask: { url: 'https://kick.com/kt-pause', asked: false, paused: false, fresh: false, langBlocked: 4, needs: ['ask', 'langs'] },
+  // An update is offered: its link takes the place of the day's numbers (the
+  // engines stay), and the stats question waits (both on top: 612 to 642px).
+  update: { url: 'https://kick.com/kt-pause', asked: false, paused: false, fresh: false, update: true, needs: [], bans: ['ask'] },
 };
 
-function shim([locale, st]) {
+// Every key the schema defines, from the schema itself, as snapshot.mjs does:
+// the hand-typed list lacked sourceLangAllowlist, the popup threw on it, and
+// three states were measured on the frame left from before the throw.
+const settingsJs = await build({
+  entryPoints: [path.join(ROOT, 'src/shared/settings.ts')],
+  bundle: true, format: 'esm', platform: 'neutral', write: false, logLevel: 'silent',
+});
+const { defaultSettings } = await import(
+  'data:text/javascript;base64,' + Buffer.from(settingsJs.outputFiles[0].text).toString('base64'));
+const DEFAULTS = defaultSettings();
+
+function shim([locale, st, defaults]) {
   const noop = { addListener() {}, removeListener() {} };
   // What the buttons did when clicked after the measure: proof of which cards mounted.
   const seen = (globalThis.__ktSeen = []);
   const settings = {
+    ...defaults,
     enabled: true, targetLang: 'auto', displayStyle: 'below', showOriginal: true,
     showSourceBadge: true, showProviderBadge: false, showFloatingBar: true,
     showComposerChip: true, composeEnabled: true, composeTargetLang: 'auto',
@@ -99,6 +120,7 @@ function shim([locale, st]) {
     providerOrder: ['google', 'mymemory', 'lingva'], favoriteLangs: [],
     deeplApiKey: '', deeplPlan: 'free',
     usageStats: false, usageStatsAsked: st.asked,
+    sourceLangAllowlist: st.langBlocked ? ['ko'] : [],
     pausedChannels: st.paused ? ['kt-pause'] : [],
     whitelistChannels: st.blocked ? ['kt-other'] : [], blacklistChannels: [],
   };
@@ -119,6 +141,9 @@ function shim([locale, st]) {
         { id: 'google', available: true }, { id: 'mymemory', available: true }, { id: 'lingva', available: false, lastError: 'cooldown' }] };
       case 'stats.get': return { type: 'stats', payload: stats };
       case 'deepl.usage': return { type: 'deepl', payload: { configured: false, count: 0, limit: 0 } };
+      case 'update.status': return st.update
+        ? { type: 'update.info', payload: { current: '3.6.0', latest: '3.6.1', updateAvailable: true, releaseUrl: 'https://example.com/r' } }
+        : { type: 'ok' };
       default: return { type: 'ok' };
     }
   };
@@ -130,10 +155,12 @@ function shim([locale, st]) {
       local: { get: async () => ({}), set: async () => {} }, onChanged: noop },
     i18n: { getUILanguage: () => locale, getMessage: () => '' },
     tabs: {
-      query: async () => [{ url: st.url }],
+      query: async () => [{ id: 1, url: st.url }],
+      sendMessage: async (_id, m) => (m?.type === 'filter.langBlocked' ? { count: st.langBlocked ?? 0 } : undefined),
       create: async (o) => {
         if (/kick\.com/.test(o?.url ?? '')) seen.push('openKick');
         if (/#filters$/.test(o?.url ?? '')) seen.push('filters');
+        if (/#filters-langs$/.test(o?.url ?? '')) seen.push('langs');
       },
     },
   };
@@ -142,13 +169,17 @@ function shim([locale, st]) {
 const browser = await chromium.launch();
 const over = [];
 const muettes = [];
+const crashed = [];
 const table = Object.fromEntries(Object.keys(STATES).map((n) => [n, {}]));
 const jobs = Object.entries(STATES).flatMap(([name, st]) => LOCALES.map((locale) => [name, st, locale]));
-// Eight pages at a time: 6 states x 43 languages one by one took minutes.
+// Eight pages at a time: every state x 43 languages one by one took minutes.
 async function measure([name, st, locale]) {
   {
     const page = await browser.newPage({ viewport: { width: 360, height: 1200 }, colorScheme: 'dark' });
-    await page.addInitScript(shim, [locale, st]);
+    // A render that throws leaves the previous frame on screen: the height
+    // read would be of a state the user never sees.
+    page.on('pageerror', (e) => crashed.push(`${name}/${locale}: ${e.message}`));
+    await page.addInitScript(shim, [locale, st, DEFAULTS]);
     await page.goto(`http://localhost:${port}/src/popup/index.html`);
     await page.waitForTimeout(1300);
     const h = await page.evaluate(() => document.body.scrollHeight);
@@ -189,6 +220,10 @@ for (const [name, row] of Object.entries(table)) {
 }
 console.log('  (! = over budget)');
 
+if (crashed.length) {
+  console.error(`\nSILENT PROBE: the popup threw, state not measured: ${crashed.join(', ')}`);
+  process.exit(2);
+}
 if (muettes.length) {
   console.error(`\nSILENT PROBE: required card missing, state not measured: ${muettes.join(', ')}`);
   process.exit(2);

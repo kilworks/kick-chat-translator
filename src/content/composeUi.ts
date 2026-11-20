@@ -9,7 +9,7 @@
  */
 import { getLang } from '~/shared/languages';
 import { flagEl } from '~/shared/flags';
-import { computePanelGeom, morceauxPourEditeur } from './composeLogic';
+import { chatReserve, computePanelGeom, morceauxPourEditeur } from './composeLogic';
 import { send } from '~/shared/messages';
 import { showToast } from './injector';
 import { msg } from './msg';
@@ -64,6 +64,7 @@ export function mountComposePreview(
   // Re-mount cleanly if the composer node changed (SPA swap).
   if (ui && ui.composer === composer && document.getElementById(COMPOSE_ID)) return;
   unmountComposePreview();
+  loadInsertHint();
 
   const panel = document.createElement('div');
   panel.id = COMPOSE_ID;
@@ -141,6 +142,42 @@ function positionPanel(panel: HTMLElement, composer: HTMLElement): void {
   panel.style.left = `${geom.left}px`;
   panel.style.width = `${geom.width}px`;
   panel.style.bottom = `${geom.bottom}px`;
+  // The key name beside the glyph gives way first on a narrow column: there it
+  // took the width the translation needs (the glyph's title still names it).
+  panel.dataset.narrow = String(geom.width < HINT_MIN_WIDTH);
+  // offsetHeight, not the box: the panel slides in by a 5px transform.
+  reserveChat(composer, window.innerHeight - geom.bottom - panel.offsetHeight);
+}
+
+/**
+ * Padding added under Kick's chat list while the panel is up, so the last
+ * lines scroll above it instead of under it (chatReserve says why). Checked on
+ * kick.com: #chatroom-messages is a plain block scroller with absolutely
+ * placed rows, so bottom padding extends its scroll range and Kick keeps it.
+ * shortcut: found by Kick's id only; if Kick renames it the panel covers the
+ * last line again, as before, and nothing else breaks.
+ */
+let reserved: { list: HTMLElement; prev: string; px: number } | undefined;
+
+function reserveChat(composer: HTMLElement, panelTop: number): void {
+  const list = composer.closest('#channel-chatroom')?.querySelector<HTMLElement>('#chatroom-messages');
+  if (!list) return releaseChat();
+  if (reserved && reserved.list !== list) releaseChat();
+  const px = chatReserve(panelTop, list.getBoundingClientRect().bottom);
+  if (reserved?.px === px) return; // also what stops the scroll below from looping back here
+  if (px === 0) return releaseChat();
+  // Following the chat at the bottom: stay at the bottom. Reading back up: no jump.
+  const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 4;
+  reserved ??= { list, prev: list.style.paddingBottom, px: 0 };
+  reserved.px = px;
+  list.style.paddingBottom = `${px}px`;
+  if (atBottom) list.scrollTop = list.scrollHeight;
+}
+
+function releaseChat(): void {
+  if (!reserved) return;
+  reserved.list.style.paddingBottom = reserved.prev;
+  reserved = undefined;
 }
 
 /**
@@ -211,6 +248,7 @@ export function updateComposePreview(state: ComposeUiState): void {
   switch (state.kind) {
     case 'hidden':
       panel.dataset.state = 'hidden';
+      releaseChat();
       // Once hidden, the text belongs to a message that is gone: the next
       // 'loading' would pulse it under a different message (measured).
       textEl.textContent = '';
@@ -219,11 +257,13 @@ export function updateComposePreview(state: ComposeUiState): void {
       // Keep prior text visible and pulsing while refreshing. On a first
       // translation (no text yet) stay hidden so there's no empty-panel flash.
       panel.dataset.state = textEl.textContent ? 'loading' : 'hidden';
+      if (!textEl.textContent) releaseChat();
       if (textEl.textContent) ui.reposition();
       return;
     case 'ready':
       // Emotes read as their name, not as Kick's [emote:id:name] markup.
       textEl.textContent = state.text.replace(/\[emote:\d+:([^\]\s]+)\]/g, '$1');
+      if (panel.dataset.state === 'hidden') noteHintShown();
       panel.dataset.state = 'ready';
       ui.reposition();
       return;
@@ -240,15 +280,111 @@ export function updateComposePreview(state: ComposeUiState): void {
  */
 let toucheInsertion: 'tab-and-enter' | 'ctrl-enter' = 'tab-and-enter';
 
+/**
+ * Until the reader has inserted a translation once, or seen the panel come up
+ * HINT_MAX_SHOWN times, the key is named beside the glyph. Someone who reads
+ * the preview and types their own reply never inserts, and kept the hint on
+ * every message. Kept in storage.local like the other per-browser memories of
+ * this script, never in synced settings: true once done, else the count shown.
+ */
+const INSERT_HINT_KEY = 'kt.composeInsertHintDone';
+const HINT_MAX_SHOWN = 5;
+/** Below this panel width the key name is hidden (see positionPanel). */
+const HINT_MIN_WIDTH = 300;
+let insertHintDone = false;
+let insertHintLoaded = false;
+let insertHintShown = 0;
+
+function loadInsertHint(): void {
+  if (insertHintLoaded) return;
+  insertHintLoaded = true;
+  try {
+    void chrome.storage.local
+      .get(INSERT_HINT_KEY)
+      .then((got) => {
+        const v: unknown = got[INSERT_HINT_KEY];
+        if (v === true || (typeof v === 'number' && v >= HINT_MAX_SHOWN)) markInsertHintDone(false);
+        else if (typeof v === 'number') insertHintShown = Math.max(insertHintShown, v);
+      })
+      .catch(() => undefined);
+  } catch {
+    // No extension context (tests, an orphaned script): keep the hint.
+  }
+}
+
+/** The panel came up with the hint on it: count it, and retire it after the last one. */
+function noteHintShown(): void {
+  if (insertHintDone) return;
+  if (insertHintShown >= HINT_MAX_SHOWN) {
+    markInsertHintDone(true);
+    return;
+  }
+  insertHintShown++;
+  try {
+    void chrome.storage.local.set({ [INSERT_HINT_KEY]: insertHintShown }).catch(() => undefined);
+  } catch {
+    // Nothing to remember it in: the count starts over on the next page.
+  }
+}
+
+function markInsertHintDone(persist: boolean): void {
+  if (insertHintDone) return;
+  insertHintDone = true;
+  const el = document.querySelector<HTMLElement>('.kt-compose-insert');
+  if (el) marquerInsertion(el);
+  if (!persist) return;
+  try {
+    void chrome.storage.local.set({ [INSERT_HINT_KEY]: true }).catch(() => undefined);
+  } catch {
+    // Same: nothing to remember it in, the hint comes back on the next page.
+  }
+}
+
+/** The reader inserted a translation: they know the key, drop the hint for good. */
+export function noteComposeInserted(): void {
+  markInsertHintDone(true);
+}
+
 /** Le glyphe de la touche, et l'aide qui la nomme. */
 function marquerInsertion(el: HTMLElement): void {
   const tab = toucheInsertion === 'tab-and-enter';
   // U+21E5 est le symbole de tabulation, U+21B5 celui du retour. Aucun des
   // deux n'est un emoji : ils se dessinent avec la police du texte.
   el.textContent = tab ? '\u21e5' : '\u21b5';
-  el.title = tab
+  const tip = tab
     ? msg('composeInsertTipTab', 'Insert \u00b7 Tab \u00b7 Esc to dismiss')
     : msg('composeInsertTip', 'Insert \u00b7 Ctrl/Cmd+Enter \u00b7 Esc to dismiss');
+  // The key name only, quiet, beside the glyph: the verb is in the tooltip.
+  // A green "Tab to insert" at 600 was louder than the translation it sat by.
+  if (!insertHintDone) {
+    const hint = document.createElement('span');
+    hint.className = 'kt-compose-hint';
+    // Every catalogue's tooltip names the key (composeUi.hint.test.ts), so no English fallback here.
+    hint.textContent = insertKeyName(tip, '');
+    el.append(hint);
+  }
+  el.title = tip;
+}
+
+/**
+ * The key's name as this language writes it ("Strg/Cmd+Eingabe" in German):
+ * the middle of the cue's own tooltip, "Insert, <key>, Esc to dismiss" joined
+ * by middle dots, so the hint and the tooltip never name two different keys.
+ */
+export function insertKeyName(tip: string, fallback: string, mac = isMac()): string {
+  const parts = tip.split(' \u00b7 ');
+  const name = parts.length === 3 && parts[1] ? parts[1] : fallback;
+  // "Ctrl/Cmd+Enter" names two keyboards; beside the glyph, only this one's
+  // ("Ctrl+Enter", or "Cmd+Enter" on a Mac). The tooltip keeps both.
+  return name.replace(/^([^/+]+)\/([^/+]+)\+/, (_, pc: string, apple: string) => `${mac ? apple : pc}+`);
+}
+
+function isMac(): boolean {
+  try {
+    return /Mac|iPhone|iPad/.test(navigator.platform);
+  } catch {
+    return false;
+  }
 }
 
 /** Appele au demarrage et a chaque changement de reglages. */
@@ -292,6 +428,7 @@ export function unmountComposePreview(): void {
     window.visualViewport?.removeEventListener('scroll', ui.reposition);
     ui.resizeObs?.disconnect();
   }
+  releaseChat();
   document.getElementById(COMPOSE_ID)?.remove();
   ui = undefined;
 }

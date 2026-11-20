@@ -5,6 +5,7 @@ export const vi: Record<string, string> = {
   barBlockedTipWhite: 'Kênh này không có trong danh sách kênh cho phép của bạn (Cài đặt, Bộ lọc)',
   barCount: 'Đã dịch trên trang này: $N$',
   barLangDir: 'Chat của những người xem khác, đã dịch cho bạn',
+  barLangFilterTip: 'Danh sách ngôn ngữ nguồn cho phép: $N$ trong 10 dòng gần nhất không được dịch (Cài đặt, Bộ lọc)',
   barOff: 'Đã tắt dịch',
   barOn: 'Đang dịch',
   barOnTip: 'Đang đọc chat bằng $LANG$',

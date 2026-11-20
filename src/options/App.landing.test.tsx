@@ -47,6 +47,18 @@ describe('options landing tab', () => {
     document.body.innerHTML = '';
     expect(selected(await mount('#providers'))).toBe('tab-providers');
   });
+
+  // The popup's allowlist line names the card and links to it, not to the top
+  // of the tab where the General card sits.
+  it('opens #filters-langs on Filters, at the allowlist card', async () => {
+    const scrolled = vi.fn();
+    Element.prototype.scrollIntoView = scrolled;
+    const root = await mount('#filters-langs');
+    await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+    expect(selected(root)).toBe('tab-filters');
+    expect(document.activeElement?.id).toBe('filters-langs');
+    expect(scrolled).toHaveBeenCalled();
+  });
 });
 
 describe('interface language button', () => {

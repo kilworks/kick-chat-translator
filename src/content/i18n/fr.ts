@@ -5,6 +5,7 @@ export const fr: Record<string, string> = {
   barBlockedTipWhite: 'Cette chaîne ne fait pas partie de tes chaînes autorisées (Options, Filtres)',
   barCount: 'Traduits sur cette page : $N$',
   barLangDir: 'Le chat des autres spectateurs, traduit pour toi',
+  barLangFilterTip: 'Langues sources autorisées : $N$ des 10 dernières lignes non traduites (Options, Filtres)',
   barOff: 'Traduction désactivée',
   barOn: 'Traduction active',
   barOnTip: 'Lecture du chat en $LANG$',

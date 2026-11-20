@@ -5,6 +5,7 @@ export const ca: Record<string, string> = {
   barBlockedTipWhite: 'Aquest canal no és als teus canals permesos (Opcions, Filtres)',
   barCount: 'Traduïts en aquesta pàgina: $N$',
   barLangDir: 'El xat dels altres espectadors, traduït per a tu',
+  barLangFilterTip: "Idiomes d'origen permesos: $N$ de les 10 últimes línies sense traduir (Opcions, Filtres)",
   barOff: 'Traducció desactivada',
   barOn: 'Traduint',
   barOnTip: 'Llegint el xat en $LANG$',

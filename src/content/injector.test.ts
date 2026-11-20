@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defaultSettings } from '~/shared/settings';
 import type { Settings } from '~/shared/settings';
 import type { TranslationResult } from '~/shared/types';
-import { HANDLED_SELECTOR, applyDisplayStyle, applyShowOriginal, armHoverTranslate, incrementFloatingCount, inject, markSkipped, mountFloatingBar, updateActiveProvider, removeAllArtifacts, showError, showLoading, unmountFloatingBar, updateFloatingBar } from './injector';
+import { HANDLED_SELECTOR, applyDisplayStyle, applyShowOriginal, armHoverTranslate, incrementFloatingCount, inject, markSkipped, mountFloatingBar, updateActiveProvider, removeAllArtifacts, showError, showLangBlocked, showLoading, showThrottleIndicator, unmountFloatingBar, updateFloatingBar } from './injector';
 // Read from disk: vitest runs with CSS processing off, so `?inline` imports
 // resolve to an empty string and would make these assertions pass on anything.
 const injectCss = readFileSync('src/content/inject.css', 'utf8');
@@ -965,5 +965,67 @@ describe('hover to translate', () => {
     vi.advanceTimersByTime(500);
     expect(fired, 'the previous message translated itself onto a recycled row').toHaveLength(0);
     expect(second).toHaveLength(1);
+  });
+});
+
+// The language allowlist left lines untranslated with nothing on the bar. It
+// gets its own mark beside the language button; the state label keeps saying
+// "Translating", which is still true, in the bar's narrowest slot.
+describe('floating bar, language filter', () => {
+  afterEach(() => showLangBlocked(0));
+  const mark = (bar: HTMLElement) => bar.querySelector<HTMLElement>('.kt-float-langfilter');
+
+  it('shows a named filter mark before the language button, then clears', () => {
+    const bar = mountBarInto(document.body);
+    const label = bar.querySelector<HTMLElement>('.kt-float-label')!;
+    showLangBlocked(4);
+    expect(label.textContent).toBe('Translating');
+    const m = mark(bar)!;
+    expect(m.getAttribute('role')).toBe('img');
+    expect(m.getAttribute('aria-label')).toBe(
+      'Source languages allowlist: 4 of the last 10 lines not translated (Options, Filters)',
+    );
+    expect(m.title).toBe(m.getAttribute('aria-label'));
+    expect(m.querySelector('svg')!.getAttribute('aria-hidden')).toBe('true');
+    expect(m.nextElementSibling?.className).toBe('kt-float-lang-host');
+    showLangBlocked(0);
+    expect(mark(bar)).toBeNull();
+    expect(label.textContent).toBe('Translating');
+  });
+
+  // A bar Kick remounts must come back saying the same thing.
+  it('carries the state onto a bar mounted later', () => {
+    showLangBlocked(3);
+    const bar = mountBarInto(document.body);
+    expect(mark(bar)?.getAttribute('aria-label')).toContain('3 of the last 10');
+  });
+
+  // Control: paused stays paused, the filter has nothing to say then.
+  it('leaves a paused bar saying it is off', () => {
+    showLangBlocked(5);
+    document.body.innerHTML = '<div id="channel-chatroom"><div data-index="0"></div></div>';
+    const panel = document.querySelector('#channel-chatroom')!;
+    mountFloatingBar(panel, { ...defaultSettings(), enabled: false }, {
+      onToggle: () => {}, onTargetLang: () => {}, onOpenOptions: () => {}, onEnableLocal: () => {},
+    });
+    expect(panel.querySelector<HTMLElement>('.kt-float-label')!.textContent).toBe('Translation off');
+    expect(panel.querySelector('.kt-float-langfilter')).toBeNull();
+  });
+});
+
+// The rate-limit mark was the hourglass emoji; the UI carries none.
+describe('floating bar, rate limit', () => {
+  it('draws an icon with a name, not an emoji', () => {
+    const bar = mountBarInto(document.body);
+    showThrottleIndicator(true);
+    const ind = bar.querySelector<HTMLElement>('.kt-float-throttle')!;
+    expect(ind.querySelector('svg')).not.toBeNull();
+    expect(ind.querySelector('svg')!.getAttribute('aria-hidden')).toBe('true');
+    expect(ind.getAttribute('role')).toBe('img');
+    expect(ind.getAttribute('aria-label')).toBe('Rate-limited, some messages skipped');
+    expect(ind.textContent).toBe('');
+    expect(ind.outerHTML).not.toMatch(/\p{Extended_Pictographic}/u);
+    showThrottleIndicator(false);
+    expect(bar.querySelector('.kt-float-throttle')).toBeNull();
   });
 });

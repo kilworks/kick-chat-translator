@@ -5,6 +5,7 @@ export const th: Record<string, string> = {
   barBlockedTipWhite: 'ช่องนี้ไม่อยู่ในรายการที่อนุญาต (ตัวเลือก, ตัวกรอง)',
   barCount: 'แปลในหน้านี้แล้ว: $N$',
   barLangDir: 'แชทจากผู้ชมคนอื่น แปลให้แล้ว',
+  barLangFilterTip: 'รายการภาษาต้นทางที่อนุญาต: ไม่ได้แปล $N$ จาก 10 บรรทัดล่าสุด (ตัวเลือก, ตัวกรอง)',
   barOff: 'ปิดการแปล',
   barOn: 'กำลังแปล',
   barOnTip: 'อ่านแชทเป็น $LANG$',

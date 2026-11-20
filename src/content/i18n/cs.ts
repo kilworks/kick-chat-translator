@@ -5,6 +5,7 @@ export const cs: Record<string, string> = {
   barBlockedTipWhite: 'Tento kanál není na tvém seznamu povolených (Možnosti, Filtry)',
   barCount: 'Přeloženo na této stránce: $N$',
   barLangDir: 'Chat ostatních diváků přeložený pro tebe',
+  barLangFilterTip: 'Povolené zdrojové jazyky: $N$ z posledních 10 řádků nepřeloženo (Možnosti, Filtry)',
   barOff: 'Překlad vypnut',
   barOn: 'Překládá se',
   barOnTip: 'Chat se čte v jazyce $LANG$',

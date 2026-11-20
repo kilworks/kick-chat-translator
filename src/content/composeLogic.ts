@@ -245,6 +245,22 @@ export function computePanelGeom(
   return { left, width, bottom };
 }
 
+/**
+ * Room to add under Kick's chat list so its newest lines sit above the panel.
+ *
+ * Measured on kick.com (1280x720 and 1500x950, 2026-11-20): the list ends 34px
+ * above the composer and a one-line panel is 38px tall from 6px above it, so it
+ * covered the bottom 10px of the last line, and nearly all of it on a channel
+ * without the chat-mode band ("Followers only") that fills part of that gap.
+ * The line hidden is the one a reply is usually about.
+ *
+ * @param panelTop viewport Y of the panel's top edge
+ * @param listBottom viewport Y of the chat list's bottom edge
+ */
+export function chatReserve(panelTop: number, listBottom: number): number {
+  return Math.max(0, Math.ceil(listBottom - panelTop));
+}
+
 /** Sliding-window rate limiter. */
 export class RateLimiter {
   private hits: number[] = [];

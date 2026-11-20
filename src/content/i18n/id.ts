@@ -5,6 +5,7 @@ export const id: Record<string, string> = {
   barBlockedTipWhite: 'Channel ini tidak ada di daftar izin Anda (Pengaturan, Filter)',
   barCount: 'Diterjemahkan di halaman ini: $N$',
   barLangDir: 'Chat penonton lain, diterjemahkan untuk Anda',
+  barLangFilterTip: 'Daftar izin bahasa sumber: $N$ dari 10 baris terakhir tidak diterjemahkan (Pengaturan, Filter)',
   barOff: 'Terjemahan nonaktif',
   barOn: 'Menerjemahkan',
   barOnTip: 'Membaca chat dalam $LANG$',

@@ -5,6 +5,7 @@ export const pl: Record<string, string> = {
   barBlockedTipWhite: 'Tego kanału nie ma na twojej liście dozwolonych (Opcje, Filtry)',
   barCount: 'Przetłumaczono na tej stronie: $N$',
   barLangDir: 'Czat innych widzów, przetłumaczony dla ciebie',
+  barLangFilterTip: 'Dozwolone języki źródłowe: $N$ z ostatnich 10 wierszy nieprzetłumaczone (Opcje, Filtry)',
   barOff: 'Tłumaczenie wyłączone',
   barOn: 'Tłumaczenie włączone',
   barOnTip: 'Czat czytany w języku: $LANG$',

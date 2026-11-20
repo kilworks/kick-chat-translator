@@ -41,6 +41,7 @@ vi.mock('./pipeline', () => ({
     private readonly nom = copie;
     setChannelLang(): void {}
     updateSettings(): void {}
+    resetLangBlocked(): void {}
     reapplyBlocked(): void {}
     recentDecisions(): unknown[] {
       return [];

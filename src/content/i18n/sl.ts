@@ -5,6 +5,7 @@ export const sl: Record<string, string> = {
   barBlockedTipWhite: 'Tega kanala ni na vašem seznamu dovoljenih (Nastavitve, Filtri)',
   barCount: 'Prevedeno na tej strani: $N$',
   barLangDir: 'Klepet drugih gledalcev, preveden za vas',
+  barLangFilterTip: 'Dovoljeni izvorni jeziki: $N$ od zadnjih 10 vrstic ni prevedenih (Nastavitve, Filtri)',
   barOff: 'Prevajanje izklopljeno',
   barOn: 'Prevajanje',
   barOnTip: 'Branje klepeta v jeziku $LANG$',

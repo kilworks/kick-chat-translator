@@ -5,6 +5,7 @@ export const tr: Record<string, string> = {
   barBlockedTipWhite: 'Bu kanal izin verilenler listende değil (Seçenekler, Filtreler)',
   barCount: 'Bu sayfada çevrilen: $N$',
   barLangDir: 'Diğer izleyicilerin sohbeti, senin için çevrildi',
+  barLangFilterTip: 'İzin verilen kaynak diller: son 10 satırdan $N$ tanesi çevrilmedi (Seçenekler, Filtreler)',
   barOff: 'Çeviri kapalı',
   barOn: 'Çevriliyor',
   barOnTip: 'Sohbet $LANG$ dilinde okunuyor',

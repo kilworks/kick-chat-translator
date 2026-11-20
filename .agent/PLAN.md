@@ -1598,18 +1598,18 @@ reads dist/, so it serialises behind any build. D touches no code.
 Born from P0-1 (the snapshots now render all six tabs) and from work on the
 surfaces touched this pass. Counted in the pass report.
 
-- [ ] **Options spacing under 8px, now visible on every tab** (`verify_spacing`,
+- [x] **Options spacing under 8px, now visible on every tab** (`verify_spacing`,
   kit 3.1.1): label to control 7.5px for 8 controls on Display (Translate
   everything to, Text size, Line spacing, Font, Density, Accent colour, Chat
   theme, Write my messages in) and 3 on Providers; 6px between the 68 source
   language chips on Filters and the model chips on Providers; 7.9px under the
   "Always ignored" hint on Filters. Extends P2-16 to the options page (phase 2).
-- [ ] **The rate-limit indicator in the chat bar is an emoji** (`⏳`,
+- [x] **The rate-limit indicator in the chat bar is an emoji** (`⏳`,
   `src/content/injector.ts`, `showThrottleIndicator`). The UI carries no emoji
   by rule; a lucide icon from the kit's set replaces it.
 - [x] **Em dash as the empty value on the About tab** (now `-`) (`valeur={... '—'}`,
   `AboutSection.tsx`, 3 occurrences). The UI carries no em dash by rule.
-- [ ] **P1-7, language half: a source-language allowlist is still silent on the
+- [x] **P1-7, language half: a source-language allowlist is still silent on the
   bar and in the popup.** The channel half is shown (bar label and tooltip,
   popup card with a link to `#filters`). Languages are decided per line; showing
   it needs a count of recent `lang_not_allowed` drops sent to the bar, the
@@ -1627,31 +1627,38 @@ surfaces touched this pass. Counted in the pass report.
   translated nothing (`engineMode.combos.test.ts`); the migration keeps the "no
   network" promise. A Firefox reader with that pair still gets nothing (no
   on-device API) and is not told so.
-- [ ] **The popup sits at exactly 600px in one language, usual state** (ta or
-  th, measure-popup 2026-11-19). Every state fits in all 43 languages, with no
+- [ ] **The popup sits at exactly 600px in one language** (ta, state
+  langblockedask, measure-popup 2026-11-20; usual is down to 576). Every state fits in all 43 languages, with no
   margin left there: the next string that grows in that language overflows.
-- [ ] **Design critique of the popup, items left after the first fixes**
+- [x] **Design critique of the popup, items left after the first fixes**
   (design-critic, 2026-11-19, verdict fix-then-ship; #1 to #4, #6, #7 and #10
   done): one-size hierarchy (h1 at 14px like the select text, inner and outer
   spacing both 12px); the update link's title is English and carries a `⬆`
   glyph inside a translated string; `.kt-label` keeps `uppercase
   tracking-wider` in Arabic, where letter spacing breaks the joining; Clear
   cache gives no feedback when pressed.
-- [ ] **Text under 12px left on the options page** (P2-7, phase 2): the popup is
+- [x] **Text under 12px left on the options page** (P2-7, phase 2): the popup is
   at 0, the options still carry `text-[10px]` and `text-[11px]`.
 
 ### Phase 2 done (options), left open
-- [ ] EngineCard download chips: name reads "JA" plus a glyph, state only in title and opacity; give each an aria-label ("Download Japanese") and aria-disabled when unavailable (needs new keys).
-- [ ] "Download languages -> AUTO" prints the raw target code when the target is auto; show the resolved language name.
-- [ ] DeepL "Show key" keeps one label, state carried by aria-pressed only; "Hide key" needs a new key.
-- [ ] Display: segmented groups hug the left, switches the right; a shared column would line the card up (critic minor).
+- [x] EngineCard download chips: name reads "JA" plus a glyph, state only in title and opacity; give each an aria-label ("Download Japanese") and aria-disabled when unavailable (needs new keys).
+- [x] "Download languages -> AUTO" prints the raw target code when the target is auto; show the resolved language name.
+- [x] DeepL "Show key" keeps one label, state carried by aria-pressed only; "Hide key" needs a new key.
+- [x] Display: segmented groups hug the left, switches the right; a shared column would line the card up (critic minor).
 - [ ] Sticky preview and the short-viewport fallback were checked by class only, not at 400% zoom in a real browser.
-- [ ] Switch forced-colors and busy focus: not seen in a real browser.
+- [x] Switch forced-colors and busy focus: not seen in a real browser.
 - [ ] Translations of the 27 phase 2 keys: model-written, no native review.
 - [ ] The 42 localised READMEs still list Providers first and the DeepL key as always there in their Settings section (English fixed in phase 3); left for the existing [k] entry on localised READMEs.
-- [ ] `screenshots/japanese-chat.jpg` is tracked but shown nowhere (readme-drift HIDDEN, older than this pass): delete or show, kil's call.
-- [k] **Live smoke of the UI comfort pass on kick.com was not run**: Claude in Chrome was not connected in the session (2026-11-19). To do in Brave, read only: chat bar, language panel, one incoming translation, compose preview visible without sending; then the options (Display landing, switches, segmented controls) and the popup.
-- [ ] P3-1 language panel: endonyms (Deutsch, Japanese in its own script) next to the localised name, and a filter that finds either. Not done in this pass (chat surface, P3 only if cheap).
-- [ ] P3-2 compose preview: a first-use hint for Tab, the glyph alone announces it today. Not done.
-- [ ] P3-3 composer chip drawn dotted against the bar chip's solid line reads as "empty". Not done.
-- [ ] P3-4 rest: channel and user lists stay "one per line" textareas with a monospace placeholder (the inner scroll of the language grid is gone).
+- [x] `screenshots/japanese-chat.jpg` is tracked but shown nowhere (readme-drift HIDDEN, older than this pass): delete or show, kil's call.
+- [x] **Live smoke of the UI comfort pass on kick.com was not run** (done 2026-11-19 in Chrome, see PR #58): Claude in Chrome was not connected in the session (2026-11-19). To do in Brave, read only: chat bar, language panel, one incoming translation, compose preview visible without sending; then the options (Display landing, switches, segmented controls) and the popup.
+- [x] P3-1 language panel: endonyms (Deutsch, Japanese in its own script) next to the localised name, and a filter that finds either. Not done in this pass (chat surface, P3 only if cheap).
+- [x] P3-2 compose preview: a first-use hint for Tab, the glyph alone announces it today. Not done.
+- [x] P3-3 composer chip drawn dotted against the bar chip's solid line reads as "empty". Not done.
+- [x] P3-4 rest: channel and user lists stay "one per line" textareas with a monospace placeholder (the inner scroll of the language grid is gone).
+
+### Comfort rest (feat/ui-comfort-rest, 2026-11-20), left open
+- [ ] Live smoke of this wave on kick.com not run (Claude in Chrome not connected): bar funnel mark after 3 of the last 10 lines dropped, compose key name, endonyms in both pickers, light-scheme chip modes, popup allowlist line.
+- [ ] `test/e2e/lang-menu-live.mjs` exits 1 on live kick.com ("le menu ne s est pas ouvert" after a forced click on `.kt-chip-tag`); the local chip-live harness passes. Not investigated.
+- [ ] `verify_keyboard` stays red on the 6 options snapshots, all dead-arrows: the frozen dump carries no listeners (same kit limit as above). Arrow keys are unit-tested.
+- [ ] `barLangFilterTip` writes the window size 10 into 42 strings; changing `LANG_BLOCKED_WINDOW` means editing them all.
+- [ ] Translations of this wave's keys (5 `t()`, 11 earlier, `barLangFilterTip`): model-written, no native review.

@@ -5,6 +5,7 @@ export const fa: Record<string, string> = {
   barBlockedTipWhite: 'این کانال در فهرست مجاز شما نیست (تنظیمات، فیلترها)',
   barCount: 'ترجمه‌شده در این صفحه: $N$',
   barLangDir: 'چت بقیه بیننده‌ها، ترجمه‌شده برای شما',
+  barLangFilterTip: 'فهرست مجاز زبان‌های مبدأ: $N$ خط از 10 خط آخر ترجمه نشد (تنظیمات، فیلترها)',
   barOff: 'ترجمه خاموش است',
   barOn: 'در حال ترجمه',
   barOnTip: 'خواندن چت به زبان $LANG$',

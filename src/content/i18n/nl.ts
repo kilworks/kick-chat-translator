@@ -5,6 +5,7 @@ export const nl: Record<string, string> = {
   barBlockedTipWhite: 'Dit kanaal staat niet in je toegestane kanalen (Opties, Filters)',
   barCount: 'Vertaald op deze pagina: $N$',
   barLangDir: 'Chat van andere kijkers, vertaald voor jou',
+  barLangFilterTip: 'Toegestane brontalen: $N$ van de laatste 10 regels niet vertaald (Opties, Filters)',
   barOff: 'Vertalen staat uit',
   barOn: 'Vertalen',
   barOnTip: 'Chat lezen in het $LANG$',

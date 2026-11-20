@@ -187,12 +187,17 @@ describe('DeepL card (P2-11)', () => {
     const { act } = await import('preact/test-utils');
     const el = mountFull({ providerOrder: ['deepl'], deeplApiKey: 'abc:fx' });
     const input = el.querySelector<HTMLInputElement>('input[aria-label="API key"]')!;
-    const btn = el.querySelector<HTMLButtonElement>('button[aria-pressed]')!;
+    const btn = el.querySelector<HTMLButtonElement>(`button[aria-controls="${CSS.escape(input.id)}"]`)!;
     expect(input.type).toBe('password');
-    expect(btn.getAttribute('aria-pressed')).toBe('false');
+    // The label carries the state; aria-pressed on top would read backwards.
+    expect(btn.textContent).toBe('Show key');
+    expect(btn.hasAttribute('aria-pressed')).toBe(false);
     void act(() => btn.click());
     expect(el.querySelector<HTMLInputElement>('input[aria-label="API key"]')!.type).toBe('text');
-    expect(btn.getAttribute('aria-pressed')).toBe('true');
+    expect(btn.textContent).toBe('Hide key');
+    void act(() => btn.click());
+    expect(el.querySelector<HTMLInputElement>('input[aria-label="API key"]')!.type).toBe('password');
+    expect(btn.textContent).toBe('Show key');
   });
 });
 
@@ -202,5 +207,15 @@ describe('readable text (P2-7, P2-8)', () => {
       { id: 'google', available: true },
     ]);
     expect(el.innerHTML).not.toMatch(/text-\[(9|10|11)px\]/);
+  });
+});
+
+// The DeepL switch was the one control on the start column of the page.
+describe('one column for switches', () => {
+  it('puts every switch on the end, the DeepL one included', () => {
+    const el = mountFull({ providerOrder: ['deepl'], deeplApiKey: 'abc:fx' });
+    const switches = [...el.querySelectorAll('.kt-switch')];
+    expect(switches.some((s) => s.textContent?.includes('Save DeepL'))).toBe(true);
+    for (const s of switches) expect(s.hasAttribute('data-reverse'), s.textContent ?? '').toBe(true);
   });
 });

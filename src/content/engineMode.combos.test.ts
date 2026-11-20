@@ -24,6 +24,7 @@ vi.mock('./injector', () => ({
   showError: vi.fn(),
   showLoading: vi.fn(),
   showThrottleIndicator: vi.fn(),
+  showLangBlocked: vi.fn(),
   showToast: vi.fn(),
   updateActiveProvider: vi.fn(),
 }));

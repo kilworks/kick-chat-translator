@@ -34,6 +34,7 @@ import {
   pickInjectionTarget,
 } from './selectors';
 import { extractChannelSlug, fetchChannelLangIso } from './kickApi';
+import { LANG_BLOCKED_ASK } from './filters';
 import { localEngine } from './localEngine';
 import { logPlatform, refresh7TV } from './platform';
 import { resolveBrowserLang, withFavorite } from '~/shared/languages';
@@ -342,6 +343,10 @@ async function main(): Promise<void> {
   function attachForRoute(force = false): void {
     const slug = extractChannelSlug(location.pathname);
     if (slug === currentSlug && !force) return;
+    // The language allowlist's count belongs to the channel it was seen on.
+    // Reset on the route itself: waiting for the next line kept the old count
+    // on a page with no chat, or on a quiet channel, for as long as it lasted.
+    if (slug !== currentSlug) pipeline.resetLangBlocked(slug ?? '');
     currentSlug = slug;
     log.debug('route change, channel slug:', slug);
 
@@ -591,8 +596,13 @@ async function main(): Promise<void> {
   // decisions are made here. It asks, we answer: no subscription, no polling,
   // and nothing leaves this page unless someone opens that tab.
   chrome.runtime.onMessage.addListener((msg: { type?: string }, _sender, sendResponse) => {
-    if (msg?.type !== 'debug.decisions' || estOrphelin()) return false;
-    sendResponse({ type: 'debug.decisions', payload: pipeline.recentDecisions() });
+    if (estOrphelin()) return false;
+    if (msg?.type === 'debug.decisions') {
+      sendResponse({ type: 'debug.decisions', payload: pipeline.recentDecisions() });
+    } else if (msg?.type === LANG_BLOCKED_ASK) {
+      // The popup's one line about the language allowlist, from the same count as the bar.
+      sendResponse({ count: pipeline.langBlockedCount() });
+    }
     return false;
   });
 

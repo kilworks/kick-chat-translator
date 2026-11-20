@@ -143,7 +143,8 @@ show its update badge. [Details](PRIVACY.md)
 Open the Activity tab in the settings and press "Read decisions": it lists the last 50 lines and says why
 each one was translated or left alone. Most skipped lines are skipped on purpose. Over one live session, 213
 of 234 were the same user repeating themselves, 9 were too short, 7 were emoji or laughter only, and 1 was
-already in the reading language. If the tab shows nothing at all, the extension is not seeing the chat:
+already in the reading language. A small filter mark in the chat bar means your source language allowlist
+is holding lines back: the popup links straight to it. If the tab shows nothing at all, the extension is not seeing the chat:
 please open an issue.
 
 **The green bar disappeared.**
@@ -179,6 +180,8 @@ Coming in the next update:
 - Each translation engine says whether it is ready or paused, and why
 - A channel your lists leave out says "Not translated here" instead of going quiet
 - The popup fits without a scrollbar in all 43 interface languages
+- A small filter mark in the chat bar says when your source language allowlist is holding lines back
+- Both language pickers in the chat show each language's own name (Deutsch, 日本語) and find it when you search
 
 In 3.5.0, cloud first became the default engine mode, and lines the engine hands back unchanged are asked again with the channel's language.
 

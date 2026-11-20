@@ -100,12 +100,19 @@
   opacity: 0.6;
 }
 /* busy: a change in flight. The input stays focusable (aria-disabled) and the
-   change is refused in the component; the rail just reads as held. */
+   change is refused in the component. Loading is not disabled: the rail used
+   to dim to 50%, the same cue as "you cannot use this". It keeps its full
+   colour and takes diagonal stripes instead, a shape rather than a shade, and
+   static, so reduced motion has nothing to cut. */
 .kt-switch[data-busy] {
   cursor: progress;
 }
 .kt-switch[data-busy] .kt-switch-rail {
-  opacity: 0.5;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 4px,
+    rgb(var(--kt-ink-rgb) / 0.45) 4px 8px
+  );
 }
 
 .kt-switch-text {
@@ -126,17 +133,73 @@
   }
 }
 
+/* Forced colours (Windows high contrast). The browser would repaint the rail
+   and the knob with the page's Canvas, and both vanish: they are drawn with
+   backgrounds, not text. forced-color-adjust: none keeps them, and every colour
+   below is a system colour, so they follow the user's theme. The 1px border
+   takes 1px of the padding box, so the knob moves in by 1px to stay centred. */
 @media (forced-colors: active) {
+  .kt-switch-rail,
+  .kt-switch-knob {
+    forced-color-adjust: none;
+  }
   .kt-switch-rail {
     border: 1px solid CanvasText;
+    background: Canvas;
   }
   .kt-switch-knob {
+    inset-block-start: 1px;
+    inset-inline-start: 1px;
     background: CanvasText;
   }
-  .kt-switch-input:checked + .kt-switch-rail {
+  .kt-switch:not([data-disabled]):not([data-busy]):hover .kt-switch-rail {
+    border-color: Highlight;
+    background: Canvas;
+  }
+  .kt-switch-input:checked + .kt-switch-rail,
+  .kt-switch:not([data-disabled]):not([data-busy]):hover .kt-switch-input:checked + .kt-switch-rail {
+    border-color: Highlight;
     background: Highlight;
   }
   .kt-switch-input:checked + .kt-switch-rail .kt-switch-knob {
+    inset-inline-start: 17px;
+    background: HighlightText;
+  }
+  /* The ring sits 2px off the rail, so it stays apart from a Highlight rail. */
+  .kt-switch-input:focus-visible + .kt-switch-rail {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+  .kt-switch-input[aria-invalid='true'] + .kt-switch-rail {
+    outline: 2px dashed CanvasText;
+    outline-offset: 2px;
+  }
+  .kt-switch-input[aria-invalid='true']:focus-visible + .kt-switch-rail {
+    outline: 3px solid Highlight;
+    outline-offset: 4px;
+  }
+  /* Disabled: GrayText, the system's own word for it, at full opacity (a dimmed
+     GrayText falls under the theme's contrast). */
+  .kt-switch[data-disabled] {
+    opacity: 1;
+    color: GrayText;
+  }
+  .kt-switch[data-disabled] .kt-switch-rail {
+    border-color: GrayText;
+    background: Canvas;
+  }
+  .kt-switch[data-disabled] .kt-switch-knob,
+  .kt-switch[data-disabled] .kt-switch-input:checked + .kt-switch-rail .kt-switch-knob {
+    background: GrayText;
+  }
+  /* Busy: the stripes are dropped for a dashed rail on Canvas, a shape that
+     survives any theme. On a Highlight fill the dashes vanished into it, so the
+     rail stays empty and the knob's side alone says on or off. */
+  .kt-switch[data-busy] .kt-switch-rail {
+    background: Canvas;
+    border: 1px dashed CanvasText;
+  }
+  .kt-switch[data-busy] .kt-switch-input:checked + .kt-switch-rail .kt-switch-knob {
     background: CanvasText;
   }
 }

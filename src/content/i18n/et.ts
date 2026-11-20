@@ -5,6 +5,7 @@ export const et: Record<string, string> = {
   barBlockedTipWhite: 'See kanal ei ole sinu lubatud kanalite loendis (Seaded, Filtrid)',
   barCount: 'Tõlgitud sellel lehel: $N$',
   barLangDir: 'Teiste vaatajate vestlus, sinu jaoks tõlgitud',
+  barLangFilterTip: 'Lubatud lähtekeeled: viimasest 10 reast jäi $N$ tõlkimata (Seaded, Filtrid)',
   barOff: 'Tõlge väljas',
   barOn: 'Tõlge sees',
   barOnTip: 'Vestluse lugemiskeel: $LANG$',

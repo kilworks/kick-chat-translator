@@ -500,6 +500,27 @@ html[data-kt-scheme='light'] .kt-translation-replace {
   cursor: default;
 }
 
+/* Rate limit and language allowlist, as icons. Muted by colour, not opacity,
+   so the stroke keeps the 3:1 a non-text mark needs; the name is on the
+   element for assistive tech. */
+.kt-float-throttle,
+.kt-float-langfilter {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--kt-muted);
+}
+.kt-float-throttle svg,
+.kt-float-langfilter svg {
+  display: block;
+  inline-size: 14px;
+  block-size: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .kt-float-count {
   font-size: var(--kt-fs-sm);
   font-variant-numeric: tabular-nums;
@@ -613,6 +634,24 @@ html[data-kt-scheme='light'] .kt-translation-replace {
   line-height: 1;
   color: rgb(var(--kt-green-rgb) / 0.85);
   transition: color 0.15s ease;
+}
+/* First use only: the key's name beside its glyph, gone after the first insert
+   or the fifth preview (composeUi). Muted and small: it explains the cue, it is
+   not what the panel is for. */
+.kt-compose-hint {
+  margin-inline-start: 6px;
+  font-family: var(--kt-font-mono);
+  font-size: var(--kt-fs-sm);
+  font-weight: 400;
+  color: var(--kt-muted);
+  white-space: nowrap;
+  vertical-align: 2px;
+}
+/* Gives way on a narrow column, and while rate-limited: the dimmed cue below
+   would take its words under 2:1 for a key that still works. */
+.kt-compose[data-narrow='true'] .kt-compose-hint,
+.kt-compose[data-throttled='true'] .kt-compose-hint {
+  display: none;
 }
 .kt-compose:hover .kt-compose-insert {
   color: var(--kt-green-ink);
@@ -794,8 +833,11 @@ html[data-kt-scheme='light'] .kt-compose-insert {
 .kt-chip[aria-expanded='true'] .kt-chip-caret {
   transform: rotate(180deg);
 }
+/* Same solid hairline as the bar's language button, in every mode: a dashed or
+   dotted edge read as "empty" or "drop here". The mode is carried by what is
+   inside instead: auto is the muted code, pinned the green bed and edge, off
+   the word OFF on no surface. */
 .kt-chip[data-mode='auto'] {
-  border-style: dashed;
   color: var(--kt-muted);
 }
 .kt-chip[data-mode='pinned'] {
@@ -804,7 +846,6 @@ html[data-kt-scheme='light'] .kt-compose-insert {
   color: var(--kt-text);
 }
 .kt-chip[data-mode='off'] {
-  border-style: dotted;
   background: transparent;
   color: var(--kt-muted);
   cursor: default;
@@ -940,6 +981,18 @@ html[data-kt-scheme='light'] .kt-compose-insert {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* The bar panel's two-line row (name, then the language's own name), at its
+   height: the two lists of the same 42 languages keep one shape. */
+.kt-chip-row {
+  block-size: 38px;
+  padding-block: 0;
+}
+.kt-lang-text .kt-chip-name {
+  flex: none;
+}
+.kt-chip-menu .kt-lang-native {
+  color: var(--kt-muted);
+}
 .kt-chip-sep {
   height: 1px;
   margin: 4px 2px;
@@ -993,6 +1046,22 @@ html[data-kt-scheme='light'] .kt-chip[data-mode='loading'] {
 }
 html[data-kt-scheme='light'] .kt-chip[data-mode='loading'] {
   animation-name: kt-chip-wait-light;
+}
+/* The light base rule above is 0,2,1 and outranks the 0,2,0 mode rules, which
+   left pinned with the auto chip's edge and fill and off on a fill: in light,
+   the modes differed by text grey alone. Each mode states its surface again. */
+html[data-kt-scheme='light'] .kt-chip[data-mode='pinned'] {
+  border-color: var(--kt-green-edge);
+  background: var(--kt-green-bed);
+  color: var(--kt-text);
+}
+html[data-kt-scheme='light'] .kt-chip[data-mode='off'] {
+  background: transparent;
+}
+html[data-kt-scheme='light'] .kt-chip[data-mode='error'] {
+  border-color: var(--kt-danger);
+  background: var(--kt-danger-bed);
+  color: var(--kt-danger-ink);
 }
 @keyframes kt-chip-wait-light {
   50% {
@@ -1311,15 +1380,16 @@ html[data-kt-scheme='light'] .kt-chip[data-mode='loading'] {
  * s'arrete, donc elle annonce une fin. La demi-rangee qui depasse est le seul
  * signal de defilement qui ne coute ni script ni degrade, et qui reste vrai
  * quel que soit le nombre de langues filtrees.
- * Le pas est de 32 : 30 de rangee et 2 de gouttiere. 304 en montre neuf et
- * demie. */
+ * Le pas est de 40 : 38 de rangee et 2 de gouttiere. 300 en montre sept et
+ * demie. 38 et non 30 depuis que la rangee porte le nom de la langue dans sa
+ * propre langue sous le nom localise (P3-1). */
 .kt-lang-list {
   display: grid;
   grid-template-columns: repeat(var(--kt-lp-cols, 3), minmax(0, 1fr));
   /* 1px laissait les coins arrondis de deux rangees voisines se toucher, ce qui
    * lit comme un defaut de rendu plutot que comme une forme. */
   gap: 2px;
-  max-block-size: 304px;
+  max-block-size: 300px;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -1333,8 +1403,9 @@ html[data-kt-scheme='light'] .kt-chip[data-mode='loading'] {
   gap: 8px;
   inline-size: 100%;
   /* PT-BR et ZH-TW avaient casse l'uniformite des rangees du menu de la puce :
-   * hauteur fixe, et le nom passe en ellipse plutot que de pousser. */
-  block-size: 30px;
+   * hauteur fixe, et le nom passe en ellipse plutot que de pousser. Deux
+   * lignes de 17 (nom, endonyme, 12px a 1.4) et 4 de marge. */
+  block-size: 38px;
   padding-inline: 8px;
   border: 0;
   border-radius: 4px;
@@ -1382,12 +1453,29 @@ html[data-kt-scheme='light'] .kt-chip[data-mode='loading'] {
   background: var(--kt-lp-accent);
 }
 
-.kt-lang-name {
+.kt-lang-text {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-inline-size: 0;
+  /* 1.4, not tighter: Tamil and Devanagari names stack their marks above and
+     below, and at 1.25 the endonym's marks ran into the name above it. */
+  line-height: 1.4;
+}
+
+.kt-lang-name,
+.kt-lang-native {
   min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* The language's own name, second line. Same size as the name (meaningful text
+   stays at 12px), set back by colour only. */
+.kt-lang-native {
+  color: var(--kt-lp-muted);
 }
 
 /* Le liseré des drapeaux vient de flags.css, calibre pour une surface sombre :

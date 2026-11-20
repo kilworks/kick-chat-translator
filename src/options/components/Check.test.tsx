@@ -169,3 +169,67 @@ describe('options stylesheet', () => {
     expect(styles).toMatch(/\.kt-btn-ghost:disabled:hover[^{]*\{[^}]*background: transparent/);
   });
 });
+
+// The shared switch (src/shared/switch.css) in Windows high contrast and in
+// its two held states. Not seen in a real browser here: these read the rules.
+describe('switch in forced colors, busy and disabled', () => {
+  const css = readFileSync('src/shared/switch.css', 'utf8');
+  const forced = css.slice(css.indexOf('@media (forced-colors: active)'));
+  const block = (sel: string, from: string) => {
+    const at = from.indexOf(`${sel} {`);
+    expect(at, `${sel} is missing`).toBeGreaterThanOrEqual(0);
+    return from.slice(at, from.indexOf('}', at));
+  };
+
+  it('keeps the rail and knob out of the forced repaint', () => {
+    expect(forced).toMatch(/\.kt-switch-rail,\s*\.kt-switch-knob \{\s*forced-color-adjust: none;/);
+  });
+
+  it('draws every part with system colours only', () => {
+    const colours = forced.match(/(?:background|border|border-color|outline|color):[^;]+;/g) ?? [];
+    expect(colours.length).toBeGreaterThan(8);
+    for (const c of colours) expect(c, c).not.toMatch(/var\(|#|rgb/);
+  });
+
+  it('keeps a focus ring apart from a Highlight rail', () => {
+    const ring = block('.kt-switch-input:focus-visible + .kt-switch-rail', forced);
+    expect(ring).toContain('outline: 2px solid Highlight');
+    expect(ring).toContain('outline-offset: 2px');
+  });
+
+  it('centres the knob inside the 1px border, on and off', () => {
+    // The knob's own rule, not the forced-color-adjust one it shares with the rail.
+    const knob = forced.slice(forced.indexOf('forced-color-adjust: none;'));
+    expect(block('.kt-switch-knob', knob)).toContain('inset-inline-start: 1px');
+    // 36px rail - 2px border - 16px knob - 1px inset.
+    expect(block('.kt-switch-input:checked + .kt-switch-rail .kt-switch-knob', forced)).toContain('inset-inline-start: 17px');
+  });
+
+  it('says disabled with GrayText at full opacity', () => {
+    const d = block('.kt-switch[data-disabled]', forced);
+    expect(d).toContain('opacity: 1');
+    expect(d).toContain('color: GrayText');
+  });
+
+  it('marks busy by shape, not by dimming', () => {
+    const busy = block('.kt-switch[data-busy] .kt-switch-rail', css);
+    expect(busy).not.toContain('opacity');
+    expect(busy).toContain('repeating-linear-gradient');
+    // On Canvas, not Highlight: dashes in Highlight on a Highlight fill vanished.
+    const fBusy = block('.kt-switch[data-busy] .kt-switch-rail', forced);
+    expect(fBusy).toContain('border: 1px dashed CanvasText');
+    expect(fBusy).toContain('background: Canvas;');
+  });
+
+  // Control: the disabled state is still the dimmed one outside forced colours.
+  it('still dims a disabled switch in the normal theme', () => {
+    expect(block('.kt-switch[data-disabled]', css)).toContain('opacity: 0.6');
+  });
+
+  it('marks a busy switch on the element the CSS reads', () => {
+    const el = mount(<Check checked onChange={() => {}} label="x" busy />);
+    expect(el.querySelector('.kt-switch')!.hasAttribute('data-busy')).toBe(true);
+    expect(el.querySelector('.kt-switch')!.hasAttribute('data-disabled')).toBe(false);
+    expect(rail(el)).not.toBeNull();
+  });
+});

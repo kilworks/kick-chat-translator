@@ -1,4 +1,4 @@
-import { useId } from 'preact/hooks';
+import { useId, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import type { JSX } from 'preact';
 
 export interface SegmentedOption {
@@ -29,6 +29,8 @@ export function Segmented({ label, value, options, onChange, swatch = false }: P
   const id = useId();
   const current = options.findIndex((o) => o.value === value);
   const stop = current < 0 ? 0 : current;
+  const group = useRef<HTMLDivElement>(null);
+  const stacked = useStacked(group, swatch ? '' : options.map((o) => o.label).join('\n'));
 
   const onKeyDown = (e: JSX.TargetedKeyboardEvent<HTMLDivElement>) => {
     // Alt+Left is browser back; Ctrl and Meta chords belong to the browser too.
@@ -58,19 +60,24 @@ export function Segmented({ label, value, options, onChange, swatch = false }: P
   const checkedLabel = options[current]?.label;
 
   return (
-    <div class="kt-row">
-      <span id={id} class="kt-label">
+    // Label at the start, segments at the end: the column the switches use.
+    <div class="kt-row-inline">
+      <span id={id} class="text-sm text-kick-text">
         {label}
       </span>
-      <div class="flex flex-wrap items-center gap-2">
+      <div class={`${stacked ? 'w-full' : 'ms-auto'} flex flex-wrap items-center gap-2`}>
         <div
+          ref={group}
           role="radiogroup"
           aria-labelledby={id}
           onKeyDown={onKeyDown}
+          data-stacked={stacked || undefined}
           class={
             swatch
               ? 'flex flex-wrap gap-2'
-              : 'flex flex-wrap gap-1 rounded-lg border border-kick-stroke p-1'
+              : stacked
+                ? 'flex w-full flex-col gap-1 rounded-lg border border-kick-stroke p-1'
+                : 'flex flex-wrap gap-1 rounded-lg border border-kick-stroke p-1'
           }
         >
           {options.map((o, i) => {
@@ -106,7 +113,7 @@ export function Segmented({ label, value, options, onChange, swatch = false }: P
                 aria-checked={on}
                 tabIndex={i === stop ? 0 : -1}
                 onClick={() => onChange(o.value)}
-                class={`min-h-8 rounded px-3 py-1 text-sm ${ring} ${
+                class={`kt-seg min-h-8 rounded px-3 py-1 text-sm ${stacked ? 'text-start' : ''} ${ring} ${
                   on
                     ? 'bg-kick-primary/15 text-kick-primary'
                     : 'text-kick-muted hover:bg-kick-dark/40 hover:text-kick-text'
@@ -132,4 +139,41 @@ export function Segmented({ label, value, options, onChange, swatch = false }: P
       )}
     </div>
   );
+}
+
+/**
+ * True while the segments cannot sit on one line. Wrapped, they broke into
+ * uneven rows inside one frame (Tamil's Font group 4+1 at 1280px, 3+2 at a
+ * narrow window); stacked, they read as a list. Measured on the rendered
+ * group: once the last segment drops below the first, stack, remembering the
+ * width at which it happened, and unstack once the row is wider than that.
+ * Starts over when the labels change (another interface language).
+ */
+function useStacked(group: { current: HTMLDivElement | null }, labels: string): boolean {
+  const [stacked, setStacked] = useState(false);
+  const wrapAt = useRef(0);
+  useLayoutEffect(() => {
+    const g = group.current;
+    const row = g?.parentElement?.parentElement;
+    setStacked(false);
+    wrapAt.current = 0;
+    if (!g || !row || !labels || typeof ResizeObserver === 'undefined') return;
+    const check = (): void => {
+      const width = row.clientWidth;
+      if (g.dataset.stacked) {
+        if (width > wrapAt.current) setStacked(false);
+        return;
+      }
+      const first = g.firstElementChild as HTMLElement | null;
+      const last = g.lastElementChild as HTMLElement | null;
+      if (first && last && last.offsetTop > first.offsetTop) {
+        wrapAt.current = width;
+        setStacked(true);
+      }
+    };
+    const watch = new ResizeObserver(check);
+    watch.observe(row);
+    return () => watch.disconnect();
+  }, [labels]);
+  return stacked;
 }
