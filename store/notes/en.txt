@@ -3,3 +3,5 @@ The settings and the popup were reworked to be plain and consistent. The setting
 Each translation engine now says its state in words: Ready, or Paused with the reason and when it comes back. The DeepL card appears once DeepL is in the order or a key is saved, and the key stays hidden until you show it. The popup shows one main button at a time, puts the version in the footer, and fits without a scrollbar in every interface language.
 
 Fixes: a channel your channel lists leave out now says "Not translated here" in the chat bar instead of going quiet, and the popup offers a way to Filters. Engine settings can no longer contradict each other. Glossary lines written with "->" or "=>" work, and lines the glossary cannot read are listed under it.
+
+Also new: a small filter mark in the chat bar says when your source language allowlist is holding lines back, both language pickers show each language's own name and find it when you search, the compose preview names its insert key and no longer covers the last chat line, and the settings and popup got tighter spacing and clearer labels.
