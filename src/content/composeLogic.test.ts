@@ -4,6 +4,7 @@ import {
   COMPOSE_PANEL_TOP_MARGIN,
   RateLimiter,
   Sequencer,
+  chatReserve,
   computePanelGeom,
   decideComposeAction,
   isLinkOrMentionOnly,
@@ -275,5 +276,19 @@ describe('toucheEchange', () => {
     for (const k of ['a', ' ', 'Escape', 'ArrowDown', 'Backspace']) {
       expect(toucheEchange(frappe(k), 'tab-and-enter')).toBe(false);
     }
+  });
+});
+
+// Measured on kick.com: the chat list ends 34px above the composer and a
+// one-line preview reaches 44px above it, so it hid the bottom 10px of the
+// last line. The reserve is that overlap, and nothing when there is none.
+describe('chatReserve', () => {
+  it('is the part of the list the panel covers', () => {
+    expect(chatReserve(580, 590)).toBe(10);
+    expect(chatReserve(579.4, 590)).toBe(11);
+  });
+
+  it('is zero when the panel clears the list', () => {
+    expect(chatReserve(600, 590)).toBe(0);
   });
 });

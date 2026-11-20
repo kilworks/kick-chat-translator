@@ -22,6 +22,9 @@
 import { LANGUAGES, getLang, localLangName, uiLocale } from '~/shared/languages';
 import { flagEl } from '~/shared/flags';
 import { msg } from './msg';
+// One search and one row shape for the two pickers of the same 42 languages:
+// the bar's panel found "Deutsch" in a Japanese interface and this one did not.
+import { endonymFor, isolated, matchesQuery } from './langMenu';
 
 const CHIP_ID = 'kt-lang-chip';
 const MENU_ID = 'kt-lang-menu';
@@ -216,14 +219,6 @@ function makeMenu(): HTMLElement {
  */
 export const MENU_COLS = 3;
 
-export function matchesQuery(name: string, code: string, query: string): boolean {
-  const fold = (s: string): string =>
-    s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-  const q = fold(query.trim());
-  if (!q) return true;
-  return fold(name).includes(q) || fold(code).includes(q);
-}
-
 /** Rows of the list: a filter box, the favourites, then every supported language. */
 function fillMenu(menu: HTMLElement, state: ChipState, h: ChipHandlers, close: () => void): void {
   menu.textContent = '';
@@ -254,7 +249,7 @@ function fillMenu(menu: HTMLElement, state: ChipState, h: ChipHandlers, close: (
   list.style.setProperty('--kt-chip-cols', String(MENU_COLS));
   menu.appendChild(list);
 
-  const add = (code: string, name: string, group: string): void => {
+  const add = (code: string, name: string, group: string, native?: string): void => {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'kt-chip-row';
@@ -274,17 +269,30 @@ function fillMenu(menu: HTMLElement, state: ChipState, h: ChipHandlers, close: (
     iso.append(flagEl(code) ?? (code === 'auto' ? '' : code.toUpperCase()));
     row.appendChild(iso);
 
+    // Same two lines as a row of the bar's panel (langMenu, addRow): the
+    // localised name, then the language's own name when it says something else.
+    const text = document.createElement('span');
+    text.className = 'kt-lang-text';
     const label = document.createElement('span');
     label.className = 'kt-chip-name';
     label.textContent = name;
-    row.appendChild(label);
+    text.appendChild(label);
+    if (native) {
+      const own = document.createElement('span');
+      own.className = 'kt-lang-native';
+      own.lang = code;
+      own.append(isolated(native));
+      text.appendChild(own);
+    }
+    row.appendChild(text);
     // A third of the old width per tile, so the longer names ellipsis. The
     // title gives the full one back on hover, and aria-label keeps it whole for
     // a screen reader, which reads the accessible name, not the clipped text.
-    row.title = name;
-    row.setAttribute('aria-label', name);
+    row.title = native ? `${name} (${native})` : name;
+    row.setAttribute('aria-label', row.title);
 
     row.dataset.name = name;
+    if (native) row.dataset.native = native;
     row.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -302,7 +310,10 @@ function fillMenu(menu: HTMLElement, state: ChipState, h: ChipHandlers, close: (
     if (seen.has(code)) continue;
     seen.add(code);
     const info = getLang(code);
-    if (info) add(code, localName(code, info.native), 'fav');
+    if (info) {
+      const name = localName(code, info.native);
+      add(code, name, 'fav', endonymFor(name, info.native));
+    }
   }
 
   const sep = document.createElement('div');
@@ -313,9 +324,12 @@ function fillMenu(menu: HTMLElement, state: ChipState, h: ChipHandlers, close: (
   // Sorted with the UI locale's collation, on the names actually displayed —
   // a plain sort puts Čeština after Zulu in any locale that has accents.
   const rest = LANGUAGES.filter((l) => !seen.has(l.code))
-    .map((l) => ({ code: l.code, name: localName(l.code, l.native) }))
+    .map((l) => {
+      const name = localName(l.code, l.native);
+      return { code: l.code, name, native: endonymFor(name, l.native) };
+    })
     .sort((a, b) => collator().compare(a.name, b.name));
-  for (const l of rest) add(l.code, l.name, 'all');
+  for (const l of rest) add(l.code, l.name, 'all', l.native);
 
   const empty = document.createElement('div');
   empty.className = 'kt-chip-empty';
@@ -328,7 +342,7 @@ function fillMenu(menu: HTMLElement, state: ChipState, h: ChipHandlers, close: (
     const q = search.value;
     let shown = 0;
     for (const row of menu.querySelectorAll<HTMLElement>('.kt-chip-row')) {
-      const hit = matchesQuery(row.dataset.name ?? '', row.dataset.code ?? '', q);
+      const hit = matchesQuery(row.dataset.name ?? '', row.dataset.code ?? '', q, row.dataset.native);
       row.hidden = !hit;
       if (hit) shown++;
     }

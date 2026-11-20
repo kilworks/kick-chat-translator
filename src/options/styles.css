@@ -91,13 +91,17 @@
 
   .kt-input { @apply w-full rounded-md border border-kick-border bg-kick-surface px-3 py-2 text-sm text-kick-text outline-none focus:border-kick-primary placeholder:text-kick-muted; }
   /* 110px is about six lines, reserved for lists that are usually empty and
-     rarely pass three entries — measured, the three of them held 330px of the
-     Filters tab between them. Four lines to start, and the textarea still
-     grows by drag like any other. */
-  .kt-textarea { @apply w-full min-h-[76px] resize-y rounded-md border border-kick-border bg-kick-surface px-3 py-2 text-sm text-kick-text outline-none focus:border-kick-primary placeholder:text-kick-muted font-mono leading-relaxed; border-color: var(--kt-edge); }
+     rarely pass three entries (measured: the three of them held 330px of the
+     Filters tab between them). Four lines to start, and the textarea still
+     grows by drag like any other. Proportional, not monospace: these hold
+     names and phrases, and a code font made a list of channels read as code. */
+  .kt-textarea { @apply w-full min-h-[76px] resize-y rounded-md border border-kick-border bg-kick-surface px-3 py-2 text-sm text-kick-text outline-none focus:border-kick-primary placeholder:text-kick-muted leading-relaxed; border-color: var(--kt-edge); }
   .kt-textarea:hover:not(:disabled) { border-color: var(--kt-edge-strong); }
   .kt-textarea:focus-visible { outline: 2px solid var(--kt-green); outline-offset: 1px; }
   .kt-label { @apply text-xs uppercase tracking-wider text-kick-muted; }
+  /* No capitals or tracking in caseless scripts: letter spacing pulls Arabic's
+     joined letters apart. Same rule as the popup. */
+  .kt-label:is(:lang(ar), :lang(fa), :lang(he), :lang(hi), :lang(bn), :lang(ta), :lang(th), :lang(ja), :lang(ko), :lang(zh), :lang(yue)) { text-transform: none; letter-spacing: normal; }
   .kt-btn { @apply rounded-md bg-kick-primary px-3 py-2 text-sm font-semibold text-kick-dark hover:brightness-95 transition; }
   .kt-btn-ghost { @apply rounded-md border border-kick-stroke bg-transparent px-3 py-2 text-sm font-medium text-kick-text hover:bg-kick-surface transition; }
   .kt-btn-ghost:disabled, .kt-btn-ghost[aria-disabled='true'] { opacity: 0.4; cursor: not-allowed; }
@@ -144,6 +148,12 @@
   }
   /* 8px between a label and its control: gap-1.5 measured 7.5px. */
   .kt-row { @apply flex flex-col gap-2; }
+  /* A setting with a compact control (segments, a slider): label at the start,
+     control at the end, the same column as the switches. When the row wraps on
+     a narrow window, ms-auto on the control keeps it on that end column, and
+     the row gap keeps 8px under the label. At least 41px tall, the height of a
+     switch row (.kt-setting), so sliders and switches keep one pitch. */
+  .kt-row-inline { @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-2; min-block-size: 41px; }
 }
 
 @layer components {
@@ -156,7 +166,7 @@
 
   /* ─── Select ──────────────────────────────────────────────────────────────
      appearance:none already, so the only thing the browser still draws is the
-     arrow — replaced by an inline chevron so the control matches the rest. */
+     arrow, replaced by an inline chevron so the control matches the rest. */
   .kt-select {
     border-color: var(--kt-edge);
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%239fa6ad' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
@@ -193,6 +203,23 @@
   }
   .kt-input:disabled {
     @apply cursor-not-allowed opacity-60;
+  }
+}
+
+/* Forced colours repaint every fill with Canvas, and the chosen segment was told
+   apart by its fill alone: in high contrast all segments read the same. The
+   system's own selection pair marks it instead. */
+@media (forced-colors: active) {
+  .kt-seg[aria-checked='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+  /* forced-color-adjust: none above also keeps the authored green focus ring,
+     1.37:1 on a white Canvas. The checked segment is the radiogroup's tab stop,
+     so its ring goes back to a system colour. 0,3,0 beats the Tailwind utility. */
+  .kt-seg[aria-checked='true']:focus-visible {
+    outline-color: CanvasText;
   }
 }
 

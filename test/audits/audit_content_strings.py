@@ -34,6 +34,7 @@ STATEMENT = re.compile(
 )
 LITERAL = re.compile(r"'([^'\\]*)'|\"([^\"\\]*)\"|`([^`]*)`")
 WORDY = re.compile(r"[A-Za-z]{3}")
+INTERPOLATION = re.compile(r"\$\{[^}]*\}")
 CODEISH = re.compile(r"^(kt-|data-|aria-|https?:|#|\.|\[)")
 
 # Deliberate exceptions, each with the reason it is not copy. Anything not on
@@ -66,6 +67,8 @@ for path in FILES:
         line = src[: m.start()].count('\n') + 1
         for lit in LITERAL.finditer(expr):
             text = next((g for g in lit.groups() if g), '')
+            # A template's ${...} is code: `${name} (${native})` holds no copy.
+            text = INTERPOLATION.sub('', text)
             if not WORDY.search(text) or CODEISH.match(text):
                 continue
             if ' ' not in text and text == text.lower():

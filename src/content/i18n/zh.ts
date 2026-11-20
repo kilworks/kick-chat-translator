@@ -5,6 +5,7 @@ export const zh: Record<string, string> = {
   barBlockedTipWhite: '此频道不在你的白名单中（选项，筛选）',
   barCount: '本页已翻译：$N$',
   barLangDir: '其他观众的聊天内容，已为你翻译',
+  barLangFilterTip: '源语言白名单：最近 10 行中有 $N$ 行没有翻译（选项，筛选）',
   barOff: '翻译已关闭',
   barOn: '翻译中',
   barOnTip: '正在用 $LANG$ 阅读聊天',

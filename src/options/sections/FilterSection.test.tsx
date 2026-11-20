@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { render } from 'preact';
 import { FilterSection } from './FilterSection';
 import { defaultSettings } from '~/shared/settings';
@@ -130,5 +131,73 @@ describe('glossary', () => {
     const settings = { ...defaultSettings(), glossary: ['kusa->lol', '草→lol'] };
     render(<FilterSection settings={settings} onPatch={() => {}} />, host);
     expect(host.textContent).not.toContain('word -> replacement:');
+  });
+});
+
+// P3-4: the lists read as code boxes ("one per line", monospace). They now
+// read as lists: proportional text, the count of entries, a plain helper line.
+describe('channel and user lists', () => {
+  const field = (el: HTMLElement, id: string) => el.querySelector<HTMLTextAreaElement>(`#${id}`)!;
+  const described = (ta: HTMLTextAreaElement) =>
+    (ta.getAttribute('aria-describedby') ?? '')
+      .split(' ')
+      .map((id) => document.getElementById(id)?.textContent ?? '')
+      .join(' | ');
+
+  it('shows how many entries each list holds, tied to the field', () => {
+    host = document.createElement('div');
+    document.body.appendChild(host);
+    const settings = { ...defaultSettings(), blacklistUsers: ['a', 'b', 'c'] };
+    render(<FilterSection settings={settings} onPatch={() => {}} />, host);
+    expect(described(field(host, 'kt-blacklist-users'))).toContain('Entries: 3');
+    // An empty list carries no "Entries: 0", and the glossary (hidden label) no count at all.
+    expect(described(field(host, 'kt-whitelist-channels'))).not.toContain('Entries');
+    expect(host.querySelectorAll('[data-kt-count]').length).toBe(1);
+  });
+
+  it('says once, for the three name lists, that spaces and commas separate', () => {
+    const el = mount();
+    for (const id of ['kt-whitelist-channels', 'kt-blacklist-channels', 'kt-blacklist-users']) {
+      expect(described(field(el, id))).toContain('Spaces and commas also separate names.');
+    }
+    expect(el.textContent!.split('Spaces and commas also separate names.').length - 1).toBe(1);
+    expect(described(field(el, 'kt-blocked-keywords'))).toContain('Each line is one word or phrase.');
+  });
+
+  it('moves the built-in bots under the bot field as its helper', () => {
+    host = document.createElement('div');
+    document.body.appendChild(host);
+    render(<FilterSection settings={{ ...defaultSettings(), ignoreBots: true }} onPatch={() => {}} />, host);
+    expect(described(field(host, 'kt-extra-bots'))).toContain('Always ignored:');
+  });
+
+  it('counts what will be saved while typing, not raw lines', async () => {
+    const el = mount();
+    // Let the mount effects run first, as a frame does before anyone types.
+    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+    const ta = field(el, 'kt-blacklist-channels');
+    ta.dispatchEvent(new Event('focus'));
+    ta.value = '@One, two\n\nthree';
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+    expect(described(field(el, 'kt-blacklist-channels'))).toContain('Entries: 3');
+  });
+
+  // The stored format does not move: the parsed array, saved on blur.
+  it('still saves the parsed list', () => {
+    host = document.createElement('div');
+    document.body.appendChild(host);
+    let saved: string[] | undefined;
+    render(<FilterSection settings={defaultSettings()} onPatch={(p) => (saved = p.blacklistUsers)} />, host);
+    const ta = field(host, 'kt-blacklist-users');
+    ta.value = '@Alice, bob\ncarol';
+    ta.dispatchEvent(new Event('blur'));
+    expect(saved).toEqual(['alice', 'bob', 'carol']);
+  });
+
+  it('does not draw the lists in a code font', () => {
+    const css = readFileSync('src/options/styles.css', 'utf8');
+    const at = css.indexOf('.kt-textarea {');
+    expect(css.slice(at, css.indexOf('}', at))).not.toContain('font-mono');
   });
 });

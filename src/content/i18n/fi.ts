@@ -5,6 +5,7 @@ export const fi: Record<string, string> = {
   barBlockedTipWhite: 'Tämä kanava ei ole sallittujen listallasi (Asetukset, Suodattimet)',
   barCount: 'Käännetty tällä sivulla: $N$',
   barLangDir: 'Muiden katsojien chat, käännettynä sinulle',
+  barLangFilterTip: 'Sallitut lähdekielet: $N$ viimeisistä 10 rivistä jäi kääntämättä (Asetukset, Suodattimet)',
   barOff: 'Käännös pois päältä',
   barOn: 'Käännetään',
   barOnTip: 'Chatin lukukieli: $LANG$',

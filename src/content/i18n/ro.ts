@@ -5,6 +5,7 @@ export const ro: Record<string, string> = {
   barBlockedTipWhite: 'Acest canal nu este în canalele tale permise (Setări, Filtre)',
   barCount: 'Traduse pe această pagină: $N$',
   barLangDir: 'Chatul celorlalți spectatori, tradus pentru tine',
+  barLangFilterTip: 'Limbi sursă permise: $N$ din ultimele 10 rânduri netraduse (Setări, Filtre)',
   barOff: 'Traducere dezactivată',
   barOn: 'Se traduce',
   barOnTip: 'Citești chatul în $LANG$',

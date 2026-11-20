@@ -5,6 +5,7 @@ export const hu: Record<string, string> = {
   barBlockedTipWhite: 'Ez a csatorna nincs az engedélyezettek listáján (Beállítások, Szűrők)',
   barCount: 'Lefordítva ezen az oldalon: $N$',
   barLangDir: 'A többi néző csevegése, lefordítva neked',
+  barLangFilterTip: 'Engedélyezett forrásnyelvek: az utolsó 10 sorból $N$ nincs lefordítva (Beállítások, Szűrők)',
   barOff: 'Fordítás kikapcsolva',
   barOn: 'Fordítás folyamatban',
   barOnTip: 'Csevegés olvasása ezen a nyelven: $LANG$',

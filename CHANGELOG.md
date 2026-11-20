@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **The chat bar shows when your source language allowlist is holding lines
+  back**: a small filter mark appears once 3 of the last 10 lines were left
+  untranslated by it, and the popup says so under Today with a link straight to
+  that list in Filters.
+- **Both language pickers in the chat show each language's own name** (Deutsch,
+  日本語) under the name in your interface language, and their search finds
+  either one or the ISO code.
+- **The compose preview names its insert key** (Tab, or Ctrl+Enter) for your
+  first few previews.
+
+### Changed
+
+- **The composer chip keeps a solid edge in every mode**, like the bar's
+  language button; the mode shows in what it carries, in the dark and light chat
+  themes alike.
+- **The rate-limit sign in the chat bar is an hourglass icon** instead of an
+  emoji.
+- **Settings**: no gap under 8px, the channel and user lists explain their
+  format once and show a count only when filled, Display is grouped into Text,
+  Colour and theme, and In the chat, the download chips are named for screen
+  readers, AUTO shows the language it resolves to, and the DeepL key button says
+  Show key or Hide key.
+- **The popup** tops out at 576px in its usual state, its update link is
+  translated, labels drop the capitals and letter spacing in scripts where they
+  break the writing, and Clear cache confirms it worked.
+
+### Fixed
+
+- **The compose preview no longer covers the last chat line**: the chat makes
+  room for it while it is up.
+- **Switches and the selected choice in segmented controls stay visible** in
+  Windows high contrast mode.
+
 ## [3.6.0] - 2026-11-20
 
 ### Changed

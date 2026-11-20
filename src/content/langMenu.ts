@@ -99,13 +99,32 @@ function icon(name: keyof typeof ICONS, cls: string): SVGSVGElement {
 /**
  * Does this language match what was typed?
  *
- * Matches the name and the ISO code, accent-insensitively, so someone typing
- * "francais" finds "Français" and someone typing "br" finds "pt-br".
+ * Matches the name, the language's own name and the ISO code,
+ * accent-insensitively, so someone typing "francais" finds "Français", someone
+ * typing "br" finds "pt-br", and someone typing "Deutsch" in a Japanese
+ * interface finds the row named ドイツ語.
  */
-export function matchesQuery(name: string, code: string, query: string): boolean {
+export function matchesQuery(name: string, code: string, query: string, native = ''): boolean {
   const q = fold(query.trim());
   if (!q) return true;
-  return fold(name).includes(q) || fold(code).includes(q);
+  return fold(name).includes(q) || fold(code).includes(q) || fold(native).includes(q);
+}
+
+/** Text in its own direction, isolated from the line around it. */
+export function isolated(text: string): HTMLElement {
+  const bdi = document.createElement('bdi');
+  bdi.dir = 'auto';
+  bdi.textContent = text;
+  return bdi;
+}
+
+/**
+ * The language's own name, when it says something the localised name does not.
+ * Undefined when the two are the same word (German in a German interface), so
+ * no row repeats itself.
+ */
+export function endonymFor(name: string, native: string | undefined): string | undefined {
+  return native && fold(native) !== fold(name) ? native : undefined;
 }
 
 function fold(s: string): string {
@@ -167,6 +186,7 @@ interface Row {
   el: HTMLElement;
   code: string;
   name: string;
+  native?: string;
 }
 
 /**
@@ -252,7 +272,7 @@ export function fillLangMenu(
         h.onPick(code);
       });
       strip.appendChild(tile);
-      rows.push({ el: tile, code, name });
+      rows.push({ el: tile, code, name, native: info.native });
     }
     box.appendChild(strip);
 
@@ -279,7 +299,7 @@ export function fillLangMenu(
   list.dataset.cols = String(PANEL_COLS);
   box.appendChild(list);
 
-  const addRow = (code: string, name: string, isAuto: boolean): void => {
+  const addRow = (code: string, name: string, isAuto: boolean, native?: string): void => {
     const row = document.createElement('div');
     row.className = 'kt-lang-row';
     row.setAttribute('role', 'option');
@@ -291,7 +311,7 @@ export function fillLangMenu(
     // across all 40 rows, exactly one does, "Brazilian Portuguese". It keeps
     // its full text in the DOM and ellipsises on screen, so a screen reader
     // still reads it whole; the title gives it back to a pointer.
-    row.title = name;
+    row.title = native ? `${name} (${native})` : name;
 
     if (isAuto) {
       const globe = document.createElement('span');
@@ -314,10 +334,27 @@ export function fillLangMenu(
     // row, 17 percent of the width, to repeat what the flag beside it and the
     // name after it already say. Three encodings of one fact is what made the
     // row cramped, and the width it frees is what lets the list run in columns.
+    // The language's own name under the localised one, for a reader who knows
+    // "Deutsch" or "日本語" before the word their interface uses for it. A
+    // second line and not a suffix: on the same line it would take the width
+    // the localised name already runs short of.
+    const text = document.createElement('span');
+    text.className = 'kt-lang-text';
     const label = document.createElement('span');
     label.className = 'kt-lang-name';
     label.textContent = name;
-    row.appendChild(label);
+    text.appendChild(label);
+    if (native) {
+      const own = document.createElement('span');
+      own.className = 'kt-lang-native';
+      own.lang = code;
+      // The box keeps the list's direction, so the name lines up under the one
+      // above it; the <bdi> inside lets العربية, עברית, فارسی run in their own.
+      // dir=auto on the box itself pushed them to the far edge of the cell.
+      own.append(isolated(native));
+      text.appendChild(own);
+    }
+    row.appendChild(text);
 
     if (!isAuto && h.onToggleFavorite) {
       const star = icon('star', 'kt-lang-star');
@@ -340,18 +377,21 @@ export function fillLangMenu(
       else h.onPick(code);
     });
     list.appendChild(row);
-    rows.push({ el: row, code, name });
+    rows.push({ el: row, code, name, native });
   };
 
   addRow('auto', msg('chipAuto', "Channel's language"), true);
   seen.add('auto');
 
   const rest = LANGUAGES.filter((l) => !seen.has(l.code))
-    .map((l) => ({ code: l.code, name: localName(l.code, l.native) }))
+    .map((l) => {
+      const name = localName(l.code, l.native);
+      return { code: l.code, name, native: endonymFor(name, l.native) };
+    })
     // Sorted with the UI locale's collation, on the names actually displayed:
     // a plain sort puts Čeština after Zulu in any locale that has accents.
     .sort((a, b) => collator().compare(a.name, b.name));
-  for (const l of rest) addRow(l.code, l.name, false);
+  for (const l of rest) addRow(l.code, l.name, false, l.native);
 
   const empty = document.createElement('div');
   empty.className = 'kt-lang-empty';
@@ -367,7 +407,7 @@ export function fillLangMenu(
     const q = search.value;
     let shown = 0;
     for (const r of rows) {
-      const hit = matchesQuery(r.name, r.code, q);
+      const hit = matchesQuery(r.name, r.code, q, r.native);
       r.el.hidden = !hit;
       if (hit) shown++;
     }

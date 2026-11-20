@@ -5,6 +5,7 @@ export const ms: Record<string, string> = {
   barBlockedTipWhite: 'Saluran ini tiada dalam senarai dibenarkan anda (Tetapan, Penapis)',
   barCount: 'Diterjemah pada halaman ini: $N$',
   barLangDir: 'Sembang penonton lain, diterjemahkan untuk anda',
+  barLangFilterTip: 'Senarai bahasa sumber dibenarkan: $N$ daripada 10 baris terakhir tidak diterjemah (Tetapan, Penapis)',
   barOff: 'Terjemahan dimatikan',
   barOn: 'Menterjemah',
   barOnTip: 'Membaca sembang dalam $LANG$',

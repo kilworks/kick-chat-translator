@@ -5,6 +5,7 @@ export const lv: Record<string, string> = {
   barBlockedTipWhite: 'Šī kanāla nav tavā atļauto kanālu sarakstā (Iestatījumi, Filtri)',
   barCount: 'Iztulkots šajā lapā: $N$',
   barLangDir: 'Citu skatītāju čats, tulkots tev',
+  barLangFilterTip: 'Atļautās avota valodas: $N$ no pēdējām 10 rindām nav iztulkotas (Iestatījumi, Filtri)',
   barOff: 'Tulkošana izslēgta',
   barOn: 'Tulkošana ieslēgta',
   barOnTip: 'Čata lasīšanas valoda: $LANG$',

@@ -5,6 +5,7 @@ export const lt: Record<string, string> = {
   barBlockedTipWhite: 'Šio kanalo nėra tavo leidžiamų kanalų sąraše (Nustatymai, Filtrai)',
   barCount: 'Išversta šiame puslapyje: $N$',
   barLangDir: 'Kitų žiūrovų pokalbis, išverstas tau',
+  barLangFilterTip: 'Leidžiamos šaltinio kalbos: neišversta $N$ iš paskutinių 10 eilučių (Nustatymai, Filtrai)',
   barOff: 'Vertimas išjungtas',
   barOn: 'Vertimas įjungtas',
   barOnTip: 'Pokalbio skaitymo kalba: $LANG$',

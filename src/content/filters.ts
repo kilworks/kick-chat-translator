@@ -42,6 +42,12 @@ export function hasBlockedKeyword(text: string, settings: Settings): boolean {
   return settings.blockedKeywords.some((k) => k && t.includes(foldCase(k)));
 }
 
+/**
+ * What the popup sends the chat tab to ask how many recent lines the language
+ * allowlist left; the answer is `{ count: number }`, 0 when none.
+ */
+export const LANG_BLOCKED_ASK = 'filter.langBlocked';
+
 export function shouldDropBySourceLang(detected: string | undefined, settings: Settings): string | undefined {
   if (settings.sourceLangAllowlist.length === 0) return undefined;
   if (!detected) return 'lang_unknown';

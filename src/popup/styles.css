@@ -24,7 +24,7 @@
 @layer components {
   /* `border` is the card token: 1.18 on a card, 1.28 on the page. Fine for a
      panel edge, but on a select or a text field it is the control's only
-     boundary, which WCAG 1.4.11 holds to 3:1 — the same correction the options
+     boundary, which WCAG 1.4.11 holds to 3:1, the same correction the options
      page already carries. `stroke` measures 3.07 on a card. */
   .kt-select {
     @apply w-full appearance-none rounded-md border border-kick-stroke bg-kick-surface px-2 py-1.5 text-sm text-kick-text outline-none;
@@ -54,6 +54,14 @@
   .kt-label {
     @apply text-xs uppercase tracking-wider text-kick-muted;
   }
+  /* Capitals and wide tracking are a habit of cased scripts. Arabic, Persian
+     and Hebrew have no case, and letter spacing pulls Arabic's joined letters
+     apart; the other caseless scripts of the interface gain nothing from
+     either. Same rule on the options page. */
+  .kt-label:is(:lang(ar), :lang(fa), :lang(he), :lang(hi), :lang(bn), :lang(ta), :lang(th), :lang(ja), :lang(ko), :lang(zh), :lang(yue)) {
+    text-transform: none;
+    letter-spacing: normal;
+  }
   /* A text action: the underline carries it. Not green, which belongs to the
      one primary button of each state. */
   .kt-link {
@@ -70,8 +78,11 @@
   .kt-btn-ghost {
     @apply rounded-md border border-kick-stroke bg-transparent px-3 py-1.5 text-sm font-medium text-kick-text hover:bg-kick-surface hover:border-kick-stroke-strong transition;
   }
+  /* 10px top and bottom, under the 12px between cards: the space between two
+     cards has to read wider than the space inside one, or the stack is one
+     flat size (App.tsx explains the scale). */
   .kt-card {
-    @apply rounded-lg bg-kick-surface p-3;
+    @apply rounded-lg bg-kick-surface px-3 py-2.5;
   }
 }
 

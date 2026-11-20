@@ -1,14 +1,16 @@
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   findComposerRow,
   isClipped,
   isLangChipMounted,
   localName,
-  matchesQuery,
   mountLangChip,
   unmountLangChip,
   updateLangChip,
 } from './langChip';
+import { matchesQuery } from './langMenu';
+import { setUiLocale } from '~/shared/languages';
 import type { ChipState } from './langChip';
 import { withFavorite } from '~/shared/languages';
 import { FAVORITE_LANGS_MAX } from '~/shared/constants';
@@ -366,6 +368,32 @@ describe('matchesQuery', () => {
   });
 });
 
+// The bar's panel and this menu list the same 42 languages: one search, one row
+// shape. In a Japanese interface, typing "Deutsch" used to find nothing here.
+describe('own names in the chip menu', () => {
+  it('shows the own name under the localised one and finds a row by it', () => {
+    setUiLocale('ja');
+    try {
+      const composer = document.createElement('div');
+      composer.setAttribute('contenteditable', 'true');
+      document.body.appendChild(composer);
+      mountLangChip(composer, { mode: 'auto', code: 'auto', favorites: [] }, { onPick: () => undefined, onAuto: () => undefined });
+      document.querySelector<HTMLElement>('.kt-chip')!.click();
+      const de = document.querySelector<HTMLElement>('.kt-chip-row[data-code="de"]')!;
+      expect(de.querySelector('.kt-lang-native')?.textContent).toBe('Deutsch');
+      const search = document.querySelector<HTMLInputElement>('.kt-chip-search')!;
+      search.value = 'Deutsch';
+      search.dispatchEvent(new Event('input'));
+      const shown = [...document.querySelectorAll<HTMLElement>('.kt-chip-row')].filter((r) => !r.hidden);
+      expect(shown.map((r) => r.dataset.code)).toEqual(['de']);
+    } finally {
+      unmountLangChip();
+      setUiLocale(undefined);
+      document.body.textContent = '';
+    }
+  });
+});
+
 describe('anchoring, against the DOM actually measured on kick.com', () => {
   const box = (w: number, h: number, x: number, y: number) => () =>
     ({ width: w, height: h, left: x, top: y, right: x + w, bottom: y + h, x, y, toJSON: () => ({}) }) as DOMRect;
@@ -508,5 +536,23 @@ describe('the caret half of the chip', () => {
     caret.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(chip.getAttribute('aria-expanded')).toBe('false');
     expect(picks).toEqual([]);
+  });
+});
+
+// P3-3: the composer chip was dashed in auto and dotted when off, against the
+// bar button's solid line, and a broken edge reads as "empty". One solid
+// hairline everywhere; the mode lives in the content (muted code, OFF, green).
+describe('the composer chip draws the same edge as the bar button', () => {
+  const css = readFileSync('src/content/inject.css', 'utf8');
+  it.each(['auto', 'off', 'pinned', 'loading', 'error'])('keeps a solid edge in %s mode', (mode) => {
+    const rules = css.match(new RegExp(String.raw`\.kt-chip\[data-mode='${mode}'\][^{]*\{[^}]*\}`, 'g')) ?? [];
+    expect(rules.length).toBeGreaterThan(0);
+    for (const r of rules) expect(r).not.toMatch(/border-style|dashed|dotted/);
+  });
+
+  it('still tells auto from pinned by more than the edge', () => {
+    const rule = (mode: string) => css.match(new RegExp(String.raw`\.kt-chip\[data-mode='${mode}'\]\s*\{([^}]*)\}`))?.[1] ?? '';
+    expect(rule('auto')).toMatch(/color:\s*var\(--kt-muted\)/);
+    expect(rule('pinned')).toMatch(/background:\s*var\(--kt-green-bed\)/);
   });
 });

@@ -5,6 +5,7 @@ export const he: Record<string, string> = {
   barBlockedTipWhite: 'הערוץ הזה לא ברשימת הערוצים המותרים שלך (אפשרויות, מסננים)',
   barCount: 'תורגמו בדף הזה: $N$',
   barLangDir: "הצ'אט של שאר הצופים, מתורגם בשבילך",
+  barLangFilterTip: 'רשימת שפות מקור מותרות: $N$ מתוך 10 השורות האחרונות לא תורגמו (אפשרויות, מסננים)',
   barOff: 'התרגום כבוי',
   barOn: 'מתרגם',
   barOnTip: "קריאת הצ'אט ב$LANG$",

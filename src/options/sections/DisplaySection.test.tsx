@@ -219,13 +219,37 @@ describe('style cards state', () => {
 describe('labels are tied to their control', () => {
   it('every label has a for that resolves to a control', () => {
     const root = mount({});
-    const labels = [...root.querySelectorAll('label.kt-label')];
+    // A switch is its own label element and needs no for.
+    const labels = [...root.querySelectorAll('label:not(.kt-switch)')];
     expect(labels.length).toBeGreaterThanOrEqual(4);
     for (const l of labels) {
       const f = l.getAttribute('for');
       expect(f, l.textContent ?? '').toBeTruthy();
       expect(document.getElementById(f!)).not.toBeNull();
     }
+  });
+});
+
+// Segments hugged the start while switches hugged the end (critic minor): the
+// compact controls now sit on the switches' end column, label at the start.
+describe('one shared column', () => {
+  it('puts sliders and segmented groups on the end column, like the switches', () => {
+    const root = mount({});
+    const rows = [...root.querySelectorAll<HTMLElement>('.kt-row-inline')];
+    // 2 sliders + 4 groups in Display style, 2 groups in Compose preview.
+    expect(rows).toHaveLength(8);
+    for (const r of rows) {
+      expect(r.querySelector(':scope > .ms-auto'), r.textContent ?? '').not.toBeNull();
+      expect(r.querySelector(':scope > .kt-label')).toBeNull();
+    }
+    for (const s of root.querySelectorAll('.kt-switch')) expect(s.hasAttribute('data-reverse')).toBe(true);
+  });
+
+  it('keeps 8px under a label when a row wraps', () => {
+    const css = readFileSync('src/options/styles.css', 'utf8');
+    const rule = css.slice(css.indexOf('.kt-row-inline {'), css.indexOf('}', css.indexOf('.kt-row-inline {')));
+    expect(rule).toMatch(/gap-y-2\b/);
+    expect(rule).toMatch(/justify-between/);
   });
 });
 
@@ -240,5 +264,14 @@ describe('plain words', () => {
   it('keeps meaningful text at 12px or more', () => {
     const src = readFileSync('src/options/sections/DisplaySection.tsx', 'utf8');
     expect(src.match(/text-\[(9|10|11)px\]/g)).toBeNull();
+  });
+});
+
+describe('style cards at 320px', () => {
+  // The recommended badge ran out of its card over the next one.
+  it('lets the card heading wrap', () => {
+    const root = mount({});
+    const head = root.querySelector('button[aria-pressed] > div')!;
+    expect(head.className).toContain('flex-wrap');
   });
 });

@@ -5,6 +5,7 @@ export const ko: Record<string, string> = {
   barBlockedTipWhite: '이 채널은 허용 목록에 없습니다(옵션, 필터)',
   barCount: '이 페이지에서 번역됨: $N$',
   barLangDir: '다른 시청자의 채팅을 내 언어로 번역',
+  barLangFilterTip: '원본 언어 허용 목록: 최근 10줄 중 $N$줄을 번역하지 않았습니다(옵션, 필터)',
   barOff: '번역 꺼짐',
   barOn: '번역 중',
   barOnTip: '채팅 읽는 언어: $LANG$',

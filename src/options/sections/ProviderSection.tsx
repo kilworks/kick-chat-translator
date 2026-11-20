@@ -236,14 +236,16 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
             placeholder="••••••••-••••-••••-••••-••••••••••••:fx"
               onInput={(e) => onPatch({ deeplApiKey: (e.target as HTMLInputElement).value.trim() })}
             />
-            {/* Text, not an eye glyph: the kit's icons.js has no eye or eye-off. */}
+            {/* Text, not an eye glyph: the kit's icons.js has no eye or eye-off.
+                The label says what a press does, so no aria-pressed on top: a
+                pressed "Hide key" would read backwards. */}
             <button
               type="button"
               class="kt-btn-ghost shrink-0 text-xs"
-              aria-pressed={showKey}
+              aria-controls={keyId}
               onClick={() => setShowKey((v) => !v)}
             >
-              {t('Show key')}
+              {showKey ? t('Hide key') : t('Show key')}
             </button>
           </div>
           <p class="text-xs text-kick-muted">
@@ -274,16 +276,20 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
             <option value="pro">{t('Pro (api.deepl.com)')}</option>
           </select>
         </div>
-        <Check
-          checked={settings.deeplSmartRouting}
-          onChange={(v) => onPatch({ deeplSmartRouting: v })}
-          label={t('Save DeepL for European languages')}
-        />
-        <p class="text-xs text-kick-muted -mt-2">
-          {t(
-            'DeepL is used only for European languages, where it is best. Other languages (Japanese, Arabic, Hindi...) use the free engines first, so your DeepL allowance lasts longer.',
-          )}
-        </p>
+        {/* Control on the end, like every other switch on the page. */}
+        <div class="kt-setting">
+          <Check
+            checked={settings.deeplSmartRouting}
+            onChange={(v) => onPatch({ deeplSmartRouting: v })}
+            label={t('Save DeepL for European languages')}
+            // The switch's own hint, as on the on-device switch: a sibling
+            // paragraph sat as close to the Plan select above as to this.
+            hint={t(
+              'DeepL is used only for European languages, where it is best. Other languages (Japanese, Arabic, Hindi...) use the free engines first, so your DeepL allowance lasts longer.',
+            )}
+            reverse
+          />
+        </div>
       </section>
       )}
 

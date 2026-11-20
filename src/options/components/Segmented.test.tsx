@@ -145,3 +145,80 @@ describe('Segmented', () => {
     expect(el.querySelector('symbol#i-check path')?.getAttribute('d')).toBe('M20 6 9 17l-5-5');
   });
 });
+
+// In Windows high contrast every fill becomes Canvas, and the chosen segment
+// was told apart by its fill alone.
+describe('forced colors', () => {
+  it('marks the chosen segment with the system selection colours', async () => {
+    const { readFileSync } = await import('node:fs');
+    const css = readFileSync('src/options/styles.css', 'utf8');
+    const at = css.indexOf('@media (forced-colors: active)');
+    expect(at).toBeGreaterThanOrEqual(0);
+    expect(css.slice(at)).toMatch(/\.kt-seg\[aria-checked='true'\] \{[^}]*background: Highlight;[^}]*color: HighlightText;/);
+    const { el } = mount('b');
+    expect(radios(el).every((r) => r.classList.contains('kt-seg'))).toBe(true);
+    expect(el.querySelector('.kt-seg[aria-checked="true"]')!.textContent).toBe('Bravo');
+  });
+
+  // Swatches carry a tick and the chosen name beside them, so they need no class.
+  it('leaves swatches to their tick', () => {
+    const { el } = mount('a', true);
+    expect(el.querySelector('.kt-seg')).toBeNull();
+  });
+});
+
+// A group that cannot sit on one line used to wrap 4+1 inside its frame. It
+// stacks instead, full width, and comes back to one line once there is room.
+describe('segments that do not fit', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('stack when the last segment drops below the first, and unstack with room', async () => {
+    let fire: () => void = () => undefined;
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(cb: () => void) {
+          fire = cb;
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    const { el } = mount();
+    const group = el.querySelector<HTMLElement>('[role=radiogroup]')!;
+    const row = group.parentElement!.parentElement!;
+    let width = 300;
+    Object.defineProperty(row, 'clientWidth', { get: () => width });
+    Object.defineProperty(radios(el).at(-1)!, 'offsetTop', { configurable: true, get: () => (group.dataset.stacked ? 80 : 40) });
+    await act(() => fire());
+    expect(group.dataset.stacked).toBe('true');
+    expect(group.className).toContain('flex-col');
+    // Same width: stays stacked (no flip on its own height change).
+    await act(() => fire());
+    expect(group.dataset.stacked).toBe('true');
+    width = 900;
+    Object.defineProperty(radios(el).at(-1)!, 'offsetTop', { configurable: true, get: () => 0 });
+    await act(() => fire());
+    expect(group.dataset.stacked).toBeUndefined();
+  });
+
+  // Control: segments on one line stay a row.
+  it('stays a row when everything fits', async () => {
+    let fire: () => void = () => undefined;
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(cb: () => void) {
+          fire = cb;
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    const { el } = mount();
+    await act(() => fire());
+    expect(el.querySelector<HTMLElement>('[role=radiogroup]')!.dataset.stacked).toBeUndefined();
+  });
+});

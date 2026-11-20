@@ -5,6 +5,7 @@ export const pt_pt: Record<string, string> = {
   barBlockedTipWhite: 'Este canal não está nos teus canais permitidos (Opções, Filtros)',
   barCount: 'Traduzidas nesta página: $N$',
   barLangDir: 'O chat dos outros espectadores, traduzido para ti',
+  barLangFilterTip: 'Idiomas de origem permitidos: $N$ das últimas 10 linhas por traduzir (Opções, Filtros)',
   barOff: 'Tradução desativada',
   barOn: 'A traduzir',
   barOnTip: 'A ler o chat em $LANG$',

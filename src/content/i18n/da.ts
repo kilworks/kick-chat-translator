@@ -5,6 +5,7 @@ export const da: Record<string, string> = {
   barBlockedTipWhite: 'Denne kanal er ikke på din liste over tilladte (Indstillinger, Filtre)',
   barCount: 'Oversat på denne side: $N$',
   barLangDir: 'Chat fra andre seere, oversat til dig',
+  barLangFilterTip: 'Tilladte kildesprog: $N$ af de seneste 10 linjer blev ikke oversat (Indstillinger, Filtre)',
   barOff: 'Oversættelse slået fra',
   barOn: 'Oversætter',
   barOnTip: 'Læser chatten på $LANG$',

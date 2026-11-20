@@ -5,6 +5,7 @@ export const yue: Record<string, string> = {
   barBlockedTipWhite: '呢個頻道唔喺你嘅允許清單入面（選項，篩選）',
   barCount: '呢頁已翻譯：$N$',
   barLangDir: '其他觀眾嘅聊天內容，已經幫你翻譯',
+  barLangFilterTip: '來源語言允許清單：最近 10 行入面有 $N$ 行冇翻譯（選項，篩選）',
   barOff: '翻譯已關閉',
   barOn: '翻譯中',
   barOnTip: '而家用 $LANG$ 睇聊天室',

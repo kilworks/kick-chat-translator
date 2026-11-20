@@ -37,8 +37,10 @@ export function App() {
   // setting that explains why a channel is not translated. Without a hash the
   // page lands on Display, where the language and the look are: a newcomer's
   // first question, where Providers is the most technical tab.
+  // `#filters-langs` opens the tab before the dash, then brings that card's
+  // heading (id `filters-langs`) into view once the settings are in.
   const [tab, setTab] = useState<Tab>(() => {
-    const asked = location.hash.slice(1);
+    const asked = location.hash.slice(1).split('-')[0];
     return TABS.some((tb) => tb.id === asked) ? (asked as Tab) : 'display';
   });
   const [savedAt, setSavedAt] = useState<number | undefined>(undefined);
@@ -48,7 +50,16 @@ export function App() {
   const t = useMemo(() => makeT(locale), [locale]);
 
   useEffect(() => {
-    void refresh().catch(() => undefined);
+    void refresh()
+      .catch(() => undefined)
+      .then(() => {
+        const card = location.hash.includes('-') ? document.getElementById(location.hash.slice(1)) : null;
+        if (!card) return;
+        requestAnimationFrame(() => {
+          card.scrollIntoView({ block: 'start' });
+          card.focus({ preventScroll: true });
+        });
+      });
   }, []);
 
   useEffect(() => {

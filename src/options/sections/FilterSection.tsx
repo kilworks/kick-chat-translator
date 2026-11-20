@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 import type { Settings } from '~/shared/settings';
 import type { UsageStats } from '~/shared/types';
 import { sortedLanguages } from '~/shared/languages';
@@ -41,6 +41,7 @@ export function toLines(v: string): string[] {
 
 export function FilterSection({ settings, onPatch, stats }: Props) {
   const t = useT();
+  const namesNote = useId();
   const [langQuery, setLangQuery] = useState('');
   // Localised and collated for the interface language the user chose,
   // not the one their browser happens to run in.
@@ -76,20 +77,18 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
           onChange={(v) => onPatch({ ignoreBots: v })}
           label={t('Ignore chat bots')}
         />
+        {/* The built-in list is the field's helper line now: above the label it
+            sat 7.9px from it, and it reads as part of the field anyway. */}
         {settings.ignoreBots && (
-          <div class="kt-row">
-            <p class="kt-hint">
-              {t('Always ignored:')} {KICK_BOTS.join(', ')}
-            </p>
-            <ListField
-              id="kt-extra-bots"
-              label={t('Other bots to ignore')}
-              placeholder={t('one bot name per line')}
-              value={settings.extraBots}
-              parse={toNames}
-              onCommit={(v) => onPatch({ extraBots: v })}
-            />
-          </div>
+          <ListField
+            id="kt-extra-bots"
+            label={t('Other bots to ignore')}
+            placeholder={t('one bot name per line')}
+            help={`${t('Always ignored:')} ${KICK_BOTS.join(', ')}`}
+            value={settings.extraBots}
+            parse={toNames}
+            onCommit={(v) => onPatch({ extraBots: v })}
+          />
         )}
         <div class="grid grid-cols-[1fr,140px] gap-3 items-start">
           <div>
@@ -118,7 +117,10 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
       </section>
 
       <section class="kt-card space-y-3">
-        <h2 class="kt-section">{t('Source languages allowlist')}</h2>
+        {/* The popup's allowlist line links here (#filters-langs). */}
+        <h2 id="filters-langs" tabIndex={-1} class="kt-section scroll-mt-4 focus:outline-none">
+          {t('Source languages allowlist')}
+        </h2>
         <p class="text-xs text-kick-muted">
           {t(
             'Leave empty to translate every detected language. Pick specific ones to ONLY translate those (e.g. only JA + KO).',
@@ -199,38 +201,51 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
 
       <section class="kt-card space-y-3">
         <h2 class="kt-section">{t('Channels & users')}</h2>
-        <ListField
-          id="kt-whitelist-channels"
-          label={t('Channel allowlist (only translate on these)')}
-          placeholder={t('one channel name per line')}
-          value={settings.whitelistChannels}
-          parse={toNames}
-          onCommit={(v) => onPatch({ whitelistChannels: v })}
-        />
-        <ListField
-          id="kt-blacklist-channels"
-          label={t('Channel blocklist')}
-          placeholder={t('one channel name per line')}
-          value={settings.blacklistChannels}
-          parse={toNames}
-          onCommit={(v) => onPatch({ blacklistChannels: v })}
-        />
-        <ListField
-          id="kt-blacklist-users"
-          label={t('User blocklist')}
-          placeholder={t('one username per line')}
-          value={settings.blacklistUsers}
-          parse={toNames}
-          onCommit={(v) => onPatch({ blacklistUsers: v })}
-        />
-        <ListField
-          id="kt-blocked-keywords"
-          label={t('Hide messages containing')}
-          placeholder={t('one keyword per line, e.g. !fish')}
-          value={settings.blockedKeywords}
-          parse={toLines}
-          onCommit={(v) => onPatch({ blockedKeywords: v })}
-        />
+        {/* Said once for the three name lists, not three times word for word
+            under each, where it read as the caption of the next field. */}
+        <p id={namesNote} class="text-xs text-kick-muted">
+          {t('Spaces and commas also separate names.')}
+        </p>
+        {/* 24px between fields, 4px from a field to its own helper: the
+            helper belongs to the field above it, not the label below. */}
+        <div class="space-y-6">
+          <ListField
+            id="kt-whitelist-channels"
+            describedBy={namesNote}
+            label={t('Channel allowlist (only translate on these)')}
+            placeholder={t('one channel name per line')}
+            value={settings.whitelistChannels}
+            parse={toNames}
+            onCommit={(v) => onPatch({ whitelistChannels: v })}
+          />
+          <ListField
+            id="kt-blacklist-channels"
+            describedBy={namesNote}
+            label={t('Channel blocklist')}
+            placeholder={t('one channel name per line')}
+            value={settings.blacklistChannels}
+            parse={toNames}
+            onCommit={(v) => onPatch({ blacklistChannels: v })}
+          />
+          <ListField
+            id="kt-blacklist-users"
+            describedBy={namesNote}
+            label={t('User blocklist')}
+            placeholder={t('one username per line')}
+            value={settings.blacklistUsers}
+            parse={toNames}
+            onCommit={(v) => onPatch({ blacklistUsers: v })}
+          />
+          <ListField
+            id="kt-blocked-keywords"
+            label={t('Hide messages containing')}
+            placeholder={t('one keyword per line, e.g. !fish')}
+            help={t('Each line is one word or phrase.')}
+            value={settings.blockedKeywords}
+            parse={toLines}
+            onCommit={(v) => onPatch({ blockedKeywords: v })}
+          />
+        </div>
       </section>
 
       <section class="kt-card space-y-3">
@@ -264,6 +279,11 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
 /**
  * A list typed one entry per line.
  *
+ * Read as a list rather than a code box: proportional text, the entry count
+ * beside the label (what will actually be saved, so "a, b" counts two), and a
+ * plain helper line, both tied to the field with aria-describedby. The stored
+ * format is unchanged: the parsed array, one entry per line.
+ *
  * The text areas used to be rebuilt from the saved list on every keystroke, so
  * the line break Enter makes was dropped at once (empty line filtered out) and
  * no second entry could be typed, a space split "good game" in two, and the
@@ -278,15 +298,24 @@ function ListField({
   parse,
   onCommit,
   hideLabel,
+  help,
+  describedBy,
 }: {
   id: string;
   label: string;
   placeholder: string;
+  /** Plain helper line under the field. */
+  help?: string;
+  /** A note outside the field that also describes it (a card's intro line). */
+  describedBy?: string;
   value: string[];
   parse: (v: string) => string[];
   onCommit: (v: string[]) => void;
   hideLabel?: boolean;
 }) {
+  const t = useT();
+  const countId = useId();
+  const helpId = useId();
   const saved = value.join('\n');
   const [draft, setDraft] = useState(saved);
   const focused = useRef(false);
@@ -300,14 +329,33 @@ function ListField({
     const next = parse(text);
     if (next.join('\n') !== saved) onCommit(next);
   };
+  // No count on an empty list (4 of 6 in a default install), and none on the
+  // glossary, whose label is hidden: the count sat alone on its own row there.
+  const entries = parse(draft).length;
+  const counted = entries > 0 && !hideLabel;
+  const describedIds = [counted && countId, help && helpId, describedBy].filter(Boolean).join(' ');
   return (
     <div class="kt-row">
-      <label class={hideLabel ? 'sr-only' : 'kt-label'} for={id}>
-        {label}
-      </label>
+      {hideLabel ? (
+        <label class="sr-only" for={id}>
+          {label}
+        </label>
+      ) : (
+        <div class="flex items-baseline justify-between gap-2">
+          <label class="kt-label" for={id}>
+            {label}
+          </label>
+          {counted && (
+            <span id={countId} data-kt-count class="ms-auto shrink-0 text-xs tabular-nums text-kick-muted">
+              {t('Entries:')} {entries}
+            </span>
+          )}
+        </div>
+      )}
       <textarea
         id={id}
         class="kt-textarea"
+        aria-describedby={describedIds || undefined}
         value={draft}
         placeholder={placeholder}
         onFocus={() => {
@@ -325,6 +373,11 @@ function ListField({
           commit((e.target as HTMLTextAreaElement).value);
         }}
       />
+      {help && (
+        <p id={helpId} class="kt-hint">
+          {help}
+        </p>
+      )}
     </div>
   );
 }

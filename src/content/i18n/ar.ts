@@ -5,6 +5,7 @@ export const ar: Record<string, string> = {
   barBlockedTipWhite: 'هذه القناة ليست في قائمة السماح لديك (الإعدادات، التصفية)',
   barCount: 'المترجم في هذه الصفحة: $N$',
   barLangDir: 'دردشة بقية المشاهدين، مترجمة لك',
+  barLangFilterTip: 'قائمة سماح للغات المصدر: لم تُترجم $N$ من آخر 10 أسطر (الإعدادات، التصفية)',
   barOff: 'الترجمة معطّلة',
   barOn: 'جارٍ الترجمة',
   barOnTip: 'قراءة الدردشة بلغة $LANG$',
