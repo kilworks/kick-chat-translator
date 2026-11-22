@@ -1,9 +1,10 @@
 // Rescan the public Twitch directory: live channels per broadcaster language, most viewed first.
-// node tools/lid/twitch_dir.mjs --out <raw>/twitch-channels-2.json --pc-out <raw>/twitch-channels.json [--pc-top 50] [--cap 3000] [--langs fr,da]
+// node tools/lid/twitch_dir.mjs --out <raw>/twitch-channels-2.json --pc-out <raw>/twitch-channels.json [--pc-top 50] [--cap 3000] [--langs fr,da] [--drop en]
 // Logged out, a directory page stops at 30 channels (scrolling loads nothing more, measured 22/11), so each
 // language is read on the "all" page and on the 30 top categories. --out keeps the union with its last content
 // (fresh channels first, at most --cap per language): a channel offline now often comes back. --pc-out gets the
-// --pc-top most viewed of this scan. A language whose filter chip never shows is not a Twitch language: skipped.
+// --pc-top most viewed of this scan, then its own last content. --drop (default en, the language we hold the most
+// of) leaves both lists. A language whose filter chip never shows is not a Twitch language: skipped.
 // Files are replaced only when the scan found enough channels. Prints counts only.
 import fs from 'node:fs';
 import { chromium } from '../../test/e2e/playwright.mjs';
@@ -13,14 +14,15 @@ const out = arg('--out');
 const pcOut = arg('--pc-out');
 const pcTop = Number(arg('--pc-top', 50));
 const cap = Number(arg('--cap', 3000));
+const drop = new Set(arg('--drop', 'en').split(','));
 const LANGS = (arg('--langs') ?? 'ar bg bn ca cs da de el en es et fa fi fr he hi hu id it ja ko lt lv ms nl no pl pt ro ru sk sl sv ta th tl tr '
-  + 'uk vi zh zh-hk').split(/[ ,]/);
+  + 'uk vi zh zh-hk').split(/[ ,]/).filter((l) => !drop.has(l));
 const CARD = 'a[data-a-target="preview-card-channel-link"]';
 
 async function cards(page, url, lang) {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   try {
-    await page.waitForSelector(CARD, { timeout: 8000 });
+    await page.waitForSelector(CARD, { timeout: 15000 });
   } catch {
     return { chip: false, got: [] };  // nothing live there in this language
   }
@@ -44,13 +46,15 @@ console.log('categories', cats.length);
 
 const found = {};
 const queue = [...LANGS];
-await Promise.all([...Array(8).keys()].map(async () => {
+await Promise.all([0, 1, 2].map(async () => {  // 8 pages at once lost whole languages (22/11): Twitch slows a busy client
   const page = await browser.newPage({ locale: 'en-US', viewport: { width: 1600, height: 1200 } });
   for (let lang; (lang = queue.shift());) {
     const seen = new Set();
     let chip = false;
     for (const u of ['/directory/all', ...cats]) {
-      const r = await cards(page, `https://www.twitch.tv${u}?sort=VIEWER_COUNT&tl=${lang}`, lang).catch(() => ({ chip: false, got: [] }));
+      const url = `https://www.twitch.tv${u}?sort=VIEWER_COUNT&tl=${lang}`;
+      let r = await cards(page, url, lang).catch(() => ({ chip: false, got: [] }));
+      if (u === '/directory/all' && !r.chip) r = await cards(page, url, lang).catch(() => ({ chip: false, got: [] }));  // one retry before skipping
       chip ||= r.chip;
       r.got.forEach((c) => seen.add(c));
       if (u === '/directory/all' && !r.chip) break;  // not a Twitch language, or nothing live at all
@@ -70,11 +74,15 @@ const write = (file, data) => {
   fs.writeFileSync(`${file}.tmp`, JSON.stringify(data));
   fs.renameSync(`${file}.tmp`, file);
 };
-let old = {};
-try { old = JSON.parse(fs.readFileSync(out, 'utf8')); } catch { /* first scan */ }
-const merged = {};
-for (const l of new Set([...Object.keys(found), ...Object.keys(old)])) merged[l] = [...new Set([...(found[l] ?? []), ...(old[l] ?? [])])].slice(0, cap);
-write(out, merged);
-if (pcOut) write(pcOut, Object.fromEntries(Object.entries(found).map(([l, v]) => [l, v.slice(0, pcTop)])));
+const merge = (file, n) => {  // fresh channels first, then the file's last content, at most n per language
+  let old = {};
+  try { old = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { /* first scan */ }
+  const m = {};
+  for (const l of new Set([...Object.keys(found), ...Object.keys(old)])) if (!drop.has(l)) m[l] = [...new Set([...(found[l] ?? []), ...(old[l] ?? [])])].slice(0, n);
+  write(file, m);
+  return m;
+};
+const merged = merge(out, cap);
+if (pcOut) merge(pcOut, pcTop);
 console.log('written: union', Object.values(merged).reduce((s, v) => s + v.length, 0), 'channels in', Object.keys(merged).length, 'languages');
 process.exit(0);

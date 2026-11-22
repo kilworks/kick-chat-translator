@@ -38,37 +38,40 @@ def log(*a):
     print(time.strftime('%H:%M:%S'), *a, flush=True)
 
 
-def oracle(parts, secs, raw, end, tag=''):
-    d = 'lid-collect/run'
+def oracle(parts, secs, raw, end, tag='', slot=''):
+    """SLOT names a second batch beside the main one (the parts of a VM a job holds): own dir, files, pkill."""
+    d = f'lid-collect/run{slot}'
+    o = f'ora{slot}'
     subprocess.run(['ssh', 'oracle', f'rm -rf {d} && mkdir -p {d}'], check=True)
     tmp = raw / '_shards'
     tmp.mkdir(exist_ok=True)
     for i, s in enumerate(parts):
-        (tmp / f'ora-{i}.json').write_text(json.dumps(s), encoding='utf-8')
-    subprocess.run(['scp', '-q', str(IRC), *[str(tmp / f'ora-{i}.json') for i in range(len(parts))], f'oracle:{d}/'], check=True)
-    start = ' '.join(f'(nohup nice -n 10 timeout {secs + 60} python3 twitch_irc.py --channels ora-{i}.json '
-                     f'--out ora-{i}.jsonl --hours {secs / 3600:.4f} > ora-{i}.log 2>&1 &);' for i in range(len(parts)))
+        (tmp / f'{o}-{i}.json').write_text(json.dumps(s), encoding='utf-8')
+    subprocess.run(['scp', '-q', str(IRC), *[str(tmp / f'{o}-{i}.json') for i in range(len(parts))], f'oracle:{d}/'], check=True)
+    start = ' '.join(f'(nohup nice -n 10 timeout {secs + 60} python3 twitch_irc.py --channels {o}-{i}.json '
+                     f'--out {o}-{i}.jsonl --hours {secs / 3600:.4f} > {o}-{i}.log 2>&1 &);' for i in range(len(parts)))
     subprocess.run(['ssh', 'oracle', f'cd {d} && {start} sleep 1; pgrep -fc twitch_irc.py'], check=True)
-    log('oracle', len(parts), 'processus lances')
+    log(o, len(parts), 'processus lances')
     while True:
         last = time.time() > end + 30
         for i in range(len(parts)):
-            dst = raw / f'twitch-ora-{tag}{i}.jsonl'
-            r = subprocess.run(['scp', '-q', f'oracle:{d}/ora-{i}.jsonl', str(dst) + '.part'], capture_output=True)
+            dst = raw / f'twitch-{o}-{tag}{i}.jsonl'
+            r = subprocess.run(['scp', '-q', f'oracle:{d}/{o}-{i}.jsonl', str(dst) + '.part'], capture_output=True)
             if r.returncode == 0:
                 os.replace(str(dst) + '.part', dst)
         if last:
             break
         time.sleep(60)
-    subprocess.run(['ssh', 'oracle', f'pkill -f "twitch_irc.py --channels ora-" ; rm -rf {d}'])
-    log('oracle termine')
+    subprocess.run(['ssh', 'oracle', f'pkill -f "twitch_irc.py --channels {o}-" ; rm -rf {d}'])
+    log(o, 'termine')
 
 
 def vm(name, parts, secs, raw, end, tag=''):
     import ibx
     with ibx.hold([name]) as n:
-        if n is None:
-            log(name, 'tenue par un autre job : ignoree')
+        if n is None:  # the feed has it: its channels go to Oracle, which has room (0.1 % CPU per reader)
+            log(name, 'tenue par un autre job : ses parts vont sur Oracle')
+            oracle(parts, int(end - time.time()), raw, end, tag, slot=name.split('-')[-1])
             return
         mid = ibx.up(n)
         d = f'{ibx.WORK}/lid-collect'
