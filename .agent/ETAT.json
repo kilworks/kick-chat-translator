@@ -1,30 +1,28 @@
 {
-  "genere": "2026-11-19T22:30:11.670Z",
+  "genere": "2026-11-22T09:58:32.121Z",
   "parQui": ".agent/state.mjs",
   "avertissement": "Genere. Ne pas editer a la main : la prochaine passe ecrase. La version commitee decrit l'etat d'AVANT le commit qui la porte, puisque la fin de passe genere puis commite : git.head y pointe le commit precedent et git.arbrePropre y est faux. Relancer `node .agent/state.mjs` avant de lire, ce que le prompt demande deja en premier.",
   "git": {
     "remotesEnDouble": [],
-    "branche": "feat/ui-comfort",
-    "head": "60b532caef524423dc463a831e902c30e4aec25a",
-    "sujet": "Refresh README captures and changelog for the UI comfort pass",
+    "branche": "feat/perf-fast-chat",
+    "head": "3c158989abc11b3c75e393ce40d195d6facc2a5b",
+    "sujet": "Keep the delayed \"…\" off a row recycled for another message",
     "arbrePropre": false,
-    "fichiersModifies": 7,
-    "dernierTag": "v3.5.0",
-    "decrit": "v3.5.0-7-g60b532c",
+    "fichiersModifies": 9,
+    "dernierTag": "v3.6.1",
+    "decrit": "v3.6.1-18-g3c15898",
     "remotes": {
       "origin": "https://github.com/kilworks/kick-chat-translator.git"
     },
     "ecarts": {
       "origin": {
-        "derriere": 0,
-        "devant": 0,
-        "aJour": true
+        "note": "pas de origin/feat/perf-fast-chat connu localement"
       }
     }
   },
   "versions": {
-    "packageJson": "3.5.0",
-    "distManifest": "3.5.0",
+    "packageJson": "3.6.1",
+    "distManifest": "3.6.1",
     "accordent": true,
     "note": null
   },
@@ -173,7 +171,7 @@
       "poids-notes",
       "audit-fiche"
     ],
-    "harnaisSurDisque": 86,
+    "harnaisSurDisque": 87,
     "orphelins": [
       "a11y",
       "anglais-essai",
@@ -186,6 +184,7 @@
       "canto-candidats",
       "capture-chat",
       "charge-chat",
+      "chip-modes",
       "collision-clavier",
       "compose-kick-live",
       "compose-scenarios",
@@ -240,26 +239,26 @@
       "unanimite",
       "variante"
     ],
-    "nbOrphelins": 64,
+    "nbOrphelins": 65,
     "note": "Les portes live ouvrent un navigateur sur kick.com et ne sont dans aucun runner. Un orphelin n est pas forcement un defaut ; un orphelin qui couvre du code livre en est un."
   },
   "releaseGithub": {
     "depot": "kilworks/kick-chat-translator",
     "http": 200,
-    "tag": "v3.5.0",
-    "publiee": "2026-11-08T21:23:24Z",
+    "tag": "v3.6.1",
+    "publiee": "2026-11-20T04:06:15Z",
     "assets": [
       {
-        "nom": "kick-chat-translator-3.5.0-chromium.zip",
-        "octets": 453984
+        "nom": "kick-chat-translator-3.6.1-chromium.zip",
+        "octets": 475539
       },
       {
-        "nom": "kick-chat-translator-3.5.0-firefox.zip",
-        "octets": 453936
+        "nom": "kick-chat-translator-3.6.1-firefox.zip",
+        "octets": 475490
       },
       {
-        "nom": "kick-chat-translator-3.5.0-source.zip",
-        "octets": 3905626
+        "nom": "kick-chat-translator-3.6.1-source.zip",
+        "octets": 3956341
       }
     ]
   },
@@ -273,21 +272,21 @@
     "chrome": {
       "id": "nkkjmbkmacbdkboijmnhjnblcaiclhni",
       "http": 200,
-      "version": "3.5.0",
-      "maj": "November 9, 2026",
-      "utilisateurs": 252
+      "version": "3.6.1",
+      "maj": "November 20, 2026",
+      "utilisateurs": 257
     },
     "amo": {
       "slug": "kick-chat-translator",
       "http": 200,
-      "version": "3.5.0",
-      "relue": "2026-11-08T21:26:49Z",
+      "version": "3.6.1",
+      "relue": "2026-11-20T04:11:34Z",
       "utilisateurs": 16,
       "statut": "public"
     }
   },
   "boutiquesContreVersion": {
-    "versionLocale": "3.5.0",
+    "versionLocale": "3.6.1",
     "chrome": "a jour",
     "amo": "a jour",
     "note": "Un retard n'est pas un defaut : soumettre est du ressort de kil. Ce champ existe pour qu'on cesse de citer un chiffre de tete."
@@ -307,10 +306,14 @@
       "**Validate the popup direction** before phase 2 (options, chat): before",
       "**DeepL's free figure is not stated on one official page.** Support",
       "**`local-only` with on-device off is migrated to on-device on.** That pair",
-      "**Live smoke of the UI comfort pass on kick.com was not run**: Claude in Chrome was not connected in the session (2026-11-19). To do in Brave, read only: chat bar, language panel, one incoming translation, compose preview visible without sending; then the options (Display landing, switches, segmented controls) and the popup."
+      "Channel budget: at the default 200 a minute, 66 to 73 % of sends are refused at 20 to 25 msg/s (offline S1 to S5), so most lines of a fast chat stay untranslated by design. Raise, lower or leave it: a default the reader sees, not changed here.",
+      "`anyProviderReady` semantics: untouched (M6 refuted under 429 bursts, one MyMemory call per line, no storm). Nothing to decide unless you want it revisited.",
+      "Release: CHANGELOG [Unreleased] filled, version not changed. Merge, tag and stores are yours.",
+      "Validation on your Brave: the copy loaded today is 3.3.0. Load the release build of this branch (copied to `Downloads/kct-perf-build/`) unpacked, disable the other KCT copies, reset the target language, watch the fastest stream for 30 min, report, remove it.",
+      "Live visual smoke with Claude in Chrome: not run in this pass (tools not connected in this session)."
     ],
-    "nbBloques": 14,
-    "nbOuverts": 19,
-    "nbFaits": 127
+    "nbBloques": 18,
+    "nbOuverts": 20,
+    "nbFaits": 154
   }
 }

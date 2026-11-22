@@ -1,7 +1,7 @@
 import type { Settings } from '~/shared/settings';
 import type { Decision } from '~/shared/messages';
 import type { ProviderId, TranslationOutcome, TranslationResult } from '~/shared/types';
-import { MAX_TEXT_LENGTH } from '~/shared/constants';
+import { CLOUD_ANSWER_DEADLINE_MS, MAX_TEXT_LENGTH } from '~/shared/constants';
 import { rootLogger } from '~/shared/logger';
 import { send } from '~/shared/messages';
 import { applyUserGlossary, isSlangOnly, protectNames, restoreNames } from '~/shared/glossary';
@@ -21,6 +21,20 @@ import { msg as localised } from './msg';
 
 const log = rootLogger.child('pipeline');
 const metrics = createMetrics('content');
+
+/** How long the hourglass stays after the last line the channel budget refused. */
+const THROTTLE_HOLD_MS = 5000;
+/** "…" only on a line still waiting after this long: a refusal or a cached answer comes back well before. */
+const LOADING_DELAY_MS = 250;
+
+/** The worker's answer, or undefined once `ms` has passed; an answer after that is dropped. */
+function withinDeadline<T>(answer: Promise<T>, ms: number): Promise<T | undefined> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<undefined>((resolve) => {
+    timer = setTimeout(() => resolve(undefined), ms);
+  });
+  return Promise.race([answer, late]).finally(() => clearTimeout(timer));
+}
 
 export interface IncomingDomMessage {
   rowElement: Element;
@@ -94,6 +108,7 @@ export class TranslationPipeline {
   private recent = new Map<string, string[]>();
   /** Per-user dedup: skip identical messages spammed by the same user. */
   private userDedup = new Map<string, string>();
+  private throttleTimer: ReturnType<typeof setTimeout> | undefined;
   // Kept with its slug, so an answer that lands after a channel change never serves the next channel.
   private channelLang: { slug: string; lang: string } | undefined;
   /**
@@ -478,7 +493,12 @@ export class TranslationPipeline {
     // right person; everything else gets the cheap 2-line window.
     const lines = isContextCritical(sourceLang) ? CONTEXT_LINES_HARD : CONTEXT_LINES;
     const context = this.contextFor(msg.channel, real, msg.username, lines);
-    showLoading(msg.injectionTarget);
+    // Put on at once, "…" flashed on every line over the channel budget, whose
+    // refusal comes back in milliseconds: two layouts a line for nothing.
+    // Not on a row Kick has since given to another message: nothing would take it off.
+    const loading = setTimeout(() => {
+      if (!this.rowRecycled(msg)) showLoading(msg.injectionTarget);
+    }, LOADING_DELAY_MS);
     // Counterpart of `e2e.local`. This span covers the whole round trip the
     // reader waits through: coalescing window, SW cache lookup, provider call and
     // every fallback the chain walked. Not the provider latency the SW records,
@@ -490,6 +510,7 @@ export class TranslationPipeline {
     // shown while saying something else. `sourceLang` still sizes the context
     // window above, where being wrong costs nothing.
     const outcome = await this.requestCloud(real, this.effTarget, msg.channel, context, false, hint);
+    clearTimeout(loading);
     if ((!outcome || (!outcome.ok && outcome.error.code !== 'channel_budget')) && (await this.answerOnDevice(msg, real, sourceLang, hint))) return;
     if (!outcome) {
       showError(msg.injectionTarget, localised('errTranslateFailed', 'Translation failed'), () => void this.forceRetranslate(msg, real));
@@ -504,7 +525,11 @@ export class TranslationPipeline {
       // leave the line bare. Every other reason keeps its per-line marker.
       if (code === 'channel_budget') {
         showThrottleIndicator(true);
-        setTimeout(() => showThrottleIndicator(false), 5000);
+        // One timer, re-armed: the hourglass goes 5 s after the LAST refusal.
+        // A timer per refusal ran hundreds a minute at twice the budget, each
+        // taking the hourglass off while the next refusal put it back.
+        clearTimeout(this.throttleTimer);
+        this.throttleTimer = setTimeout(() => showThrottleIndicator(false), THROTTLE_HOLD_MS);
         removeAllArtifacts(msg.injectionTarget);
         return;
       }
@@ -611,7 +636,10 @@ export class TranslationPipeline {
       // `leg.sw.total`, which the worker records for its own share: the
       // difference is message transport plus, in MV3, waking a worker that the
       // browser may have killed since the last line.
-      const call = (): ReturnType<typeof send> => send({
+      // Bounded: a worker that never answers would keep the row on "…" and this
+      // message alive for the life of the page. Past the deadline the line takes
+      // the failure path and its retry button.
+      const call = (): Promise<Awaited<ReturnType<typeof send>> | undefined> => withinDeadline(send({
         type: 'translate',
         payload: {
           messageId: 'dom',
@@ -622,9 +650,9 @@ export class TranslationPipeline {
           ...(context ? { context } : {}),
           ...(noCache ? { noCache: true } : {}),
         },
-      });
+      }), CLOUD_ANSWER_DEADLINE_MS);
       const res = __KT_METRICS__ ? await metrics.measure('leg.roundtrip', call) : await call();
-      return res.type === 'translate.result' ? res.payload : undefined;
+      return res?.type === 'translate.result' ? res.payload : undefined;
     } catch (err: unknown) {
       log.warn('cloud translate failed', err);
       return undefined;

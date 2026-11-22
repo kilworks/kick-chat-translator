@@ -955,6 +955,29 @@ describe('hover to translate', () => {
     expect(fired).toHaveLength(0);
   });
 
+  // Each arming added a mouseenter and mouseleave pair that only a completed
+  // hover took off. A recycled row re-armed ten times carried ten pairs, nine of
+  // them holding a message that was no longer on screen.
+  it('keeps one pair of listeners on a row re-armed after each recycle', () => {
+    vi.useFakeTimers();
+    const row = document.createElement('div');
+    document.body.appendChild(row);
+    const add = vi.spyOn(row, 'addEventListener');
+    const remove = vi.spyOn(row, 'removeEventListener');
+    const fired: number[] = [];
+    for (let k = 0; k < 10; k++) {
+      removeAllArtifacts(row);
+      armHoverTranslate(row, () => fired.push(k));
+    }
+    const live = (type: string): number =>
+      add.mock.calls.filter((c) => c[0] === type).length - remove.mock.calls.filter((c) => c[0] === type).length;
+    expect(live('mouseenter')).toBe(1);
+    expect(live('mouseleave')).toBe(1);
+    row.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(500);
+    expect(fired).toEqual([9]);
+  });
+
   it('re-arms a recycled row without the old listener speaking up', () => {
     vi.useFakeTimers();
     const { row, fired } = armed();
@@ -1027,5 +1050,33 @@ describe('floating bar, rate limit', () => {
     expect(ind.outerHTML).not.toMatch(/\p{Extended_Pictographic}/u);
     showThrottleIndicator(false);
     expect(bar.querySelector('.kt-float-throttle')).toBeNull();
+  });
+});
+
+describe('floating bar, remounted by the guard', () => {
+  // Kick drops the bar on a re-render and the guard mounts a new one. The
+  // language panel hangs off the body and its outside-click listener off the
+  // document; neither went with the bar, so every remount left one more of each.
+  it('leaves one language panel and one outside-click listener after ten remounts', () => {
+    // Earlier tests leave a mounted bar behind: start from none.
+    unmountFloatingBar();
+    document.body.innerHTML = '<div id="channel-chatroom"><div data-index="0"></div><div id="hote"></div></div>';
+    const host = document.querySelector('#hote')!;
+    const add = vi.spyOn(document, 'addEventListener');
+    const remove = vi.spyOn(document, 'removeEventListener');
+    const handlers = { onToggle: vi.fn(), onTargetLang: vi.fn(), onOpenOptions: vi.fn(), onEnableLocal: vi.fn() };
+    const settings = { ...defaultSettings(), enabled: true, targetLang: 'fr' };
+    for (let k = 0; k < 10; k++) {
+      mountFloatingBar(host, settings, handlers);
+      document.querySelector('#kt-floating-bar')!.remove();
+    }
+    mountFloatingBar(host, settings, handlers);
+    const capture = (calls: unknown[][]): number => calls.filter((c) => c[0] === 'click' && c[2] === true).length;
+    expect(document.querySelectorAll('#kt-float-lang-menu')).toHaveLength(1);
+    expect(capture(add.mock.calls) - capture(remove.mock.calls)).toBe(1);
+    add.mockRestore();
+    remove.mockRestore();
+    unmountFloatingBar();
+    document.body.innerHTML = '';
   });
 });

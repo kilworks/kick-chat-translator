@@ -62,7 +62,6 @@ export class ChatObserver {
 
   stop(): void {
     this.running = false;
-    if (this.pollHandle) clearTimeout(this.pollHandle);
     this.detach();
   }
 
@@ -73,6 +72,11 @@ export class ChatObserver {
 
   /** Single teardown path: both observers are dropped together or neither is. */
   private detach(): void {
+    // A pending poll is part of what is attached: left running, it attaches a
+    // second pair of observers beside the next one (two reset() calls while the
+    // list is missing, measured: three pairs left connected).
+    clearTimeout(this.pollHandle);
+    this.pollHandle = undefined;
     this.listObserver?.disconnect();
     this.listObserver = undefined;
     this.containerWatcher?.disconnect();
@@ -82,6 +86,7 @@ export class ChatObserver {
   }
 
   private tryAttach(): void {
+    if (!this.running) return;
     const container = findChatContainer(document);
     if (container) {
       if (__KT_METRICS__) metrics.count('dom.attach');

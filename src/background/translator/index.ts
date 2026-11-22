@@ -6,6 +6,7 @@ import { decodeHtmlEntities } from '~/shared/decode';
 import { isDeeplPremium, routeForBudget } from '~/shared/langTiers';
 import { normalizeLang } from '~/shared/languages';
 import { isTransliteration } from '~/shared/transliterationGuard';
+import { PROVIDER_BATCH_DEADLINE_MS, PROVIDER_ITEM_DEADLINE_MS } from '~/shared/constants';
 import { ConcurrencyQueue } from '../queue';
 import { googleProvider } from './google';
 import { deeplProvider } from './deepl';
@@ -50,6 +51,24 @@ function buildContext(settings: Settings, signal?: AbortSignal): ProviderContext
     signal,
     concurrency: settings.concurrency,
   };
+}
+
+/**
+ * One provider attempt under its own deadline. The signal aborts the fetch, and
+ * the race covers a provider that would not honour it: either way the attempt
+ * fails as `network`, the rung of the backoff ladder a silent provider belongs on.
+ */
+function withDeadline<T>(id: CloudProviderId, ms: number, ctx: ProviderContext, run: (ctx: ProviderContext) => Promise<T>): Promise<T> {
+  const ac = new AbortController();
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      ac.abort();
+      reject(new ProviderError(id, 'network', `${id}: no answer in ${ms} ms`));
+    }, ms);
+    run({ ...ctx, signal: ac.signal })
+      .then(resolve, reject)
+      .finally(() => clearTimeout(timer));
+  });
 }
 
 function markFailure(id: CloudProviderId, code: string, message: string): void {
@@ -224,7 +243,8 @@ export async function translateGroup(
       // that says whether the window is closing too early or too late.
       if (__KT_METRICS__) metrics.timing('batch.items', batchReqs.length);
       try {
-        const runBatch = (): ReturnType<typeof batchFn> => batchFn(batchReqs, ctx);
+        const runBatch = (): ReturnType<typeof batchFn> =>
+          withDeadline(id, PROVIDER_BATCH_DEADLINE_MS, ctx, (c) => batchFn(batchReqs, c));
         const out = __KT_METRICS__ ? await metrics.measure(`provider.${id}.batch`, runBatch) : await runBatch();
         markSuccess(id);
         if (__KT_METRICS__) metrics.count(`chain.depth.${depth}`);
@@ -256,7 +276,9 @@ export async function translateGroup(
       indices.map((idx) =>
         pool.add(async () => {
           try {
-            const runItem = (): ReturnType<typeof provider.translate> => provider.translate(reqs[idx]!, ctx);
+            // The deadline is armed here, when the line's call starts, not when it was queued.
+            const runItem = (): ReturnType<typeof provider.translate> =>
+              withDeadline(id, PROVIDER_ITEM_DEADLINE_MS, ctx, (c) => provider.translate(reqs[idx]!, c));
             const r = __KT_METRICS__ ? await metrics.measure(`provider.${id}.item`, runItem) : await runItem();
             if (!r.translatedText.trim()) throw new ProviderError(id, 'empty', 'empty');
             // Marked before the guard: the provider did answer, so its health is

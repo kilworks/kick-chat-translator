@@ -163,3 +163,63 @@ describe('the detected language comes back in the product codes', () => {
     });
   }
 });
+
+describe('a provider that never answers', () => {
+  const originalFetch = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.useRealTimers();
+  });
+
+  /** Google hangs and ignores its signal; MyMemory answers at once. */
+  function hangingGoogle(): string[] {
+    const seen: string[] = [];
+    globalThis.fetch = vi.fn((url: string) => {
+      if (url.includes('translate.googleapis.com')) {
+        seen.push('google');
+        return new Promise<Response>(() => undefined);
+      }
+      seen.push('mymemory');
+      return Promise.resolve(new Response(myMemoryBody('bonjour'), { status: 200 }));
+    }) as unknown as typeof fetch;
+    return seen;
+  }
+
+  // Nothing bounded a provider call: one that never settled held its flush, and
+  // every tab waiting on that flush with its rows on "…", until the network gave
+  // up or the browser stopped the worker. A fresh module each time, since the
+  // failure cools Google down for whatever runs next.
+  it('gives up on a line at its deadline, as a network failure, and the next provider answers', async () => {
+    vi.resetModules();
+    const { translateGroup: fresh, getProviderStatus } = await import('./index');
+    vi.useFakeTimers();
+    const seen = hangingGoogle();
+    const pending = fresh([{ messageId: 'h1', text: 'hello there', targetLang: 'fr' }], settings(['google', 'mymemory']), 1);
+    await vi.advanceTimersByTimeAsync(60_000);
+    const [out] = await pending;
+    expect(seen).toEqual(['google', 'mymemory']);
+    expect(out?.ok && out.result.translatedText).toBe('bonjour');
+    // The network rung of the backoff ladder, never the five-minute quota one.
+    const google = getProviderStatus(settings(['google', 'mymemory'])).find((s) => s.id === 'google');
+    expect(google?.cooldownLeftSec).toBe(0);
+  });
+
+  it('gives up on a batch at its deadline and the next provider answers every line', async () => {
+    vi.resetModules();
+    const { translateGroup: fresh } = await import('./index');
+    vi.useFakeTimers();
+    const seen = hangingGoogle();
+    const pending = fresh(
+      [
+        { messageId: 'b1', text: 'hello there', targetLang: 'fr' },
+        { messageId: 'b2', text: 'good game', targetLang: 'fr' },
+      ],
+      settings(['google', 'mymemory']),
+      1,
+    );
+    await vi.advanceTimersByTimeAsync(60_000);
+    const out = await pending;
+    expect(seen).toEqual(['google', 'mymemory', 'mymemory']);
+    expect(out.map((o) => o.ok)).toEqual([true, true]);
+  });
+});

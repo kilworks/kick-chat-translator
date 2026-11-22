@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **"…" only shows on a line still waiting after a quarter of a second.** On a
+  chat over its translation budget most lines got it and lost it at once,
+  which made Kick re-measure its chat list twice a line. Measured at 25
+  messages a second: about 145 placeholders a minute instead of 780. Against
+  3.6.1, run side by side twice at 20 and 25 messages a second, the work the
+  extension adds to the page drops by 30 % (tasks) and 60 % (layouts).
+
+### Fixed
+
+- **A translation service that never answers no longer holds its lines.** After
+  8 seconds (12 for a batch) the next service is asked; the page itself stops
+  waiting after 20 seconds and offers the line's retry.
+- **Long sessions on fast chats**: the chat bar no longer leaves a language panel
+  and a click listener behind each time it is put back, a reused chat line no
+  longer collects hover listeners, the rate-limit hourglass keeps one timer
+  instead of one per refused line, and the chat watcher no longer doubles its
+  search for the chat list on a channel switch.
+
 ## [3.6.1] - 2026-11-20
 
 ### Added

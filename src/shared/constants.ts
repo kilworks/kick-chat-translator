@@ -53,6 +53,26 @@ export const MIN_BATCH_WINDOW_MS = 40;
 export const MAX_BATCH_WINDOW_MS = 300;
 export const BATCH_MAX_ITEMS = 40; // flush size — aligned with DeepL's batch cap (fewer requests)
 
+/**
+ * How long one provider attempt may take: a call that never settles otherwise
+ * holds its flush, and every row waiting on it, until the network gives up.
+ * The per-line clock starts when that line's call starts, not when it is
+ * queued: a 40-line fallback at concurrency 4 outlasts any deadline shared by
+ * the group.
+ * shortcut: starting values, revisit with provider latencies read on a real fast chat.
+ */
+export const PROVIDER_ITEM_DEADLINE_MS = 8_000;
+export const PROVIDER_BATCH_DEADLINE_MS = 12_000;
+/**
+ * How long a chat line waits on the worker before it shows the failure and its
+ * retry button. Deliberately shorter than a chain that meets two hung engines
+ * (12 s a batch each): past 20 s a chat line is gone from a fast chat anyway.
+ * The worker keeps going and caches what it gets; the page drops that late
+ * answer and never writes it over the error.
+ * shortcut: starting value, revisit with the chain latencies read on a real fast chat.
+ */
+export const CLOUD_ANSWER_DEADLINE_MS = 20_000;
+
 // DeepL usage endpoints (quota display in the popup).
 export const DEEPL_USAGE_FREE = 'https://api-free.deepl.com/v2/usage';
 export const DEEPL_USAGE_PRO = 'https://api.deepl.com/v2/usage';
