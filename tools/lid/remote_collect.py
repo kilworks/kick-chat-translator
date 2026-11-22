@@ -1,12 +1,12 @@
 """Run twitch_irc.py on Oracle and on free InstaBox VMs, pull their files into raw-chat every minute.
 
 python tools/lid/remote_collect.py --channels <data>/lid/raw-chat/twitch-channels-2.json --until 19:58
-    [--oracle 8] [--vms ibx-w4,ibx-w5] [--per-vm 6] [--data C:/Users/kil/kct-data]
+    [--oracle 8] [--vms ibx-w1,ibx-w2,ibx-w3] [--per-vm 6] [--data C:/Users/kil/kct-data]
 
 Channels already read by the PC (twitch-channels.json) are skipped. Each process reads one shard
 over its own anonymous IRC connection (no browser, ~1 % CPU). Output lands in
 raw-chat/twitch-ora-<i>.jsonl and twitch-<vm>-<i>.jsonl, which watch_collect.py already counts.
-VMs come through ibx.hold() (never one the feed holds) and are suspended at the end.
+VMs come through ibx.hold() (never one a job holds; w4-w5 are the feed's) and are suspended at the end.
 """
 import argparse
 import datetime
@@ -107,7 +107,7 @@ def main():
     ap.add_argument('--minutes', type=float, help='run length instead of --until (cycles with no end time)')
     ap.add_argument('--tag', default='', help='file name part, so a new cycle never overwrites the last one')
     ap.add_argument('--oracle', type=int, default=8)
-    ap.add_argument('--vms', default='ibx-w4,ibx-w5')
+    ap.add_argument('--vms', default='ibx-w1,ibx-w2,ibx-w3')  # the PC's pool (PC out of the feed); w4-w5 belong to Oracle's reserve_kick
     ap.add_argument('--per-vm', type=int, default=6)
     a = ap.parse_args()
     raw = pathlib.Path(a.data) / 'lid' / 'raw-chat'
