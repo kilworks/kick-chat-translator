@@ -1,14 +1,15 @@
 #!/bin/sh
 # Whole chat collection, autonomous: run by the scheduled task LidCollect (at logon, and by hand with
 # schtasks /Run /TN LidCollect). Each part starts only if it is not already running, then loops.
-#   remote  Oracle + 2 InstaBox VMs (collect_loop.sh)
+#   remote  Oracle + the 5 InstaBox VMs (collect_loop.sh), each VM only when no job holds it
 #   twitch  PC IRC reader, 2 h runs appended to twitch-1.jsonl
 #   kick    PC Kick capture (headed browser), one file per batch, backs off on refusals itself
+#   scan    rescan of the public Twitch directory every 2 h (twitch_dir.mjs), lists read by the next runs
 #   dash    the console dashboard window
 # Stop everything: create <data>/lid/raw-chat/collect.STOP (remove it before restarting).
 HERE=/c/Users/kil/Downloads/kick-chat-translator/tools/lid
 RAW=/c/Users/kil/kct-data/lid/raw-chat
-PARTS=${*:-remote twitch kick dash}
+PARTS=${*:-scan remote twitch kick dash}
 export PYTHONIOENCODING=utf-8
 
 running() {  # a process whose command line matches $1 already runs
@@ -23,6 +24,15 @@ twitch() {
   done
 }
 
+scan() {
+  cd "$HERE/../.." || exit 1
+  while [ ! -f "$RAW/collect.STOP" ]; do
+    echo "--- $(date '+%H:%M') rescan" >> "$RAW/scan-log.txt"
+    node "$HERE/twitch_dir.mjs" --out "$RAW/twitch-channels-2.json" --pc-out "$RAW/twitch-channels.json" >> "$RAW/scan-log.txt" 2>&1
+    sleep 7200
+  done
+}
+
 kick() {
   cd "$HERE/../.." || exit 1
   while [ ! -f "$RAW/collect.STOP" ]; do
@@ -34,7 +44,8 @@ kick() {
 
 for p in $PARTS; do
   case $p in
-    remote) running 'collect_loop.sh|remote_collect.py' || sh "$HERE/collect_loop.sh" ibx-w4,ibx-w5 & ;;
+    scan)   running 'twitch_dir.mjs' || scan & ;;
+    remote) running 'collect_loop.sh|remote_collect.py' || sh "$HERE/collect_loop.sh" & ;;
     twitch) running 'twitch_irc.py --channels .*twitch-channels.json' || twitch & ;;
     kick)   running 'kick_capture.mjs' || kick & ;;
     dash)   running 'watch_collect.py' || cmd.exe //c start "Collecte LID" python "$(cygpath -w "$HERE/watch_collect.py")" ;;
