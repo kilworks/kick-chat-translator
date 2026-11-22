@@ -3,6 +3,7 @@ import { francToIso2, isSupportedLang, normalizeLang } from '~/shared/languages'
 import { isLaughter, laughterLanguage } from '~/shared/laughter';
 import { isArabizi } from '~/shared/arabizi';
 import { romanisedLanguage } from '~/shared/romanised';
+import { lidPredict } from './lid/model';
 
 const COMMON_SHORT_TOKENS = new Set([
   'lol',
@@ -2647,7 +2648,35 @@ function sansRire(text: string): string {
  */
 export function confidentLanguage(text: string): string | undefined {
   const trimmed = text.trim();
-  return trimmed.length === 0 ? undefined : memo(LOOKUP_MEMO, trimmed, detectByLookup);
+  return trimmed.length === 0 ? undefined : memo(LOOKUP_MEMO, trimmed, detectConfident);
+}
+
+/**
+ * Where the trained classifier (lid/model.ts) is trusted. `det` gates the raw
+ * answer (flag, filters, on-device source); `sl` gates the source language sent
+ * to the cloud, the costliest mistake, so it is Infinity unless the cost bench
+ * (tools/lid/cost.py) showed a threshold that lowers it. `below` says what the
+ * raw answer does under `det`: stay silent, or fall back to franc.
+ */
+export interface LidThresholds {
+  det: number;
+  sl: number;
+  below: 'silence' | 'franc';
+}
+let LID: LidThresholds = { det: 0.5, sl: Infinity, below: 'silence' };
+
+/** For the cost bench only: swap thresholds and forget memoized answers. */
+export function setLidThresholds(t: LidThresholds): void {
+  LID = t;
+  LOOKUP_MEMO.clear();
+  DETECT_MEMO.clear();
+}
+
+function detectConfident(trimmed: string): string | undefined {
+  const lookedUp = detectByLookup(trimmed);
+  if (lookedUp || LID.sl === Infinity) return lookedUp;
+  const lid = lidPredict(trimmed);
+  return lid && lid.p >= LID.sl ? lid.lang : undefined;
 }
 
 /**
@@ -2732,7 +2761,7 @@ export async function detectLanguageWithBrowser(text: string): Promise<string | 
 }
 
 function detectUncached(trimmed: string): string | undefined {
-  const lookedUp = memo(LOOKUP_MEMO, trimmed, detectByLookup);
+  const lookedUp = memo(LOOKUP_MEMO, trimmed, detectConfident);
   if (lookedUp) return lookedUp;
 
   // L'arabizi, apres la recherche en table et avant franc.
@@ -2766,6 +2795,11 @@ function detectUncached(trimmed: string): string | undefined {
   const penche = detectByPenchant(trimmed);
   if (penche) return penche;
 
+  const lid = lidPredict(trimmed);
+  if (lid && lid.p >= LID.det) return lid.lang;
+  if (lid && LID.below === 'silence') return undefined;
+
+  // No model (weights missing or corrupt), or below its threshold in franc mode.
   const francCode = franc(trimmed, { minLength: 3 });
   if (francCode === 'und') {
     // Heuristic: pure ASCII = probably English

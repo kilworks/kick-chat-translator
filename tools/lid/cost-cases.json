@@ -1,0 +1,11 @@
+[
+  {"text": "hello there", "conf": null, "det": "en", "target": "en", "deleted": true},
+  {"text": "è troppo forte", "conf": null, "det": "en", "target": "en", "deleted": false},
+  {"text": "bonjour", "conf": "fr", "det": "fr", "target": "fr", "deleted": true},
+  {"text": "bonjour", "conf": "fr", "det": "fr", "target": "fr-CA", "deleted": true},
+  {"text": "hola", "conf": null, "det": "es", "target": "fr", "deleted": false},
+  {"text": "hola", "conf": null, "det": "es", "target": "fr", "allow": ["en", "es", "pt"], "deleted": false},
+  {"text": "privet", "conf": null, "det": null, "target": "fr", "allow": ["en", "es", "pt"], "deleted": true},
+  {"text": "privet", "conf": null, "det": "ru", "target": "fr", "allow": ["en", "es", "pt"], "deleted": true},
+  {"text": "hello", "conf": null, "det": "en", "target": "fr", "allow": ["en", "es", "pt"], "deleted": false}
+]

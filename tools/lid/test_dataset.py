@@ -19,6 +19,10 @@ class DatasetTest(unittest.TestCase):
         with self.assertRaises(LeakError):
             excluded_texts({'sets': {'dev': [], 'heldout': [], 'tatoeba': [{'text': 'x', 'gold': 'en'}]}})
 
+    def test_romanized_variants_are_labeled_with_their_language(self):
+        rows = build({'hi': ['मुझे नहीं पता']}, set(), romanized=True)
+        self.assertIn({'text': 'mujhe nahin pata', 'lang': 'hi'}, rows)
+
     def test_normalize(self):
         self.assertEqual(normalize('  JAJAJAJA  sooooo   123 https://x.y/z '), 'jajajaja soo 00 u')
 
