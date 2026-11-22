@@ -19,6 +19,9 @@
  *       [--unique 0.6] [--recyclage] [--graine 1]
  *       [--latence 300] [--gigue 200] [--repli-latence 800] [--repli-gigue 400]
  *       [--rafale429 30/180] [--blocage 0.1:60] [--profil 180,1080]
+ *   node test/e2e/charge-chat.mjs --live --decouvrir --sortie f.json
+ *   node test/e2e/charge-chat.mjs --live --chaine <slug> [--temoin-seul | --sans-temoin]
+ *       [--moteur-reel] [--cible fr] --duree 1200 --echantillon 60 [--profil 180,1080]
  *
  * Ce n'est pas une porte : les chiffres dependent de la machine. Il sert a
  * comparer deux builds sur la meme machine. The build under test is `KT_EXT`
@@ -30,6 +33,14 @@
  * hidden or an extension pass that translated nothing. With `--echantillon`,
  * a drift verdict compares the mean of samples 5 to 10 with the last 5: exit 1
  * when it is red.
+ *
+ * `--live` runs on kick.com, read only, in a fresh anonymous profile, off
+ * screen but never headless (Kick does not load headless). `--decouvrir` ranks
+ * five channels from /browse by chat lines a minute. A pass on one channel
+ * answers the engines with the fake unless `--moteur-reel` (15 min at most:
+ * Google blocks by IP). The chat's own lag is the time from a message's
+ * WebSocket frame, read through CDP, to its row in the DOM. No channel name is
+ * written anywhere but the `--sortie` file the caller chose.
  */
 import os from 'node:os';
 import path from 'node:path';
@@ -71,7 +82,24 @@ const [BLOCAGE_P, BLOCAGE_S] = (brut('--blocage') ?? '0:0').split(':').map(Numbe
 /** `--profil 180,1080` : a 30 s CPU profile starting at each of these seconds of the run. */
 const PROFILS = (brut('--profil') ?? '').split(',').filter(Boolean).map(Number);
 const PROFIL_S = 30;
+/** `--tas 300,1500`: heap snapshots at those seconds, diffed by constructor at the end. */
+const TAS = (brut('--tas') ?? '').split(',').filter(Boolean).map(Number);
 const SORTIE = brut('--sortie');
+const LIVE = process.argv.includes('--live');
+const DECOUVRIR = process.argv.includes('--decouvrir');
+const CHAINE = brut('--chaine');
+const MOTEUR_REEL = process.argv.includes('--moteur-reel');
+/** `--cible fr`: the browser's language, which the extension takes as the reading language. */
+const CIBLE = brut('--cible');
+if (LIVE && !DECOUVRIR && !/^[a-zA-Z0-9_-]{2,25}$/.test(CHAINE ?? '')) {
+  console.error('--live veut --chaine <slug> ou --decouvrir');
+  process.exit(2);
+}
+// The real engine on this machine's IP: one short pass, never a long one.
+if (MOTEUR_REEL && DUREE > 900) {
+  console.error('--moteur-reel : 900 s au plus');
+  process.exit(2);
+}
 
 const nombres = { DEBIT, DUREE, ECHANTILLON, PAGE, UNIQUE, GRAINE, LATENCE, GIGUE, REPLI_LATENCE, REPLI_GIGUE, RAFALE_S, RAFALE_PERIODE, BLOCAGE_P, BLOCAGE_S };
 const fautifs = Object.entries(nombres).filter(([, v]) => !Number.isFinite(v)).map(([k]) => k);
@@ -177,30 +205,54 @@ const FIXTURE = `<!doctype html><html lang="en"><head><meta charset="utf-8"><tit
 </script>
 </body></html>`;
 
+/** One key for a chat message, computed the same way from its WebSocket frame and from its row. */
+const cleMessage = (u, t) => `${u}`.trim().toLowerCase() + '|' + `${t}`.replace(/\s+/g, ' ').trim().toLowerCase();
+
 /**
  * Main-world probe, installed by the harness rather than by the page or the
  * extension. It times each row from the moment its `data-index` first appears
  * to the moment a translation lands in it, counts long tasks, and drains on
- * each sample so nothing it holds grows with the session.
+ * each sample so nothing it holds grows with the session. On Kick it also keys
+ * each new row for the WebSocket match, and counts the batches of body
+ * mutations and of theme attribute changes that the extension's page-wide
+ * observers wake on.
  */
 const SONDE = `(() => {
   if (window.__sonde) return;
-  const S = { longues: [], latences: [], retards: [], tIns: new Map(), traduits: new Set(), barres: 0, rangees: 0, cible: null };
+  const LIVE = ${LIVE};
+  const cle = ${cleMessage.toString()};
+  const S = { longues: [], latences: [], retards: [], tIns: new Map(), traduits: new Set(), barres: 0, rangees: 0, cible: null, inserees: [], corpsAppels: 0, corpsEnr: 0, themeAppels: 0, corps: null, chargements: 0 };
   window.__sonde = S;
   try {
     new PerformanceObserver((l) => { for (const e of l.getEntries()) S.longues.push(e.duration); }).observe({ type: 'longtask' });
   } catch {}
   const TR = ['kt-translation', 'kt-translation-inline', 'kt-translation-replace'];
   const borne = (m) => { while (m.size > 5000) m.delete(m.keys().next().value); };
-  const noter = (r) => {
+  // Kick caps its list and numbers rows again from the top: on Kick a
+  // data-index comes back for another message, and every shown row changes
+  // index at once. The key there is the message itself, name and text.
+  const contenu = (r) => {
+    const nom = r.querySelector('button[title]')?.getAttribute('title') ?? r.querySelector('button.font-bold')?.textContent ?? '';
+    const texte = [...r.querySelectorAll('span.font-normal')]
+      .filter((x) => !x.classList.contains('font-bold'))
+      .map((x) => [...x.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(''))
+      .join(' ');
+    return cle(nom, texte);
+  };
+  const cleRangee = (r) => {
     const d = r.getAttribute('data-index');
+    return d === null ? null : LIVE ? contenu(r) : d;
+  };
+  const noter = (r) => {
+    const d = cleRangee(r);
     if (d === null || S.tIns.has(d)) return;
     S.tIns.set(d, performance.now());
     S.rangees++;
     borne(S.tIns);
+    if (LIVE) S.inserees.push({ k: d, at: Date.now() });
   };
   const traduite = (r) => {
-    const d = r && r.getAttribute('data-index');
+    const d = r && cleRangee(r);
     if (d == null || S.traduits.has(d) || !S.tIns.has(d)) return;
     S.traduits.add(d);
     borne(S.traduits);
@@ -212,6 +264,8 @@ const SONDE = `(() => {
       for (const n of r.addedNodes) {
         if (n.nodeType !== 1) continue;
         if (n.id === 'kt-floating-bar') { S.barres++; continue; }
+        // Each "…" put on a row is one height change Kick's list has to re-measure.
+        if (n.classList.contains('kt-loading')) { S.chargements++; continue; }
         if (TR.some((c) => n.classList.contains(c))) { traduite(n.closest('[data-index]')); continue; }
         if (n.hasAttribute('data-index')) { noter(n); continue; }
         const r2 = r.target.closest ? r.target.closest('[data-index]') : null;
@@ -219,12 +273,23 @@ const SONDE = `(() => {
       }
     }
   });
+  const corpsObs = new MutationObserver((recs) => { S.corpsAppels++; S.corpsEnr += recs.length; });
+  const themeObs = new MutationObserver(() => { S.themeAppels++; });
   setInterval(() => {
-    const c = document.querySelector('#channel-chatroom');
+    // Kick can hold a hidden server-rendered copy first: take the shown panel with rows.
+    const panneaux = [...document.querySelectorAll('#channel-chatroom')];
+    const c = panneaux.find((p) => p.querySelector('[data-index]') && (!p.checkVisibility || p.checkVisibility())) ?? panneaux[0];
     if (c && c !== S.cible) {
       obs.disconnect();
       obs.observe(c, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-index'] });
       S.cible = c;
+    }
+    if (LIVE && document.body && document.body !== S.corps) {
+      corpsObs.disconnect();
+      themeObs.disconnect();
+      corpsObs.observe(document.body, { childList: true, subtree: true });
+      for (const t of [document.documentElement, document.body]) themeObs.observe(t, { attributes: true, attributeFilter: ['class', 'style', 'data-theme'] });
+      S.corps = document.body;
     }
   }, 500);
   S.retard = (ms) => S.retards.push(ms);
@@ -240,9 +305,23 @@ const SONDE = `(() => {
       enAttente: document.querySelectorAll('.kt-loading').length,
       traductionsDom: document.querySelectorAll('.kt-translation, .kt-translation-inline, .kt-translation-replace').length,
       panneaux: document.querySelectorAll('#kt-float-lang-menu').length,
+      chargements: S.chargements,
       visible: document.visibilityState,
     };
-    S.longues = []; S.latences = []; S.retards = []; S.rangees = 0; S.barres = 0;
+    if (LIVE) {
+      // The chat's scroller: the first ancestor of a row that scrolls. Far from the bottom = Kick stopped following.
+      let sc = document.querySelector('#channel-chatroom [data-index]')?.parentElement ?? null;
+      while (sc && sc !== document.body && !(sc.scrollHeight > sc.clientHeight + 2 && /(auto|scroll)/.test(getComputedStyle(sc).overflowY))) sc = sc.parentElement;
+      Object.assign(out, {
+        inserees: S.inserees,
+        corpsAppels: S.corpsAppels,
+        corpsEnr: S.corpsEnr,
+        themeAppels: S.themeAppels,
+        distanceBas: sc && sc !== document.body ? Math.round(sc.scrollHeight - sc.scrollTop - sc.clientHeight) : null,
+      });
+      S.inserees = []; S.corpsAppels = 0; S.corpsEnr = 0; S.themeAppels = 0;
+    }
+    S.longues = []; S.latences = []; S.retards = []; S.rangees = 0; S.barres = 0; S.chargements = 0;
     return out;
   };
 })();`;
@@ -252,17 +331,23 @@ const SONDE = `(() => {
  * sends the worker and how the worker answered, without touching the build.
  * A text that ends with a number is a fixture line seen once, so its sends
  * beyond the first are resends of the same row.
+ *
+ * It lives in the extension's heap, so it must not grow: a Map of every text
+ * sent was the whole 2.2 MB "heap drift" of the first 30 min pass. Fixture
+ * lines are counted by their number in an array sized up front, the shared
+ * pool (a few hundred texts) in a Map, and on Kick no text is kept.
  */
 const COMPTEUR = `(() => {
   if (globalThis.__ktSonde) return 'deja';
-  const s = (globalThis.__ktSonde = { envois: 0, codes: {}, textes: new Map() });
+  const s = (globalThis.__ktSonde = { envois: 0, codes: {}, textes: new Map(), parNumero: new Uint8Array(${LIVE ? 0 : Math.ceil(DEBIT * DUREE) + 20000}) });
   const orig = chrome.runtime.sendMessage;
   const enveloppe = function (msg, ...rest) {
     if (msg && msg.type === 'translate' && msg.payload) {
       s.envois++;
       const t = msg.payload.text;
-      s.textes.set(t, (s.textes.get(t) || 0) + 1);
-      if (s.textes.size > 50000) s.textes.delete(s.textes.keys().next().value);
+      const m = ${LIVE} ? null : / (\\d+)$/.exec(t);
+      if (m && +m[1] < s.parNumero.length) s.parNumero[+m[1]] = Math.min(255, s.parNumero[+m[1]] + 1);
+      else if (!${LIVE} && s.textes.size < 5000) s.textes.set(t, (s.textes.get(t) || 0) + 1);
       const k = rest.length - 1;
       if (k >= 0 && typeof rest[k] === 'function') {
         const cb = rest[k];
@@ -283,11 +368,13 @@ const LIRE_COMPTEUR = `(() => {
   const s = globalThis.__ktSonde;
   if (!s) return null;
   let uniques = 0, envoisUniques = 0;
-  for (const [t, c] of s.textes) if (/ \\d+$/.test(t)) { uniques++; envoisUniques += c; }
-  return { envois: s.envois, distincts: s.textes.size, uniques, envoisUniques, codes: { ...s.codes } };
+  for (const c of s.parNumero) if (c) { uniques++; envoisUniques += c; }
+  return { envois: s.envois, distincts: s.textes.size + uniques, uniques, envoisUniques, codes: { ...s.codes } };
 })()`;
 
 const KICK = /^https?:\/\/(www\.)?kick\.com\//;
+/** Every host the worker can send a chat line to. */
+const MOTEURS = ['translate.googleapis.com', 'api.mymemory.translated.net', 'lingva.lunar.icu', 'lingva.ml', 'api-free.deepl.com', 'api.deepl.com', 'www.google-analytics.com'];
 const CLES = [
   'ScriptDuration',
   'TaskDuration',
@@ -326,11 +413,13 @@ async function brancherMoteurs(ctx) {
   };
   const json = (corps) => () => ({ status: 200, contentType: 'application/json', body: JSON.stringify(corps) });
 
-  // Registered first, so it runs last: whatever no route below claims.
-  await ctx.route('**/*', (route) => {
-    c.sorties.push(route.request().url().slice(0, 120));
-    return route.abort();
-  });
+  // Registered first, so it runs last: whatever no route below claims. Not on
+  // kick.com, where the page itself needs the network.
+  if (!LIVE)
+    await ctx.route('**/*', (route) => {
+      c.sorties.push(route.request().url().slice(0, 120));
+      return route.abort();
+    });
   await ctx.route('**://translate.googleapis.com/**', (route) => {
     const req = route.request();
     const url = new URL(req.url());
@@ -412,6 +501,41 @@ async function profilCPU(cdp, depart) {
   return resumerProfil(profile, depart);
 }
 
+/** One heap snapshot of the renderer (page and extension worlds), summed by type and constructor. */
+async function releveTas(cdp, t) {
+  let brut = '';
+  const lire = (e) => { brut += e.chunk; };
+  cdp.on('HeapProfiler.addHeapSnapshotChunk', lire);
+  await cdp.send('HeapProfiler.takeHeapSnapshot', { reportProgress: false, captureNumericValue: false });
+  cdp.off('HeapProfiler.addHeapSnapshotChunk', lire);
+  const snap = JSON.parse(brut);
+  const champs = snap.snapshot.meta.node_fields;
+  const types = snap.snapshot.meta.node_types[0];
+  const n = champs.length;
+  const [iT, iN, iS] = ['type', 'name', 'self_size'].map((f) => champs.indexOf(f));
+  const parCle = new Map();
+  for (let i = 0; i < snap.nodes.length; i += n) {
+    const type = types[snap.nodes[i + iT]];
+    const cle = /string|number|code|hidden|array|native/.test(type) ? `(${type})` : `${type}:${snap.strings[snap.nodes[i + iN]].slice(0, 60)}`;
+    const e = parCle.get(cle) ?? { n: 0, o: 0 };
+    e.n++;
+    e.o += snap.nodes[i + iS];
+    parCle.set(cle, e);
+  }
+  return { t, total: [...parCle.values()].reduce((a, e) => a + e.o, 0), parCle: Object.fromEntries(parCle) };
+}
+
+function diffTas(a, b) {
+  const cles = new Set([...Object.keys(a.parCle), ...Object.keys(b.parCle)]);
+  const lignes = [...cles].map((k) => {
+    const x = a.parCle[k] ?? { n: 0, o: 0 };
+    const y = b.parCle[k] ?? { n: 0, o: 0 };
+    return { cle: k, dN: y.n - x.n, dKo: Math.round((y.o - x.o) / 102.4) / 10 };
+  });
+  lignes.sort((p, q) => q.dKo - p.dKo);
+  return { de: a.t, a: b.t, totalKo: Math.round((b.total - a.total) / 1024), hausses: lignes.slice(0, 30), baisses: lignes.slice(-5) };
+}
+
 function resumerProfil(profile, depart) {
   const noeuds = new Map(profile.nodes.map((n) => [n.id, n]));
   const parent = new Map();
@@ -449,6 +573,74 @@ function resumerProfil(profile, depart) {
   };
 }
 
+/**
+ * Kick's chat arrives over a WebSocket. Each chat frame is timed where CDP sees
+ * it, before the page's main thread does anything with it, and matched later to
+ * the row it became: the gap is the chat's own lag, the "buffer" a reader sees.
+ */
+function suivreWebSocket(cdp) {
+  const enAttente = new Map();
+  let decalage = null;
+  let trames = 0;
+  let messages = 0;
+  cdp.on('Network.requestWillBeSent', (e) => {
+    // CDP stamps frames on a monotonic clock; one request gives its offset to wall time.
+    if (decalage === null && e.wallTime) decalage = e.wallTime * 1000 - e.timestamp * 1000;
+  });
+  cdp.on('Network.webSocketFrameReceived', (e) => {
+    trames++;
+    const brut = e.response?.payloadData;
+    if (!brut || !brut.includes('ChatMessageEvent')) return;
+    const at = decalage === null ? Date.now() : e.timestamp * 1000 + decalage;
+    // Pusher sends one event a frame; Kick's realtime service (Centrifugo) can
+    // batch several pushes in one frame, one JSON object a line.
+    for (const ligne of brut.split('\n')) {
+      let j;
+      try {
+        j = JSON.parse(ligne);
+      } catch {
+        continue;
+      }
+      const ev = j.push?.pub?.data ?? j;
+      if (!`${ev?.event ?? ''}`.includes('ChatMessageEvent')) continue;
+      let d = ev.data;
+      try {
+        if (typeof d === 'string') d = JSON.parse(d);
+      } catch {
+        continue;
+      }
+      if (typeof d?.sender?.username !== 'string' || typeof d?.content !== 'string') continue;
+      messages++;
+      const k = cleMessage(d.sender.username, d.content.replace(/\[emote:\d+:[^\]]*\]/g, ' '));
+      if (!enAttente.has(k)) enAttente.set(k, []);
+      enAttente.get(k).push(at);
+    }
+  });
+  return {
+    apparier(inserees) {
+      const retards = [];
+      let sansPaire = 0;
+      for (const { k, at } of inserees) {
+        const file = enAttente.get(k);
+        if (!file?.length) {
+          sansPaire++;
+          continue;
+        }
+        retards.push(Math.round(at - file.shift()));
+        if (!file.length) enAttente.delete(k);
+      }
+      // A frame whose row never came (filtered, deleted, missed) is forgotten after 30 s.
+      const limite = Date.now() - 30_000;
+      for (const [k, file] of enAttente) {
+        while (file.length && file[0] < limite) file.shift();
+        if (!file.length) enAttente.delete(k);
+      }
+      return { retards, sansPaire };
+    },
+    etat: () => ({ trames, messages, horloge: decalage !== null }),
+  };
+}
+
 const CLES_DERIVE = ['tasMB', 'noeuds', 'ecouteurs', 'scriptMsParS', 'tacheMsParS', 'latenceP95', 'enAttente'];
 const COMPTES = new Set(['noeuds', 'ecouteurs', 'enAttente']);
 
@@ -466,7 +658,8 @@ function verdictDerive(tranches, avecTraduction) {
     const v = xs.map((t) => t[k]).filter((x) => typeof x === 'number');
     return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null;
   };
-  const lignes = (avecTraduction ? CLES_DERIVE : CLES_DERIVE.slice(0, 5)).map((cle) => {
+  const cles = [...(avecTraduction ? CLES_DERIVE : CLES_DERIVE.slice(0, 5)), ...(LIVE ? ['retardP95'] : [])];
+  const lignes = cles.map((cle) => {
     const a = moyenne(A, cle);
     const b = moyenne(B, cle);
     if (a === null || b === null) return { cle, a, b, ok: null };
@@ -487,17 +680,21 @@ async function passe(avecExtension) {
     // Off screen must not read as hidden: with pauseWhenHidden the extension would translate nothing.
     '--disable-backgrounding-occluded-windows',
     '--disable-features=CalculateNativeWinOcclusion',
-    // What no route answers fails to resolve instead of leaving the machine.
-    '--host-resolver-rules=MAP * ~NOTFOUND',
   ];
+  // What no route answers fails to resolve instead of leaving the machine: every
+  // host offline, the engines only on kick.com, nothing with the real engine.
+  if (!LIVE) args.push('--host-resolver-rules=MAP * ~NOTFOUND');
+  else if (!MOTEUR_REEL) args.push(`--host-resolver-rules=${MOTEURS.map((h) => `MAP ${h} ~NOTFOUND`).join(', ')}`);
+  if (CIBLE) args.push(`--lang=${CIBLE}`);
   if (avecExtension) args.push(`--disable-extensions-except=${EXT}`, `--load-extension=${EXT}`);
   const ctx = await chromium.launchPersistentContext(profile, {
     headless: false,
     viewport: { width: 1200, height: 800 },
+    ...(CIBLE ? { locale: CIBLE } : {}),
     args,
   });
-  const moteur = await brancherMoteurs(ctx);
-  await ctx.route(KICK, async (route) => {
+  const moteur = LIVE && MOTEUR_REEL ? { t0: null, googleGet: 0, googlePost: 0, lignesGoogle: 0, refus429: 0, bloques: 0, mymemory: 0, lingva: 0, deepl: 0, ga: 0, enVol: 0, enVolMax: 0, sorties: [] } : await brancherMoteurs(ctx);
+  if (!LIVE) await ctx.route(KICK, async (route) => {
     const req = route.request();
     if (req.resourceType() === 'document')
       return route.fulfill({ status: 200, contentType: 'text/html', body: FIXTURE });
@@ -512,19 +709,30 @@ async function passe(avecExtension) {
   await ctx.addInitScript(SONDE);
 
   const page = ctx.pages()[0] ?? (await ctx.newPage());
-  await page.goto('https://kick.com/kt-charge', { waitUntil: 'domcontentloaded' });
+  let cdp = null;
+  let ws = null;
+  if (LIVE) {
+    // Before the page opens its socket, so every chat frame is seen.
+    cdp = await ctx.newCDPSession(page);
+    ws = suivreWebSocket(cdp);
+    await cdp.send('Network.enable');
+    await page.goto(`https://kick.com/${CHAINE}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await page.waitForSelector('#channel-chatroom [data-index]', { state: 'attached', timeout: 60000 });
+  } else await page.goto('https://kick.com/kt-charge', { waitUntil: 'domcontentloaded' });
   if (avecExtension) {
     await page.waitForSelector('#kt-inject-style', { state: 'attached', timeout: 15000 });
   }
   const invalide = [];
   const visibilite = await page.evaluate(() => document.visibilityState);
   if (visibilite !== 'visible') invalide.push(`page ${visibilite} au depart`);
-  if (PAGE) await page.evaluate((n) => window.__remplir(n), PAGE);
-  // Une rangee pour que l'observateur s'accroche, puis le calme.
-  await page.evaluate(() => window.__lancer(10, 0.5));
-  await page.waitForTimeout(2500);
-
-  const cdp = await ctx.newCDPSession(page);
+  if (LIVE) await page.waitForTimeout(10000);
+  else {
+    if (PAGE) await page.evaluate((n) => window.__remplir(n), PAGE);
+    // Une rangee pour que l'observateur s'accroche, puis le calme.
+    await page.evaluate(() => window.__lancer(10, 0.5));
+    await page.waitForTimeout(2500);
+    cdp = await ctx.newCDPSession(page);
+  }
   let compteur = null;
   if (avecExtension) {
     compteur = await mondeExtension(cdp);
@@ -556,13 +764,17 @@ async function passe(avecExtension) {
   moteur.t0 = t0;
   const tranches = [];
   const profils = [];
-  const lancer = page.evaluate(([d, s]) => window.__lancer(d, s), [DEBIT, DUREE]);
+  const releves = [];
+  let profilSuivant = false;
+  const lancer = LIVE ? attendre(DUREE * 1000).then(() => null) : page.evaluate(([d, s]) => window.__lancer(d, s), [DEBIT, DUREE]);
   if (ECHANTILLON) {
     let prec = avant;
     let tPrec = t0;
     let mPrec = { ...moteur };
     for (let k = 1; k * ECHANTILLON <= DUREE; k++) {
-      let profil = false;
+      // A sample right after a heap snapshot carries its cost: excluded like a profiled one.
+      let profil = profilSuivant;
+      profilSuivant = false;
       for (const p of PROFILS) {
         if (p >= (k - 1) * ECHANTILLON && p < k * ECHANTILLON) {
           await attendre(t0 + p * 1000 - Date.now());
@@ -573,11 +785,19 @@ async function passe(avecExtension) {
       await attendre(t0 + k * ECHANTILLON * 1000 - Date.now());
       await cdp.send('HeapProfiler.collectGarbage');
       const m = await lire();
+      // After the sample's metrics, so the snapshot's own cost lands on the next one.
+      if (TAS.some((x) => x > (k - 1) * ECHANTILLON && x <= k * ECHANTILLON)) {
+        releves.push(await releveTas(cdp, k * ECHANTILLON));
+        profilSuivant = true;
+      }
       const s = await page.evaluate(() => window.__sonde.vider());
       const maintenant = Date.now();
       const dt = (maintenant - tPrec) / 1000;
       const delta = (cle) => moteur[cle] - mPrec[cle];
       const envois = compteur ? await compteur(LIRE_COMPTEUR) : null;
+      // On Kick the lag is the chat's own, frame to row; on the fixture, schedule to row.
+      const paires = LIVE ? ws.apparier(s.inserees) : null;
+      if (paires) s.retards = paires.retards;
       const tranche = {
         t: Math.round((maintenant - t0) / 1000),
         profil,
@@ -601,8 +821,12 @@ async function passe(avecExtension) {
         enAttente: s.enAttente,
         traductionsDom: s.traductionsDom,
         panneaux: s.panneaux,
+        chargements: s.chargements,
         barres: s.barres,
         visible: s.visible,
+        ...(LIVE
+          ? { sansPaire: paires.sansPaire, corpsAppels: s.corpsAppels, corpsEnr: s.corpsEnr, themeAppels: s.themeAppels, distanceBas: s.distanceBas, ws: ws.etat() }
+          : {}),
         moteur: {
           googleGet: delta('googleGet'),
           googlePost: delta('googlePost'),
@@ -626,7 +850,8 @@ async function passe(avecExtension) {
       mPrec = { ...moteur };
     }
   }
-  const messages = await lancer;
+  const messages = (await lancer) ?? tranches.reduce((n, t) => n + t.rangees, 0);
+  if (LIVE && ECHANTILLON && !tranches.some((t) => t.retardP50 !== null)) invalide.push(`retard du chat non mesure : ${JSON.stringify(ws.etat())}`);
   await page.waitForTimeout(1500);
   await cdp.send('HeapProfiler.collectGarbage');
   const apres = await lire();
@@ -653,15 +878,74 @@ async function passe(avecExtension) {
     metriques: metriquesFin,
     tranches,
     profils,
+    tas: releves.length >= 2 ? diffTas(releves[0], releves[releves.length - 1]) : null,
     verdict: ECHANTILLON ? verdictDerive(tranches, avecExtension) : null,
+    chaine: LIVE ? CHAINE : undefined,
     invalide,
   };
 }
 
+/** The busiest of five channels from /browse, by chat lines in 60 s, without the extension. */
+async function decouvrir() {
+  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'kct-decouvre-'));
+  const ctx = await chromium.launchPersistentContext(profile, {
+    headless: false,
+    viewport: { width: 1200, height: 800 },
+    args: ['--no-first-run', '--no-default-browser-check', '--window-position=-2400,-2400', '--disable-backgrounding-occluded-windows', '--disable-features=CalculateNativeWinOcclusion'],
+  });
+  await ctx.addInitScript(SONDE);
+  const page = ctx.pages()[0] ?? (await ctx.newPage());
+  await page.goto('https://kick.com/browse', { waitUntil: 'domcontentloaded', timeout: 45000 });
+  await page.waitForTimeout(7000);
+  // Kick's own live listing, busiest first; the page's links only if it fails.
+  const parAudience = await page.evaluate(async () => {
+    try {
+      const r = await fetch('/stream/livestreams/en?page=1&limit=24&sort=desc');
+      const j = await r.json();
+      return (j.data ?? []).map((d) => d.channel?.slug).filter((x) => typeof x === 'string').map((x) => '/' + x);
+    } catch {
+      return [];
+    }
+  });
+  const liens = await page.evaluate(() => [
+    ...new Set(
+      [...document.querySelectorAll('a[href^="/"]')]
+        .map((a) => a.getAttribute('href'))
+        .filter((h) => /^\/[a-zA-Z0-9_-]{3,25}$/.test(h))
+        .filter((h) => !/^\/(browse|following|categories|search|about|help|login|signup|clips|home|subscriptions)$/.test(h)),
+    ),
+  ]);
+  const chaines = parAudience.length ? parAudience : liens;
+  const mesures = [];
+  for (const c of chaines.slice(0, 5)) {
+    await page.goto('https://kick.com' + c, { waitUntil: 'domcontentloaded', timeout: 45000 }).catch(() => {});
+    await page.waitForTimeout(15000);
+    await page.evaluate(() => window.__sonde?.vider());
+    await page.waitForTimeout(60000);
+    const s = await page.evaluate(() => window.__sonde?.vider() ?? { rangees: 0 });
+    mesures.push({ chaine: c.slice(1), lignesParMinute: s.rangees });
+    if (!JSON_SEUL) console.log(`  candidate ${mesures.length} : ${s.rangees} lignes en 60 s`);
+  }
+  await ctx.close();
+  fs.rmSync(profile, { recursive: true, force: true });
+  mesures.sort((a, b) => b.lignesParMinute - a.lignesParMinute);
+  if (SORTIE) {
+    fs.mkdirSync(path.dirname(path.resolve(SORTIE)), { recursive: true });
+    fs.writeFileSync(SORTIE, JSON.stringify({ mesures, meilleure: mesures[0] ?? null }, null, 1));
+  }
+  if (!mesures.length || mesures[0].lignesParMinute === 0) {
+    console.error(`decouverte : ${chaines.length} chaines trouvees, aucune ligne de chat mesuree`);
+    process.exit(3);
+  }
+  console.log(`decouverte : meilleure a ${mesures[0].lignesParMinute} lignes par minute${SORTIE ? `, nom dans ${SORTIE}` : ''}`);
+  process.exit(0);
+}
+if (DECOUVRIR) await decouvrir();
+
 const temoin = SANS_TEMOIN ? null : await passe(false);
 const ext = TEMOIN_SEUL ? null : await passe(true);
 const resultat = {
-  params: { ext: TEMOIN_SEUL ? null : EXT, debit: DEBIT, duree: DUREE, page: PAGE, echantillon: ECHANTILLON, unique: UNIQUE, recyclage: RECYCLAGE, graine: GRAINE, latence: LATENCE, gigue: GIGUE, repliLatence: REPLI_LATENCE, repliGigue: REPLI_GIGUE, rafale429: [RAFALE_S, RAFALE_PERIODE], blocage: [BLOCAGE_P, BLOCAGE_S], profils: PROFILS },
+  params: { ext: TEMOIN_SEUL ? null : EXT, debit: DEBIT, duree: DUREE, page: PAGE, echantillon: ECHANTILLON, unique: UNIQUE, recyclage: RECYCLAGE, graine: GRAINE, latence: LATENCE, gigue: GIGUE, repliLatence: REPLI_LATENCE, repliGigue: REPLI_GIGUE, rafale429: [RAFALE_S, RAFALE_PERIODE], blocage: [BLOCAGE_P, BLOCAGE_S], profils: PROFILS, tas: TAS },
   temoin,
   ext,
 };
