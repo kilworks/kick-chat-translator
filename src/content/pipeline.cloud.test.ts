@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Headless the pipeline: stub the DOM/runtime side-effecting modules so we can drive
 // the message path and assert on what gets dispatched to the service worker.
@@ -23,7 +23,7 @@ vi.mock('./localEngine', () => ({
 vi.mock('./memcache', () => ({ memCache: { get: () => undefined, set: vi.fn() } }));
 
 import { TranslationPipeline } from './pipeline';
-import { inject, showError } from './injector';
+import { inject, showError, showThrottleIndicator } from './injector';
 import { defaultSettings } from '~/shared/settings';
 
 /** onDomMessage does not await the translate path, so let it settle before asserting. */
@@ -97,5 +97,74 @@ describe('TranslationPipeline, cloud first', () => {
     await reader({ localEnabled: false }).onDomMessage(domMsg());
     await flush();
     expect(onDevice).not.toHaveBeenCalled();
+  });
+});
+
+describe('TranslationPipeline, waiting on the worker', () => {
+  const line = (n: number) => {
+    const rowElement = document.createElement('div');
+    const injectionTarget = document.createElement('span');
+    injectionTarget.className = 'font-normal';
+    injectionTarget.textContent = `jestem tutaj dzisiaj numer ${n}`;
+    rowElement.appendChild(injectionTarget);
+    document.body.appendChild(rowElement);
+    return { rowElement, injectionTarget, id: `w${n}`, text: injectionTarget.textContent, channel: 'chan', username: `u${n}`, isBot: false };
+  };
+  const reader = () =>
+    new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false, localEnabled: false });
+  const success = { type: 'translate.result', payload: { ok: true, result: { translatedText: 'je suis ici', detectedLang: 'pl', provider: 'google', cached: false } } };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    sendMock.mockReset();
+    vi.mocked(inject).mockClear();
+    vi.mocked(showError).mockClear();
+    vi.mocked(showThrottleIndicator).mockClear();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  // `send` had no deadline: a worker that never answered kept the row on "…"
+  // and the message alive for as long as the page lived.
+  it('gives up on an answer that never comes and offers the retry', async () => {
+    sendMock.mockReturnValue(new Promise(() => undefined));
+    await reader().onDomMessage(line(1));
+    await vi.advanceTimersByTimeAsync(25_000);
+    expect(showError).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(showError).mock.calls[0]?.[2]).toBeTypeOf('function');
+    expect(inject).not.toHaveBeenCalled();
+  });
+
+  it('drops an answer that arrives after the deadline, never writing the line twice', async () => {
+    let answer: (v: unknown) => void = () => undefined;
+    sendMock.mockReturnValue(new Promise((resolve) => (answer = resolve)));
+    await reader().onDomMessage(line(2));
+    await vi.advanceTimersByTimeAsync(25_000);
+    answer(success);
+    await vi.advanceTimersByTimeAsync(10);
+    expect(showError).toHaveBeenCalledTimes(1);
+    expect(inject).not.toHaveBeenCalled();
+  });
+
+  // Each refusal armed its own 5 s timer, so at twice the budget hundreds ran a
+  // minute and the hourglass was taken off and put back while refusals went on.
+  it('keeps one hourglass timer and hides it 5 s after the last refusal', async () => {
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: false, error: { code: 'channel_budget', message: 'x' } } });
+    const p = reader();
+    // The pipeline's own minute interval (userDedup) is already there.
+    const base = vi.getTimerCount();
+    for (let n = 0; n < 10; n++) {
+      await p.onDomMessage(line(100 + n));
+      await vi.advanceTimersByTimeAsync(400);
+    }
+    const hidden = () => vi.mocked(showThrottleIndicator).mock.calls.filter((c) => c[0] === false).length;
+    expect(hidden()).toBe(0);
+    expect(vi.getTimerCount()).toBe(base + 1);
+    // The last refusal came 400 ms ago: 4.6 s more is 5 s after it.
+    await vi.advanceTimersByTimeAsync(4_500);
+    expect(hidden()).toBe(0);
+    await vi.advanceTimersByTimeAsync(200);
+    expect(hidden()).toBe(1);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(hidden()).toBe(1);
   });
 });
