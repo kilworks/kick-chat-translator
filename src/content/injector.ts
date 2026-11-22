@@ -96,6 +96,9 @@ export function armHoverTranslate(target: Element, onHover: () => void): void {
   // way was correct in a browser and invisible to every test: this one armed the
   // same row twice and the suite had no way to say so.
   if ([...target.children].some((c) => c.classList.contains(HOVER_CLASS))) return;
+  // A recycled row re-armed for its next message drops the previous pair first:
+  // only a completed hover used to take them off, so they piled up per recycle.
+  hoverDisarm.get(target)?.();
   const mark = document.createElement('span');
   mark.className = HOVER_CLASS;
   target.appendChild(mark);
@@ -105,15 +108,19 @@ export function armHoverTranslate(target: Element, onHover: () => void): void {
     if (timer) clearTimeout(timer);
     timer = undefined;
   };
+  const disarm = (): void => {
+    cancel();
+    target.removeEventListener('mouseenter', enter);
+    target.removeEventListener('mouseleave', cancel);
+    hoverDisarm.delete(target);
+  };
   const fire = (): void => {
     // The listener sits on the row, which Kick's virtual scroller recycles, so
     // it can outlive the message it was armed for. The marker cannot: any path
     // that re-processes the line takes it out. Its absence is what says this
     // closure is stale, and firing anyway would put the previous message's
     // translation on somebody else's line.
-    cancel();
-    target.removeEventListener('mouseenter', enter);
-    target.removeEventListener('mouseleave', cancel);
+    disarm();
     if (!mark.isConnected) return;
     mark.remove();
     onHover();
@@ -125,7 +132,11 @@ export function armHoverTranslate(target: Element, onHover: () => void): void {
 
   target.addEventListener('mouseenter', enter);
   target.addEventListener('mouseleave', cancel);
+  hoverDisarm.set(target, disarm);
 }
+
+/** How to take an armed row's listeners off, so re-arming never stacks a second pair. */
+const hoverDisarm = new WeakMap<Element, () => void>();
 
 export function ensureStyles(): void {
   if (document.getElementById(STYLE_ID)) return;
@@ -456,6 +467,8 @@ const FLOAT_LANG_MENU_ID = 'kt-float-lang-menu';
  * which is what a miss already did.
  */
 let liveBar: HTMLElement | null = null;
+/** Takes the mounted bar's outside-click listener off the document. */
+let detachLangOutside: (() => void) | undefined;
 
 function findBar(): HTMLElement | null {
   if (liveBar?.isConnected) return liveBar;
@@ -484,6 +497,11 @@ export type LocalChipState =
 export function mountFloatingBar(container: Element, settings: Settings, h: FloatingBarHandlers): void {
   const host = container.closest('#channel-chatroom') ?? container;
   if (host.querySelector(`#${FLOAT_ID}`)) return;
+  // The panel and the outside-click listener of the bar this one replaces live
+  // outside that bar, so they stayed when Kick dropped it: one more of each per
+  // remount, measured 11 panels after 10.
+  detachLangOutside?.();
+  for (const stale of document.querySelectorAll(`#${FLOAT_LANG_MENU_ID}`)) stale.remove();
 
   const bar = document.createElement('div');
   bar.id = FLOAT_ID;
@@ -596,6 +614,7 @@ export function mountFloatingBar(container: Element, settings: Settings, h: Floa
     if (!langMenu.hidden && !dedans) closeLang();
   };
   document.addEventListener('click', onOutside, true);
+  detachLangOutside = () => document.removeEventListener('click', onOutside, true);
 
   langHost.appendChild(langPick);
   bar.appendChild(langHost);
@@ -914,4 +933,6 @@ export function unmountFloatingBar(): void {
   // Le panneau n'est plus un enfant de la barre : le retirer avec elle, sinon
   // un remontage par la SPA de Kick en laisse un par passage.
   for (const stale of document.querySelectorAll(`#${FLOAT_LANG_MENU_ID}`)) stale.remove();
+  detachLangOutside?.();
+  detachLangOutside = undefined;
 }
