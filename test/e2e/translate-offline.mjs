@@ -284,16 +284,30 @@ await ctx.route('**://api.github.com/**', async (route) => {
 
 await ctx.route('**://translate.googleapis.com/**', async (route) => {
   vuParLeMoteur.push('google');
-  ciblesDemandees.push(
-    `${new URL(route.request().url()).searchParams.get('tl') ?? '?'}|${new URL(route.request().url()).searchParams.get('q') ?? ''}`,
-  );
+  const url = new URL(route.request().url());
+  // translate_a/t, how google.ts sends a batch: one `q` per line in the POST
+  // body. Answered in that form, or every batch fell back to one GET per line
+  // (ShapeError) and the gate guarded a path production does not take.
+  const lignesPost = route.request().method() === 'POST' ? new URLSearchParams(route.request().postData() ?? '').getAll('q') : null;
+  // One entry per request, its lines joined, so a text sent twice in one request still shows.
+  ciblesDemandees.push(`${url.searchParams.get('tl') ?? '?'}|${lignesPost ? lignesPost.join(String.fromCharCode(10)) : (url.searchParams.get('q') ?? '')}`);
   if (BASCULE) {
     // 429 est ce que `google.ts` lit comme `rate_limit`, la raison pour laquelle
     // un lecteur reel bascule : le quota gratuit qui tombe en pleine diffusion.
     await route.fulfill({ status: 429, contentType: 'text/plain', body: 'quota' });
     return;
   }
-  // La forme que `src/background/translator/google.ts` sait lire :
+  if (lignesPost) {
+    // One answer per line: `[translation, detected]`, or the bare translation when `sl` is set.
+    const sl = url.searchParams.get('sl');
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(lignesPost.map((l) => (sl && sl !== 'auto' ? `${TRADUIT}:${l}` : [`${TRADUIT}:${l}`, 'es']))),
+    });
+    return;
+  }
+  // translate_a/single, one line, the form `src/background/translator/google.ts` reads:
   // data[0] = segments, chaque segment [traduit, original, ...], data[2] = langue source.
   await route.fulfill({
     status: 200,
@@ -301,10 +315,9 @@ await ctx.route('**://translate.googleapis.com/**', async (route) => {
     // La reponse depend de la requete : `google.ts` met le texte dans `q`.
     // Rendre une constante rendrait une traduction perimee indetectable, ce qui
     // est precisement la panne que le mode recyclage cherche.
-    // Le groupage de Google, tel que `batchCall` le pratique : les textes du lot
-    // sont joints par des sauts de ligne dans UN seul `q`, et la reponse est
-    // redecoupee par lignes. Les segments sont recolles avec '' par `call`, donc
-    // le saut de ligne doit vivre dans le segment.
+    // A GET carries one line now (batches go by POST above). The split on line
+    // breaks stays for the old joined form: segments are glued with '' by
+    // `call`, so the break has to live inside the segment.
     //
     // Deux versions de ce bouchon ont accuse le produit avant celle-ci. La
     // premiere ne lisait qu'un `q` ; la seconde rendait un segment unique pour
