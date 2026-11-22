@@ -21,10 +21,10 @@ const LANGS = (arg('--langs') ?? 'ar bg bn ca cs da de el en es et fa fi fr he h
   + 'uk vi zh zh-hk').split(/[ ,]/).filter((l) => !drop.has(l));
 const CARD = 'a[data-a-target="preview-card-channel-link"]';
 
-async function cards(page, url, lang) {
+async function cards(page, url, lang, wait) {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   try {
-    await page.waitForSelector(CARD, { timeout: 15000 });
+    await page.waitForSelector(CARD, { timeout: wait });
   } catch {
     return { chip: false, got: [] };  // nothing live there in this language
   }
@@ -55,11 +55,12 @@ await Promise.all([0, 1, 2].map(async () => {  // 8 pages at once lost whole lan
     let chip = false;
     for (const u of ['/directory/all', ...cats]) {
       const url = `https://www.twitch.tv${u}?sort=VIEWER_COUNT&tl=${lang}`;
-      let r = await cards(page, url, lang).catch(() => ({ chip: false, got: [] }));
-      if (u === '/directory/all' && !r.chip) r = await cards(page, url, lang).catch(() => ({ chip: false, got: [] }));  // one retry before skipping
+      const all = u === '/directory/all';
+      let r = await cards(page, url, lang, all ? 15000 : 6000).catch(() => ({ chip: false, got: [] }));
+      if (all && !r.chip) r = await cards(page, url, lang, 15000).catch(() => ({ chip: false, got: [] }));  // one retry before skipping
       chip ||= r.chip;
       r.got.forEach((c) => seen.add(c));
-      if (u === '/directory/all' && !r.chip) break;  // not a Twitch language, or nothing live at all
+      if (all && (!r.chip || r.got.length < 28)) break;  // not a Twitch language, or a page not full: all its live channels are there
     }
     if (chip && seen.size) found[lang] = [...seen];
     console.log(lang, chip ? seen.size : 'skipped');

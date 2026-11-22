@@ -1,6 +1,7 @@
 // What the shipped rules answer on each bench text, so tools/lid/cost.py can
 // try any trained model and threshold without rebuilding.
-// node --import tsx tools/lid/answers.mjs --data <data-dir> [--set dev|heldout]
+// node --import tsx tools/lid/answers.mjs --data <data-dir> [--set dev|heldout] [--texts <json list of texts>]
+// --texts: answer these texts under the key <set> instead of texts.json sets.<set> (test2.py)
 // Writes <data>/lid/answers-<set>.json, per text of texts.json sets.<set> and
 // sets.tatoeba (key `bench`): [confident, pre, master] where
 //   confident  confidentLanguage, the looked-up answer (cloud `sl`)
@@ -23,7 +24,8 @@ const { lidReady } = await import(pathToFileURL(path.join(root, 'src/content/lid
 // Without a model, `pre` would silently hold franc's answers: refuse instead.
 if (!lidReady()) throw new Error('no model installed: run tools/lid/install.py first');
 const T = JSON.parse(fs.readFileSync(path.join(data, 'detect', 'texts.json'), 'utf8'));
-const texts = { [set]: T.sets[set].map((r) => r.text), bench: T.sets.tatoeba.map((r) => r.text) };
+const own = args.includes('--texts') ? JSON.parse(fs.readFileSync(args[args.indexOf('--texts') + 1], 'utf8')) : null;
+const texts = { [set]: own ?? T.sets[set].map((r) => r.text), bench: T.sets.tatoeba.map((r) => r.text) };
 
 const run = (cfg, fn) => {
   setLidThresholds(cfg);

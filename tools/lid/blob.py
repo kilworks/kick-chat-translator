@@ -51,22 +51,29 @@ def probs(model, feat_dir: pathlib.Path, name: str):
     idx = np.fromfile(feat_dir / f'{name}.idx', dtype=np.int32) & (model['B'] - 1)
     off = np.fromfile(feat_dir / f'{name}.off', dtype=np.int32).astype(np.int64)
     n = len(off) - 1
-    counts = np.diff(off)
-    nz = counts > 0
-    if 'mlp' in model:
-        E, b1, W1, b2, W2 = model['mlp']
-        x = np.zeros((n, E.shape[1]), dtype=np.float64)
-        if len(idx):
-            x[nz] = np.add.reduceat(E[idx], off[:-1][nz], axis=0) / counts[nz, None]
-        z = (np.maximum(x @ W1 + b1, 0) @ W2 + b2) / model['T']
-    else:
-        z = np.zeros((n, len(model['labels'])), dtype=np.float64)
-        if len(idx):
-            z[nz] = np.add.reduceat(model['W'][idx], off[:-1][nz], axis=0) / counts[nz, None]
-        z = (z + model['bias']) / model['T']
-    z -= z.max(axis=1, keepdims=True)
-    p = np.exp(z)
-    p /= p.sum(axis=1, keepdims=True)
+    nz = np.diff(off) > 0
+    p = np.zeros((n, len(model['labels'])), dtype=np.float64)
+    for lo in range(0, n, 50000):  # by blocks: W[idx] of a 1.7M-line pool would not fit in memory
+        hi = min(lo + 50000, n)
+        o = off[lo:hi + 1]
+        counts = np.diff(o)
+        bnz = counts > 0
+        seg = idx[o[0]:o[-1]]
+        starts = (o[:-1] - o[0])[bnz]
+        if 'mlp' in model:
+            E, b1, W1, b2, W2 = model['mlp']
+            x = np.zeros((hi - lo, E.shape[1]), dtype=np.float64)
+            if len(seg):
+                x[bnz] = np.add.reduceat(E[seg], starts, axis=0) / counts[bnz, None]
+            z = (np.maximum(x @ W1 + b1, 0) @ W2 + b2) / model['T']
+        else:
+            z = np.zeros((hi - lo, len(model['labels'])), dtype=np.float64)
+            if len(seg):
+                z[bnz] = np.add.reduceat(model['W'][seg], starts, axis=0) / counts[bnz, None]
+            z = (z + model['bias']) / model['T']
+        z -= z.max(axis=1, keepdims=True)
+        q = np.exp(z)
+        p[lo:hi] = q / q.sum(axis=1, keepdims=True)
     return p, nz
 
 

@@ -66,7 +66,14 @@ def main():
     ap.add_argument('--key', default='ch', choices=['ch', 'decl'], help='ch: the real channel (what the extension sees); decl: declared language group (E6)')
     ap.add_argument('--causal', action='store_true', help='count only lines of the channel captured before the judged line')
     ap.add_argument('--first', type=int, default=0, help='only the first N captured lines of each channel (warm-up)')
-    a = ap.parse_args()
+    measure(ap.parse_args())
+
+
+def measure(a):
+    """Prints and returns {'plain'|'adapted': (mean cost of the 3 paths, det, sl, sl given, sl wrong, odd, groups)}: the
+    best threshold pair that adds no wrong deletion. A is the parsed command line (train_ibx.py builds one).
+    a.half == 'even': thresholds chosen and costs given on the even dev lines only; odd = per-line cost (mean of the
+    3 paths) of those thresholds on the odd lines, never seen by the choice, groups = their channel keys."""
     d = pathlib.Path(a.data)
     m = blob.load(d / 'lid' / 'models' / f'{a.model}.bin')
     L = m['labels']
@@ -95,7 +102,10 @@ def main():
     keep = [k for k, r in enumerate(rows) if r['gold'] not in cost.NOT_LANG]
     bench = T['sets']['tatoeba']
     supported = {r['gold'] for r in bench} | {cost.base(r['gold']) for r in bench}
-    chat = ([rows[k]['text'] for k in keep], [rows[k]['gold'] for k in keep])
+    half = getattr(a, 'half', None)
+    keep, oth = (keep[0::2], keep[1::2]) if half == 'even' else (keep, [])
+    sub = lambda ks: ([rows[k]['text'] for k in ks], [rows[k]['gold'] for k in ks])
+    chat = sub(keep)
     master = [[c, c or ms] for c, _, ms in ans]
     base_s = {q: cost.evaluate(*chat, [master[k] for k in keep], q, cld, supported) for q in ('none', 'chrome', 'firefox')}
     best = []
@@ -107,6 +117,7 @@ def main():
                 ok = all(s[q][1].get(t, 0) <= base_s[q][1].get(t, 0) for q in s for t in base_s[q][1])
                 means = {q: float(np.mean(v[0])) for q, v in s.items()}
                 best.append((sum(means.values()) / 3, ok, tag, dt, st, means))
+    res = {}
     for tag, P in (('plain', pd), ('adapted', adj)):
         m0 = min((b for b in best if b[2] == tag and b[1]), key=lambda b: b[0])
         dec = cost.decide(ans, P, nzd, L, m0[3], m0[4], 'silence')
@@ -114,7 +125,11 @@ def main():
         sl_wrong = sum(1 for k in keep if dec[k][0] and cost.base(dec[k][0]) != cost.base(rows[k]['gold']))
         print(f"{tag:8s} {m0[0]:.4f} det {m0[3]} sl {m0[4]} " + ' '.join(f'{q} {v:.4f}' for q, v in m0[5].items())
               + f' | sl given {sl_given}, wrong {sl_wrong}')
+        odd = [sum(c) / 3 for c in zip(*(cost.evaluate(*sub(oth), [dec[k] for k in oth], q, cld, supported)[0]
+                                         for q in ('none', 'chrome', 'firefox')))] if oth else []
+        res[tag] = (m0[0], m0[3], m0[4], sl_given, sl_wrong, odd, [raw[k]['ch'] for k in oth])
     print('channels with a prior', len(pri), 'dev lines covered', (len(pri) if a.causal else sum(1 for r in raw if r[a.key] in pri)), '/', len(raw))
+    return res
 
 
 if __name__ == '__main__':

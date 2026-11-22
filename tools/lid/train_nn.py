@@ -54,7 +54,8 @@ def forward(P, x):
     return h @ P['W2'] + P['b2'], a1, h
 
 
-def train(idx, off, y, C, bits, D, H, epochs, lr, seed=0, bs=4096):
+def train(idx, off, y, C, bits, D, H, epochs, lr, seed=0, bs=4096, log=None, on_epoch=None):
+    """log(step, batch loss, hidden pre-activations) every 20 batches; on_epoch(epoch, params, mean loss)."""
     rng = np.random.default_rng(seed)
     B = 1 << bits
     P = {
@@ -80,9 +81,12 @@ def train(idx, off, y, C, bits, D, H, epochs, lr, seed=0, bs=4096):
             p = softmax(z)
             tgt = np.full_like(p, SMOOTH / C)
             tgt[np.arange(hi - lo), y[lo:hi]] += 1 - SMOOTH
-            loss += float(-(tgt * np.log(p + 1e-9)).sum())
+            bl = float(-(tgt * np.log(p + 1e-9)).sum())
+            loss += bl
             g = ((p - tgt) / (hi - lo)).astype(np.float32)
             t += 1
+            if log and t % 20 == 0:
+                log(t, bl / (hi - lo), a1)
             dh = g @ P['W2'].T
             da1 = dh * (a1 > 0)
             grads = {'W2': h.T @ g, 'b2': g.sum(0), 'W1': x.T @ da1, 'b1': da1.sum(0)}
@@ -101,6 +105,8 @@ def train(idx, off, y, C, bits, D, H, epochs, lr, seed=0, bs=4096):
             tE[uniq] = t
             P['E'][uniq] -= lr_ep * (mE[uniq] / (1 - B1 ** t)) / (np.sqrt(vE[uniq] / (1 - B2 ** t)) + EPS)
         print(f'epoch {ep} loss {loss / n:.4f} {time.time() - t0:.0f}s', flush=True)
+        if on_epoch:
+            on_epoch(ep, P, loss / n)
     return P
 
 
@@ -148,6 +154,7 @@ def main():
     ap.add_argument('--lr', type=float, default=0.01)
     ap.add_argument('--limit', type=int, default=0)
     ap.add_argument('--save')
+    ap.add_argument('--tb', help='TensorBoard log dir (tensorboardX): curves, histograms, 3D map of the hidden layer')
     a = ap.parse_args()
     data = pathlib.Path(a.data)
     feat, tfeat = data / 'lid' / 'feat', data / a.src / 'feat'
@@ -155,32 +162,67 @@ def main():
     labels = sorted({r['lang'] for r in rows})
     L = {l: i for i, l in enumerate(labels)}
     y = np.array([L[r['lang']] for r in rows], np.int64)
+    del rows
     if a.limit:
         off, y = off[: a.limit + 1], y[: a.limit]
-    P = train(idx, off, y, len(labels), a.bits, a.dim, a.hidden, a.epochs, a.lr)
-    Q, q, scale = quantize(P)
-    rep = {'arch': 'mlp', 'bits': a.bits, 'dim': a.dim, 'hidden': a.hidden, 'epochs': a.epochs, 'lr': a.lr,
-           'rows': len(y), 'src': a.src}
-    for name, fd in (('valid', tfeat), ('bench', feat)):
-        i2, o2, r2 = load(fd, name, a.bits)
-        y2 = np.array([L.get(r['lang'], -1) for r in r2])
-        rep[f'{name}_acc'] = float((logits(Q, i2, o2).argmax(1) == y2)[y2 >= 0].mean())
-    i3, o3, r3 = load(feat, 'dev', a.bits)
-    zd = logits(Q, i3, o3)
-    yd = np.array([L.get(r['lang'] or '', -1) for r in r3])
-    keep = np.where(yd >= 0)[0]
-    even, odd = keep[::2], keep[1::2]
-    T = fit_temperature(zd[even], yd[even])
-    rep.update(dev_acc=float((zd.argmax(1) == yd)[keep].mean()), temperature=T,
-               ece_odd_raw=ece(softmax(zd[odd]), yd[odd]), ece_odd_cal=ece(softmax(zd[odd] / T), yd[odd]))
-    blob = serialize(Q, q, scale, labels, T)
-    rep['bytes'] = len(blob)
-    print(json.dumps(rep), flush=True)
-    if a.save:
-        models = data / 'lid' / 'models'
-        models.mkdir(exist_ok=True)
-        (models / f'{a.save}.bin').write_bytes(blob)
-        (models / f'{a.save}.json').write_text(json.dumps(rep), encoding='utf-8')
+    sets = {name: load(fd, name, a.bits) for name, fd in (('valid', tfeat), ('bench', feat), ('dev', feat))}
+    models = data / 'lid' / 'models'
+    models.mkdir(exist_ok=True)
+    tb = None
+    if a.tb:
+        from tensorboardX import SummaryWriter
+        tb = SummaryWriter(a.tb)
+        tb.add_text('config', json.dumps(vars(a)))
+
+    def log(t, loss, a1):
+        tb.add_scalar('train/loss', loss, t)
+        tb.add_scalar('train/hidden_units_off', float((a1 <= 0).all(0).mean()), t)  # silent on the whole batch
+
+    def finish(ep, P, loss):
+        Q, q, scale = quantize(P)
+        rep = {'arch': 'mlp', 'bits': a.bits, 'dim': a.dim, 'hidden': a.hidden, 'epochs': ep + 1, 'lr': a.lr,
+               'rows': len(y), 'src': a.src, 'loss': loss}
+        for name in ('valid', 'bench'):
+            i2, o2, r2 = sets[name]
+            y2 = np.array([L.get(r['lang'], -1) for r in r2])
+            rep[f'{name}_acc'] = float((logits(Q, i2, o2).argmax(1) == y2)[y2 >= 0].mean())
+        i3, o3, r3 = sets['dev']
+        zd = logits(Q, i3, o3)
+        yd = np.array([L.get(r['lang'] or '', -1) for r in r3])
+        keep = np.where(yd >= 0)[0]
+        even, odd = keep[::2], keep[1::2]
+        T = fit_temperature(zd[even], yd[even])
+        rep.update(dev_acc=float((zd.argmax(1) == yd)[keep].mean()), temperature=T,
+                   ece_odd_raw=ece(softmax(zd[odd]), yd[odd]), ece_odd_cal=ece(softmax(zd[odd] / T), yd[odd]))
+        blob = serialize(Q, q, scale, labels, T)
+        rep['bytes'] = len(blob)
+        print(json.dumps(rep), flush=True)
+        if a.save:  # one model per epoch: the cost decides the epoch, not the last one by default
+            for name in (f'{a.save}-e{ep + 1}', a.save):
+                (models / f'{name}.bin').write_bytes(blob)
+                (models / f'{name}.json').write_text(json.dumps(rep), encoding='utf-8')
+        if tb:
+            for k in ('loss', 'valid_acc', 'bench_acc', 'dev_acc', 'temperature', 'ece_odd_cal'):
+                tb.add_scalar(f'epoch/{k}', rep[k], ep + 1)
+            for k in ('E', 'W1', 'b1', 'W2', 'b2'):
+                tb.add_histogram(f'weights/{k}', P[k][::64] if k == 'E' else P[k], ep + 1)
+            x, _, _ = embed(Q['E'], i3, o3, 0, len(o3) - 1)
+            tb.add_histogram('hidden/dev_activations', forward(Q, x)[2], ep + 1)
+            tb.flush()
+
+    P = train(idx, off, y, len(labels), a.bits, a.dim, a.hidden, a.epochs, a.lr,
+              log=log if tb else None, on_epoch=finish)
+    if tb:  # 3D map: hidden layer of the bench (Tatoeba) and dev lines, and the 42 output directions
+        Q = quantize(P)[0]
+        hs, meta = [], []
+        for name in ('bench', 'dev'):
+            i2, o2, r2 = sets[name]
+            x, _, _ = embed(Q['E'], i2, o2, 0, len(o2) - 1)
+            hs.append(forward(Q, x)[2])
+            meta += [[r['lang'] or '-', name, ' '.join(str(r['text']).split())[:80]] for r in r2]
+        tb.add_embedding(np.concatenate(hs), metadata=meta, metadata_header=['lang', 'set', 'text'], tag='hidden', global_step=a.epochs)
+        tb.add_embedding(P['W2'].T, metadata=labels, tag='languages', global_step=a.epochs)
+        tb.close()
 
 
 if __name__ == '__main__':

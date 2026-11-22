@@ -21,7 +21,8 @@ SMOOTH = 0.1
 
 
 def load(feat: pathlib.Path, name: str, bits: int):
-    idx = np.fromfile(feat / f'{name}.idx', dtype=np.int32) & ((1 << bits) - 1)
+    idx = np.fromfile(feat / f'{name}.idx', dtype=np.int32)
+    idx &= (1 << bits) - 1  # in place: a 2 GB train.idx must fit twice in an 8 GB VM otherwise
     off = np.fromfile(feat / f'{name}.off', dtype=np.int32).astype(np.int64)
     rows = json.loads((feat / f'{name}.json').read_text(encoding='utf-8'))
     return idx, off, rows
