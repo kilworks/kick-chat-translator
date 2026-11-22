@@ -65,8 +65,10 @@ export const PROVIDER_ITEM_DEADLINE_MS = 8_000;
 export const PROVIDER_BATCH_DEADLINE_MS = 12_000;
 /**
  * How long a chat line waits on the worker before it shows the failure and its
- * retry button. Above the longest chain without a hung call; an answer that
- * arrives later is dropped, never written over the error.
+ * retry button. Deliberately shorter than a chain that meets two hung engines
+ * (12 s a batch each): past 20 s a chat line is gone from a fast chat anyway.
+ * The worker keeps going and caches what it gets; the page drops that late
+ * answer and never writes it over the error.
  * shortcut: starting value, revisit with the chain latencies read on a real fast chat.
  */
 export const CLOUD_ANSWER_DEADLINE_MS = 20_000;

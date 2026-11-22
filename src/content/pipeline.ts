@@ -495,7 +495,10 @@ export class TranslationPipeline {
     const context = this.contextFor(msg.channel, real, msg.username, lines);
     // Put on at once, "…" flashed on every line over the channel budget, whose
     // refusal comes back in milliseconds: two layouts a line for nothing.
-    const loading = setTimeout(() => showLoading(msg.injectionTarget), LOADING_DELAY_MS);
+    // Not on a row Kick has since given to another message: nothing would take it off.
+    const loading = setTimeout(() => {
+      if (!this.rowRecycled(msg)) showLoading(msg.injectionTarget);
+    }, LOADING_DELAY_MS);
     // Counterpart of `e2e.local`. This span covers the whole round trip the
     // reader waits through: coalescing window, SW cache lookup, provider call and
     // every fallback the chain walked. Not the provider latency the SW records,

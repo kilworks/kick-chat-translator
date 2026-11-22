@@ -138,6 +138,18 @@ describe('TranslationPipeline, waiting on the worker', () => {
     expect(showLoading).not.toHaveBeenCalled();
   });
 
+  // The delay opened a window the immediate "…" never had: Kick reuses a row
+  // for the next message, and a timer left from the old one marked the new
+  // one as waiting, where nothing would ever take it off.
+  it('puts no placeholder on a row recycled for another message meanwhile', async () => {
+    sendMock.mockReturnValue(new Promise(() => undefined));
+    const m = line(203);
+    await reader().onDomMessage(m);
+    m.injectionTarget.textContent = 'otra persona escribe otra cosa';
+    await vi.advanceTimersByTimeAsync(300);
+    expect(showLoading).not.toHaveBeenCalled();
+  });
+
   it('shows the placeholder once an answer is slow to come', async () => {
     let answer: (v: unknown) => void = () => undefined;
     sendMock.mockReturnValue(new Promise((resolve) => (answer = resolve)));
