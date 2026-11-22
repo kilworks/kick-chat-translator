@@ -1,4 +1,6 @@
 #!/bin/sh
+# RETIRED 2026-11-22 (kil: no PC in the loop): the collection runs on Oracle, oracle_collect.sh and
+# lid_scan.py; the scheduled task LidCollect is disabled. Kept for the record.
 # Whole chat collection, autonomous: run by the scheduled task LidCollect (at logon, and by hand with
 # schtasks /Run /TN LidCollect). Each part starts only if it is not already running, then loops.
 #   remote  Oracle + the 5 InstaBox VMs (collect_loop.sh), each VM only when no job holds it

@@ -1,0 +1,17 @@
+[Unit]
+Description=LID Twitch chat collection on Oracle and InstaBox (tools/lid/oracle_collect.sh)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=ubuntu
+ExecStart=/bin/sh /home/ubuntu/lid-collect/oracle_collect.sh
+Restart=always
+RestartSec=60
+# Oracle airs first: the readers stay far under the pushers
+Nice=10
+CPUQuota=50%
+MemoryMax=2G
+
+[Install]
+WantedBy=multi-user.target
