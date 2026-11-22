@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.2] - 2026-11-22
+
 ### Changed
 
 - **"…" only shows on a line still waiting after a quarter of a second.** On a
