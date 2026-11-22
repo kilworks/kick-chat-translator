@@ -37,6 +37,7 @@ MEASURE = threading.Lock()  # one cost measure at a time on the PC
 NOTE = threading.Lock()  # the journal counter is shared by the VM threads
 WAIT_S = 300  # a held VM is asked again after this
 FAILS = {}  # errors per run name: a run is dropped at 3
+LEFT = [0]  # configs not finished yet: a worker with an empty queue waits while one may come back from a held VM
 
 
 def log(*a):
@@ -159,7 +160,10 @@ def worker(vm, q, data, src, tbdir):
         try:
             cfg = q.get_nowait()
         except queue.Empty:
-            break
+            if not LEFT[0]:
+                break
+            time.sleep(WAIT_S)
+            continue
         try:
             with ibx.hold([vm]) as n:
                 if n is not None:
@@ -168,6 +172,8 @@ def worker(vm, q, data, src, tbdir):
                         setup(mid, D, data, src)
                         ready = True
                     run(mid, D, cfg, data, src, tbdir)
+                    with NOTE:
+                        LEFT[0] -= 1
                     continue
             why = 'tenue par un autre job'
         except BaseException as e:  # ibx raises SystemExit, which a thread swallows without a word
@@ -176,6 +182,8 @@ def worker(vm, q, data, src, tbdir):
             why = f'erreur {type(e).__name__} : {str(e)[:160]}'
             if FAILS[cfg[0]] >= 3:
                 note(tbdir, f'{cfg[0]} abandonne apres 3 erreurs ({vm}) : {why}')
+                with NOTE:
+                    LEFT[0] -= 1
                 continue
         q.put(cfg)  # the config waits for the next free VM
         log(vm, why, ', nouvel essai dans', WAIT_S, 's')
@@ -214,6 +222,7 @@ def main():
     q = queue.Queue()
     for c in cfgs:
         q.put(c)
+    LEFT[0] = len(cfgs)
     note(tbdir, f'vague lancee sur {a.src} : ' + ', '.join(c[0] for c in cfgs))
     jobs = [threading.Thread(target=worker, args=(v, q, data, a.src, tbdir)) for v in a.vms.split(',') if v]
     for j in jobs:
