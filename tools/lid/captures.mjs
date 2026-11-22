@@ -21,14 +21,16 @@ const evaluated = new Set([...T.sets.dev, ...T.sets.heldout].map((r) => lidNorma
 const rows = [];
 const seen = new Set();
 for (const f of fs.readdirSync(data).filter((n) => /^capture-.*\.jsonl$/.test(n))) {
-  for (const line of fs.readFileSync(path.join(data, f), 'utf8').split('\n')) {
+  const lines = fs.readFileSync(path.join(data, f), 'utf8').split('\n');
+  for (let pos = 0; pos < lines.length; pos++) {
+    const line = lines[pos];
     if (!line) continue;
     const r = JSON.parse(line);
     const text = trimForEngine(parseKickContent(r.content).realText);
     const norm = lidNormalize(text);
     if (!/\p{L}/u.test(norm) || evaluated.has(norm) || seen.has(norm)) continue;
     seen.add(norm);
-    rows.push({ text, lang: r.lang });
+    rows.push({ text, lang: r.lang, ch: `${f.replace(/\.jsonl$/, "")}:${r.ch}`, pos });
   }
 }
 const idx = [];
