@@ -1,0 +1,43 @@
+#!/bin/sh
+# Whole chat collection, autonomous: run by the scheduled task LidCollect (at logon, and by hand with
+# schtasks /Run /TN LidCollect). Each part starts only if it is not already running, then loops.
+#   remote  Oracle + 2 InstaBox VMs (collect_loop.sh)
+#   twitch  PC IRC reader, 2 h runs appended to twitch-1.jsonl
+#   kick    PC Kick capture (headed browser), one file per batch, backs off on refusals itself
+#   dash    the console dashboard window
+# Stop everything: create <data>/lid/raw-chat/collect.STOP (remove it before restarting).
+HERE=/c/Users/kil/Downloads/kick-chat-translator/tools/lid
+RAW=/c/Users/kil/kct-data/lid/raw-chat
+PARTS=${*:-remote twitch kick dash}
+export PYTHONIOENCODING=utf-8
+
+running() {  # a process whose command line matches $1 already runs
+  powershell.exe -NoProfile -c "if (Get-CimInstance Win32_Process | ? { \$_.CommandLine -match '$1' -and \$_.CommandLine -notmatch 'collect_all|Get-CimInstance' }) { exit 0 } else { exit 1 }"
+}
+
+twitch() {
+  while [ ! -f "$RAW/collect.STOP" ]; do
+    echo "--- $(date '+%H:%M') lecteur PC relance" >> "$RAW/twitch-log.txt"
+    python -u "$HERE/twitch_irc.py" --channels "$RAW/twitch-channels.json" --out "$RAW/twitch-1.jsonl" --hours 2 >> "$RAW/twitch-log.txt" 2>&1
+    sleep 30
+  done
+}
+
+kick() {
+  cd "$HERE/../.." || exit 1
+  while [ ! -f "$RAW/collect.STOP" ]; do
+    echo "--- $(date '+%H:%M') lot autonome" >> "$RAW/kick-log.txt"
+    node "$HERE/kick_capture.mjs" --out "$RAW/kick-$(date +%m%d%H%M).jsonl" --rounds 27 --per-lang 40 --interval 60 >> "$RAW/kick-log.txt" 2>&1
+    sleep 120
+  done
+}
+
+for p in $PARTS; do
+  case $p in
+    remote) running 'collect_loop.sh|remote_collect.py' || sh "$HERE/collect_loop.sh" ibx-w4,ibx-w5 & ;;
+    twitch) running 'twitch_irc.py --channels .*twitch-channels.json' || twitch & ;;
+    kick)   running 'kick_capture.mjs' || kick & ;;
+    dash)   running 'watch_collect.py' || cmd.exe //c start "Collecte LID" python "$(cygpath -w "$HERE/watch_collect.py")" ;;
+  esac
+done
+wait
