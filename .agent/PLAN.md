@@ -1662,3 +1662,82 @@ surfaces touched this pass. Counted in the pass report.
 - [ ] `verify_keyboard` stays red on the 6 options snapshots, all dead-arrows: the frozen dump carries no listeners (same kit limit as above). Arrow keys are unit-tested.
 - [ ] `barLangFilterTip` writes the window size 10 into 42 strings; changing `LANG_BLOCKED_WINDOW` means editing them all.
 - [ ] Translations of this wave's keys (5 `t()`, 11 earlier, `barLangFilterTip`): model-written, no native review.
+
+## Fast chat performance (feat/perf-fast-chat, 2026-11-22)
+
+Symptom reported on the fastest Kick chats: a growing lag ("a kind of buffer") that only a reload clears. Base 3.6.1 (072aac5). Harness: `test/e2e/charge-chat.mjs` (offline, every engine faked) and its `--live` mode (kick.com, anonymous profile, read only).
+
+File sets: root only on `src/content/injector.ts`, `src/content/inject.css`. Agent 1 (sonnet, review, 2026-11-22): read only on the branch diff 072aac5..HEAD and CHANGELOG.md, writes nothing.
+
+### Phase 0: measure (in progress)
+- [x] Harness: production POST batch fake, every engine answered, catch-all, drift verdict (red on a leak control, green on 3.6.1). Commit fedf049.
+- [ ] Offline S1 to S5 and witnesses on 3.6.1 release.
+- [ ] Live A (no extension), B (3.6.1, fake engine), C (3.6.1, real engine, 15 min).
+- [ ] Verdict: symptom, attribution, each of R1 to R6, M1 to M11, K1.
+
+### Robustness (R)
+- [x] R1 provider call with no deadline: 8 s per line, 12 s per batch, then the next engine. Witness red (test timed out) then green.
+- [x] R2 page waits forever on the worker: 20 s, then the line shows its retry. Witness red then green.
+- [x] R3 one hide timer per budget refusal: one timer held 5 s. Witness 11 timers then 1.
+- [x] R4 bar remount leaves its panel and listener: witness 11 panels then 1.
+- [x] R5 hover listeners stack on a recycled row: witness 10 pairs then 1.
+- [x] R6 attach polling doubles on reset before the list exists: witness 6 observers then 2, 2 after stop then 0.
+
+### Measured on 3.6.1 (phase 0, offline, release build)
+- S1 (20 msg/s, 30 min): heap after GC climbs linearly 9.46 to 11.63 MB (+10.3 %, drift red), nodes, listeners, cost, latency, pending all flat. Heap snapshot diff (P0-S1t, minute 5 to 19): +12280 strings (+520 KB) and +400 KB of array backing store with no new array, a growing Map. It was the harness: its send counter kept every text sent in a Map inside the extension's world (18697 texts on S1). Counter now constant memory (fixture lines counted by number in a preallocated array); P0-S1c re-measures 3.6.1 with it. Heap drift of the first S1 and of P0-S3 (old counter) is not the extension's.
+- Overhead over the witness, S1: script +8.1 ms/s, tasks +42.8 ms/s, layouts +25.6/s, style recalcs +28.4/s. S2 (25 msg/s): +9.8, +46.9, +35.2, +39.4. Most of the cost is DOM writes, not script.
+- Channel budget refuses 67 % (S1) and 73 % (S2) of sends; each refused line had "…" put on and taken off.
+- M1 refuted on S1 and S2: sends per distinct row 1.001 and 1.002.
+- Profile: about 30 % of the extension's script is row identification in the observer (text and user extraction); `extractChannelSlug` builds its reserved Set per call; `showThrottleIndicator` queries the bar per refusal.
+
+### Phase 2
+- [x] M5 "…" after 250 ms instead of at once. Witness red (placeholder twice on lines answered at once, at 0 ms on a slow one), green. Browser measure pending. Visible: CHANGELOG line.
+- [x] M5 browser measure, S2 offline (25 msg/s, 10 min, release), R only against R + M5: placeholders 780 a minute to about 145, extra layouts over the witness 31.9/s to 12.9/s, extra style recalcs 36.1/s to 17/s, extra task time 31.4 to 22.2 ms/s, display latency p95 479 to 471 ms. Commit 976d63e.
+- [ ] M4 confirmed (2.35 passes per message on 3.6.1) but its fix measured no gain once M5 was in: R + M5 against R + M5 + M4, extra script 6.0 against 6.1 ms/s, extra tasks 22.2 against 22.7 ms/s. M5 removed most of the insertions that sent a row back through process. Not committed: a check on every mutation record, and a risk of skipping a real Kick change, for nothing measured. Same for building `extractChannelSlug`'s Set once (inside the same build, nothing measurable).
+- [ ] `showThrottleIndicator` queries the bar on every budget refusal (about 0.5 ms/s on S1). Left: caching it in the pipeline loses the hourglass when the guard remounts the bar during a refusal streak.
+
+### Measured on 3.6.1 (phase 0, live kick.com, fastest of five listed channels)
+- Kick's chat now arrives over its realtime service (Centrifugo pushes, several per frame); rows carry no message id and Kick renumbers `data-index` once its list is full. The harness matches frame to row on name and text.
+- A, no extension, 20 min: chat lag frame to row p50 about 270 ms, p95 about 510 ms, flat; heap, nodes, listeners flat; drift green. Kick shows 50 to 175 rows a minute while the socket carries 400 to 1600 messages.
+- B, 3.6.1 with the engine faked, 20 min: drift red on script (+60 %) and tasks (+31 %), but traffic doubled and translations tripled over the pass. Per WebSocket message, script goes 1.3 to 2.2 ms with the extension and 1.3 to 1.95 ms without. Chat lag p95 flat at about 510 ms, as without.
+- Profiles: the extension's own script is 35 to 52 ms per 30 s. Kick's virtualizer (`resizeItem` and `_measureElement`) grows with session length: 43 to 260 ms per 30 s at minutes 3 and 18 without the extension, 40 to 465 ms with it. Root cause on Kick's side (K1); every row height change the extension makes feeds it, and on 3.6.1 a refused or fast line changed height twice ("…" on, then off). M5 targets exactly that.
+- The offline fixture has no virtualizer, which is why every offline pass stayed green.
+- C, 3.6.1 with the real engine, 15 min: drift green. Display latency p50 about 800 ms, p95 1.2 to 2.3 s; chat lag p95 flat at about 500 ms; 480 of 486 sends answered ok.
+
+### Phase 0 verdict
+- Symptom: a cost that grows with session length on kick.com, with or without the extension: Kick's virtualizer re-measures rows (`resizeItem`, `_measureElement`) at 6 times its starting cost after 18 min without the extension, 11 times with 3.6.1. The chat's own lag (frame to row) stayed flat at p95 about 510 ms over 20 min in every pass, so the visible "buffer" did not appear within 20 min; the growing cost is its likely start. The Brave copy kil runs is 3.3.0, not 3.6.1.
+- Attribution: root on Kick (K1), amplified by every row height change the extension makes. Nothing of the extension's own grows: heap, nodes, listeners, its script share (35 to 52 ms per 30 s live) are flat.
+- R1 to R6: fixed, red then green witnesses (commits ff4bed9, 85085a3, fd18046, 3376642). R4 measured: 2 language panels from the first minute on every offline pass; 1 live.
+- M1 refuted: sends per distinct row 1.001 to 1.002 on S1 to S5; live, no resend.
+- M2 not seen: no `drop.recycled.unrescued` on S2 (metrics build); not measured on recycling with metrics.
+- M3 refuted as a cost: the extension's whole script is about 1.5 ms/s live, three observers inside it cannot reach the 10 % that would justify a rewrite.
+- M4 confirmed: 2.35 `dom.row.seen` per message (S2, metrics build). Fix measured no gain after M5, not kept (see Phase 2).
+- M5 confirmed: "…" on then off on every refused or fast line, two height changes feeding Kick's virtualizer; 67 to 73 % of sends are refused on a fast chat. Fixed.
+- M6 refuted: under 429 bursts (S3) MyMemory got one call per line, 1823 for 1823 lines, no storm.
+- M7 refuted: language detection about 3 % of the extension's script on S1 (profile), under the 10 % bar.
+- M8 refuted: no bar function in the profile's top 15.
+- M9 refuted: 0 theme attribute changes in 20 min live.
+- M10 not measured: worker side, usage stats off in a fresh profile.
+- M11 not measured: needs hours of worker lives, out of this pass.
+- K1 confirmed, see above. Not ours to fix; the extension can only change heights less often.
+
+### Review wave (sonnet, 2026-11-22) and corrections
+- [x] Delayed "…" could land on a row recycled for another message within 250 ms: timer now checks the row. Witness red then green.
+- [x] Page deadline (20 s) is shorter than a chain meeting two hung engines (12 s a batch each): kept on purpose, comment corrected.
+- [ ] `mountFloatingBar` in a second chat host detaches the first bar's outside-click listener and removes its panel (one module-level detach). Only matters if Kick shows a hidden chat copy again with its old bar; not reproduced, left open.
+- [ ] The local-first path and `forceRetranslate` still show "…" at once (not covered by M5, consistent with the CHANGELOG).
+
+### Waiting on kil (this pass)
+- [k] Channel budget: at the default 200 a minute, 66 to 73 % of sends are refused at 20 to 25 msg/s (offline S1 to S5), so most lines of a fast chat stay untranslated by design. Raise, lower or leave it: a default the reader sees, not changed here.
+- [k] `anyProviderReady` semantics: untouched (M6 refuted under 429 bursts, one MyMemory call per line, no storm). Nothing to decide unless you want it revisited.
+- [k] Release: CHANGELOG [Unreleased] filled, version not changed. Merge, tag and stores are yours.
+- [k] Validation on your Brave: the copy loaded today is 3.3.0. Load the release build of this branch (copied to `Downloads/kct-perf-build/`) unpacked, disable the other KCT copies, reset the target language, watch the fastest stream for 30 min, report, remove it.
+- [k] Live visual smoke with Claude in Chrome: not run in this pass (tools not connected in this session).
+
+### Phase 3, final measures
+- Run in concurrent pairs (3.6.1 and this branch at the same time) to save wall time: both get the same contention and the same live traffic. A stale serial queue ran a fifth browser beside batch 1 (stopped at 10:24); it weighed on both builds alike.
+- Live, same channel, same 20 min, paired: no difference between builds. Both drift red on script per message (1.5 to 1.8 ms on 3.6.1, 1.53 to 1.85 on this branch) and heap (+10.0 %, +10.2 %), as the page drifts without the extension (A). Kick's virtualizer at minute 18: 214 against 211 ms per 30 s. Chat lag p95 flat at about 520 ms on both. At about 32 translations a minute the budget refused nothing, so M5 saved 25 % of placeholders here (564 to 423), not the 81 % of a chat over budget. Live drift criterion (<= 10 %) not met by either build: the drift is Kick's.
+- S1 pair 1 (15 min): extra tasks over the witness 28.9 to 19.2 ms/s (-34 %), layouts 25.6/s to 10.3/s, style recalcs 28.4/s to 13.1/s, script 5.7 to 5.1 ms/s (-11 %); drift green on both; latency p95 490 against 488 ms.
+- S1 and S2, two concurrent pairs each (15 min): extra tasks 31.0 to 21.8 ms/s (S1, -30 %) and 35.0 to 24.1 ms/s (S2, -31 %), spread between repeats 4 to 8; layouts -60 % and -63 %, style recalcs -54 % and -57 % (spread about 0); script 6.4 to 5.7 and 7.4 to 6.8 ms/s, inside the spread (no gain). Drift green on all eight. Criterion "overhead halved" not met: what stays is the translation node each translated line adds and the per-row identification (M4, tried, no gain).
+- live-recycle 15 (real engine, release build of this branch): 45 samples, peak 21 translations, 0 duplicate, 0 orphan, 0 error.
+- Gates: typecheck, lint, 2316 unit tests, build, build:firefox, build, content.js 251.5 KB (audit within margin), run-gates 42/42.
