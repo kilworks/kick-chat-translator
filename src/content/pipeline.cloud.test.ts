@@ -23,7 +23,7 @@ vi.mock('./localEngine', () => ({
 vi.mock('./memcache', () => ({ memCache: { get: () => undefined, set: vi.fn() } }));
 
 import { TranslationPipeline } from './pipeline';
-import { inject, showError, showThrottleIndicator } from './injector';
+import { inject, showError, showLoading, showThrottleIndicator } from './injector';
 import { defaultSettings } from '~/shared/settings';
 
 /** onDomMessage does not await the translate path, so let it settle before asserting. */
@@ -120,8 +120,36 @@ describe('TranslationPipeline, waiting on the worker', () => {
     vi.mocked(inject).mockClear();
     vi.mocked(showError).mockClear();
     vi.mocked(showThrottleIndicator).mockClear();
+    vi.mocked(showLoading).mockClear();
   });
   afterEach(() => vi.useRealTimers());
+
+  // "…" went on every line sent and came off when the answer did. A refusal
+  // answers in milliseconds, so on a chat over its budget most lines flashed it
+  // for nothing, and each flash cost the page two layouts.
+  it('shows no placeholder on a line the worker answers at once', async () => {
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: false, error: { code: 'channel_budget', message: 'x' } } });
+    await reader().onDomMessage(line(200));
+    await vi.advanceTimersByTimeAsync(1_000);
+    sendMock.mockResolvedValue(success);
+    await reader().onDomMessage(line(201));
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(inject).toHaveBeenCalledTimes(1);
+    expect(showLoading).not.toHaveBeenCalled();
+  });
+
+  it('shows the placeholder once an answer is slow to come', async () => {
+    let answer: (v: unknown) => void = () => undefined;
+    sendMock.mockReturnValue(new Promise((resolve) => (answer = resolve)));
+    await reader().onDomMessage(line(202));
+    await vi.advanceTimersByTimeAsync(200);
+    expect(showLoading).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(100);
+    expect(showLoading).toHaveBeenCalledTimes(1);
+    answer(success);
+    await vi.advanceTimersByTimeAsync(10);
+    expect(inject).toHaveBeenCalledTimes(1);
+  });
 
   // `send` had no deadline: a worker that never answered kept the row on "…"
   // and the message alive for as long as the page lived.

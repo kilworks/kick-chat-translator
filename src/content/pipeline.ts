@@ -24,6 +24,8 @@ const metrics = createMetrics('content');
 
 /** How long the hourglass stays after the last line the channel budget refused. */
 const THROTTLE_HOLD_MS = 5000;
+/** "…" only on a line still waiting after this long: a refusal or a cached answer comes back well before. */
+const LOADING_DELAY_MS = 250;
 
 /** The worker's answer, or undefined once `ms` has passed; an answer after that is dropped. */
 function withinDeadline<T>(answer: Promise<T>, ms: number): Promise<T | undefined> {
@@ -491,7 +493,9 @@ export class TranslationPipeline {
     // right person; everything else gets the cheap 2-line window.
     const lines = isContextCritical(sourceLang) ? CONTEXT_LINES_HARD : CONTEXT_LINES;
     const context = this.contextFor(msg.channel, real, msg.username, lines);
-    showLoading(msg.injectionTarget);
+    // Put on at once, "…" flashed on every line over the channel budget, whose
+    // refusal comes back in milliseconds: two layouts a line for nothing.
+    const loading = setTimeout(() => showLoading(msg.injectionTarget), LOADING_DELAY_MS);
     // Counterpart of `e2e.local`. This span covers the whole round trip the
     // reader waits through: coalescing window, SW cache lookup, provider call and
     // every fallback the chain walked. Not the provider latency the SW records,
@@ -503,6 +507,7 @@ export class TranslationPipeline {
     // shown while saying something else. `sourceLang` still sizes the context
     // window above, where being wrong costs nothing.
     const outcome = await this.requestCloud(real, this.effTarget, msg.channel, context, false, hint);
+    clearTimeout(loading);
     if ((!outcome || (!outcome.ok && outcome.error.code !== 'channel_budget')) && (await this.answerOnDevice(msg, real, sourceLang, hint))) return;
     if (!outcome) {
       showError(msg.injectionTarget, localised('errTranslateFailed', 'Translation failed'), () => void this.forceRetranslate(msg, real));
