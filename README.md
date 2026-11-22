@@ -42,7 +42,7 @@ changed in the settings, and a reading language can be remembered per channel.
   (Brazilian and European Portuguese, Simplified and Traditional Chinese, Cantonese)
 - **The extension speaks them too**: settings, popup and chat bar in all 43, picked from a menu with flags
 - **Free out of the box** with Google Translate. Add your own free DeepL key for better European languages;
-  MyMemory and Lingva take over when an engine fails
+  MyMemory and Lingva take over when an engine fails or gives no answer within 8 seconds
 - **On-device translation** in Chrome and Edge where the browser offers it, as a fallback by default or
   first if you pick it: 22 ms instead of 1.6 s and the text never leaves your computer, but measured less
   accurate than Google on all six languages tested
@@ -222,6 +222,14 @@ on its held-out half, and without `KCT_BENCH` that test skips. `test/e2e/transla
 error grid. `test/e2e/exclusivity-check.mjs` checks every "only this language writes this word" rule of the
 detector against word frequency lists for the 42 languages that have one (OpenSubtitles, kept outside the
 repository), and lists each rule another language also writes.
+
+`test/e2e/charge-chat.mjs` measures what the extension costs on a fast chat and whether that cost grows over a
+session: it plays a seeded chat at a set rate (`--debit`, `--duree`), answers every engine locally with a set
+latency, 429 bursts or hung calls, samples CPU, layouts, heap, nodes and display latency every interval, and gives a
+drift verdict (`--temoin-seul` runs the page without the extension, `--recyclage` reuses rows like Kick's list).
+`--live --decouvrir` ranks the busiest channels of Kick's live listing, and `--live --chaine <name>` runs the same
+measure on kick.com, read only, timing each message from its WebSocket frame to its row (`--moteur-reel` uses the
+real engine, 15 minutes at most).
 
 A line no table recognises is checked against the browser's own detector, `i18n.detectLanguage`: what it reliably
 names wins, a guess of ours stands only if its first choice agrees, otherwise the line has no known language. That
