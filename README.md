@@ -1,27 +1,34 @@
 <div align="center">
 
-<img src="public/icons/icon128.png" alt="" width="80" height="80">
+<img src="public/icons/icon128.png" alt="" width="96" height="96">
 
 # Kick Chat Translator
 
-Read any Kick chat in your own language, and reply in the channel's.<br>
+**Read any Kick chat in your own language, and reply in the channel's.**<br>
 Free, no account, nothing to set up. 43 languages, in the chat and in the extension itself.
 
-**[Add to Chrome, Brave or Edge](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)** &nbsp;·&nbsp; **[Add to Firefox](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)** &nbsp;·&nbsp; [Discord](https://discord.gg/udDzxQRyQ9)
+[![Add to Chrome, Brave or Edge](https://img.shields.io/badge/Add_to-Chrome%2C_Brave%2C_Edge-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
+[![Add to Firefox](https://img.shields.io/badge/Add_to-Firefox-FF7139?style=for-the-badge&logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)
+[![Join the Discord](https://img.shields.io/badge/Join_the-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/udDzxQRyQ9)
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Firefox Add-on](https://img.shields.io/amo/v/kick-chat-translator?label=Firefox%20Add-on&color=53fc18)](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)
 [![CI](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/kilworks/kick-chat-translator/badge)](https://scorecard.dev/viewer/?uri=github.com/kilworks/kick-chat-translator)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
-[Français](README.fr.md) · [Español](README.es.md) · [Português (Portugal)](README.pt-PT.md) · [Português (Brasil)](README.pt-BR.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Svenska](README.sv.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Українська](README.uk.md) · [Türkçe](README.tr.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [ไทย](README.th.md) · [Tiếng Việt](README.vi.md) · [Bahasa Indonesia](README.id.md) · [हिन्दी](README.hi.md) · [Suomi](README.fi.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Ελληνικά](README.el.md) · [Magyar](README.hu.md) · [Български](README.bg.md) · [Català](README.ca.md) · [Slovenščina](README.sl.md) · [Eesti](README.et.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [فارسی](README.fa.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Bahasa Melayu](README.ms.md) · [Filipino](README.tl.md) · [粵語](README.yue.md)
 
 <img src="screenshots/demo.gif" alt="Spanish chat messages arrive one by one, each with its English translation underneath; then an English reply is typed, a Spanish preview appears above the chat box, and Tab swaps it in" width="360">
 
-[Watch it on a real chat](https://www.youtube.com/watch?v=NoGJeUrwy9o)
+[Watch it on a real chat](https://www.youtube.com/watch?v=NoGJeUrwy9o) &nbsp;·&nbsp; Watching Twitch too? [Twitch Chat Translator](https://github.com/kilworks/twitch-chat-translator) does the same there.
 
-Watching Twitch too? [Twitch Chat Translator](https://github.com/kilworks/twitch-chat-translator) does the same there.
+<details>
+<summary>Read this page in another language</summary>
+<br>
+
+[Français](README.fr.md) · [Español](README.es.md) · [Português (Portugal)](README.pt-PT.md) · [Português (Brasil)](README.pt-BR.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Svenska](README.sv.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Українська](README.uk.md) · [Türkçe](README.tr.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [ไทย](README.th.md) · [Tiếng Việt](README.vi.md) · [Bahasa Indonesia](README.id.md) · [हिन्दी](README.hi.md) · [Suomi](README.fi.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Ελληνικά](README.el.md) · [Magyar](README.hu.md) · [Български](README.bg.md) · [Català](README.ca.md) · [Slovenščina](README.sl.md) · [Eesti](README.et.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [فارسی](README.fa.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Bahasa Melayu](README.ms.md) · [Filipino](README.tl.md) · [粵語](README.yue.md)
+
+</details>
 
 </div>
 
@@ -36,7 +43,7 @@ Watching Twitch too? [Twitch Chat Translator](https://github.com/kilworks/twitch
 The channel's language is read from Kick itself, so there is nothing to configure. Both languages can be
 changed in the settings, and a reading language can be remembered per channel.
 
-## What you get
+## Features
 
 - **43 languages**, right to left included (Arabic, Hebrew, Persian), with regional variants kept apart
   (Brazilian and European Portuguese, Simplified and Traditional Chinese, Cantonese)
@@ -53,7 +60,7 @@ changed in the settings, and a reading language can be remembered per channel.
 - **Four display styles**: under the message, on the same line, in place of it, or only on hover
 - **Pause one channel** from the chat bar without stopping the others. Switching channels or updating the
   extension keeps open tabs translating, no reload
-- Chrome, Brave, Edge and Firefox
+- **Chrome, Brave, Edge and Firefox**
 
 | Chat, translated as it scrolls | The toolbar popup |
 |---|---|
@@ -66,16 +73,21 @@ changed in the settings, and a reading language can be remembered per channel.
 <sub>Taken from the shipping build in a chat room this repository makes up: the usernames and messages are
 invented and the translations are answered locally, so no real person's handle ends up on this page.</sub>
 
+## Privacy
+
+No account, no server of mine, and no analytics unless you opt in to a daily anonymous count sent to Google
+Analytics (engines used, errors, speed, never your messages, names or channels). Chat messages go to the
+translation provider you picked and nowhere else, and in on-device mode not even there. A copy installed from
+a store makes no other request. A copy installed by hand asks GitHub for the latest release tag, at most every
+six hours, to know whether to show its update badge. [Details](PRIVACY.md)
+
 ## Install
 
-[Chrome, Brave, Edge: Chrome Web Store](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
-&nbsp;·&nbsp;
-[Firefox: Mozilla Add-ons](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)
-
-Store copies update themselves.
+Use the buttons at the top. Store copies update themselves.
 
 <details>
-<summary>Install by hand, from a release zip</summary>
+<summary><b>Install by hand</b>, from a release zip</summary>
+<br>
 
 Download the zip for your browser from [Releases](https://github.com/kilworks/kick-chat-translator/releases/latest) and unzip it.
 
@@ -88,9 +100,13 @@ popup links to the store.
 
 </details>
 
-## Translation engines
+## Details
 
-Four providers, chained: when one fails, the next takes over. The order is yours to set.
+<details>
+<summary><b>Translation engines</b>: four providers, chained, and the browser's own translator</summary>
+<br>
+
+When one provider fails, the next takes over. The order is yours to set.
 
 | Provider | Key | Note |
 |---|---|---|
@@ -105,7 +121,11 @@ quota. Chrome and Edge 138 and later can offer it, though not every copy does, a
 its model downloaded once, with one click from the bar. Firefox does not have it. Wherever it is missing,
 the cloud chain takes over and nothing breaks.
 
-## Settings
+</details>
+
+<details>
+<summary><b>Settings</b>: what each tab of the options page holds</summary>
+<br>
 
 Click the gear on the chat bar, or right-click the extension icon and choose Options. The page opens on
 Display.
@@ -125,54 +145,92 @@ Display.
 - The language button in the chat's action bar: one click switches between the channel's language and
   your last pick, press and hold opens the list, typing two letters filters it
 
-## Supported languages
+</details>
+
+<details>
+<summary><b>Supported languages</b>: all 43</summary>
+<br>
 
 English · French · Spanish · Portuguese · Portuguese (Brazil) · German · Italian · Dutch · Polish · Swedish · Czech · Slovak · Romanian · Russian · Ukrainian · Turkish · Arabic · Hebrew · Japanese · Korean · Chinese (Simplified) · Chinese (Traditional) · Thai · Vietnamese · Indonesian · Hindi · Finnish · Norwegian · Danish · Greek · Hungarian · Bulgarian · Catalan · Slovenian · Estonian · Lithuanian · Latvian · Persian · Bengali · Tamil · Malay · Filipino · Cantonese
 
 Chat is translated into any of them, and the extension's own interface is available in each one.
 
-## Privacy
-
-No account, no server of mine, and no analytics unless you opt in to a daily anonymous count sent to Google
-Analytics (engines used, errors, speed, never your messages, names or channels). Chat messages go to the translation provider you picked and
-nowhere else, and in on-device mode not even there. A copy installed from a store makes no other request. A
-copy installed by hand asks GitHub for the latest release tag, at most every six hours, to know whether to
-show its update badge. [Details](PRIVACY.md)
+</details>
 
 ## FAQ
 
-**Messages aren't being translated.**
+<details>
+<summary><b>Messages aren't being translated.</b></summary>
+<br>
+
 Open the Activity tab in the settings and press "Read decisions": it lists the last 50 lines and says why
 each one was translated or left alone. Most skipped lines are skipped on purpose. Over one live session, 213
 of 234 were the same user repeating themselves, 9 were too short, 7 were emoji or laughter only, and 1 was
 already in the reading language. A small filter mark in the chat bar means your source language allowlist
-is holding lines back: the popup links straight to it. If the tab shows nothing at all, the extension is not seeing the chat:
-please open an issue.
+is holding lines back: the popup links straight to it. If the tab shows nothing at all, the extension is not
+seeing the chat: please open an issue.
 
-**The green bar disappeared.**
+</details>
+
+<details>
+<summary><b>The green bar disappeared.</b></summary>
+<br>
+
 Refresh the page. If it happens again, open an [issue](https://github.com/kilworks/kick-chat-translator/issues)
 with the channel and what you did before.
 
-**How do I get better translations?**
+</details>
+
+<details>
+<summary><b>How do I get better translations?</b></summary>
+<br>
+
 Add a free DeepL key in the settings. The free tier covers a million characters a month, and DeepL is only
 spent on the language pairs where it beats the free engines.
 
-**Which display style should I use?**
+</details>
+
+<details>
+<summary><b>Which display style should I use?</b></summary>
+<br>
+
 Below the message. The other three work, and are still being adjusted.
 
-**Can I use the extension in my language?**
+</details>
+
+<details>
+<summary><b>Can I use the extension in my language?</b></summary>
+<br>
+
 Yes. It follows your browser's language, and the menu at the top of the settings switches it to any of
 the 43.
 
-**Does it work on VOD replays?**
+</details>
+
+<details>
+<summary><b>Does it work on VOD replays?</b></summary>
+<br>
+
 Yes, the same way as on live streams.
 
-**It broke after a Kick update.**
+</details>
+
+<details>
+<summary><b>It broke after a Kick update.</b></summary>
+<br>
+
 Kick sometimes changes how its chat is built. Open an [issue](https://github.com/kilworks/kick-chat-translator/issues)
 and it gets patched.
 
-**Is this made by Kick?**
+</details>
+
+<details>
+<summary><b>Is this made by Kick?</b></summary>
+<br>
+
 No. It is an independent open-source project, not affiliated with Kick.
+
+</details>
 
 ## What's new
 
@@ -192,6 +250,10 @@ Every release, with what changed and the measurement behind it:
 [Releases](https://github.com/kilworks/kick-chat-translator/releases) and [CHANGELOG.md](CHANGELOG.md).
 
 ## Development
+
+<details>
+<summary><b>Build, test and release</b></summary>
+<br>
 
 ```bash
 git clone https://github.com/kilworks/kick-chat-translator.git
@@ -217,6 +279,22 @@ node test/e2e/store-shots-fixture.mjs --lang=ja         # the store screenshots,
 node test/e2e/store-shots-fixture.mjs --gif             # English store screenshots, the README images and this GIF
 ```
 
+Interface strings live in `src/shared/i18n/` (popup and options, keyed by the English text) and
+`src/content/i18n/` (chat bar, keyed by id with the English text as the fallback), one file per language;
+tests hold every file to the full key set. Store texts live in [store/](store/), and a release is a version
+tag: CI builds, checks and publishes it to both stores, and signs build provenance for the zips
+(`gh attestation verify <zip> -R kilworks/kick-chat-translator`). The store keys are only readable by the
+publish job, which installs nothing. Dependabot and OpenSSF Scorecard watch the dependencies and the
+workflows. To report a vulnerability, see [SECURITY.md](SECURITY.md).
+
+Stack: Manifest V3, Vite, TypeScript, Preact, Tailwind.
+
+</details>
+
+<details>
+<summary><b>Measuring detection, translation quality and load</b></summary>
+<br>
+
 Detection is also measured on real Kick chat, annotated by two independent annotators. That chat belongs to
 other people, so it never enters the repository: `test/e2e/capture-chat.mjs` and `test/e2e/real-bench.mjs`
 build the bench in a local folder, `KCT_BENCH=<folder> npx vitest run src/content/realBench.test.ts` measures
@@ -238,23 +316,19 @@ A line no table recognises is checked against the browser's own detector, `i18n.
 names wins, a guess of ours stands only if its first choice agrees, otherwise the line has no known language. That
 answer feeds the English skip, the source allowlist and the language flag, never the source sent to the engine.
 
-Interface strings live in `src/shared/i18n/` (popup and options, keyed by the English text) and
-`src/content/i18n/` (chat bar, keyed by id with the English text as the fallback), one file per language;
-tests hold every file to the full key set. Store
-texts live in [store/](store/), and a release is a version tag: CI builds, checks and publishes it to both
-stores, and signs build provenance for the zips (`gh attestation verify <zip> -R kilworks/kick-chat-translator`).
-The store keys are only readable by the publish job, which installs nothing. Dependabot and OpenSSF Scorecard
-watch the dependencies and the workflows. To report a vulnerability, see [SECURITY.md](SECURITY.md).
+</details>
 
-Stack: Manifest V3, Vite, TypeScript, Preact, Tailwind.
-
-### Research: on-device language identification (paused)
+<details>
+<summary><b>Research: on-device language identification</b> (paused)</summary>
+<br>
 
 A trained language classifier meant to replace the franc fallback is on the `feat/lid-inference` branch, in no
 release. Measured on 5,248 fresh chat lines, the branch as it stands lowers the detection cost by 27 % on Brave and
 barely moves Chrome and Firefox; a retrained model already on hand would lower it by 42 to 58 % on all three. A
 small neural network was tried and did not beat the linear model. Method, results and the seven items left before a
 release: [docs/language-identification.md](docs/language-identification.md).
+
+</details>
 
 ## Related projects
 
