@@ -1,5 +1,0 @@
-A beállítások és a felugró ablak egyszerűbb és egységesebb lett. A Beállítások mostantól a Megjelenés lapon nyílnak meg, ahol a nyelv és a külalak van. Minden be/ki beállítás kapcsoló, amely azonnal érvényesül. A betűtípus, a sűrűség, a csevegőtéma és a kiemelőszín gombokként és elnevezett színmintákként mutatja a választékát, és a stílus előnézete látható marad, amíg módosítod őket.
-
-Minden fordítómotor szavakkal mondja el az állapotát: Kész, vagy Szünetel az okkal és a visszatérés idejével. A DeepL-kártya akkor jelenik meg, ha a DeepL benne van a sorrendben vagy van mentett kulcs, és a kulcs rejtve marad, amíg meg nem mutatod. A felugró ablak egyszerre egy fő gombot mutat, a verziót a láblécben tartja, és görgetősáv nélkül elfér minden felületi nyelven.
-
-Javítások: az a csatorna, amelyet a csatornalistáid kihagynak, mostantól a csevegősávban azt írja, hogy "Itt nincs fordítva", ahelyett hogy elhallgatna, és a felugró ablak utat kínál a Szűrők felé. A motorbeállítások már nem mondhatnak ellent egymásnak. A "->" vagy "=>" jellel írt szószedetsorok működnek, a szószedet számára olvashatatlan sorokat pedig alatta listázza.

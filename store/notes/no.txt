@@ -1,5 +1,0 @@
-Innstillingene og popupen er gjort enklere og mer ensartede. Innstillingene åpner nå på Visning, der språket og utseendet ligger. Hver av/på-innstilling er en bryter som gjelder med en gang. Skrift, tetthet, chattema og aksentfarge viser valgene som knapper og navngitte fargeprøver, og stilforhåndsvisningen blir stående i bildet mens du endrer dem.
-
-Hver oversettelsesmotor sier nå tilstanden med ord: "Klar", eller "På pause" med årsaken og når den kommer tilbake. DeepL-kortet vises når DeepL er med i rekkefølgen eller en nøkkel er lagret, og nøkkelen forblir skjult til du viser den. Popupen viser én hovedknapp om gangen, har versjonen i bunnteksten og passer uten rullefelt på alle grensesnittspråk.
-
-Rettelser: en kanal som kanallistene dine utelater, sier nå "Ikke oversatt her" i chattlinjen i stedet for å bli stille, og popupen har en vei til "Filtre". Motorinnstillinger kan ikke lenger motsi hverandre. Ordlistelinjer skrevet med "->" eller "=>" fungerer, og linjer ordlisten ikke kan lese, vises under den.

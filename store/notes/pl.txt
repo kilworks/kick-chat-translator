@@ -1,5 +1,0 @@
-Ustawienia i okno popup zostały uproszczone i ujednolicone. Ustawienia otwierają się teraz na karcie Wyświetlanie, gdzie są język i wygląd. Każde ustawienie włącz/wyłącz to przełącznik, który działa od razu. Czcionka, gęstość, motyw czatu i kolor akcentu pokazują swoje opcje jako przyciski i nazwane próbki kolorów, a podgląd stylu pozostaje na widoku podczas ich zmiany.
-
-Każdy silnik tłumaczenia podaje teraz swój stan słowami: "Gotowe" albo "Wstrzymano" z powodem i informacją, kiedy wróci. Karta DeepL pojawia się, gdy DeepL jest w kolejności silników albo zapisano klucz, a klucz pozostaje ukryty, dopóki go nie pokażesz. Popup pokazuje naraz jeden główny przycisk, ma wersję w stopce i mieści się bez paska przewijania w każdym języku interfejsu.
-
-Poprawki: kanał pominięty na Twoich listach kanałów pokazuje teraz na pasku czatu "Nie tłumaczymy tutaj" zamiast milczeć, a popup podpowiada drogę do "Filtry". Ustawienia silnika nie mogą już sobie przeczyć. Linie słownika zapisane przez "->" lub "=>" działają, a linie, których słownik nie potrafi odczytać, są wypisane pod nim.

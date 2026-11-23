@@ -1,5 +1,0 @@
-As configurações e o popup foram refeitos para ficar simples e consistentes. As configurações agora abrem em Exibição, onde ficam o idioma e a aparência. Toda opção de ligar e desligar é um interruptor que vale na hora. Fonte, densidade, tema do chat e cor de destaque mostram as opções como botões e amostras de cor com nome, e a prévia do estilo continua à vista enquanto você muda.
-
-Cada mecanismo de tradução agora diz seu estado em palavras: "Pronto" ou "Em pausa", com o motivo e quando volta. O cartão do DeepL aparece quando o DeepL está na ordem ou há uma chave salva, e a chave fica oculta até você mostrá-la. O popup mostra um botão principal por vez, traz a versão no rodapé e cabe sem barra de rolagem em todos os idiomas da interface.
-
-Correções: um canal que as suas listas de canais deixam de fora agora diz "Não traduzido aqui" na barra do chat em vez de ficar mudo, e o popup oferece um caminho até "Filtros". As configurações do mecanismo não podem mais se contradizer. Linhas do glossário escritas com "->" ou "=>" funcionam, e as linhas que o glossário não consegue ler aparecem listadas abaixo dele.

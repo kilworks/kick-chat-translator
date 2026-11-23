@@ -7,7 +7,7 @@ description: Ship a release to the Chrome Web Store and addons.mozilla.org. A ta
 
 ## A release, since 3.0.0
 
-1. **On master**, merged through a pull request with CI green: bump `package.json`, move `## [Unreleased]` in CHANGELOG under the new version, write `store/notes/<lang>.txt` for it (what changed, every language), then check locally:
+1. **On master**, merged through a pull request with CI green: bump `package.json`, move `## [Unreleased]` in CHANGELOG under the new version, write `store/notes/en.txt` for it (what changed; English only since 3.6.3, AMO falls back to it in every locale), then check locally:
    ```bash
    npm run release:check && npm run package:all && npm run stores:payloads -- <scratchpad>/stores
    ```
@@ -28,7 +28,7 @@ Work in a worktree so the main checkout (other sessions, other branches) stays u
 
 1. `gh pr list`; merge what must ship (`gh pr view <n> --json mergeStateStatus`: BEHIND -> `gh pr update-branch <n>`, wait CI, `gh pr merge <n> --merge`; auto-merge is disabled on this repository).
 2. `git fetch && git checkout -b release/X.Y.Z origin/master`, `npm version X.Y.Z --no-git-tag-version`, in CHANGELOG add `## [X.Y.Z] - <date>` under `## [Unreleased]`.
-3. Notes: write `<scratchpad>/notes/en.txt` by hand from the Unreleased section (plain paragraphs, store users' words). Fill `tools/notes-brief.md` (replace `<notes-dir>`, `<repo>`), two Sonnet agents in parallel, 14 languages each (the list = `ls store/notes`). Then `python .claude/skills/publish-stores/tools/check_notes.py <notes-dir> store/notes` and check the register against the previous note yourself (fr, de, es slipped to tu/du/tú in 3.4.0). Copy into `store/notes/`.
+3. Notes: write `store/notes/en.txt` by hand from the Unreleased section (plain paragraphs, store users' words). English only since 3.6.3 (kil): no translations, `payloads.mjs` sends the English note alone and AMO shows it in every locale. `tools/notes-brief.md` and `scripts/stores/notes-draft.mjs` stay for the day translations come back.
 4. `npm run release:check`, `npm run package:all`, `npm run stores:payloads -- <scratchpad>/stores`, `npm run stores:preflight -- --html release/preflight.html`, `node scripts/stores/cws.mjs status` (no revision in review, or `cancel` first).
 5. Commit "Release X.Y.Z", PR, CI green, merge, `git checkout --detach origin/master`, `git tag -a vX.Y.Z -m "Release X.Y.Z" && git push origin vX.Y.Z`, `gh run watch <id>`. Expect: Chrome PENDING_REVIEW X.Y.Z, AMO `POST .../versions/ -> 201` "unreviewed", GitHub release with three zips.
 6. UI change in the release: `tools/layout-probe.mjs` on the change and on master (both builds), all 43 locales, then look at the screenshots.

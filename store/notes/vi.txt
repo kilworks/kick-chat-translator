@@ -1,5 +1,0 @@
-Phần cài đặt và cửa sổ popup được làm lại cho đơn giản và nhất quán. Cài đặt nay mở ở tab Hiển thị, nơi có ngôn ngữ và giao diện. Mọi cài đặt bật/tắt đều là một công tắc có hiệu lực ngay. Phông chữ, mật độ, giao diện chat và màu nhấn hiển thị các lựa chọn dưới dạng nút và mẫu màu có tên, còn phần xem trước kiểu dáng vẫn hiện trong lúc bạn thay đổi.
-
-Mỗi công cụ dịch nay nói trạng thái của mình bằng chữ: "Sẵn sàng", hoặc "Tạm dừng" kèm lý do và lúc nào hoạt động lại. Thẻ DeepL xuất hiện khi DeepL nằm trong thứ tự công cụ hoặc đã lưu khóa, và khóa được ẩn cho đến khi bạn chọn hiện. Popup chỉ hiện một nút chính mỗi lần, đặt phiên bản ở chân trang và vừa khít mà không có thanh cuộn ở mọi ngôn ngữ giao diện.
-
-Sửa lỗi: một kênh bị các danh sách kênh của bạn bỏ sót nay hiện "Không dịch ở đây" trên thanh chat thay vì im lặng, và popup có đường dẫn tới "Bộ lọc". Các cài đặt của công cụ không còn mâu thuẫn nhau. Các dòng trong bảng thuật ngữ viết bằng "->" hoặc "=>" hoạt động, và những dòng bảng thuật ngữ không đọc được sẽ được liệt kê bên dưới nó.
