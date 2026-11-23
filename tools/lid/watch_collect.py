@@ -1,6 +1,6 @@
 """Live console dashboard of the chat collection (E9), built on tui_dash.py.
 
-python tools/lid/watch_collect.py [--data C:/Users/kil/kct-data] [--once]
+python tools/lid/watch_collect.py --data <data-dir> [--once]
 
 Reads <data>/lid/raw-chat: kick-*.jsonl, twitch-*.jsonl and their logs. Only
 the bytes appended since the last refresh are parsed. Ctrl+C to quit.
@@ -20,7 +20,7 @@ START = '17:20'                 # first Twitch reader
 EXTRA = {'Serbian': 'sr', 'Malayalam': 'ml', 'Mongolian': 'mn', 'Albanian': 'sq', 'Bosnian': 'bs', 'Macedonian': 'mk',
          'Croatian': 'hr', 'Nepali': 'ne', 'Somali': 'so', 'Latvian': 'lv', 'Lithuanian': 'lt', 'Bengali': 'bn',
          'Urdu': 'ur', 'Azerbaijani': 'az', 'Korean': 'ko', 'Norwegian': 'no', 'Greek': 'el', 'Vietnamese': 'vi'}
-DATA = pathlib.Path(sys.argv[sys.argv.index('--data') + 1] if '--data' in sys.argv else r'C:\Users\kil\kct-data')
+DATA = pathlib.Path(sys.argv[sys.argv.index('--data') + 1])
 RAW = DATA / 'lid' / 'raw-chat'
 
 
@@ -129,7 +129,7 @@ def build():
         'chart_title': 'KICK  -  LIGNES NOUVELLES PAR TOUR (1 min), TOUT LE RUN', 'chart': series,
         'chart_note': (f'min {min(series):,}   max {max(series):,}   dernier {series[-1]:,}') if series else '',
         'log_title': 'JOURNAL (moteur distant, puis Kick)',
-        'log': [(f'en cours depuis {up // 3600} h {up % 3600 // 60:02d}, sans heure de fin (kil 22/11)', 'y'),
+        'log': [(f'en cours depuis {up // 3600} h {up % 3600 // 60:02d}, sans heure de fin', 'y'),
                 (f'debit /min : kick {rate["kick"]:,.0f}  pc {rate.get("PC", 0):,.0f}  oracle {rate.get("ORACLE", 0):,.0f}'
                  f'  instabox {rate.get("INSTABOX", 0):,.0f}', 'g'),
                 (f'rapatrie il y a : oracle {fresh["ORACLE"]} s  instabox {fresh["INSTABOX"]} s',

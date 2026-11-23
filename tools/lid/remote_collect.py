@@ -1,7 +1,7 @@
 """Run twitch_irc.py on Oracle and on free InstaBox VMs, pull their files into raw-chat every minute.
 
 python tools/lid/remote_collect.py --channels <data>/lid/raw-chat/twitch-channels-2.json --until 19:58
-    [--oracle 8] [--vms ibx-w1,ibx-w2,ibx-w3] [--per-vm 6] [--data C:/Users/kil/kct-data] [--here] [--target 100000]
+    [--oracle 8] [--vms ibx-w1,ibx-w2,ibx-w3] [--per-vm 6] --data <data-dir> [--here] [--target 100000]
 
 --here: run on Oracle itself (oracle_collect.sh, service lid-collect): its readers write straight into raw-chat,
 the VMs' files are pulled every 5 minutes. --target: a language with that many lines already collected
@@ -26,7 +26,7 @@ import time
 
 HERE = pathlib.Path(__file__).parent
 IRC = HERE / 'twitch_irc.py'
-sys.path.insert(0, os.environ.get('IBX_DIR', r'C:\Users\kil\Downloads\02 - Projects\instabox-farm'))
+sys.path.insert(0, os.environ['IBX_DIR'])  # the instabox-farm checkout (ibx.py))
 LOCAL = False  # --here
 
 
@@ -137,7 +137,7 @@ def vm(name, parts, secs, raw, end, tag=''):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--data', default=r'C:\Users\kil\kct-data')
+    ap.add_argument('--data', required=True)
     ap.add_argument('--channels', required=True)
     ap.add_argument('--until', help='HH:MM local')
     ap.add_argument('--minutes', type=float, help='run length instead of --until (cycles with no end time)')

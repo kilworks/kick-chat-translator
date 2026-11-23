@@ -5,7 +5,7 @@ python tools/lid/confirm.py --data <data-dir> --ref st2tw-b16 --models 'st2tw-*-
 Every candidate (models/<glob>.bin) and the reference get their thresholds on the even lines (adapt.measure,
 k=10 causal, half=even). The candidate with the lowest even-line cost is the pick. On the odd lines: mean cost
 of the pick and of the reference, paired difference with a 95 % bootstrap over channels (file:channel keys).
-The goal's bar (kil, 22/11): the whole interval below 0 on the adapted path. Run it on candidates ONCE, at the end:
+The goal's bar (set 22/11): the whole interval below 0 on the adapted path. Run it on candidates ONCE, at the end:
 every look at the odd lines spends them. Heldout is never read.
 """
 import argparse

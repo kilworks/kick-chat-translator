@@ -42,7 +42,7 @@ def boot(diff, groups, n=2000, seed=0):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--data', default=r'C:\Users\kil\kct-data')
+    ap.add_argument('--data', required=True)
     ap.add_argument('--models', default='accrom-b16,st1-b16,st-twitch-b16,st-kick-b16')
     ap.add_argument('--k', type=float, default=10)
     ap.add_argument('--sure', type=float, default=0.9)

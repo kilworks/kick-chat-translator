@@ -1,5 +1,5 @@
 #!/bin/sh
-# RETIRED 2026-11-22 (kil: no PC in the loop): the collection runs on Oracle, oracle_collect.sh and
+# RETIRED 2026-11-22 (no PC in the loop): the collection runs on Oracle, oracle_collect.sh and
 # lid_scan.py; the scheduled task LidCollect is disabled. Kept for the record.
 # Whole chat collection, autonomous: run by the scheduled task LidCollect (at logon, and by hand with
 # schtasks /Run /TN LidCollect). Each part starts only if it is not already running, then loops.
@@ -9,8 +9,8 @@
 #   scan    rescan of the public Twitch directory every 2 h (twitch_dir.mjs), lists read by the next runs
 #   dash    the console dashboard window
 # Stop everything: create <data>/lid/raw-chat/collect.STOP (remove it before restarting).
-HERE=/c/Users/kil/Downloads/kick-chat-translator/tools/lid
-RAW=/c/Users/kil/kct-data/lid/raw-chat
+HERE=$(cd "$(dirname "$0")" && pwd)
+RAW=${RAW:?set RAW to <data>/lid/raw-chat}
 PARTS=${*:-scan remote twitch kick dash}
 export PYTHONIOENCODING=utf-8
 

@@ -1,4 +1,4 @@
-description: "LID KCT : rescan de l'annuaire Twitch toutes les 2 h sur une machine InstaBox libre (lid_scan.py, priorite ordo 9, jamais une machine tenue : les encodages passent avant, sinon le run est saute). Seules les langues sous 100 000 lignes sont rescannees, les manquantes comprises ; lid-collect.service lit la liste au cycle suivant (kil, 2026-11-22)."
+description: "LID KCT : rescan de l'annuaire Twitch toutes les 2 h sur une machine InstaBox libre (lid_scan.py, priorite ordo 9, jamais une machine tenue : les encodages passent avant, sinon le run est saute). Seules les langues sous 100 000 lignes sont rescannees, les manquantes comprises ; lid-collect.service lit la liste au cycle suivant (2026-11-22)."
 labels: [lid, instabox]
 schedule: "40 */2 * * *"
 max_active_runs: 1

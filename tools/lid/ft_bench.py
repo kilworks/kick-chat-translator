@@ -19,7 +19,7 @@ import cost
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--data', default=r'C:\Users\kil\kct-data')
+    ap.add_argument('--data', required=True)
     ap.add_argument('--ft', required=True)
     ap.add_argument('--like', default='accrom-b16', help='model whose label set and no-feature mask are reused')
     a = ap.parse_args()

@@ -1,9 +1,9 @@
 """Train neural LID configurations on free InstaBox VMs, watched live in TensorBoard on the PC.
 
-python tools/lid/train_ibx.py --data C:/Users/kil/kct-data --src lid-st2tw --run NAME:LR:DIM:HIDDEN:EPOCHS [--run ...]
+python tools/lid/train_ibx.py --data <data-dir> --src lid-st2tw --run NAME:LR:DIM:HIDDEN:EPOCHS [--run ...]
     (HIDDEN 0: the linear model, train.py, DIM ignored)
     [--vms ibx-w1,ibx-w2,ibx-w3,ibx-w4,ibx-w5] [--ref st2tw-b16,nn-st2tw-d32-h128]
-python tools/lid/train_ibx.py --data C:/Users/kil/kct-data --note "text"     (a line in the TensorBoard journal)
+python tools/lid/train_ibx.py --data <data-dir> --note "text"     (a line in the TensorBoard journal)
 
 One configuration per VM at a time, held through ibx.hold() at ordo priority 9: video encodes come first, a VM
 another job holds is skipped and the configuration waits for the next free one. A VM receives the train and valid
@@ -26,7 +26,7 @@ import time
 import traceback
 
 os.environ.setdefault('IBX_PRIO', '9')
-sys.path.insert(0, os.environ.get('IBX_DIR', r'C:\Users\kil\Downloads\02 - Projects\instabox-farm'))
+sys.path.insert(0, os.environ['IBX_DIR'])  # the instabox-farm checkout (ibx.py))
 import ibx  # noqa: E402
 from tensorboardX import SummaryWriter  # noqa: E402
 

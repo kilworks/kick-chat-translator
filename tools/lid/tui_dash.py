@@ -1,4 +1,4 @@
-"""Console dashboard in kil's stream style (SafeZone stock bot, KCT chat collection).
+"""Console dashboard in a stream style (SafeZone stock bot, KCT chat collection).
 
 Copy this file next to the project's script, then:
 

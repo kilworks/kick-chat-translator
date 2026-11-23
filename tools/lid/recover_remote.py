@@ -1,7 +1,7 @@
 """Recover a remote_collect run whose driver died: pull every file left on Oracle and the VMs into
 raw-chat, then stop the readers, remove the run dirs, free the VM leases and suspend the VMs.
 
-python tools/lid/recover_remote.py [--tag ''] [--vms ibx-w4,ibx-w5] [--data C:/Users/kil/kct-data]
+python tools/lid/recover_remote.py [--tag ''] [--vms ibx-w4,ibx-w5] --data <data-dir>
 
 --tag is the tag of the dead run (its local file names). Pulled files replace the local ones:
 a remote file only grows, so the full copy is a superset of the last pull.
@@ -12,12 +12,12 @@ import pathlib
 import subprocess
 import sys
 
-sys.path.insert(0, r'C:\Users\kil\Downloads\02 - Projects\instabox-farm')
+sys.path.insert(0, os.environ['IBX_DIR'])  # the instabox-farm checkout (ibx.py)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--data', default=r'C:\Users\kil\kct-data')
+    ap.add_argument('--data', required=True)
     ap.add_argument('--tag', default='')
     ap.add_argument('--vms', default='ibx-w4,ibx-w5')
     a = ap.parse_args()
