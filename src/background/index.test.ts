@@ -193,3 +193,13 @@ describe('what a Kick tab may ask the worker', () => {
     expect((await ask({ type: 'cache.clear' }, OPTIONS_PAGE)).type).toBe('ack');
   });
 });
+
+// A message can wake the worker and arrive before init() has read storage:
+// it used to be answered with the defaults, not the reader's settings.
+describe('a message that wakes the worker', () => {
+  it('is answered with the stored settings, not the defaults', async () => {
+    const { ask } = await loadWorker({ [STORAGE_KEY_SETTINGS]: { targetLang: 'ja', engineModeMoved: true } }, {}, { slowSync: true });
+    const res = await ask({ type: 'settings.get' }, OPTIONS_PAGE);
+    expect((res as { payload: Settings }).payload.targetLang).toBe('ja');
+  });
+});
