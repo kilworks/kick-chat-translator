@@ -117,6 +117,7 @@ Display.
   on-device only), and your DeepL key once DeepL is in the order
 - **Filters**: bots, users, channels, keywords, source languages, and a glossary of replacements
 - **Advanced**: cache size and lifetime, concurrent requests, a per-channel rate limit, backup and restore
+  (the file never holds your DeepL key, and importing one keeps your own key and Lingva server)
 - **Activity**: messages translated, cache hits, every language seen in chat, and why each of the last 50
   lines was translated or left alone
 - **Keyboard**: Alt+T turns chat translation on or off, Alt+W the compose preview
