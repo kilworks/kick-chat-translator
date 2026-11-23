@@ -134,5 +134,13 @@ Do not rebuild or rediscover any of this: it runs on its own.
 - runReport takes at most 10 metrics: the summary is fetched in two calls.
 - Reading the numbers: one event = one user-day; counters are per user-day
   averages in the GA UI cards (`has_7tv` 0.28 proves it). The script divides sums by eventCount.
+- Since a7a64ac the report starts with a PNG (`~/ga-report/stats.png`, matplotlib
+  from apt `python3-matplotlib`, dark palette of the dataviz skill): KPI tiles with
+  change vs the week before (rates in points), 28-day users line, translation
+  sources, versions/browsers/UI language. It also reads the public store counts
+  (Chrome page "N users", AMO `average_daily_users`, 3 tries each): GA only sees
+  users who opted in, so the store total is printed beside it; an unreadable store
+  shows "indisponible" and the total becomes "au moins N". A failed picture adds
+  "image KO" to the text and never blocks it.
 - Known anomaly: TCT versions (1.0.x, 1.1.0) also land in the KCT property; the
   report counts them on a "hors 3.x" line. 1.0.0 shipped the KCT id; 1.0.2+ is unexplained.
