@@ -102,13 +102,28 @@ export function applyUserGlossary(text: string, entries: string[]): string {
 const KEEP_AS_IS = ['FACEIT'];
 const KEEP_RE = new RegExp(String.raw`(?<![\p{L}\p{N}])(${KEEP_AS_IS.join('|')})(?![\p{L}\p{N}])`, 'giu');
 
+const BRACKET = /[⟦⟧]/;
+const PLACEHOLDERS = /⟦\d+⟧/g;
+
 /** The text for the engine, each kept name swapped for its placeholder. */
 export function protectNames(text: string): string {
+  // A line with brackets of its own keeps its names as typed: restoreNames
+  // would take the reader's brackets for the engine's and remove them.
+  if (BRACKET.test(text)) return text;
   return text.replace(KEEP_RE, (m) => `⟦${KEEP_AS_IS.findIndex((n) => n.toLowerCase() === m.toLowerCase()) + 1}⟧`);
 }
 
-/** The names back in place. A placeholder the engine dropped stays dropped; one it mangled is removed, never shown. */
-export function restoreNames(translated: string): string {
+/**
+ * The names back in place, in the translation of `sent` (what protectNames gave
+ * the engine). A placeholder the engine dropped stays dropped; one it mangled is
+ * removed, never shown. When no placeholder went out, any bracket is the reader's.
+ *
+ * shortcut: a line whose only brackets are typed as well-formed placeholders
+ * ("⟦1⟧") reads as protected; upgrade by passing protectNames' verdict along
+ * if anyone ever types that.
+ */
+export function restoreNames(translated: string, sent: string): string {
+  if (!sent.match(PLACEHOLDERS) || BRACKET.test(sent.replace(PLACEHOLDERS, ''))) return translated;
   return translated
     .replace(/⟦\s*(\d+)\s*⟧/g, (_, n: string) => KEEP_AS_IS[Number(n) - 1] ?? '')
     // MyMemory pulls the two brackets apart around other words (34 of 100 bench lines), so the pair above misses them.

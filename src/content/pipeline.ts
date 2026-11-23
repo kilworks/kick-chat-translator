@@ -46,14 +46,6 @@ export interface IncomingDomMessage {
   isBot: boolean;
 }
 
-export interface IncomingWsMessage {
-  id: string;
-  text: string;
-  channel: string;
-  username: string;
-  isBot: boolean;
-}
-
 interface Prepared {
   /** What goes to the engine: the line's words, abbreviations spelled out when English. */
   real: string;
@@ -249,7 +241,6 @@ export class TranslationPipeline {
   private async prepare(
     rawText: string,
     meta: { username: string; channel: string; isBot: boolean },
-    opts: { dedup: boolean } = { dedup: true },
   ): Promise<Prepared | string> {
     // An empty reason means "skipped, but there is nothing worth telling this
     // line about": the two gates below are about the whole tab, not the message.
@@ -264,14 +255,9 @@ export class TranslationPipeline {
 
     // Per-user dedup: if this user just sent the exact same message, skip it.
     // Common in chat spam — saves a provider call + avoids duplicate translations.
-    // Only the DOM path takes part. It is the only path that displays, so letting
-    // the websocket warm pass claim the slot first would suppress the display of a
-    // message nobody has seen yet.
-    if (opts.dedup) {
-      const dedupKey = meta.username.toLowerCase();
-      if (dedupKey && this.userDedup.get(dedupKey) === rawText) return localised('skipDuplicate', 'the same user just sent this');
-      if (dedupKey) this.userDedup.set(dedupKey, rawText);
-    }
+    const dedupKey = meta.username.toLowerCase();
+    if (dedupKey && this.userDedup.get(dedupKey) === rawText) return localised('skipDuplicate', 'the same user just sent this');
+    if (dedupKey) this.userDedup.set(dedupKey, rawText);
 
     const parsed = parseKickContent(rawText).realText;
     if (isBareCommand(parsed)) return localised('skipCommand', 'it is a command for a chat bot');
@@ -354,30 +340,6 @@ export class TranslationPipeline {
       if (oldest !== undefined && oldest !== channel) this.recent.delete(oldest);
     }
     return ctx;
-  }
-
-  async onWebSocketMessage(msg: IncomingWsMessage): Promise<void> {
-    if (this.settings.engineMode === 'local-only') return;
-    const prepared = await this.prepare(msg.text, msg, { dedup: false });
-    if (typeof prepared === 'string') return;
-    // Same source hint as the display path. The warm pass usually reaches the
-    // worker first, so the answer it caches is the one the reader sees, and a
-    // hint makes it cache an answer translated from a guess.
-    const { hint } = prepared;
-    try {
-      await send({
-        type: 'translate',
-        payload: {
-          messageId: `ws:${msg.id}`,
-          text: prepared.real,
-          targetLang: this.effTarget,
-          channel: msg.channel,
-          ...(hint ? { sourceLangHint: hint } : {}),
-        },
-      });
-    } catch (err: unknown) {
-      log.debug('ws warmup failed', err);
-    }
   }
 
   async onDomMessage(msg: IncomingDomMessage): Promise<void> {
@@ -697,7 +659,7 @@ export class TranslationPipeline {
       }
       msg = { ...msg, rowElement: rescued.row, injectionTarget: rescued.target };
     }
-    const tt = applyUserGlossary(restoreNames(result.translatedText), this.settings.glossary);
+    const tt = applyUserGlossary(restoreNames(result.translatedText, real), this.settings.glossary);
     if (!tt) {
       this.skip(msg, localised('skipGlossary', 'your glossary emptied the translation'));
       removeAllArtifacts(msg.injectionTarget);
@@ -709,7 +671,7 @@ export class TranslationPipeline {
         removeAllArtifacts(msg.injectionTarget);
         return;
       }
-      if (tt.trim().toLowerCase() === restoreNames(real).trim().toLowerCase()) {
+      if (tt.trim().toLowerCase() === restoreNames(real, real).trim().toLowerCase()) {
         // The engine handed the line straight back. On stretched chat that is
         // usually why: "BINNNNNNNGOOOOOOO" and "muuuuy biennnn" both return
         // unchanged, and flattened they come back as "BINGO" and "très bien".
@@ -743,8 +705,11 @@ export class TranslationPipeline {
         metrics.count('cache.mem.store');
         metrics.timing('cache.mem.size', memCache.size());
       }
+      // Before the glossary: a replay passes through the line above again, and a
+      // glossary changed since applies to it. Names are restored so the compose
+      // path, which reads this same cache, never shows a placeholder.
       memCache.set(real, this.effTarget, {
-        translatedText: tt,
+        translatedText: restoreNames(result.translatedText, real),
         detectedLang: result.detectedLang,
         provider: result.provider,
       });

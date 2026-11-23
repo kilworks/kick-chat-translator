@@ -253,4 +253,7 @@ export const sl: Record<string, string> = {
   'Text': 'Besedilo',
   'Colour and theme': 'Barva in tema',
   'In the chat': 'V klepetu',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Ni uporabljeno: sprejet je samo naslov https://, zato besedilo klepeta nikoli ne potuje nešifrirano.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Ni shranjeno: vaši seznami so predolgi za sinhronizacijo v brskalniku. Skrajšajte blokirane besede, glosar ali uporabniške sezname.",
+  "Not saved.": "Ni shranjeno.",
 };

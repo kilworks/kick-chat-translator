@@ -251,5 +251,8 @@
   "{lang}: download failed, try again",
   "Text",
   "Colour and theme",
-  "In the chat"
+  "In the chat",
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.",
+  "Not saved."
 ]

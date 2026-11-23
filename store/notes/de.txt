@@ -1,5 +1,0 @@
-Einstellungen und Popup wurden überarbeitet, damit sie schlicht und einheitlich sind. Die Optionen öffnen sich jetzt bei Anzeige, wo Sprache und Aussehen liegen. Jede Ein/Aus-Einstellung ist ein Schalter, der sofort wirkt. Schrift, Dichte, Chat-Design und Akzentfarbe zeigen ihre Auswahl als Schaltflächen und benannte Farbfelder, und die Stilvorschau bleibt sichtbar, während Sie sie ändern.
-
-Jede Übersetzungs-Engine nennt ihren Zustand jetzt in Worten: Bereit oder Pausiert, mit Grund und Zeitpunkt der Rückkehr. Die DeepL-Karte erscheint, sobald DeepL in der Reihenfolge steht oder ein Schlüssel gespeichert ist, und der Schlüssel bleibt verborgen, bis Sie ihn anzeigen. Das Popup zeigt jeweils eine Hauptschaltfläche, hat die Version in der Fußzeile und passt in jeder Oberflächensprache ohne Bildlaufleiste.
-
-Korrekturen: Ein Kanal, den Ihre Kanallisten ausschließen, zeigt in der Chatleiste jetzt "Hier nicht übersetzt", statt stumm zu bleiben, und das Popup führt jetzt zu Filter. Die Engine-Einstellungen können sich nicht mehr widersprechen. Glossarzeilen mit "->" oder "=>" funktionieren, und Zeilen, die das Glossar nicht lesen kann, werden darunter aufgelistet.

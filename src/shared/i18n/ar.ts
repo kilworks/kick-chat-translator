@@ -253,4 +253,7 @@ export const ar: Record<string, string> = {
   'Text': 'النص',
   'Colour and theme': 'اللون والمظهر',
   'In the chat': 'في الدردشة',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "غير مستخدم: يتم قبول عنوان https:// فقط، لذلك لا ينتقل نص الدردشة مطلقًا بدون تشفير.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "لم يتم الحفظ: قوائمك طويلة جدًا ولا يمكن مزامنة المتصفح معها. تقصير الكلمات المحظورة أو المسرد أو قوائم المستخدمين.",
+  "Not saved.": "لم يتم حفظها.",
 };

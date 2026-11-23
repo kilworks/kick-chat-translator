@@ -26,7 +26,7 @@ WHAT YOU GET
 
 WHAT LEAVES YOUR BROWSER
 
-Chat text goes only to the translation engine you picked. With Google, MyMemory or Lingva, that is the text of each message and nothing else: not the channel, not who said it. With DeepL, the last few chat lines go along as context, with the names of whoever wrote them, so the translation fits the conversation. That is what the "website content" line in the permissions above refers to, and it is the whole of it. There is no account and no server of mine: the extension talks to Kick, to the engine you chose, and to the GitHub releases page to tell you when a newer version exists, sending nothing with that request. If you tick the optional "technical and interaction data" choice, it also sends Google Analytics a daily anonymous count of engines used, errors and speed, never your messages, names or channels.
+Chat text goes only to the translation engine you picked. With Google, MyMemory or Lingva, that is the text of each message and nothing else: not the channel, not who said it. With DeepL, the last few chat lines go along as context, with the names of whoever wrote them, so the translation fits the conversation. That is what the "website content" line in the permissions above refers to, and it is the whole of it. There is no account and no server of mine: the extension talks to Kick and to the engine you chose, nothing else. If you tick the optional "technical and interaction data" choice, it also sends Google Analytics a daily anonymous count of engines used, errors and speed, never your messages, names or channels.
 
 FREE AND OPEN SOURCE
 

@@ -253,4 +253,7 @@ export const fr: Record<string, string> = {
   'Text': 'Texte',
   'Colour and theme': 'Couleur et thème',
   'In the chat': 'Dans le chat',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Non utilisé : seule une adresse https:// est acceptée, le texte du chat ne circule donc jamais en clair.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Non enregistré : vos listes sont trop longues pour la synchronisation du navigateur. Raccourcissez les mots bloqués, le glossaire ou les listes d'utilisateurs.",
+  "Not saved.": "Non enregistré.",
 };

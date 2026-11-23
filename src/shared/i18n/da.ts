@@ -253,4 +253,7 @@ export const da: Record<string, string> = {
   'Text': 'Tekst',
   'Colour and theme': 'Farve og tema',
   'In the chat': 'I chatten',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Bruges ikke: kun en https://-adresse accepteres, så chatteksten rejser aldrig ukrypteret.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Ikke gemt: Dine lister er for lange til browsersynkronisering. Forkort de blokerede ord, ordlisten eller brugerlisterne.",
+  "Not saved.": "Ikke gemt.",
 };

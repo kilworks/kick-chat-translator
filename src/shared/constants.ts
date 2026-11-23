@@ -13,8 +13,9 @@ export const PROVIDER_ENDPOINTS = {
 } as const;
 
 // Public Lingva instances, rotated round-robin to spread load / dodge per-host 500s.
-// Keep in sync with host_permissions in manifest.config.ts.
-export const LINGVA_POOL = ['https://lingva.lunar.icu', 'https://lingva.ml'];
+// Each one is named in PRIVACY.md and the store texts, and kept in sync with
+// host_permissions in manifest.config.ts: chat text goes to no undeclared host.
+export const LINGVA_POOL = ['https://lingva.lunar.icu'];
 
 // The same host's multi-line endpoint: repeated `q` fields, one answer per line.
 export const GOOGLE_MULTI_ENDPOINT = 'https://translate.googleapis.com/translate_a/t';

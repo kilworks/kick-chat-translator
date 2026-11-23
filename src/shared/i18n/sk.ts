@@ -289,4 +289,7 @@ export const sk: Record<string, string> = {
   'Text': 'Text',
   'Colour and theme': 'Farba a motív',
   'In the chat': 'V chate',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Nepoužíva sa: akceptuje sa iba adresa https://, takže text rozhovoru nikdy neprejde nezašifrovaný.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Neuložené: vaše zoznamy sú príliš dlhé na synchronizáciu prehliadača. Skráťte blokované slová, slovník alebo zoznamy používateľov.",
+  "Not saved.": "Neuložené.",
 };

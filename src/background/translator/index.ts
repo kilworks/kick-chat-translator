@@ -328,15 +328,6 @@ function failOutcome(_req: TranslationRequest, lastError?: ProviderError): Trans
   };
 }
 
-/** Single-request convenience wrapper. */
-export async function translateWithFallback(
-  req: TranslationRequest,
-  settings: Settings,
-): Promise<TranslationOutcome> {
-  const [outcome] = await translateGroup([req], settings, 1);
-  return outcome ?? failOutcome(req);
-}
-
 export function getProviderStatus(settings: Settings): ProviderStatus[] {
   const ctx = buildContext(settings);
   const now = Date.now();

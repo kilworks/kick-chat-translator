@@ -1,5 +1,5 @@
-import { defaultSettings, loadSettings, resetSettings, saveSettings, watchSettings, type Settings } from '~/shared/settings';
-import { onMessage, type RuntimeResponse } from '~/shared/messages';
+import { defaultSettings, loadSettings, resetSettings, saveSettings, watchSettings, withoutKey, type Settings } from '~/shared/settings';
+import { onMessage, type RuntimeMessage, type RuntimeResponse } from '~/shared/messages';
 import { rootLogger } from '~/shared/logger';
 import { createMetrics } from '~/shared/metrics';
 import { TranslationCache, warmTargets } from './cache';
@@ -10,7 +10,7 @@ import { TranslationCoalescer } from './coalescer';
 import { anyProviderReady, getProviderStatus, setDeeplUsagePct } from './translator';
 import { armKeepalive, installKeepalive, listenKeepalive } from './keepalive';
 import { getUpdateStatus, installUpdateCheck } from './updateChecker';
-import { DEEPL_USAGE_FREE, DEEPL_USAGE_PRO, STORAGE_KEY_SETTINGS } from '~/shared/constants';
+import { DEEPL_USAGE_FREE, DEEPL_USAGE_PRO } from '~/shared/constants';
 import { getSemanticOverride } from '~/shared/transliterationGuard';
 import { ecrireAutourDesEmotes } from './lexicalWrite';
 import { CHAT_MESSAGES } from '~/content/i18n';
@@ -36,12 +36,6 @@ function bucketFor(channel: string): TokenBucket {
 }
 
 function applySettings(next: Settings): void {
-  // Auto-promote DeepL to #1 when a key is configured but DeepL is missing from the chain.
-  if (next.deeplApiKey && !next.providerOrder.includes('deepl')) {
-    next = { ...next, providerOrder: ['deepl', ...next.providerOrder] };
-    void chrome.storage.sync.set({ [STORAGE_KEY_SETTINGS]: next });
-    log.info('DeepL key detected, auto-added to provider chain as #1');
-  }
   // Consent withdrawn: the day counted so far goes with it.
   if (settings.usageStats && !next.usageStats) void dropUsage();
   settings = next;
@@ -177,6 +171,8 @@ function scheduleDeeplUsageRefresh(): void {
   }, 5 * 60_000);
 }
 
+const CACHE_PRUNE_ALARM = 'kt.cachePrune';
+
 async function init(): Promise<void> {
   settings = await loadSettings();
   applySettings(settings);
@@ -188,10 +184,19 @@ async function init(): Promise<void> {
   scheduleDeeplUsageRefresh();
   // Seed the budget pacing on startup.
   if (settings.deeplApiKey) void fetchDeeplUsage();
+  // Daily, and never on this path: a large readwrite pass would hold up the first
+  // cache reads after a start. Alarms do not survive an update, hence the check.
+  if (!(await chrome.alarms.get(CACHE_PRUNE_ALARM).catch(() => undefined))) {
+    void chrome.alarms.create(CACHE_PRUNE_ALARM, { delayInMinutes: 1, periodInMinutes: 1440 });
+  }
 }
 
 // Top level, before anything awaits: see listenKeepalive.
 listenKeepalive();
+chrome.alarms.onAlarm.addListener((alarm) => {
+  // Pruning before init would apply the default size and lifetime, not the reader's.
+  if (alarm.name === CACHE_PRUNE_ALARM) void ready.then(() => cache.prune());
+});
 installUsage(
   () => settings,
   (on) => void saveSettings({ usageStats: on, usageStatsAsked: true }).then(applySettings),
@@ -202,10 +207,48 @@ if (__KT_DEV__) {
     if (m === 'kt-dev-reload') chrome.runtime.reload();
   });
 }
-void init();
+// An event can wake the worker and arrive before init() has read storage:
+// every handler waits for it, or it would act on the defaults.
+const ready = init().catch((e: unknown) => log.error('init failed', e));
 watchSettings(applySettings);
 
+/**
+ * What a Kick tab may ask. A page is the least trusted context that reaches
+ * this router: a renderer compromised through kick.com can send whatever the
+ * content script can. So it gets exactly what the content script uses, every
+ * settings answer comes without the DeepL key, and it may write only the
+ * settings the chat bar and the composer write. Dev builds let a test page
+ * patch any other setting, never the key. The extension's own pages keep
+ * every right.
+ */
+const PAGE_MESSAGES = new Set<RuntimeMessage['type']>([
+  'translate',
+  'stats.local',
+  'usage.add',
+  'i18n.chat',
+  'settings.get',
+  'settings.set',
+  'open.options',
+  'compose.write',
+  'ping',
+]);
+const PAGE_SETTINGS = new Set<string>([
+  'targetLang',
+  'enabled',
+  'pausedChannels',
+  'channelLangs',
+  'favoriteLangs',
+  'composeTargetLang',
+]);
+const pageMayWrite = (patch: Partial<Settings>): boolean =>
+  Object.keys(patch).every((k) => k !== 'deeplApiKey' && (__KT_DEV__ || PAGE_SETTINGS.has(k)));
+const NOT_ALLOWED: RuntimeResponse = { type: 'error', payload: { message: 'not allowed' } };
+
 onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
+  await ready;
+  // Chrome gives chrome-extension://<id>/, Firefox moz-extension://<uuid>/.
+  const fromPage = !sender.url?.startsWith(chrome.runtime.getURL(''));
+  if (fromPage && !PAGE_MESSAGES.has(msg.type)) return NOT_ALLOWED;
   // A message from a page means a Kick tab is open, which is what the
   // keepalive waits for after it cleared itself. The popup and the options
   // page have no tab and do not need the worker kept warm.
@@ -238,11 +281,12 @@ onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
     case 'i18n.chat':
       return { type: 'i18n.chat', payload: CHAT_MESSAGES[msg.locale] };
     case 'settings.get':
-      return { type: 'settings', payload: settings };
+      return { type: 'settings', payload: fromPage ? withoutKey(settings) : settings };
     case 'settings.set': {
+      if (fromPage && !pageMayWrite(msg.payload)) return NOT_ALLOWED;
       const next = await saveSettings(msg.payload);
       applySettings(next);
-      return { type: 'settings', payload: next };
+      return { type: 'settings', payload: fromPage ? withoutKey(next) : next };
     }
     case 'settings.reset': {
       const fresh = await resetSettings();
@@ -302,6 +346,7 @@ onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
  */
 chrome.commands?.onCommand.addListener((command) => {
   void (async () => {
+    await ready;
     const patch =
       command === 'toggle-translation'
         ? { enabled: !settings.enabled }
@@ -315,7 +360,7 @@ chrome.commands?.onCommand.addListener((command) => {
 
 chrome.runtime.onInstalled.addListener(() => {
   log.info('Installed / updated');
-  void init();
+  // No init() here: the module already ran it when this worker started.
   void reinjecterOngletsOuverts();
 });
 

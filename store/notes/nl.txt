@@ -1,5 +1,0 @@
-De instellingen en de popup zijn herwerkt zodat ze overzichtelijk en consistent zijn. De opties openen nu op Weergave, waar op één plek de taal en het uiterlijk staan. Elke aan/uit-instelling is een schakelaar die meteen werkt. Lettertype, dichtheid, chatthema en accentkleur tonen hun keuzes als knoppen en benoemde kleurstalen, en het stijlvoorbeeld blijft in beeld terwijl je ze aanpast.
-
-Elke vertaalengine meldt nu in woorden hoe het ermee staat: Klaar, of Gepauzeerd met de reden en wanneer hij terugkomt. De DeepL-kaart verschijnt zodra DeepL in de volgorde staat of er een sleutel is opgeslagen, en de sleutel blijft verborgen tot je hem toont. De popup toont telkens één hoofdknop, zet de versie in de voettekst en past zonder schuifbalk in elke interfacetaal.
-
-Fixes: een kanaal dat je kanaallijsten uitsluiten, meldt nu "Hier niet vertaald" in de chatbalk in plaats van stil te blijven, en de popup biedt een weg naar Filters. Engine-instellingen kunnen elkaar niet meer tegenspreken. Regels in de woordenlijst met "->" of "=>" werken, en regels die de woordenlijst niet kan lezen, worden eronder in één lijst getoond.

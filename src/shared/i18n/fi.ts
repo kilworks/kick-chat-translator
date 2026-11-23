@@ -253,4 +253,7 @@ export const fi: Record<string, string> = {
   'Text': 'Teksti',
   'Colour and theme': 'Väri ja teema',
   'In the chat': 'Chatissa',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Ei käytössä: vain https://-osoite hyväksytään, joten chat-teksti ei koskaan kulje salaamattomana.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Ei tallennettu: luettelosi ovat liian pitkiä selaimen synkronointia varten. Lyhennä estettyjä sanoja, sanastoa tai käyttäjäluetteloita.",
+  "Not saved.": "Ei tallennettu.",
 };

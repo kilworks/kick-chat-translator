@@ -253,4 +253,7 @@ export const id: Record<string, string> = {
   'Text': 'Teks',
   'Colour and theme': 'Warna dan tema',
   'In the chat': 'Di chat',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Tidak digunakan: hanya alamat https:// yang diterima, sehingga teks obrolan tidak pernah dikirim tanpa terenkripsi.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Tidak disimpan: daftar Anda terlalu panjang untuk sinkronisasi browser. Persingkat kata-kata yang diblokir, glosarium, atau daftar pengguna.",
+  "Not saved.": "Tidak disimpan.",
 };

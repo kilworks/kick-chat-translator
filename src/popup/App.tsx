@@ -5,7 +5,8 @@ import { sortedLanguages } from '~/shared/languages';
 import { send } from '~/shared/messages';
 import { extractChannelSlug } from '~/content/kickApi';
 import { LANG_BLOCKED_ASK, channelBlockedBy } from '~/content/filters';
-import { I18nProvider } from '~/shared/i18nContext';
+import { memoriserLangueChaine, vueDeChaine } from '~/shared/channelLang';
+import { I18nProvider, useLoadedLocale } from '~/shared/i18nContext';
 import { DiscordLink } from '~/shared/discord';
 import { makeT, resolveUiLocale, isRtlLocale } from '~/shared/i18n';
 import type { ProviderStatus, UsageStats } from '~/shared/types';
@@ -46,7 +47,7 @@ export function App() {
   // as the chat's own bar counts them. 0 when none, or when the tab cannot say.
   const [langBlocked, setLangBlocked] = useState(0);
 
-  const locale = resolveUiLocale(settings.uiLang);
+  const locale = useLoadedLocale(resolveUiLocale(settings.uiLang));
   // Named for the reader and sorted with their locale's collation. Keyed on the
   // extension's own UI locale, NOT the browser's: someone who set the interface
   // to Japanese must get Japanese names, whatever their system language says.
@@ -263,8 +264,18 @@ export function App() {
           <select
             aria-label={t('Target language')}
             class="kt-select"
-            value={settings.targetLang}
-            onChange={(e) => void patch('targetLang', (e.target as HTMLSelectElement).value)}
+            value={vueDeChaine(settings, channel).targetLang}
+            onChange={(e) => {
+              const targetLang = (e.target as HTMLSelectElement).value;
+              // On a channel whose language is remembered, the tab reads that
+              // memory, so the pick goes there too, as on the chat bar.
+              void patchMany({
+                targetLang,
+                ...(settings.rememberChannelLang && channel
+                  ? { channelLangs: memoriserLangueChaine(settings.channelLangs, channel, targetLang) }
+                  : {}),
+              });
+            }}
           >
             <option value="auto">{t('Auto (your language)')}</option>
             {langs.map((l) => (

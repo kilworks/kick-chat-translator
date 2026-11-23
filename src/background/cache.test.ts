@@ -12,7 +12,36 @@ vi.stubGlobal('IDBKeyRange', {
 vi.mock('idb-keyval', () => {
   const inRange = (k: string, r?: { lower: string; upper: string }) =>
     !r || (k >= r.lower && k <= r.upper);
+  // A cursor walks the keys in order, one success event per step, and the
+  // transaction completes after the last one, as in IndexedDB.
+  let txDone: Promise<void> = Promise.resolve();
   const objectStore = {
+    count: () => ({ result: idb.entries.size }),
+    delete: (k: string) => {
+      idb.entries.delete(k);
+      return {};
+    },
+    openCursor: () => {
+      const req: { result: unknown; onsuccess?: () => void } = { result: null };
+      const ks = [...idb.entries.keys()].sort();
+      let i = 0;
+      txDone = new Promise<void>((resolve) => {
+        const step = (): void => {
+          const k = ks[i++];
+          req.result =
+            k === undefined
+              ? null
+              : { key: k, value: idb.entries.get(k), delete: () => idb.entries.delete(k), continue: () => queueMicrotask(step) };
+          req.onsuccess?.();
+          if (k === undefined) resolve();
+        };
+        queueMicrotask(step);
+      });
+      return req;
+    },
+    get transaction() {
+      return { done: txDone };
+    },
     getAllKeys: (r: { lower: string; upper: string } | undefined, n: number) => ({
       result: [...idb.entries.keys()]
         .sort()
@@ -29,7 +58,7 @@ vi.mock('idb-keyval', () => {
   };
   return {
     createStore: () => (_mode: string, cb: (s: typeof objectStore) => unknown) => cb(objectStore),
-    promisifyRequest: (r: { result: unknown }) => Promise.resolve(r.result),
+    promisifyRequest: (r: { result?: unknown; done?: Promise<void> }) => r.done ?? Promise.resolve(r.result),
     keys: () => {
       idb.keyLists++;
       return Promise.resolve([...idb.entries.keys()].sort());
@@ -243,5 +272,21 @@ describe('TranslationCache.stats', () => {
     const c = new TranslationCache(100, 3600_000);
     await c.set('bonjour', 'en', { translatedText: 'hello', detectedLang: 'fr', provider: 'x' });
     expect((await c.stats()).oldestMs).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('TranslationCache.prune', () => {
+  // evict() and the TTL only touched entries the worker had seen since it
+  // started, about 200 after warm(), so the database itself never shrank.
+  it('drops expired entries and the oldest past the cap, from the database itself', async () => {
+    idb.entries.clear();
+    const now = Date.now();
+    const hour = 3_600_000;
+    for (let i = 0; i < 3; i++) idb.entries.set(`en::old${i}`, { translatedText: 'x', detectedLang: 'fr', provider: 'x', storedAtMs: now - 100 * hour });
+    for (let i = 0; i < 5; i++) idb.entries.set(`en::fresh${i}`, { translatedText: 'x', detectedLang: 'fr', provider: 'x', storedAtMs: now - i * 60_000 });
+    const c = new TranslationCache(3, 72 * hour);
+    await c.prune();
+    expect([...idb.entries.keys()].sort()).toEqual(['en::fresh0', 'en::fresh1', 'en::fresh2']);
+    expect((await c.stats()).entries).toBe(3);
   });
 });

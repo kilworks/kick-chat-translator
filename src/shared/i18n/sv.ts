@@ -442,4 +442,7 @@ export const sv: Record<string, string> = {
   'Text': 'Text',
   'Colour and theme': 'Färg och tema',
   'In the chat': 'I chatten',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Används inte: endast en https://-adress accepteras, så chatttexten färdas aldrig okrypterad.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Inte sparat: dina listor är för långa för webbläsarsynkronisering. Förkorta de blockerade orden, ordlistan eller användarlistorna.",
+  "Not saved.": "Inte sparad.",
 };

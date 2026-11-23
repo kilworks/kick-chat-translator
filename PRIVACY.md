@@ -1,6 +1,6 @@
 # Privacy Policy: Kick Chat Translator
 
-_Last updated: 2026-10-16_
+_Last updated: 2026-11-23_
 
 ## What we collect
 
@@ -47,22 +47,35 @@ URLs, and `@mentions`) is sent to the translation provider you configure:
 | MyMemory | `api.mymemory.translated.net` | text only |
 | Lingva (configurable) | `lingva.lunar.icu` (or your instance) | text only |
 
+A copy installed from a release zip rather than a store also asks
+`api.github.com` every six hours for the latest version number. That request
+carries nothing about you. Store copies update themselves and never send it.
+
 Apart from that DeepL context and the optional statistics above, we never send:
 usernames, channel names, badges, timestamps, your IP (beyond what the browser
 sends to any HTTP endpoint), or any other metadata.
 
 ## What we store locally
 
-These pieces of data live **only** on your device, in your browser's
-extension storage:
+These pieces of data live in your browser's extension storage:
 
-- Your preferences (target language, display style, providers, filters).
-- A cache of recent translations (text + translation pair), keyed by text.
+- Your preferences (target language, display style, providers, filters, and
+  per-channel choices such as a remembered reading language or a paused
+  channel). They sit in the browser's synced extension storage: if you turned
+  on your browser's sync, the browser itself (Google or Mozilla) copies them to
+  your other devices. We never see them.
+- Your DeepL API key, if you add one. It stays on this device: it is never
+  synced, and a settings export never contains it.
+- A cache of recent translations (text + translation pair), keyed by text, on
+  this device. Entries are deleted after the age and count set in the options
+  (72 hours and 15,000 entries by default), checked once a day.
 - A daily counter of how many requests you made, broken down by provider
-  and detected language. This is shown in the popup and you can reset it.
+  and detected language, on this device. The popup shows it and you can reset
+  it.
 
-You can wipe everything from the extension's options page ("Clear cache",
-"Reset usage stats") or by removing the extension.
+You can wipe everything from the extension's options page ("Clear translation
+cache", "Reset usage stats", "Reset all settings to defaults") or by removing
+the extension.
 
 ## Third-party providers
 
@@ -77,15 +90,20 @@ them. Read theirs if you care:
 ## Permissions
 
 - `storage`: to save your preferences and cache.
-- `alarms`: to keep the service worker alive briefly during bursts of chat.
+- `alarms`: to keep the service worker alive briefly during bursts of chat, and
+  to schedule the daily cache cleanup and, for a copy installed from a zip, the
+  update check.
 - `scripting`: once, when the extension is installed or updated, to load its
   own content script into kick.com tabs already open, so they keep translating
-  without a reload. It injects nothing else, and nowhere but kick.com.
-- `host_permissions` for kick.com and the translation provider endpoints
-  above: to read chat and call the translators.
+  without a reload; and each time you insert a translation that contains
+  emotes into the message box, to run one packaged function in the kick.com
+  page that writes the text around them. It runs nothing else, no remote code,
+  and nowhere but kick.com.
+- `host_permissions` for kick.com: to read chat and write translations into
+  it. For the translation provider endpoints above: to call the translators.
 
 We do not request the `tabs` or `<all_urls>` permission.
 
 ## Contact
 
-Open an issue at <https://github.com/Pkkls/kick-chat-translator/issues>.
+Open an issue at <https://github.com/kilworks/kick-chat-translator/issues>.

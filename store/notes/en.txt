@@ -1,5 +1,13 @@
-Lighter on fast chats. Measured on a chat running at 20 to 25 messages a second, against 3.6.1: the work the extension adds to the page drops by 30 %, page re-layouts by 60 % and style recalculations by 55 %. The "…" mark now only shows on a line still waiting for its translation after a quarter of a second, about 145 times a minute instead of 780.
+Pressing Tab right after typing no longer swaps in the translation of what you had typed a moment earlier: the extension translates your current text first.
 
-A translation engine that stops answering no longer holds its lines: after 8 seconds (12 for a batch) the next engine takes over, where 3.6.1 waited forever. A line still unanswered after 20 seconds shows its retry button.
+Your DeepL key stays on this device. It is no longer copied to browser sync, never written into a settings export, and removing DeepL from the engine order now sticks. If you ever shared a settings file, change your DeepL key in your DeepL account.
 
-Fixes for long sessions: the chat bar, the chat lines and the rate-limit hourglass no longer pile up hidden listeners and timers over hours of watching.
+Blocked words now match whole words only: blocking "rat" no longer hides "congrats".
+
+The options page now tells you when your lists are too long for browser sync to save, instead of silently dropping every change.
+
+Repeated lines no longer get your glossary twice, the language you remember for a channel no longer spreads to your other open tabs, and the translation cache now cleans itself once a day.
+
+The popup and the options page load 84 % less code each time they open.
+
+One server and one permission fewer: chat text is no longer sent to lingva.ml, a custom Lingva server is used over https only, a settings file can no longer change it, and Kick pages can no longer read your DeepL key.

@@ -1,5 +1,0 @@
-As definições e o popup foram refeitos para ficarem simples e coerentes. As definições abrem agora em Apresentação, onde estão o idioma e o aspeto. Cada opção de ligar e desligar é um interruptor que se aplica logo. O tipo de letra, a densidade, o tema do chat e a cor de destaque mostram as opções como botões e amostras de cor com nome, e a pré-visualização do estilo continua à vista enquanto as altera.
-
-Cada motor de tradução diz agora o seu estado por palavras: "Pronto" ou "Em pausa", com o motivo e quando volta. O cartão do DeepL aparece quando o DeepL está na ordem ou há uma chave guardada, e a chave fica oculta até a mostrar. O popup mostra um botão principal de cada vez, traz a versão no rodapé e cabe sem barra de deslocação em todos os idiomas da interface.
-
-Correções: um canal que as suas listas de canais deixam de fora diz agora "Não traduzido aqui" na barra do chat em vez de ficar calado, e o popup oferece um caminho até "Filtros". As definições do motor já não se podem contradizer. As linhas do glossário escritas com "->" ou "=>" funcionam, e as linhas que o glossário não consegue ler ficam listadas por baixo dele.

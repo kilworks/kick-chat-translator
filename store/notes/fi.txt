@@ -1,5 +1,0 @@
-Asetukset ja ponnahdusikkuna on uudistettu selkeiksi ja yhdenmukaisiksi. Asetukset aukeavat nyt Näyttö-välilehdelle, jossa ovat kieli ja ulkoasu. Jokainen päälle/pois-asetus on kytkin, joka vaikuttaa heti. Fontti, tiheys, chatin teema ja korostusväri näyttävät vaihtoehtonsa painikkeina ja nimettyinä värinäytteinä, ja tyylin esikatselu pysyy näkyvissä, kun muutat niitä.
-
-Jokainen käännösmoottori kertoo nyt tilansa sanoin: Valmis tai Tauolla syyn ja paluuajan kanssa. DeepL-kortti ilmestyy, kun DeepL on järjestyksessä tai avain on tallennettu, ja avain pysyy piilossa, kunnes näytät sen. Ponnahdusikkunassa on kerrallaan yksi pääpainike, versio on alatunnisteessa, ja se mahtuu ilman vierityspalkkia kaikilla käyttöliittymäkielillä.
-
-Korjaukset: kanava, jonka kanavalistasi sulkevat pois, kertoo nyt chat-palkissa "Ei käännetä täällä" eikä enää vaikene, ja ponnahdusikkuna tarjoaa tien kohtaan Suodattimet. Moottorin asetukset eivät enää voi olla ristiriidassa keskenään. Merkinnällä "->" tai "=>" kirjoitetut sanastorivit toimivat, ja rivit, joita sanasto ei osaa lukea, luetellaan sen alla.

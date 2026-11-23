@@ -253,4 +253,7 @@ export const ca: Record<string, string> = {
   'Text': 'Text',
   'Colour and theme': 'Color i tema',
   'In the chat': 'Al xat',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "No s'utilitza: només s'accepta una adreça https://, de manera que el text del xat mai no viatja sense xifrar.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "No desat: les vostres llistes són massa llargues per a la sincronització del navegador. Escurceu les paraules bloquejades, el glossari o les llistes d'usuaris.",
+  "Not saved.": "No s'ha guardat.",
 };

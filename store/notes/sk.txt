@@ -1,5 +1,0 @@
-Nastavenia a vyskakovacie okno sme prepracovali, aby boli jednoduché a jednotné. Nastavenia sa teraz otvárajú na položke "Zobrazenie", kde je jazyk a vzhľad. Každé nastavenie zapnúť/vypnúť je prepínač, ktorý platí hneď. Písmo, hustota, motív chatu a akcentová farba ukazujú voľby ako tlačidlá a pomenované vzorky farieb a náhľad štýlu zostáva na očiach, kým ich meníte.
-
-Každý prekladový nástroj teraz opisuje svoj stav slovami: "Pripravené" alebo "Pozastavené" s dôvodom a časom, kedy sa vráti. Karta DeepL sa zobrazí, keď je DeepL v poradí nástrojov alebo je uložený kľúč, a kľúč zostane skrytý, kým ho nezobrazíte. Vyskakovacie okno ukazuje naraz jedno hlavné tlačidlo, verziu má v päte a vojde sa bez posuvníka v každom jazyku rozhrania.
-
-Opravy: kanál, ktorý vaše zoznamy kanálov vynechávajú, teraz v paneli chatu hlási "Tu sa neprekladá" namiesto toho, aby mlčal, a vyskakovacie okno ponúka cestu k položke "Filtre". Nastavenia nástroja si už nemôžu odporovať. Riadky glosára napísané s "->" alebo "=>" fungujú a riadky, ktoré glosár nevie prečítať, sú uvedené pod ním.

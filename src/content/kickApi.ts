@@ -2,7 +2,6 @@ import { KICK_CHANNEL_API } from '~/shared/constants';
 import { normalizeLang } from '~/shared/languages';
 
 interface ChannelResponse {
-  chatroom?: { id: number };
   slug?: string;
   user?: { username?: string };
   // Present only while the channel is live. `lang_iso` is a clean ISO-639-1 code
@@ -46,7 +45,6 @@ export function extractChannelSlug(pathname: string): string | undefined {
 }
 
 export interface ChannelMeta {
-  chatroomId?: number;
   /** The channel's broadcast language as a supported ISO-2 code, when live. */
   langIso?: string;
 }
@@ -55,8 +53,8 @@ interface CachedMeta extends ChannelMeta {
   at: number;
 }
 
-// Cache TTL: the chatroom id is stable, but `langIso` only appears once a channel
-// goes live — so re-fetch periodically rather than caching "unknown" forever.
+// Cache TTL: `langIso` only appears once a channel goes live, so re-fetch
+// periodically rather than caching "unknown" forever.
 const META_TTL_MS = 5 * 60_000;
 const metaCache = new Map<string, CachedMeta>();
 // Coalesce concurrent fetches for the same slug (rapid route changes / both
@@ -86,7 +84,6 @@ async function fetchChannelMeta(slug: string): Promise<ChannelMeta> {
       const data = (await res.json()) as ChannelResponse;
       const rawLang = data.livestream?.lang_iso;
       const meta: CachedMeta = {
-        chatroomId: typeof data.chatroom?.id === 'number' ? data.chatroom.id : cached?.chatroomId,
         langIso: rawLang ? normalizeLang(rawLang) : cached?.langIso,
         at: Date.now(),
       };
@@ -107,10 +104,6 @@ async function fetchChannelMeta(slug: string): Promise<ChannelMeta> {
   })();
   inflight.set(slug, request);
   return request;
-}
-
-export async function fetchChatroomId(slug: string): Promise<number | undefined> {
-  return (await fetchChannelMeta(slug)).chatroomId;
 }
 
 /**

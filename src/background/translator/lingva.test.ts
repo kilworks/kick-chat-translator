@@ -166,7 +166,16 @@ describe('lingvaProvider', () => {
     });
   });
 
+  // The shipped pool holds one declared instance since lingva.ml left it; the
+  // failover is kept for the next one, and tested on a pool of two.
   it('tries the next pooled instance when one fails', async () => {
+    vi.resetModules();
+    vi.doMock('~/shared/constants', async (orig) => ({
+      ...(await orig<object>()),
+      LINGVA_POOL: ['https://one.example', 'https://two.example'],
+    }));
+    const { lingvaProvider: pooled } = await import('./lingva');
+    vi.doUnmock('~/shared/constants');
     const hosts: string[] = [];
     globalThis.fetch = vi.fn(async (url: unknown) => {
       hosts.push(new URL(String(url)).host);
@@ -174,7 +183,7 @@ describe('lingvaProvider', () => {
       return reply('hola');
     }) as unknown as typeof fetch;
 
-    const res = await lingvaProvider.translate(
+    const res = await pooled.translate(
       { messageId: '1', text: 'hi', targetLang: 'es' },
       { ...baseCtx, lingvaInstance: '' },
     );
@@ -182,5 +191,28 @@ describe('lingvaProvider', () => {
     expect(res.translatedText).toBe('hola');
     expect(hosts.length).toBeGreaterThan(1);
     expect(new Set(hosts).size).toBe(hosts.length);
+  });
+});
+
+// Chat text travels in the URL path: over http, anyone on the network reads it.
+describe('a custom Lingva instance', () => {
+  it('is used only over https; a plain-http one falls back to the default pool', async () => {
+    const hosts: string[] = [];
+    globalThis.fetch = vi.fn(async (url: unknown) => {
+      hosts.push(new URL(String(url)).origin);
+      return reply('hola');
+    }) as unknown as typeof fetch;
+    await lingvaProvider.translate({ messageId: '1', text: 'hi', targetLang: 'es' }, { ...baseCtx, lingvaInstance: 'http://lingva.example' });
+    expect(hosts).toEqual(['https://lingva.lunar.icu']);
+  });
+
+  it('is used as given over https', async () => {
+    const hosts: string[] = [];
+    globalThis.fetch = vi.fn(async (url: unknown) => {
+      hosts.push(new URL(String(url)).origin);
+      return reply('hola');
+    }) as unknown as typeof fetch;
+    await lingvaProvider.translate({ messageId: '1', text: 'hi', targetLang: 'es' }, { ...baseCtx, lingvaInstance: 'https://lingva.example' });
+    expect(hosts).toEqual(['https://lingva.example']);
   });
 });

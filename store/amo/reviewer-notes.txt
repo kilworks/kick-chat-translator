@@ -1,9 +1,9 @@
-Source: https://github.com/Pkkls/kick-chat-translator, public, MIT, tag v{{VERSION}}.
+Source: https://github.com/kilworks/kick-chat-translator, public, MIT, tag v{{VERSION}}.
 The submitted zip is built from that tag with no patching in between.
 
 Build:
 
-  git clone https://github.com/Pkkls/kick-chat-translator
+  git clone https://github.com/kilworks/kick-chat-translator
   cd kick-chat-translator
   git checkout v{{VERSION}}
   npm ci
@@ -26,14 +26,19 @@ to contain no backslash before release.
 
 No remote code. Every line of JavaScript is inside the package: no eval, no new
 Function on fetched text, no remote script tag, no hosted module. The only
-network calls are the translation engines the user selects, kick.com, and one
-GET to the project's own GitHub releases endpoint for the update notice.
+network calls are the translation engines the user selects and kick.com. The
+update notice is skipped on a store install, so this copy never calls GitHub.
 
-scripting is used in one place, background/index.ts, on runtime.onInstalled:
-it calls scripting.executeScript with the extension's own packaged content
-script file, read from the manifest, on kick.com tabs that were already open.
-Without it an update leaves those tabs with a disconnected script that stops
-translating until a reload. No code string, no other file, no other host.
+scripting is used in two places, always with the extension's own packaged code
+and on kick.com only. First, in background/index.ts on runtime.onInstalled: it
+calls scripting.executeScript with the extension's own content script file,
+read from the manifest, on kick.com tabs that were already open. Without it an
+update leaves those tabs with a disconnected script that stops translating
+until a reload. Second, in the compose.write handler of background/index.ts:
+when the user inserts a translation that contains emotes, it runs the packaged
+function ecrireAutourDesEmotes (background/lexicalWrite.ts) in that kick.com
+tab's main world, to write the text around the emotes through the chat
+editor's own API. No code string, no other file, no other host.
 
 Minification is esbuild and Vite defaults through @crxjs/vite-plugin. There is
 no obfuscation step.

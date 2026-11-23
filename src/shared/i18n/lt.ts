@@ -253,4 +253,7 @@ export const lt: Record<string, string> = {
   'Text': 'Tekstas',
   'Colour and theme': 'Spalva ir tema',
   'In the chat': 'Pokalbyje',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Nenaudojamas: priimamas tik https:// adresas, todėl pokalbio tekstas niekada nekeliauja nešifruotas.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Neišsaugoti: jūsų sąrašai per ilgi, kad būtų galima sinchronizuoti naršyklę. Sutrumpinkite užblokuotus žodžius, žodyną arba vartotojų sąrašus.",
+  "Not saved.": "Neišsaugota.",
 };

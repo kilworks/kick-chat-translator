@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { STORAGE_KEY_DEEPL_KEY, STORAGE_KEY_SETTINGS } from './constants';
-import { defaultSettings, importSettings, loadSettings, resetSettings, saveSettings } from './settings';
+import { defaultSettings, exportSettings, importSettings, loadSettings, resetSettings, saveSettings } from './settings';
 
 /**
  * Where the DeepL key is stored, asserted against the storage areas themselves.
@@ -107,6 +107,37 @@ describe('reset and import', () => {
     expect(heldKey()).toBe('from-backup');
     expect(syncedBlob()?.deeplApiKey).toBe('');
     expect(syncedBlob()?.targetLang).toBe('ja');
+  });
+});
+
+// A settings file gets shared: to ask for help on Discord, or as "optimised
+// settings" from someone else. It carried the DeepL key in clear, importing one
+// without a key erased the key on this device, and its Lingva server became
+// the one every chat line went to, with nothing on screen to say so.
+describe('settings backup files', () => {
+  it('never export the DeepL key', async () => {
+    await saveSettings({ deeplApiKey: 'secret-abc', targetLang: 'fr' });
+    const file = JSON.parse(await exportSettings()) as Record<string, unknown>;
+    expect(file.deeplApiKey ?? '').toBe('');
+    expect(file.targetLang).toBe('fr');
+  });
+
+  it('keep the key on this device when the imported file has none', async () => {
+    await saveSettings({ deeplApiKey: 'secret-abc' });
+    await importSettings(JSON.stringify({ ...defaultSettings(), targetLang: 'ja' }));
+    expect(heldKey()).toBe('secret-abc');
+    expect((await loadSettings()).deeplApiKey).toBe('secret-abc');
+    expect(syncedBlob()?.targetLang).toBe('ja');
+  });
+
+  it("keep this device's Lingva server, whatever the file says", async () => {
+    await saveSettings({ lingvaInstance: '' });
+    const s = await importSettings(
+      JSON.stringify({ ...defaultSettings(), lingvaInstance: 'https://lingva.example', providerOrder: ['lingva'] }),
+    );
+    expect(s.lingvaInstance).toBe('');
+    expect(syncedBlob()?.lingvaInstance).toBe('');
+    expect(syncedBlob()?.providerOrder).toEqual(['lingva']);
   });
 });
 

@@ -1,5 +1,0 @@
-Ayarlar ve açılır pencere sade ve tutarlı olacak şekilde yeniden düzenlendi. Ayarlar artık dilin ve görünümün bulunduğu "Görünüm" bölümünde açılıyor. Açma/kapama olan her ayar anında uygulanan bir anahtardır. Yazı tipi, yoğunluk, sohbet teması ve vurgu rengi seçeneklerini düğmeler ve adlandırılmış renk örnekleri olarak gösteriyor; stil önizlemesi sen değiştirirken görünür kalıyor.
-
-Her çeviri motoru artık durumunu sözcüklerle söylüyor: "Hazır" ya da "Duraklatıldı", nedeni ve ne zaman döneceğiyle birlikte. DeepL kartı, DeepL sırada olduğunda ya da bir anahtar kaydedildiğinde görünüyor; anahtar sen gösterene kadar gizli kalıyor. Açılır pencere aynı anda tek bir ana düğme gösteriyor, sürümü alt bilgide taşıyor ve her arayüz dilinde kaydırma çubuğu olmadan sığıyor.
-
-Düzeltmeler: kanal listelerinin dışında bıraktığı bir kanal artık sohbet çubuğunda sessiz kalmak yerine "Burada çevrilmiyor" diyor ve açılır pencere "Filtreler" bölümüne giden bir yol sunuyor. Motor ayarları artık birbiriyle çelişemiyor. "->" ya da "=>" ile yazılan sözlük satırları çalışıyor, sözlüğün okuyamadığı satırlar altında listeleniyor.

@@ -95,8 +95,11 @@ for (const [lang, { amo: locales }] of ON_AMO) {
   for (const loc of locales) (name[loc] = n), (summary[loc] = s), (description[loc] = d);
 }
 
+// Release notes in English only since 3.6.3 (kil): AMO shows the default
+// locale's notes wherever a translation is missing.
 const notes = {};
 for (const [lang, { amo: locales }] of ON_AMO) {
+  if (lang !== 'en') continue;
   const text = unwrap(read(`notes/${lang}.txt`));
   check(`note ${lang}`, lang, text);
   for (const loc of locales) notes[loc] = text;

@@ -283,4 +283,7 @@ export const zh: Record<string, string> = {
   'Text': '文字',
   'Colour and theme': '颜色和主题',
   'In the chat': '聊天中',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "未使用：仅接受 https:// 地址，因此聊天文本绝不会在未加密的情况下传输。",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "未保存：您的列表太长，无法同步浏览器。缩短被阻止的单词、词汇表或用户列表。",
+  "Not saved.": "没有保存。",
 };

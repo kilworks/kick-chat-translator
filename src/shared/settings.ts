@@ -132,8 +132,6 @@ export const SettingsSchema = z.object({
   concurrency: z.number().int().min(1).max(16).default(4),
   perChannelBudgetPerMin: z.number().int().min(10).max(2000).default(200),
 
-  // Connection strategy
-  connectionMode: z.enum(['auto', 'websocket', 'dom']).default('auto'),
   // Pause translating in tabs that aren't visible — stops background tabs from
   // burning provider quota (DeepL) while you're not watching.
   pauseWhenHidden: z.boolean().default(true),
@@ -214,7 +212,7 @@ export function defaultSettings(): Settings {
  * and taken off again on every write. Keeping the field in the schema means no
  * consumer, and no part of the options UI, has to know where it actually lives.
  */
-function withoutKey(s: Settings): Settings {
+export function withoutKey(s: Settings): Settings {
   return { ...s, deeplApiKey: '' };
 }
 
@@ -276,10 +274,13 @@ export async function resetSettings(): Promise<Settings> {
   return fresh;
 }
 
-/** Export all settings as a JSON string (for backup / transfer). */
+/**
+ * Export the settings as a JSON string (for backup / transfer). Without the
+ * DeepL key: these files get shared, to ask for help or to pass settings on.
+ */
 export async function exportSettings(): Promise<string> {
   const s = await loadSettings();
-  return JSON.stringify(s, null, 2);
+  return JSON.stringify(withoutKey(s), null, 2);
 }
 
 /**
@@ -294,12 +295,21 @@ export function parseSettingsJson(json: string): Settings {
   return parsed.data;
 }
 
-/** Import settings from a JSON string. Returns the imported settings. */
+/**
+ * Import settings from a JSON string. Returns the settings now in force.
+ *
+ * Two things stay this device's own. The DeepL key: a file without one (every
+ * export since 3.6.3) leaves it in place. The Lingva server: a file someone
+ * else wrote would otherwise send every chat line to their server, and nothing
+ * on screen would say so.
+ */
 export async function importSettings(json: string): Promise<Settings> {
-  const next = parseSettingsJson(json);
-  // A backup written before the split still carries the key in its JSON, so it
-  // is routed to local storage rather than silently dropped on import.
-  await chrome.storage.local.set({ [STORAGE_KEY_DEEPL_KEY]: next.deeplApiKey });
+  const file = parseSettingsJson(json);
+  const current = await loadSettings();
+  const next = { ...file, lingvaInstance: current.lingvaInstance, deeplApiKey: file.deeplApiKey || current.deeplApiKey };
+  // A backup written before 3.6.3 may still carry a key: it goes to local
+  // storage, never to sync.
+  if (file.deeplApiKey) await chrome.storage.local.set({ [STORAGE_KEY_DEEPL_KEY]: file.deeplApiKey });
   await chrome.storage.sync.set({ [STORAGE_KEY_SETTINGS]: withoutKey(next) });
   return next;
 }

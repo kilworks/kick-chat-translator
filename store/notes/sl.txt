@@ -1,5 +1,0 @@
-Nastavitve in pojavno okno smo preuredili, da so preproste in dosledne. Nastavitve se zdaj odprejo na zavihku "Prikaz", kjer sta jezik in videz. Vsaka nastavitev vklop/izklop je stikalo, ki velja takoj. Pisava, gostota, tema klepeta in poudarjena barva prikazujejo izbire kot gumbe in poimenovane vzorce barv, predogled sloga pa ostane na očeh, medtem ko jih spreminjate.
-
-Vsak prevajalski mehanizem zdaj pove svoje stanje z besedami: "Pripravljeno" ali "Začasno ustavljeno" z razlogom in časom vrnitve. Kartica DeepL se pokaže, ko je DeepL v vrstnem redu mehanizmov ali je shranjen ključ, ključ pa ostane skrit, dokler ga ne pokažete. Pojavno okno prikazuje po en glavni gumb, ima različico v nogi in se brez drsnika prilega v vsakem jeziku vmesnika.
-
-Popravki: kanal, ki ga vaši seznami kanalov izpuščajo, zdaj v vrstici klepeta pove "Tu se ne prevaja", namesto da molči, pojavno okno pa ponuja pot do "Filtri". Nastavitve mehanizma si ne morejo več nasprotovati. Vrstice glosarja, napisane z "->" ali "=>", delujejo, vrstice, ki jih glosar ne more prebrati, pa so navedene pod njim.

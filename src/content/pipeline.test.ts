@@ -29,7 +29,20 @@ import { defaultSettings } from '~/shared/settings';
 import { detectLanguage, detectLanguageWithBrowser } from './langDetect';
 
 const JP = 'これはテストメッセージです';
-const wsMsg = (text: string) => ({ id: '1', text, channel: 'chan', username: 'user', isBot: false });
+let lines = 0;
+/** A chat line as the DOM observer hands it over: a Kick-shaped row, attached, its own author. */
+const lineMsg = (text: string) => {
+  const rowElement = document.createElement('div');
+  const injectionTarget = document.createElement('div');
+  const span = document.createElement('span');
+  span.className = 'font-normal';
+  span.textContent = text;
+  injectionTarget.appendChild(span);
+  rowElement.appendChild(injectionTarget);
+  document.body.appendChild(rowElement);
+  lines += 1;
+  return { rowElement, injectionTarget, id: `l${lines}`, text, channel: 'chan', username: `user${lines}`, isBot: false };
+};
 /** onDomMessage does not await the translate path, so let it settle before asserting. */
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -44,7 +57,8 @@ describe('TranslationPipeline — effTarget (regression)', () => {
   // the SW. With the bug this test throws RangeError and send is never called.
   it('resolves the auto target and dispatches to the SW without recursing', async () => {
     const pipeline = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'auto', pauseWhenHidden: false });
-    await pipeline.onWebSocketMessage(wsMsg(JP));
+    await pipeline.onDomMessage(lineMsg(JP));
+    await flush();
     expect(sendMock).toHaveBeenCalledTimes(1);
     const target = sendMock.mock.calls[0]?.[0]?.payload?.targetLang as string | undefined;
     expect(target).toBeTruthy();
@@ -53,7 +67,8 @@ describe('TranslationPipeline — effTarget (regression)', () => {
 
   it('passes an explicit target through verbatim', async () => {
     const pipeline = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false });
-    await pipeline.onWebSocketMessage(wsMsg(JP));
+    await pipeline.onDomMessage(lineMsg(JP));
+    await flush();
     expect(sendMock.mock.calls[0]?.[0]?.payload?.targetLang).toBe('fr');
   });
 });
@@ -68,7 +83,8 @@ describe('TranslationPipeline — minTextLength', () => {
 
   it('translates a short message at the default floor', async () => {
     const pipeline = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false });
-    await pipeline.onWebSocketMessage(wsMsg(SHORT_JP));
+    await pipeline.onDomMessage(lineMsg(SHORT_JP));
+    await flush();
     expect(sendMock).toHaveBeenCalledTimes(1);
   });
 
@@ -82,17 +98,13 @@ describe('TranslationPipeline — minTextLength', () => {
       // one-character answer like 好 passes the default of 2.
       minTextLength: chatLength(SHORT_JP) + 1,
     });
-    await pipeline.onWebSocketMessage(wsMsg(SHORT_JP));
+    await pipeline.onDomMessage(lineMsg(SHORT_JP));
+    await flush();
     expect(sendMock).not.toHaveBeenCalled();
   });
 });
 
-/**
- * The websocket path only warms the cache — it never injects. The DOM path is the
- * only one that puts a translation on screen. So anything the warm path does to
- * shared state must not be able to suppress the display path.
- */
-describe('TranslationPipeline — websocket warm vs DOM display', () => {
+describe('TranslationPipeline — a user repeating a line', () => {
   const domMsg = (text: string, username = 'user') => {
     const rowElement = document.createElement('div');
     const injectionTarget = document.createElement('div');
@@ -106,24 +118,6 @@ describe('TranslationPipeline — websocket warm vs DOM display', () => {
   beforeEach(() => {
     sendMock.mockReset();
     sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: false, error: { code: 'x', message: 'x' } } });
-  });
-
-  it('still displays a message the websocket already warmed', async () => {
-    const pipeline = makePipeline();
-    await pipeline.onWebSocketMessage(wsMsg(JP));
-    sendMock.mockClear();
-
-    await pipeline.onDomMessage(domMsg(JP));
-    expect(sendMock).toHaveBeenCalled();
-  });
-
-  it('sends the same source hint from the warm pass as from the display path', async () => {
-    const pipeline = makePipeline();
-    await pipeline.onWebSocketMessage(wsMsg(JP));
-    await pipeline.onDomMessage(domMsg(JP));
-    await flush();
-    const hints = sendMock.mock.calls.map((c) => c[0]?.payload?.sourceLangHint as string | undefined);
-    expect(hints).toEqual(['ja', 'ja']);
   });
 
   it('still skips a message the same user just repeated', async () => {
@@ -379,13 +373,15 @@ describe('TranslationPipeline — the English skip', () => {
 
   it('sends an Italian line franc calls English', async () => {
     expect(detectLanguage('è troppo forte')).toBe('en');
-    await enReader().onWebSocketMessage(wsMsg('è troppo forte'));
+    await enReader().onDomMessage(lineMsg('è troppo forte'));
+    await flush();
     expect(sendMock).toHaveBeenCalledTimes(1);
   });
 
   it('still skips English', async () => {
     expect(detectLanguage('i cant believe he did that again')).toBe('en');
-    await enReader().onWebSocketMessage(wsMsg('i cant believe he did that again'));
+    await enReader().onDomMessage(lineMsg('i cant believe he did that again'));
+    await flush();
     expect(sendMock).not.toHaveBeenCalled();
   });
 });
@@ -405,22 +401,26 @@ describe('TranslationPipeline — English chat abbreviations', () => {
   const sentText = () => (sendMock.mock.calls[0]?.[0] as { payload: { text: string } }).payload.text;
 
   it('spells them out for a French reader', async () => {
-    await reader('fr').onWebSocketMessage(wsMsg('idc about the score ngl'));
+    await reader('fr').onDomMessage(lineMsg('idc about the score ngl'));
+    await flush();
     expect(sentText()).toBe("I don't care about the score not gonna lie");
   });
 
   it('leaves a Polish line alone', async () => {
-    await reader('fr').onWebSocketMessage(wsMsg('był w domu cały dzień'));
+    await reader('fr').onDomMessage(lineMsg('był w domu cały dzień'));
+    await flush();
     expect(sentText()).toBe('był w domu cały dzień');
   });
 
   it('spells out Portuguese shorthand on a line it is sure is Portuguese', async () => {
-    await reader('fr').onWebSocketMessage(wsMsg('ta um calor da porra e eles com ese macacão slk'));
+    await reader('fr').onDomMessage(lineMsg('ta um calor da porra e eles com ese macacão slk'));
+    await flush();
     expect(sentText()).toBe('ta um calor da porra e eles com ese macacão você é louco');
   });
 
   it('leaves the shorthand alone when no language is sure of the line', async () => {
-    await reader('fr').onWebSocketMessage(wsMsg('pqp lag assim ja era'));
+    await reader('fr').onDomMessage(lineMsg('pqp lag assim ja era'));
+    await flush();
     expect(sentText()).toBe('pqp lag assim ja era');
   });
 });
@@ -444,9 +444,11 @@ describe('TranslationPipeline, the browser detector behind the raw answer', () =
 
   it('lets a reliable browser answer decide the source allowlist', async () => {
     detect.mockResolvedValue({ isReliable: true, languages: [{ language: 'pl', percentage: 99 }] });
-    await reader(['pl']).onWebSocketMessage(wsMsg(line));
+    await reader(['pl']).onDomMessage(lineMsg(line));
+    await flush();
     expect(asked()).toBe(1);
-    await reader(['ru']).onWebSocketMessage(wsMsg(line));
+    await reader(['ru']).onDomMessage(lineMsg(line));
+    await flush();
     expect(asked()).toBe(1);
   });
 
@@ -523,7 +525,8 @@ describe('TranslationPipeline: only the part worth translating is sent', () => {
   });
   const run = async (text: string) => {
     const pipeline = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false });
-    await pipeline.onWebSocketMessage(wsMsg(text));
+    await pipeline.onDomMessage(lineMsg(text));
+    await flush();
     return (sendMock.mock.calls[0]?.[0] as { payload: { text: string } } | undefined)?.payload.text;
   };
 

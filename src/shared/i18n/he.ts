@@ -253,4 +253,7 @@ export const he: Record<string, string> = {
   'Text': 'טקסט',
   'Colour and theme': 'צבע וערכת נושא',
   'In the chat': 'בצ׳אט',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "לא בשימוש: מתקבלת רק כתובת https://, כך שטקסט הצ'אט לעולם לא עובר ללא מוצפן.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "לא נשמר: הרשימות שלך ארוכות מדי לסנכרון הדפדפן. קצר את המילים החסומות, מילון המונחים או רשימות המשתמשים.",
+  "Not saved.": "לא נשמר.",
 };

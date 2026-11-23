@@ -374,7 +374,7 @@ const LIRE_COMPTEUR = `(() => {
 
 const KICK = /^https?:\/\/(www\.)?kick\.com\//;
 /** Every host the worker can send a chat line to. */
-const MOTEURS = ['translate.googleapis.com', 'api.mymemory.translated.net', 'lingva.lunar.icu', 'lingva.ml', 'api-free.deepl.com', 'api.deepl.com', 'www.google-analytics.com'];
+const MOTEURS = ['translate.googleapis.com', 'api.mymemory.translated.net', 'lingva.lunar.icu', 'api-free.deepl.com', 'api.deepl.com', 'www.google-analytics.com'];
 const CLES = [
   'ScriptDuration',
   'TaskDuration',
@@ -449,7 +449,7 @@ async function brancherMoteurs(ctx) {
     const q = new URL(route.request().url()).searchParams.get('q') ?? '';
     return servir(route, REPLI_LATENCE, REPLI_GIGUE, json({ responseData: { translatedText: `MM:${q}` }, responseStatus: 200, matches: [] }));
   });
-  for (const hote of ['lingva.lunar.icu', 'lingva.ml']) {
+  for (const hote of ['lingva.lunar.icu']) {
     await ctx.route(`**://${hote}/**`, (route) => {
       c.lingva++;
       const texte = decodeURIComponent(new URL(route.request().url()).pathname.split('/').at(-1) ?? '');

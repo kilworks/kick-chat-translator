@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import type { UiLocale } from './i18n';
 import { SettingsSchema } from './settings';
-import { UI_LOCALES, UI_LOCALE_NAMES, isRtlLocale, detectUiLocale, resolveUiLocale, makeT } from './i18n';
-import { UI_MESSAGES } from './i18n.messages';
+import { UI_LOCALES, UI_LOCALE_NAMES, isRtlLocale, detectUiLocale, resolveUiLocale, makeT, loadUiMessages } from './i18n';
+import { UI_LOADERS } from './i18n.messages';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const keys = JSON.parse(readFileSync(join(here, 'i18n/keys.json'), 'utf8')) as string[];
@@ -18,11 +18,17 @@ describe('i18n', () => {
     expect(t('unknown zzz key')).toBe('unknown zzz key');
   });
 
-  it('a non-English t() resolves catalog entries and falls back to the key', () => {
-    const t = makeT('fr');
-    const saved = UI_MESSAGES.fr?.['saved'];
+  // The popup used to load all 42 catalogues at open. One is loaded now, the
+  // one being read; until it lands t() answers in English, never blank.
+  it('a non-English t() is English until its catalogue loads, then translated', async () => {
+    const t = makeT('ko');
+    expect(t('saved')).toBe('saved');
+    await loadUiMessages('ko');
+    const saved = (await UI_LOADERS.ko())['saved'];
     expect(saved).toBeTruthy();
+    expect(saved).not.toBe('saved');
     expect(t('saved')).toBe(saved);
+    expect(makeT('ko')('saved')).toBe(saved);
     expect(t('unknown zzz key')).toBe('unknown zzz key');
   });
 
@@ -66,10 +72,10 @@ describe('i18n', () => {
     for (const l of UI_LOCALES) expect(UI_LOCALE_NAMES[l]).toBeTruthy();
   });
 
-  it('every non-English catalog covers exactly the canonical keys, with no empty values', () => {
+  it('every non-English catalog covers exactly the canonical keys, with no empty values', async () => {
     const canonical = [...keys].sort();
     for (const loc of nonEn) {
-      const map = UI_MESSAGES[loc];
+      const map = await UI_LOADERS[loc]();
       expect(map, `missing catalog: ${loc}`).toBeTruthy();
       expect(Object.keys(map ?? {}).sort()).toEqual(canonical);
       for (const [k, v] of Object.entries(map ?? {})) {
