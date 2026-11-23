@@ -136,6 +136,6 @@ describe('cache housekeeping', () => {
   it('schedules the daily prune at start', async () => {
     const { alarms } = await loadWorker({}, {});
     await settle();
-    expect(alarms).toContain('kt-cache-prune');
+    expect(alarms).toContain('kt.cachePrune');
   });
 });

@@ -171,7 +171,7 @@ function scheduleDeeplUsageRefresh(): void {
   }, 5 * 60_000);
 }
 
-const CACHE_PRUNE_ALARM = 'kt-cache-prune';
+const CACHE_PRUNE_ALARM = 'kt.cachePrune';
 
 async function init(): Promise<void> {
   settings = await loadSettings();
