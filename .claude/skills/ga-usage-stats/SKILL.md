@@ -114,3 +114,25 @@ metrics and 50 dimensions per property; this uses 14 and 5.
   (883,108); dimension name (1078,135), parameter (1060,235); metric name
   (1078,77), parameter (1060,178), unit menu (1280,178) then "Standard"
   (1240,213); save (1520,20). Read the table back after each batch.
+
+## 7. Daily report, automatic (since 2026-11-23)
+
+Do not rebuild or rediscover any of this: it runs on its own.
+
+- Oracle cron `0 9 * * *` (Paris time) runs `~/ga-report/ga_report.py`, which reads
+  both properties through the GA4 Data API and posts the report in Discord
+  `#bot-ops` (channel 1568060531531587675) with the Chat Translator bot token.
+  Log `~/ga-report/ga_report.log`. `python3 ga_report.py --dry` prints instead of posting.
+- Source: repo `chat-translator-discord`, `ga_report/ga_report.py` (commit fd1e8bd).
+  Redeploy = `scp ga_report/ga_report.py oracle:ga-report/`.
+- Auth: service account `ga-report@kicktranslator.iam.gserviceaccount.com`
+  (GCP project `kicktranslator`, Analytics Data API already enabled, key id
+  16c85a7a...), Viewer on GA account 412256768 (so both properties). Key only on
+  Oracle `~/ga-report/sa.json` (600), no copy on the PC. PyJWT signs the JWT, no
+  google library. `~/ga-report/env` holds only `DISCORD_BOT_TOKEN` (600).
+- KCT property 559336585, TCT property 561930909 (stream 16255096729, G-9EZ5ZNVKM0).
+- runReport takes at most 10 metrics: the summary is fetched in two calls.
+- Reading the numbers: one event = one user-day; counters are per user-day
+  averages in the GA UI cards (`has_7tv` 0.28 proves it). The script divides sums by eventCount.
+- Known anomaly: TCT versions (1.0.x, 1.1.0) also land in the KCT property; the
+  report counts them on a "hors 3.x" line. 1.0.0 shipped the KCT id; 1.0.2+ is unexplained.

@@ -1,0 +1,86 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-11-19T20:52:08.852Z",
+        "reason": "Kick's own UI font; art direction fixed to the host (.agent/PROMPT.md section 3, mission file kct-prompt-ui-confort.md)"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "scratchpad/perf/dist-fuite/assets/index.html-BqCeuoe7.js"
+        ],
+        "createdAt": "2026-11-22T03:33:43.831Z",
+        "reason": "agent: minified 3.6.1 reference build copied into git-ignored scratchpad for perf measurement, not source"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "scratchpad/perf/dist-3.6.1-metrics/assets/index.html-BqCeuoe7.js"
+        ],
+        "createdAt": "2026-11-22T03:33:43.957Z",
+        "reason": "agent: minified 3.6.1 reference build copied into git-ignored scratchpad for perf measurement, not source"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "scratchpad/perf/dist-3.6.1/assets/index.html-BqCeuoe7.js"
+        ],
+        "createdAt": "2026-11-22T03:37:41.747Z",
+        "reason": "agent: minified 3.6.1 reference build copied into git-ignored scratchpad for perf measurement, not source"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "scratchpad/perf/dist-r/assets/index.html-Cpavpe2z.js"
+        ],
+        "createdAt": "2026-11-22T07:22:42.166Z",
+        "reason": "agent: minified build copy in git-ignored scratchpad for perf measurement, not source"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "scratchpad/perf/dist-r-m5/assets/index.html-Cpavpe2z.js"
+        ],
+        "createdAt": "2026-11-22T07:22:42.289Z",
+        "reason": "agent: minified build copy in git-ignored scratchpad for perf measurement, not source"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "scratchpad/perf/dist-tout/assets/index.html-2_-pOu1w.js"
+        ],
+        "createdAt": "2026-11-22T07:29:06.924Z",
+        "reason": "agent: minified build copy in git-ignored scratchpad for perf measurement, not source"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "scratchpad/perf/dist-new/assets/index.html-Cpavpe2z.js"
+        ],
+        "createdAt": "2026-11-22T08:58:08.205Z",
+        "reason": "agent: minified build copy in git-ignored scratchpad for perf measurement, not source"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "test/e2e/options/display.html"
+        ],
+        "createdAt": "2026-11-22T10:00:15.197Z",
+        "reason": "agent: git-ignored snapshot written by run-gates, options UI untouched by this branch"
+      }
+    ]
+  }
+}

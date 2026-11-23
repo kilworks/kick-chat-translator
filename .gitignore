@@ -32,3 +32,7 @@ test/e2e/*
 # leaves it on exactly one machine.
 .claude/*
 !.claude/skills/
+
+__pycache__/
+# Kick brand fonts: never in this public repo
+store/kick/kit/fonts/
