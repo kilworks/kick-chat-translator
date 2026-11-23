@@ -14,12 +14,13 @@ amo/description/<lang>.txt      description (15000 chars), set through the API
 amo/reviewer-notes.txt          notes for AMO reviewers; {{VERSION}}, {{CHECKSUMS}} and
                                 {{TOOLCHAIN}} are filled at build time
 amo/data-collection.txt         answers for AMO's data collection form
-notes/<lang>.txt                release notes of the version being shipped (AMO)
+notes/en.txt                    release notes of the version being shipped, English only (AMO
+                                shows them in every locale)
 keywords.json                   the queries each language is tracked on, read by scripts/stores/rank.mjs
 ```
 
 `<lang>` is a key of `scripts/stores/languages.mjs`, which lists the 42 listing languages, their
-`_locales` directory and the AMO locales each one feeds. `amo/` and `notes/` exist only for the
+`_locales` directory and the AMO locales each one feeds. `amo/` exists only for the
 languages AMO serves.
 The name and the short description Chrome shows under it are not here: they are
 the manifest's `extName` and `extDescription`, in `public/_locales/*/messages.json`,
