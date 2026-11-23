@@ -42,7 +42,9 @@ fs.mkdirSync(OUT, { recursive: true });
 
 const markdown = fs.readFileSync(CHEMIN, 'utf8');
 const requete = path.join(os.tmpdir(), `kct-md-${process.pid}.json`);
-fs.writeFileSync(requete, JSON.stringify({ text: markdown, mode: 'gfm' }), 'utf8');
+// mode markdown, as GitHub renders a file in a repository; gfm is the comment mode,
+// where every line break is a hard break (it stacked the badges one per line).
+fs.writeFileSync(requete, JSON.stringify({ text: markdown, mode: 'markdown' }), 'utf8');
 
 let corps;
 try {
