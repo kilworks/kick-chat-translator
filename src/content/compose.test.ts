@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultSettings } from '~/shared/settings';
 import { COMPOSE_DEBOUNCE_MS } from './composeLogic';
+import type * as Selectors from './selectors';
 
 const ui = vi.hoisted(() => ({
   state: 'hidden',
@@ -33,7 +34,7 @@ vi.mock('./langChip', () => ({
 vi.mock('./platform', () => ({ refresh7TV: () => false }));
 vi.mock('./usage', () => ({ countUsage: () => undefined }));
 vi.mock('./selectors', async (orig) => ({
-  ...(await orig<typeof import('./selectors')>()),
+  ...(await orig<typeof Selectors>()),
   findComposer: () => document.querySelector<HTMLElement>('#composer'),
 }));
 vi.mock('~/shared/messages', () => ({
