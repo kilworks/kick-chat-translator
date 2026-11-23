@@ -743,8 +743,11 @@ export class TranslationPipeline {
         metrics.count('cache.mem.store');
         metrics.timing('cache.mem.size', memCache.size());
       }
+      // Before the glossary: a replay passes through the line above again, and a
+      // glossary changed since applies to it. Names are restored so the compose
+      // path, which reads this same cache, never shows a placeholder.
       memCache.set(real, this.effTarget, {
-        translatedText: tt,
+        translatedText: restoreNames(result.translatedText),
         detectedLang: result.detectedLang,
         provider: result.provider,
       });
