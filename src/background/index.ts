@@ -10,7 +10,7 @@ import { TranslationCoalescer } from './coalescer';
 import { anyProviderReady, getProviderStatus, setDeeplUsagePct } from './translator';
 import { armKeepalive, installKeepalive, listenKeepalive } from './keepalive';
 import { getUpdateStatus, installUpdateCheck } from './updateChecker';
-import { DEEPL_USAGE_FREE, DEEPL_USAGE_PRO, STORAGE_KEY_SETTINGS } from '~/shared/constants';
+import { DEEPL_USAGE_FREE, DEEPL_USAGE_PRO } from '~/shared/constants';
 import { getSemanticOverride } from '~/shared/transliterationGuard';
 import { ecrireAutourDesEmotes } from './lexicalWrite';
 import { CHAT_MESSAGES } from '~/content/i18n';
@@ -36,12 +36,6 @@ function bucketFor(channel: string): TokenBucket {
 }
 
 function applySettings(next: Settings): void {
-  // Auto-promote DeepL to #1 when a key is configured but DeepL is missing from the chain.
-  if (next.deeplApiKey && !next.providerOrder.includes('deepl')) {
-    next = { ...next, providerOrder: ['deepl', ...next.providerOrder] };
-    void chrome.storage.sync.set({ [STORAGE_KEY_SETTINGS]: next });
-    log.info('DeepL key detected, auto-added to provider chain as #1');
-  }
   // Consent withdrawn: the day counted so far goes with it.
   if (settings.usageStats && !next.usageStats) void dropUsage();
   settings = next;
