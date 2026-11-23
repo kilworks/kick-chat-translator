@@ -67,7 +67,7 @@ const SETTINGS = {
   minTextLength: 3, ignoreEnglish: true, ignoreBots: true, blacklistUsers: [],
   blacklistChannels: [], whitelistChannels: [], sourceLangAllowlist: [], glossary: [],
   cacheMaxEntries: 15000, cacheTtlHours: 72, concurrency: 4, perChannelBudgetPerMin: 200,
-  connectionMode: 'auto', pauseWhenHidden: true, debug: false, lingvaInstance: '',
+  pauseWhenHidden: true, debug: false, lingvaInstance: '',
   myMemoryEmail: '', deeplBudgetPct: 0, deeplSmartRouting: true,
 };
 

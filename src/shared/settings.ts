@@ -132,8 +132,6 @@ export const SettingsSchema = z.object({
   concurrency: z.number().int().min(1).max(16).default(4),
   perChannelBudgetPerMin: z.number().int().min(10).max(2000).default(200),
 
-  // Connection strategy
-  connectionMode: z.enum(['auto', 'websocket', 'dom']).default('auto'),
   // Pause translating in tabs that aren't visible — stops background tabs from
   // burning provider quota (DeepL) while you're not watching.
   pauseWhenHidden: z.boolean().default(true),

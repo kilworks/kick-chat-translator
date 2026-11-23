@@ -137,16 +137,3 @@ describe('engineMode x localEnabled, no on-device model (Firefox)', () => {
     expect(o.skipped).toBe(expSkipped);
   });
 });
-
-describe('websocket warm pass', () => {
-  it.each<[Mode, boolean]>([
-    ['local-first', true],
-    ['cloud-first', true],
-    ['local-only', false],
-  ])('%s sends a cloud warm-up: %s', async (mode, expected) => {
-    sendMock.mockResolvedValue(ok);
-    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false, engineMode: mode, localEnabled: false });
-    await p.onWebSocketMessage({ id: 'w1', text: LINE, channel: 'chan', username: 'user', isBot: false } as never);
-    expect(sendMock.mock.calls.some((c) => (c[0] as { type: string }).type === 'translate')).toBe(expected);
-  });
-});

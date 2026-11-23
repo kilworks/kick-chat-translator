@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { extractChannelSlug, fetchChannelLangIso, fetchChatroomId } from './kickApi';
+import { extractChannelSlug, fetchChannelLangIso } from './kickApi';
 
 const mockFetch = (body: unknown, status = 200): void => {
   globalThis.fetch = vi.fn(async () => new Response(JSON.stringify(body), { status })) as unknown as typeof fetch;
@@ -57,26 +57,21 @@ describe('channel metadata requests', () => {
     vi.unstubAllGlobals();
   });
 
-  it('reads the chatroom id', async () => {
-    mockFetch({ chatroom: { id: 4242 }, livestream: { lang_iso: 'en' } });
-    expect(await fetchChatroomId('kt-test-room')).toBe(4242);
-  });
-
-  // Opening a channel asks for the language and the chatroom id at almost the same
-  // moment; both go through one metadata call, so Kick sees one request per visit.
+  // Compose and the bar ask for the language at almost the same moment on a
+  // route change; both go through one metadata call, so Kick sees one request.
   it('coalesces concurrent lookups into a single request', async () => {
     const spy = vi.fn(
       async () => new Response(JSON.stringify({ chatroom: { id: 7 }, livestream: { lang_iso: 'ja' } }), { status: 200 }),
     );
     globalThis.fetch = spy as unknown as typeof fetch;
 
-    const [lang, id] = await Promise.all([
+    const [lang, again] = await Promise.all([
       fetchChannelLangIso('kt-test-coalesce'),
-      fetchChatroomId('kt-test-coalesce'),
+      fetchChannelLangIso('kt-test-coalesce'),
     ]);
 
     expect(lang).toBe('ja');
-    expect(id).toBe(7);
+    expect(again).toBe('ja');
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
