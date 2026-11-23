@@ -253,4 +253,5 @@ export const es: Record<string, string> = {
   'Text': 'Texto',
   'Colour and theme': 'Color y tema',
   'In the chat': 'En el chat',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "No utilizado: solo se acepta una dirección https://, por lo que el texto del chat nunca viaja sin cifrar.",
 };

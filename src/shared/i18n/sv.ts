@@ -442,4 +442,5 @@ export const sv: Record<string, string> = {
   'Text': 'Text',
   'Colour and theme': 'Färg och tema',
   'In the chat': 'I chatten',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Används inte: endast en https://-adress accepteras, så chatttexten färdas aldrig okrypterad.",
 };

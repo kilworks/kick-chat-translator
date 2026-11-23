@@ -289,4 +289,5 @@ export const cs: Record<string, string> = {
   'Text': 'Text',
   'Colour and theme': 'Barva a motiv',
   'In the chat': 'V chatu',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Nepoužívá se: přijímá se pouze adresa https://, takže text chatu nikdy necestuje nezašifrovaný.",
 };

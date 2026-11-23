@@ -253,4 +253,5 @@ export const el: Record<string, string> = {
   'Text': 'Κείμενο',
   'Colour and theme': 'Χρώμα και θέμα',
   'In the chat': 'Στη συνομιλία',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Δεν χρησιμοποιείται: μόνο μια διεύθυνση https:// είναι αποδεκτή, επομένως το κείμενο συνομιλίας δεν ταξιδεύει ποτέ χωρίς κρυπτογράφηση.",
 };

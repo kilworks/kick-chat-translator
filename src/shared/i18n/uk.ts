@@ -253,4 +253,5 @@ export const uk: Record<string, string> = {
   'Text': 'Текст',
   'Colour and theme': 'Колір і тема',
   'In the chat': 'У чаті',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Не використовується: приймається лише адреса https://, тому текст чату ніколи не передається незашифрованим.",
 };

@@ -193,3 +193,26 @@ describe('lingvaProvider', () => {
     expect(new Set(hosts).size).toBe(hosts.length);
   });
 });
+
+// Chat text travels in the URL path: over http, anyone on the network reads it.
+describe('a custom Lingva instance', () => {
+  it('is used only over https; a plain-http one falls back to the default pool', async () => {
+    const hosts: string[] = [];
+    globalThis.fetch = vi.fn(async (url: unknown) => {
+      hosts.push(new URL(String(url)).origin);
+      return reply('hola');
+    }) as unknown as typeof fetch;
+    await lingvaProvider.translate({ messageId: '1', text: 'hi', targetLang: 'es' }, { ...baseCtx, lingvaInstance: 'http://lingva.example' });
+    expect(hosts).toEqual(['https://lingva.lunar.icu']);
+  });
+
+  it('is used as given over https', async () => {
+    const hosts: string[] = [];
+    globalThis.fetch = vi.fn(async (url: unknown) => {
+      hosts.push(new URL(String(url)).origin);
+      return reply('hola');
+    }) as unknown as typeof fetch;
+    await lingvaProvider.translate({ messageId: '1', text: 'hi', targetLang: 'es' }, { ...baseCtx, lingvaInstance: 'https://lingva.example' });
+    expect(hosts).toEqual(['https://lingva.example']);
+  });
+});

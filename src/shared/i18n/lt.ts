@@ -253,4 +253,5 @@ export const lt: Record<string, string> = {
   'Text': 'Tekstas',
   'Colour and theme': 'Spalva ir tema',
   'In the chat': 'Pokalbyje',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Nenaudojamas: priimamas tik https:// adresas, todėl pokalbio tekstas niekada nekeliauja nešifruotas.",
 };

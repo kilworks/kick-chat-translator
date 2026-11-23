@@ -289,4 +289,5 @@ export const pl: Record<string, string> = {
   'Text': 'Tekst',
   'Colour and theme': 'Kolor i motyw',
   'In the chat': 'Na czacie',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Nieużywane: akceptowany jest tylko adres https://, więc tekst czatu nigdy nie jest przesyłany w postaci niezaszyfrowanej.",
 };

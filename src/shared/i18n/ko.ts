@@ -253,4 +253,5 @@ export const ko: Record<string, string> = {
   'Text': '텍스트',
   'Colour and theme': '색상 및 테마',
   'In the chat': '채팅에서',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "사용되지 않음: https:// 주소만 허용되므로 채팅 텍스트는 암호화되지 않은 상태로 전달되지 않습니다.",
 };

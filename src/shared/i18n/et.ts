@@ -253,4 +253,5 @@ export const et: Record<string, string> = {
   'Text': 'Tekst',
   'Colour and theme': 'Värv ja teema',
   'In the chat': 'Vestluses',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Ei kasutata: aktsepteeritakse ainult https:// aadressi, seega ei liigu vestlustekst kunagi krüptimata.",
 };

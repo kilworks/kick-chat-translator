@@ -253,4 +253,5 @@ export const ar: Record<string, string> = {
   'Text': 'النص',
   'Colour and theme': 'اللون والمظهر',
   'In the chat': 'في الدردشة',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "غير مستخدم: يتم قبول عنوان https:// فقط، لذلك لا ينتقل نص الدردشة مطلقًا بدون تشفير.",
 };

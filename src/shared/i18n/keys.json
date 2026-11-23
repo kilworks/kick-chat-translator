@@ -251,5 +251,6 @@
   "{lang}: download failed, try again",
   "Text",
   "Colour and theme",
-  "In the chat"
+  "In the chat",
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted."
 ]

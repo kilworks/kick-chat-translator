@@ -253,4 +253,5 @@ export const ms: Record<string, string> = {
   'Text': 'Teks',
   'Colour and theme': 'Warna dan tema',
   'In the chat': 'Dalam sembang',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Tidak digunakan: hanya alamat https:// diterima, jadi teks sembang tidak pernah pergi tanpa disulitkan.",
 };

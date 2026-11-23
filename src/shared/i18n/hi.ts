@@ -253,4 +253,5 @@ export const hi: Record<string, string> = {
   'Text': 'टेक्स्ट',
   'Colour and theme': 'रंग और थीम',
   'In the chat': 'चैट में',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "उपयोग नहीं किया गया: केवल https:// पता स्वीकार किया जाता है, इसलिए चैट टेक्स्ट कभी भी अनएन्क्रिप्टेड नहीं होता है।",
 };

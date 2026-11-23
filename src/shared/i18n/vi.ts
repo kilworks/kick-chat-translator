@@ -253,4 +253,5 @@ export const vi: Record<string, string> = {
   'Text': 'Văn bản',
   'Colour and theme': 'Màu sắc và giao diện',
   'In the chat': 'Trong trò chuyện',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Không được sử dụng: chỉ địa chỉ https:// được chấp nhận, do đó, văn bản trò chuyện không bao giờ được mã hóa.",
 };

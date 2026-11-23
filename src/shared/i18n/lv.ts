@@ -253,4 +253,5 @@ export const lv: Record<string, string> = {
   'Text': 'Teksts',
   'Colour and theme': 'Krāsa un motīvs',
   'In the chat': 'Tērzēšanā',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Netiek izmantots: tiek pieņemta tikai https:// adrese, tāpēc tērzēšanas teksts nekad netiek sūtīts nešifrēts.",
 };

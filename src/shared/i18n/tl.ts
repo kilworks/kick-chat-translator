@@ -253,4 +253,5 @@ export const tl: Record<string, string> = {
   'Text': 'Teksto',
   'Colour and theme': 'Kulay at tema',
   'In the chat': 'Sa chat',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Hindi ginagamit: isang https:// address lang ang tinatanggap, kaya ang text ng chat ay hindi kailanman naglalakbay nang hindi naka-encrypt.",
 };

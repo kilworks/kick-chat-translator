@@ -253,4 +253,5 @@ export const th: Record<string, string> = {
   'Text': 'ข้อความ',
   'Colour and theme': 'สีและธีม',
   'In the chat': 'ในแชท',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "ไม่ได้ใช้: ยอมรับเฉพาะที่อยู่ https:// เท่านั้น ดังนั้นข้อความแชทจะไม่เดินทางโดยไม่เข้ารหัส",
 };

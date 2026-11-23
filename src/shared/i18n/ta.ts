@@ -253,4 +253,5 @@ export const ta: Record<string, string> = {
   'Text': 'உரை',
   'Colour and theme': 'நிறம் மற்றும் தீம்',
   'In the chat': 'அரட்டையில்',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "பயன்படுத்தப்படவில்லை: https:// முகவரி மட்டுமே ஏற்றுக்கொள்ளப்படும், எனவே அரட்டை உரை மறைகுறியாக்கப்படாது.",
 };

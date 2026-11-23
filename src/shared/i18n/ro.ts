@@ -253,4 +253,5 @@ export const ro: Record<string, string> = {
   'Text': 'Text',
   'Colour and theme': 'Culoare și temă',
   'In the chat': 'În chat',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Nu este utilizat: este acceptată doar o adresă https://, astfel încât textul de chat nu circulă niciodată necriptat.",
 };

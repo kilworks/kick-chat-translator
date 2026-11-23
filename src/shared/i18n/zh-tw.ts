@@ -283,4 +283,5 @@ export const zh_tw: Record<string, string> = {
   'Text': '文字',
   'Colour and theme': '顏色與主題',
   'In the chat': '聊天室中',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "未使用：僅接受 https:// 位址，因此聊天文字絕不會在未加密的情況下傳輸。",
 };

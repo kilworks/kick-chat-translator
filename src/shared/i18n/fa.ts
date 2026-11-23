@@ -253,4 +253,5 @@ export const fa: Record<string, string> = {
   'Text': 'متن',
   'Colour and theme': 'رنگ و پوسته',
   'In the chat': 'در چت',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "استفاده نمی شود: فقط یک آدرس https:// پذیرفته می شود، بنابراین متن چت هرگز بدون رمز عبور نمی کند.",
 };

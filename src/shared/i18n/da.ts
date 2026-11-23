@@ -253,4 +253,5 @@ export const da: Record<string, string> = {
   'Text': 'Tekst',
   'Colour and theme': 'Farve og tema',
   'In the chat': 'I chatten',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Bruges ikke: kun en https://-adresse accepteres, så chatteksten rejser aldrig ukrypteret.",
 };

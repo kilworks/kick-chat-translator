@@ -312,6 +312,12 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
           <p class="text-xs text-kick-muted">
             {t('Leave blank to use the default public instance.')}
           </p>
+          {/* Always in the DOM, so a screen reader hears the sentence when it appears. */}
+          <p class="text-xs text-red-400" role="status">
+            {settings.lingvaInstance && !settings.lingvaInstance.startsWith('https://')
+              ? t('Not used: only an https:// address is accepted, so chat text never travels unencrypted.')
+              : ''}
+          </p>
         </div>
       </section>
     </>

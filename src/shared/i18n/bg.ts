@@ -253,4 +253,5 @@ export const bg: Record<string, string> = {
   'Text': 'Текст',
   'Colour and theme': 'Цвят и тема',
   'In the chat': 'В чата',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Не се използва: приема се само https:// адрес, така че текстът на чата никога не пътува некриптиран.",
 };

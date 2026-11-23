@@ -253,4 +253,5 @@ export const ja: Record<string, string> = {
   'Text': 'テキスト',
   'Colour and theme': '色とテーマ',
   'In the chat': 'チャット内',
+  "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "使用されません: https:// アドレスのみが受け入れられるため、チャット テキストが暗号化されずに送信されることはありません。",
 };

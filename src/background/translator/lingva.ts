@@ -7,11 +7,20 @@ interface LingvaResponse {
   info?: { detectedSource?: string };
 }
 
+/** Chat text travels in the URL path, so a custom instance is used over https only. */
+function httpsOnly(url: string): boolean {
+  try {
+    return new URL(url).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 // Rotate through the public pool so one overloaded host (500s) doesn't kill the
-// whole provider. A user-supplied instance always takes priority.
+// whole provider. A user-supplied https instance always takes priority.
 let poolIdx = 0;
 function instancesFor(ctx: ProviderContext): string[] {
-  if (ctx.lingvaInstance) return [ctx.lingvaInstance];
+  if (ctx.lingvaInstance && httpsOnly(ctx.lingvaInstance)) return [ctx.lingvaInstance];
   const ordered = LINGVA_POOL.map((_, i) => LINGVA_POOL[(poolIdx + i) % LINGVA_POOL.length]!);
   poolIdx = (poolIdx + 1) % LINGVA_POOL.length;
   return ordered;
