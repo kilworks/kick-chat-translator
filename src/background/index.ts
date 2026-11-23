@@ -319,7 +319,7 @@ chrome.commands?.onCommand.addListener((command) => {
 
 chrome.runtime.onInstalled.addListener(() => {
   log.info('Installed / updated');
-  void init();
+  // No init() here: the module already ran it when this worker started.
   void reinjecterOngletsOuverts();
 });
 
