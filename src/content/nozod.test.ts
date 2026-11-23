@@ -93,7 +93,7 @@ describe('content script dependency budget', () => {
    *
    * `~/shared/i18n` exports resolveUiLocale, which is exactly the function the
    * content script wants when it turns `uiLang` into a locale, and importing it
-   * drags UI_MESSAGES along: nine catalogues for the popup and the options page,
+   * drags UI_LOADERS along: the catalogues for the popup and the options page,
    * 128.2KB of them, onto every Kick page. src/content/msg.ts carries its own
    * four-line resolver for that reason, and this is what keeps the shortcut from
    * looking harmless to the next person.
@@ -117,9 +117,11 @@ describe('content script dependency budget', () => {
 
   it('confirms shared/i18n.messages.ts is what would come with it', () => {
     // Control on the rule above: the module named there is still the one that
-    // pulls every interface catalogue in, one per language beyond English.
+    // reaches every interface catalogue, one loader per language beyond English.
+    // The content script is bundled without dynamic imports, so even loaders
+    // would pull all of them in.
     const src = readFileSync('src/shared/i18n.messages.ts', 'utf8');
-    expect(src).toContain('UI_MESSAGES');
-    expect((src.match(/^import\s+\{\s*\w+\s*\}\s*from\s*'\.\/i18n\//gm) ?? []).length).toBe(42);
+    expect(src).toContain('UI_LOADERS');
+    expect((src.match(/import\('\.\/i18n\//g) ?? []).length).toBe(42);
   });
 });

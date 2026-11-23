@@ -1,95 +1,56 @@
 import type { UiLocale } from './i18n';
-import { fr } from './i18n/fr';
-import { es } from './i18n/es';
-import { pt } from './i18n/pt';
-import { pt_pt } from './i18n/pt-pt';
-import { de } from './i18n/de';
-import { it } from './i18n/it';
-import { nl } from './i18n/nl';
-import { pl } from './i18n/pl';
-import { sv } from './i18n/sv';
-import { no } from './i18n/no';
-import { da } from './i18n/da';
-import { fi } from './i18n/fi';
-import { cs } from './i18n/cs';
-import { sk } from './i18n/sk';
-import { sl } from './i18n/sl';
-import { hu } from './i18n/hu';
-import { ro } from './i18n/ro';
-import { ca } from './i18n/ca';
-import { et } from './i18n/et';
-import { lt } from './i18n/lt';
-import { lv } from './i18n/lv';
-import { tr } from './i18n/tr';
-import { vi } from './i18n/vi';
-import { id } from './i18n/id';
-import { ms } from './i18n/ms';
-import { tl } from './i18n/tl';
-import { ru } from './i18n/ru';
-import { uk } from './i18n/uk';
-import { bg } from './i18n/bg';
-import { el } from './i18n/el';
-import { ar } from './i18n/ar';
-import { he } from './i18n/he';
-import { fa } from './i18n/fa';
-import { hi } from './i18n/hi';
-import { bn } from './i18n/bn';
-import { ta } from './i18n/ta';
-import { th } from './i18n/th';
-import { ja } from './i18n/ja';
-import { ko } from './i18n/ko';
-import { zh } from './i18n/zh';
-import { zh_tw } from './i18n/zh-tw';
-import { yue } from './i18n/yue';
 
 /**
- * UI translation catalog: English string (key) → translation, per non-English locale.
+ * UI translation catalogs: English string (key) → translation, per non-English locale.
  * Anything missing falls back to the English key, so partial coverage is safe.
  * Per-language maps live in ./i18n/<locale>.ts (keys mirror src/shared/i18n/keys.json).
+ *
+ * One loader per locale, each its own chunk: the popup and the options page load
+ * the language they show, not all of them (the 42 were 740 KB of every open).
  */
-export type UiCatalog = Partial<Record<Exclude<UiLocale, 'en'>, Record<string, string>>>;
+export type UiCatalog = Record<string, string>;
 
-export const UI_MESSAGES: UiCatalog = {
-  fr,
-  es,
-  pt,
-  'pt-pt': pt_pt,
-  de,
-  it,
-  nl,
-  pl,
-  sv,
-  no,
-  da,
-  fi,
-  cs,
-  sk,
-  sl,
-  hu,
-  ro,
-  ca,
-  et,
-  lt,
-  lv,
-  tr,
-  vi,
-  id,
-  ms,
-  tl,
-  ru,
-  uk,
-  bg,
-  el,
-  ar,
-  he,
-  fa,
-  hi,
-  bn,
-  ta,
-  th,
-  ja,
-  ko,
-  zh,
-  'zh-tw': zh_tw,
-  yue,
+export const UI_LOADERS: Record<Exclude<UiLocale, 'en'>, () => Promise<UiCatalog>> = {
+  fr: () => import('./i18n/fr').then((m) => m.fr),
+  es: () => import('./i18n/es').then((m) => m.es),
+  pt: () => import('./i18n/pt').then((m) => m.pt),
+  'pt-pt': () => import('./i18n/pt-pt').then((m) => m.pt_pt),
+  de: () => import('./i18n/de').then((m) => m.de),
+  it: () => import('./i18n/it').then((m) => m.it),
+  nl: () => import('./i18n/nl').then((m) => m.nl),
+  pl: () => import('./i18n/pl').then((m) => m.pl),
+  sv: () => import('./i18n/sv').then((m) => m.sv),
+  no: () => import('./i18n/no').then((m) => m.no),
+  da: () => import('./i18n/da').then((m) => m.da),
+  fi: () => import('./i18n/fi').then((m) => m.fi),
+  cs: () => import('./i18n/cs').then((m) => m.cs),
+  sk: () => import('./i18n/sk').then((m) => m.sk),
+  sl: () => import('./i18n/sl').then((m) => m.sl),
+  hu: () => import('./i18n/hu').then((m) => m.hu),
+  ro: () => import('./i18n/ro').then((m) => m.ro),
+  ca: () => import('./i18n/ca').then((m) => m.ca),
+  et: () => import('./i18n/et').then((m) => m.et),
+  lt: () => import('./i18n/lt').then((m) => m.lt),
+  lv: () => import('./i18n/lv').then((m) => m.lv),
+  tr: () => import('./i18n/tr').then((m) => m.tr),
+  vi: () => import('./i18n/vi').then((m) => m.vi),
+  id: () => import('./i18n/id').then((m) => m.id),
+  ms: () => import('./i18n/ms').then((m) => m.ms),
+  tl: () => import('./i18n/tl').then((m) => m.tl),
+  ru: () => import('./i18n/ru').then((m) => m.ru),
+  uk: () => import('./i18n/uk').then((m) => m.uk),
+  bg: () => import('./i18n/bg').then((m) => m.bg),
+  el: () => import('./i18n/el').then((m) => m.el),
+  ar: () => import('./i18n/ar').then((m) => m.ar),
+  he: () => import('./i18n/he').then((m) => m.he),
+  fa: () => import('./i18n/fa').then((m) => m.fa),
+  hi: () => import('./i18n/hi').then((m) => m.hi),
+  bn: () => import('./i18n/bn').then((m) => m.bn),
+  ta: () => import('./i18n/ta').then((m) => m.ta),
+  th: () => import('./i18n/th').then((m) => m.th),
+  ja: () => import('./i18n/ja').then((m) => m.ja),
+  ko: () => import('./i18n/ko').then((m) => m.ko),
+  zh: () => import('./i18n/zh').then((m) => m.zh),
+  'zh-tw': () => import('./i18n/zh-tw').then((m) => m.zh_tw),
+  yue: () => import('./i18n/yue').then((m) => m.yue),
 };

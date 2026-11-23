@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { Settings } from '~/shared/settings';
 import { defaultSettings } from '~/shared/settings';
 import { send } from '~/shared/messages';
-import { I18nProvider } from '~/shared/i18nContext';
+import { I18nProvider, useLoadedLocale } from '~/shared/i18nContext';
 import { DiscordLink } from '~/shared/discord';
 import { makeT, resolveUiLocale, isRtlLocale, UI_LOCALES, UI_LOCALE_NAMES } from '~/shared/i18n';
 import type { UiLocale } from '~/shared/i18n';
@@ -46,7 +46,7 @@ export function App() {
   const [savedAt, setSavedAt] = useState<number | undefined>(undefined);
   const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
 
-  const locale = resolveUiLocale(settings.uiLang);
+  const locale = useLoadedLocale(resolveUiLocale(settings.uiLang));
   const t = useMemo(() => makeT(locale), [locale]);
 
   useEffect(() => {

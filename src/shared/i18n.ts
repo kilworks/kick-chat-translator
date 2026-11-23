@@ -2,12 +2,12 @@
  * UI internationalization for the popup + options page.
  *
  * Strategy: the English string IS the lookup key (gettext-style). Components keep
- * readable English in the JSX via `t('Cloud engines')`; the catalog in
- * `i18n.messages.ts` maps that English string to each non-English locale. English
+ * readable English in the JSX via `t('Cloud engines')`; `i18n.messages.ts` loads,
+ * per non-English locale, the catalog that maps that English string. English
  * needs no catalog (the key is the message), and any missing translation falls back
  * to the English key — so the UI is never blank.
  */
-import { UI_MESSAGES } from './i18n.messages';
+import { UI_LOADERS, type UiCatalog } from './i18n.messages';
 import { matchUiLocale } from './uiLocaleMatch';
 
 /**
@@ -98,9 +98,20 @@ export function resolveUiLocale(setting: string | undefined): UiLocale {
 
 export type TFunc = (key: string) => string;
 
-/** Build a translate function bound to one locale. English returns the key verbatim. */
+const loaded: Partial<Record<UiLocale, UiCatalog>> = {};
+
+/** Fetch one locale's catalogue. Pages await it before they render in that locale. */
+export async function loadUiMessages(locale: UiLocale): Promise<void> {
+  if (locale === 'en' || loaded[locale]) return;
+  loaded[locale] = await UI_LOADERS[locale]();
+}
+
+/**
+ * Build a translate function bound to one locale. English returns the key
+ * verbatim, and so does any locale whose catalogue has not loaded yet: the
+ * table is read at each call, so a t() made early translates once it lands.
+ */
 export function makeT(locale: UiLocale): TFunc {
   if (locale === 'en') return (key) => key;
-  const table = UI_MESSAGES[locale];
-  return (key) => table?.[key] ?? key;
+  return (key) => loaded[locale]?.[key] ?? key;
 }
