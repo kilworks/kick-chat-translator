@@ -38,7 +38,7 @@ import { LANG_BLOCKED_ASK } from './filters';
 import { localEngine } from './localEngine';
 import { logPlatform, refresh7TV } from './platform';
 import { resolveBrowserLang, withFavorite } from '~/shared/languages';
-import { memoriserLangueChaine } from '~/shared/channelLang';
+import { memoriserLangueChaine, vueDeChaine } from '~/shared/channelLang';
 import { PAUSED_CHANNELS_MAX, ROUTE_POLL_MS } from '~/shared/constants';
 import { msg as localised, setChatTable, setContentLocale } from './msg';
 import { send } from '~/shared/messages';
@@ -155,11 +155,11 @@ async function main(): Promise<void> {
    * onglets, et durablement.
    *
    * Tout ce qui lit `enabled` recoit cette vue : le pipeline, la composition et
-   * le bandeau. Aucun de ces modules n'a eu a changer.
+   * le bandeau. Aucun de ces modules n'a eu a changer. La langue retenue pour
+   * la chaine y remplace `targetLang` de la meme facon, sans rien ecrire.
    */
   function vueLocale(base: Settings = settings, slug = currentSlug): Settings {
-    if (!slug || !base.pausedChannels.includes(slug)) return base;
-    return { ...base, enabled: false };
+    return vueDeChaine(base, slug);
   }
 
   const pipeline = new TranslationPipeline(vueLocale());
@@ -210,7 +210,8 @@ async function main(): Promise<void> {
 
   // ── On-device chip state ───────────────────────────────────────────
   function computeLocalChip(): LocalChipState {
-    const tgt = settings.targetLang === 'auto' ? resolveBrowserLang() : settings.targetLang;
+    const { targetLang } = vueLocale();
+    const tgt = targetLang === 'auto' ? resolveBrowserLang() : targetLang;
     return localChipState(settings.localEnabled, tgt, localEngine);
   }
 
@@ -274,7 +275,8 @@ async function main(): Promise<void> {
             }),
           onOpenOptions: () => void chrome.runtime.sendMessage({ type: 'open.options' }),
           onEnableLocal: () => {
-            const tgt = settings.targetLang === 'auto' ? resolveBrowserLang() : settings.targetLang;
+            const { targetLang } = vueLocale();
+            const tgt = targetLang === 'auto' ? resolveBrowserLang() : targetLang;
             const pairs = localEngine.downloadablePairs().filter((p) => p.tgt === tgt);
             void localEngine.download(pairs.length ? pairs : localEngine.downloadablePairs());
           },
@@ -365,11 +367,6 @@ async function main(): Promise<void> {
       compose.setChannelLang(undefined);
       return;
     }
-
-    // La langue de cette chaine, si on en connait une. Avant de monter la
-    // barre, pour qu'elle s'affiche deja sur la bonne plutot que de sauter.
-    const memoire = settings.rememberChannelLang ? settings.channelLangs[slug] : undefined;
-    if (memoire && memoire !== settings.targetLang) void patchSettings({ targetLang: memoire });
 
     refresh7TV();
     logPlatform();
@@ -559,8 +556,8 @@ async function main(): Promise<void> {
     // Le verdict qui compte est celui de la chaine courante, pas l'interrupteur
     // general : c'est lui qui decide si l'observateur tourne et ce que le
     // bandeau affiche.
-    const wasEnabled = vueLocale().enabled;
-    const prev = settings;
+    const prev = vueLocale();
+    const wasEnabled = prev.enabled;
     settings = next;
     setUsageEnabled(next.usageStats);
     const vue = vueLocale(next);
@@ -582,7 +579,9 @@ async function main(): Promise<void> {
 
     // Ordered after updateSettings on purpose: the rows are re-run through the
     // pipeline, which must already hold the new settings when they arrive.
-    if (vue.enabled && RERENDER_KEYS.some((k) => prev[k] !== next[k])) retranslateHandledRows();
+    // Compared on this tab's view: a language picked for a channel in another
+    // tab changes the stored settings, not what this tab reads.
+    if (vue.enabled && RERENDER_KEYS.some((k) => prev[k] !== vue[k])) retranslateHandledRows();
 
     if (vue.enabled && !wasEnabled) attachForRoute(true);
     if (!vue.enabled && wasEnabled) {

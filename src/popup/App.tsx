@@ -5,6 +5,7 @@ import { sortedLanguages } from '~/shared/languages';
 import { send } from '~/shared/messages';
 import { extractChannelSlug } from '~/content/kickApi';
 import { LANG_BLOCKED_ASK, channelBlockedBy } from '~/content/filters';
+import { memoriserLangueChaine, vueDeChaine } from '~/shared/channelLang';
 import { I18nProvider } from '~/shared/i18nContext';
 import { DiscordLink } from '~/shared/discord';
 import { makeT, resolveUiLocale, isRtlLocale } from '~/shared/i18n';
@@ -263,8 +264,18 @@ export function App() {
           <select
             aria-label={t('Target language')}
             class="kt-select"
-            value={settings.targetLang}
-            onChange={(e) => void patch('targetLang', (e.target as HTMLSelectElement).value)}
+            value={vueDeChaine(settings, channel).targetLang}
+            onChange={(e) => {
+              const targetLang = (e.target as HTMLSelectElement).value;
+              // On a channel whose language is remembered, the tab reads that
+              // memory, so the pick goes there too, as on the chat bar.
+              void patchMany({
+                targetLang,
+                ...(settings.rememberChannelLang && channel
+                  ? { channelLangs: memoriserLangueChaine(settings.channelLangs, channel, targetLang) }
+                  : {}),
+              });
+            }}
           >
             <option value="auto">{t('Auto (your language)')}</option>
             {langs.map((l) => (

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { memoriserLangueChaine } from './channelLang';
+import { memoriserLangueChaine, vueDeChaine } from './channelLang';
+import { defaultSettings } from './settings';
 import { CHANNEL_LANG_MAX } from './constants';
 
 /**
@@ -57,5 +58,32 @@ describe('memoriserLangueChaine', () => {
     memoire = memoriserLangueChaine(memoire, 'nouvelle', 'es');
     expect(memoire.canal0).toBe('fr');
     expect(memoire.canal1).toBeUndefined();
+  });
+});
+
+/**
+ * What a tab on one channel reads. The remembered language used to be written
+ * into the global targetLang on arrival, so opening channel B (German) in a
+ * second tab turned channel A's tab (Spanish) German too.
+ */
+describe('vueDeChaine', () => {
+  const base = { ...defaultSettings(), targetLang: 'fr', rememberChannelLang: true, channelLangs: { a: 'es', b: 'de' } };
+
+  it('reads each channel in its own language, and leaves the global alone', () => {
+    expect(vueDeChaine(base, 'a').targetLang).toBe('es');
+    expect(vueDeChaine(base, 'b').targetLang).toBe('de');
+    expect(vueDeChaine(base, 'c').targetLang).toBe('fr');
+    expect(base.targetLang).toBe('fr');
+  });
+
+  it('follows the global language when remembering is off', () => {
+    expect(vueDeChaine({ ...base, rememberChannelLang: false }, 'a').targetLang).toBe('fr');
+  });
+
+  it('turns translation off on a paused channel only', () => {
+    const paused = { ...base, enabled: true, pausedChannels: ['a'] };
+    expect(vueDeChaine(paused, 'a').enabled).toBe(false);
+    expect(vueDeChaine(paused, 'b').enabled).toBe(true);
+    expect(vueDeChaine(paused, undefined).enabled).toBe(true);
   });
 });
