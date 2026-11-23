@@ -1,7 +1,7 @@
 name: Release
 
 # A tag vX.Y.Z is a release on both stores (see .claude/skills/publish-stores).
-# Run by hand, the same job stops before anything is sent: a dry run.
+# Run by hand, only the build job runs and nothing is sent: a dry run.
 on:
   push:
     tags:
@@ -10,17 +10,24 @@ on:
 
 concurrency: release
 
+# Each job asks for what it needs. The store keys live in the `stores`
+# environment, which only a v* tag can enter, and only the publish job reads
+# them: it installs no package and runs no third-party action, so nothing but
+# this repository's own scripts runs next to them.
+permissions: {}
+
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           # preflight compares with the previous tag: it needs the tags and history.
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 20
           cache: npm
@@ -45,16 +52,40 @@ jobs:
       - name: Source archive and store payloads
         run: |
           V=$(node -p "require('./package.json').version")
-          echo "VERSION=$V" >> "$GITHUB_ENV"
           git archive --format=zip --prefix="kick-chat-translator-$V/" -o "release/kick-chat-translator-$V-source.zip" HEAD
-          node scripts/stores/payloads.mjs "$RUNNER_TEMP/stores"
+          node scripts/stores/payloads.mjs release/stores
           python3 test/audits/audit_fiche.py
           # What this release asks of a person in the Chrome dashboard, in the log
           # where a refusal would be read. It cannot tell whether it was done.
           node scripts/stores/preflight.mjs | tee -a "$GITHUB_STEP_SUMMARY"
 
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release
+          path: |
+            release/*.zip
+            release/stores
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: stores
+    permissions:
+      contents: read
+    steps:
+      # The store scripts import Node built-ins only: no install step here.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release
+          path: release
+
       - name: Store credentials
-        if: github.event_name == 'push'
         env:
           CWS_SERVICE_ACCOUNT_JSON: ${{ secrets.CWS_SERVICE_ACCOUNT_JSON }}
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
@@ -73,37 +104,30 @@ jobs:
       # A submission still in review blocks a new package: this release replaces it.
       - name: Chrome Web Store
         id: chrome
-        if: github.event_name == 'push'
         continue-on-error: true
         env:
           CWS_SA_KEY: ${{ runner.temp }}/cws-key.json
           CWS_PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
         run: |
+          V=$(node -p "require('./package.json').version")
           node scripts/stores/cws.mjs cancel || echo "no submission in review to cancel"
-          node scripts/stores/cws.mjs upload "release/kick-chat-translator-$VERSION-chromium.zip" --publish
+          node scripts/stores/cws.mjs upload "release/kick-chat-translator-$V-chromium.zip" --publish
 
       - name: addons.mozilla.org
         id: amo
-        if: github.event_name == 'push'
         continue-on-error: true
         env:
           AMO_API_KEY: ${{ runner.temp }}/amo-api.json
         run: |
-          node scripts/stores/amo.mjs release "release/kick-chat-translator-$VERSION-firefox.zip" "release/kick-chat-translator-$VERSION-source.zip" "$RUNNER_TEMP/stores/amo-notes.json"
-          node scripts/stores/amo.mjs listing "$RUNNER_TEMP/stores/amo-listing.json"
+          V=$(node -p "require('./package.json').version")
+          node scripts/stores/amo.mjs release "release/kick-chat-translator-$V-firefox.zip" "release/kick-chat-translator-$V-source.zip" release/stores/amo-notes.json
+          node scripts/stores/amo.mjs listing release/stores/amo-listing.json
 
-      - name: Release notes with checksums
-        run: |
-          { cat store/notes/en.txt; echo; echo '```'; (cd release && sha256sum *.zip); echo '```'; } > "$RUNNER_TEMP/release-notes.md"
-
-      - uses: softprops/action-gh-release@v2
-        if: github.event_name == 'push'
-        with:
-          files: release/*.zip
-          body_path: ${{ runner.temp }}/release-notes.md
+      - name: Remove the store keys
+        if: always()
+        run: rm -f "$RUNNER_TEMP/cws-key.json" "$RUNNER_TEMP/amo-api.json"
 
       - name: Stores outcome
-        if: github.event_name == 'push'
         env:
           CHROME: ${{ steps.chrome.outcome }}
           AMO: ${{ steps.amo.outcome }}
@@ -117,3 +141,43 @@ jobs:
             echo "::error title=addons.mozilla.org::Rerun by hand with the artifacts of this tag: node scripts/stores/amo.mjs release <firefox.zip> <source.zip> <amo-notes.json>"
           fi
           test "$CHROME" = success && test "$AMO" = success
+
+  # The GitHub release goes out whatever the stores said, as it always did: a
+  # red store step is fixed by hand from these very zips.
+  github-release:
+    needs: [build, publish]
+    if: ${{ !cancelled() && github.event_name == 'push' && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release
+          path: release
+
+      # Signed provenance: anyone can check that a zip was built by this
+      # workflow from this tag, with `gh attestation verify <zip> -R <repo>`.
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        id: attest
+        with:
+          subject-path: release/*.zip
+
+      - name: Release notes with checksums
+        run: |
+          { cat store/notes/en.txt; echo; echo '```'; (cd release && sha256sum *.zip); echo '```'; } > "$RUNNER_TEMP/release-notes.md"
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          V=$(node -p "require('./package.json').version")
+          cp "$BUNDLE" "release/kick-chat-translator-$V.intoto.jsonl"
+          gh release create "$GITHUB_REF_NAME" release/*.zip "release/kick-chat-translator-$V.intoto.jsonl" \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/release-notes.md"
