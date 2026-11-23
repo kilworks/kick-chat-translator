@@ -97,7 +97,7 @@ Four providers, chained: when one fails, the next takes over. The order is yours
 | Google | none | the default, works out of the box |
 | DeepL | free | the best quality, [free key](https://www.deepl.com/pro-api) for 1 million characters a month |
 | MyMemory | none | fallback |
-| Lingva | none | fallback, on a public instance unless you point it at your own |
+| Lingva | none | fallback, on the public instance lingva.lunar.icu unless you point it at your own (https only) |
 
 Chromium's built-in translator is faster than all of them. Measured on a live channel: 22 ms from a message
 appearing to its translation on screen, against 1618 ms through the cloud chain, with no network and no
@@ -115,7 +115,8 @@ Display.
   swaps in the translation
 - **Providers**: engine order with each engine's state, the mode (on-device first, cloud first, or
   on-device only), and your DeepL key once DeepL is in the order
-- **Filters**: bots, users, channels, keywords, source languages, and a glossary of replacements
+- **Filters**: bots, users, channels, keywords (matched as whole words), source languages, and a glossary of
+  replacements
 - **Advanced**: cache size and lifetime, concurrent requests, a per-channel rate limit, backup and restore
   (the file never holds your DeepL key, and importing one keeps your own key and Lingva server)
 - **Activity**: messages translated, cache hits, every language seen in chat, and why each of the last 50
@@ -175,16 +176,17 @@ No. It is an independent open-source project, not affiliated with Kick.
 
 ## What's new
 
-Coming in the next update:
+In 3.6.3:
 
-- The settings open on Display, every on/off setting is a switch, and fonts, density, chat theme and accent colour show their choices as buttons and swatches
-- Each translation engine says whether it is ready or paused, and why
-- A channel your lists leave out says "Not translated here" instead of going quiet
-- The popup fits without a scrollbar in all 43 interface languages
-- A small filter mark in the chat bar says when your source language allowlist is holding lines back
-- Both language pickers in the chat show each language's own name (Deutsch, 日本語) and find it when you search
+- Tab no longer inserts the translation of an older version of what you typed
+- Your DeepL key stays on the device: never synced, never in a settings export, and removing DeepL from the order sticks
+- Blocked words match whole words: blocking "rat" no longer hides "congrats"
+- The options page says when your lists are too long for browser sync to save
+- The remembered channel language stays in its own tab, repeated lines get the glossary once, and the cache cleans itself daily
+- The popup opens with 84 % less code
+- Chat text no longer goes to lingva.ml, a custom Lingva server must use https, and one permission is gone
 
-In 3.5.0, cloud first became the default engine mode, and lines the engine hands back unchanged are asked again with the channel's language.
+In 3.6.0, the settings were redesigned around switches and swatches, each engine started saying whether it is ready, and the popup fits in all 43 interface languages.
 
 Every release, with what changed and the measurement behind it:
 [Releases](https://github.com/kilworks/kick-chat-translator/releases) and [CHANGELOG.md](CHANGELOG.md).
@@ -240,7 +242,9 @@ Interface strings live in `src/shared/i18n/` (popup and options, keyed by the En
 `src/content/i18n/` (chat bar, keyed by id with the English text as the fallback), one file per language;
 tests hold every file to the full key set. Store
 texts live in [store/](store/), and a release is a version tag: CI builds, checks and publishes it to both
-stores.
+stores, and signs build provenance for the zips (`gh attestation verify <zip> -R kilworks/kick-chat-translator`).
+The store keys are only readable by the publish job, which installs nothing. Dependabot and OpenSSF Scorecard
+watch the dependencies and the workflows. To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 Stack: Manifest V3, Vite, TypeScript, Preact, Tailwind.
 

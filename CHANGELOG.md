@@ -7,6 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.3] - 2026-11-23
+
+### Fixed
+
+- **Tab no longer inserts a stale translation.** The preview stays on screen for
+  the 320 ms after a keystroke; Tab, Ctrl+Enter or the insert button pressed in
+  that window replaced what had been typed since with the translation of the
+  older text. The current text is now translated first and nothing is inserted.
+- **Removing DeepL from the engine order sticks.** The worker put DeepL back
+  first whenever a key was set.
+- **Blocked keywords match whole words.** Blocking "rat" hid "congrats" and
+  "pirate ship". Scripts written without spaces (Chinese, Japanese, Thai, Lao,
+  Khmer, Burmese) keep the substring match at their edges.
+- **The options page says when a save is refused.** Past about 540 blocked words
+  the settings no longer fit in browser sync, and every later change failed
+  without a word.
+- **Repeated lines get the glossary once**, not "bro (brother) (brother)".
+- **The remembered channel language stays in its tab.** Opening a second channel
+  with a remembered language switched every other open tab to it.
+- **The translation cache cleans itself.** Its database only ever grew; it is
+  now pruned once a day to the lifetime and size set in Advanced.
+- **No event is handled before the settings are read.** A message, shortcut or
+  alarm that woke the background worker could act on the defaults.
+- **Brackets typed in a chat line are kept.** Every ⟦ and ⟧ was removed from
+  every translation.
+- init ran twice on every install and update.
+
+### Changed
+
+- **The popup and the options page load one interface language instead of 43.**
+  The popup opens with 164,330 bytes of JavaScript instead of 1,006,153 (84 %
+  less).
+
+### Security
+
+- **The DeepL key stays on the device.** It was written into browser sync with
+  the other settings, and into every settings export. Exports carry no key,
+  importing a file keeps your key unless the file brings one, and a key left in
+  sync by an earlier version moves to local storage on update. If you shared a
+  settings file, change your DeepL key.
+- **Kick pages get only what the chat bar uses.** Each kick.com tab received the
+  DeepL key with every settings answer and could reset the settings, clear the
+  cache or change the engine order and the Lingva server. A page may now send
+  nine message types, gets settings without the key, and may write six settings.
+- **Chat text is no longer sent to lingva.ml**, a host the privacy policy never
+  named, which took about half of all Lingva requests.
+- **A custom Lingva server is used over https only**, and a settings file can no
+  longer change it.
+- **The api.github.com host permission is gone.** The update check of zip
+  installs works without it.
+- **Releases**: the store keys are readable only by a publish job that installs
+  nothing and runs no third-party action; every workflow action is pinned to a
+  commit; the zips carry signed build provenance. A security policy, Dependabot
+  and OpenSSF Scorecard were added, and npm audit reports 0 (zod 4.6.7).
+
+### Removed
+
+- The unused WebSocket warm path, the chatroom id lookup and the
+  connectionMode setting.
+
 ## [3.6.2] - 2026-11-22
 
 ### Changed
