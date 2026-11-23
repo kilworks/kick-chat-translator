@@ -334,6 +334,12 @@ release: [docs/language-identification.md](docs/language-identification.md).
 
 - [Twitch Chat Translator](https://github.com/kilworks/twitch-chat-translator), the same extension for Twitch chat
 
+## Usage stats
+
+![Usage stats of Kick Chat Translator and Twitch Chat Translator](https://raw.githubusercontent.com/kilworks/kick-chat-translator/stats/stats.png)
+
+Updated every day. Store totals count everyone who installed the extension; the shares come only from users who opted in to anonymous stats (off by default, see [PRIVACY.md](PRIVACY.md)). Groups of fewer than 3 users are shown as Other.
+
 ## License
 
 MIT. Not affiliated with Kick.
