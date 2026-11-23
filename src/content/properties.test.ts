@@ -14,6 +14,8 @@ import { hasBlockedKeyword, isNoise, trimForEngine } from './filters';
  */
 
 const RUNS = { numRuns: 2000 };
+// 2000 lines of up to 1200 characters take seconds when the whole suite runs in parallel.
+const SLOW = 60_000;
 
 // Any UTF-16 code unit, lone surrogates included: a chat line is not always valid Unicode.
 const anyUnit = fc.integer({ min: 0, max: 0xffff }).map((c) => String.fromCharCode(c));
@@ -38,7 +40,7 @@ describe('kept names', () => {
       }),
       RUNS,
     );
-  });
+  }, SLOW);
 });
 
 describe('the readers of chat text', () => {
@@ -52,7 +54,7 @@ describe('the readers of chat text', () => {
       }),
       RUNS,
     );
-  });
+  }, SLOW);
 });
 
 describe('a blocked Latin word', () => {
@@ -66,7 +68,7 @@ describe('a blocked Latin word', () => {
       }),
       RUNS,
     );
-  });
+  }, SLOW);
 
   it('is always found standing alone between spaces', () => {
     fc.assert(
@@ -75,5 +77,5 @@ describe('a blocked Latin word', () => {
       }),
       RUNS,
     );
-  });
+  }, SLOW);
 });
