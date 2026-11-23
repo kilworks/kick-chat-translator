@@ -159,5 +159,11 @@ Do not rebuild or rediscover any of this: it runs on its own.
   store totals daily for the weekly "vs a week ago" figure (shown once 8 days exist).
   Offline check: `--public [--weekly] --dry --dump`, copy `public-data.json`, run
   `check_figure.py check_public.py`.
+- Translate button (583a03a): each public run renders `public[-weekly]-<lang>.png` for
+  `PUBLIC_LANGS` (en, ja) and pushes them to branch `stats` before posting; the bot answers a
+  click ephemerally in the member's `check-xx` role language, else Discord locale, else English
+  (`statsLang` in bot.go, `statsLangs` must equal `PUBLIC_LANGS`). Member roles come from the API:
+  the gateway state holds none. A failed public run posts one line in bot-ops and exits 1.
+  Check `check_figure.py` on Oracle (Noto Sans CJK JP is only there).
 - Known anomaly: TCT versions (1.0.x, 1.1.0) also land in the KCT property; the
   report counts them on a "hors 3.x" line. 1.0.0 shipped the KCT id; 1.0.2+ is unexplained.
