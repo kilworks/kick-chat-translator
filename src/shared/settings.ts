@@ -212,7 +212,7 @@ export function defaultSettings(): Settings {
  * and taken off again on every write. Keeping the field in the schema means no
  * consumer, and no part of the options UI, has to know where it actually lives.
  */
-function withoutKey(s: Settings): Settings {
+export function withoutKey(s: Settings): Settings {
   return { ...s, deeplApiKey: '' };
 }
 

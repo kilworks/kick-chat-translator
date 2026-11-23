@@ -49,6 +49,8 @@ vi.mock('./stats', () => ({
 type Listener = (msg: RuntimeMessage, sender: chrome.runtime.MessageSender, reply: (r: RuntimeResponse) => void) => unknown;
 
 const EXT = 'chrome-extension://abcdefghijklmnop/';
+const KICK_TAB: chrome.runtime.MessageSender = { tab: { id: 1 } as chrome.tabs.Tab, url: 'https://kick.com/somechannel' };
+const OPTIONS_PAGE: chrome.runtime.MessageSender = { url: `${EXT}src/options/index.html` };
 
 async function loadWorker(
   sync: Record<string, unknown>,
@@ -79,8 +81,8 @@ async function loadWorker(
   vi.stubGlobal('fetch', async () => ({ ok: false }));
   vi.stubGlobal('chrome', {
     storage: {
-      sync: area(sync, syncWrites, slowSync),
-      local: area(local),
+      sync: area(structuredClone(sync), syncWrites, slowSync),
+      local: area(structuredClone(local)),
       session: area({}),
       onChanged: { addListener: () => undefined, removeListener: () => undefined },
     },
@@ -137,5 +139,57 @@ describe('cache housekeeping', () => {
     const { alarms } = await loadWorker({}, {});
     await settle();
     expect(alarms).toContain('kt.cachePrune');
+  });
+});
+
+/**
+ * A Kick tab is the least trusted place that can reach the worker: a renderer
+ * compromised through the page can send anything the content script can. It
+ * used to get the DeepL key with every settings answer, and could reset
+ * everything, clear the cache or point the chat at another server.
+ */
+describe('what a Kick tab may ask the worker', () => {
+  const stored = { [STORAGE_KEY_SETTINGS]: { providerOrder: ['deepl', 'google'], engineModeMoved: true } };
+  const key = { [STORAGE_KEY_DEEPL_KEY]: 'secret-key:fx' };
+
+  it('gets settings without the DeepL key', async () => {
+    const { ask } = await loadWorker(stored, key);
+    await settle();
+    const res = await ask({ type: 'settings.get' }, KICK_TAB);
+    expect(res.type).toBe('settings');
+    expect((res as { payload: Settings }).payload.deeplApiKey).toBe('');
+  });
+
+  it('cannot reset the settings or clear the cache', async () => {
+    const { ask } = await loadWorker(stored, key);
+    await settle();
+    expect((await ask({ type: 'settings.reset' }, KICK_TAB)).type).toBe('error');
+    expect((await ask({ type: 'cache.clear' }, KICK_TAB)).type).toBe('error');
+  });
+
+  it('cannot write the key, the engines or the Lingva server', async () => {
+    const { ask, syncWrites } = await loadWorker(stored, key);
+    await settle();
+    syncWrites.length = 0;
+    for (const payload of [{ deeplApiKey: 'x' }, { providerOrder: ['lingva'] as Settings['providerOrder'] }, { lingvaInstance: 'https://evil.example' }]) {
+      expect((await ask({ type: 'settings.set', payload }, KICK_TAB)).type).toBe('error');
+    }
+    expect(syncWrites).toEqual([]);
+  });
+
+  it('can still write what the chat bar and the composer write', async () => {
+    const { ask } = await loadWorker(stored, key);
+    await settle();
+    const res = await ask({ type: 'settings.set', payload: { targetLang: 'de', pausedChannels: ['x'] } }, KICK_TAB);
+    expect(res.type).toBe('settings');
+    expect((res as { payload: Settings }).payload.deeplApiKey).toBe('');
+  });
+
+  it('leaves the options page every right, the key included', async () => {
+    const { ask } = await loadWorker(stored, key);
+    await settle();
+    const res = await ask({ type: 'settings.get' }, OPTIONS_PAGE);
+    expect((res as { payload: Settings }).payload.deeplApiKey).toBe('secret-key:fx');
+    expect((await ask({ type: 'cache.clear' }, OPTIONS_PAGE)).type).toBe('ack');
   });
 });

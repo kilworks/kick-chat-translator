@@ -1,5 +1,5 @@
-import { defaultSettings, loadSettings, resetSettings, saveSettings, watchSettings, type Settings } from '~/shared/settings';
-import { onMessage, type RuntimeResponse } from '~/shared/messages';
+import { defaultSettings, loadSettings, resetSettings, saveSettings, watchSettings, withoutKey, type Settings } from '~/shared/settings';
+import { onMessage, type RuntimeMessage, type RuntimeResponse } from '~/shared/messages';
 import { rootLogger } from '~/shared/logger';
 import { createMetrics } from '~/shared/metrics';
 import { TranslationCache, warmTargets } from './cache';
@@ -209,7 +209,42 @@ if (__KT_DEV__) {
 void init();
 watchSettings(applySettings);
 
+/**
+ * What a Kick tab may ask. A page is the least trusted context that reaches
+ * this router: a renderer compromised through kick.com can send whatever the
+ * content script can. So it gets exactly what the content script uses, every
+ * settings answer comes without the DeepL key, and it may write only the
+ * settings the chat bar and the composer write. Dev builds let a test page
+ * patch any other setting, never the key. The extension's own pages keep
+ * every right.
+ */
+const PAGE_MESSAGES = new Set<RuntimeMessage['type']>([
+  'translate',
+  'stats.local',
+  'usage.add',
+  'i18n.chat',
+  'settings.get',
+  'settings.set',
+  'open.options',
+  'compose.write',
+  'ping',
+]);
+const PAGE_SETTINGS = new Set<string>([
+  'targetLang',
+  'enabled',
+  'pausedChannels',
+  'channelLangs',
+  'favoriteLangs',
+  'composeTargetLang',
+]);
+const pageMayWrite = (patch: Partial<Settings>): boolean =>
+  Object.keys(patch).every((k) => k !== 'deeplApiKey' && (__KT_DEV__ || PAGE_SETTINGS.has(k)));
+const NOT_ALLOWED: RuntimeResponse = { type: 'error', payload: { message: 'not allowed' } };
+
 onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
+  // Chrome gives chrome-extension://<id>/, Firefox moz-extension://<uuid>/.
+  const fromPage = !sender.url?.startsWith(chrome.runtime.getURL(''));
+  if (fromPage && !PAGE_MESSAGES.has(msg.type)) return NOT_ALLOWED;
   // A message from a page means a Kick tab is open, which is what the
   // keepalive waits for after it cleared itself. The popup and the options
   // page have no tab and do not need the worker kept warm.
@@ -242,11 +277,12 @@ onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
     case 'i18n.chat':
       return { type: 'i18n.chat', payload: CHAT_MESSAGES[msg.locale] };
     case 'settings.get':
-      return { type: 'settings', payload: settings };
+      return { type: 'settings', payload: fromPage ? withoutKey(settings) : settings };
     case 'settings.set': {
+      if (fromPage && !pageMayWrite(msg.payload)) return NOT_ALLOWED;
       const next = await saveSettings(msg.payload);
       applySettings(next);
-      return { type: 'settings', payload: next };
+      return { type: 'settings', payload: fromPage ? withoutKey(next) : next };
     }
     case 'settings.reset': {
       const fresh = await resetSettings();
