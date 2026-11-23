@@ -165,5 +165,27 @@ Do not rebuild or rediscover any of this: it runs on its own.
   (`statsLang` in bot.go, `statsLangs` must equal `PUBLIC_LANGS`). Member roles come from the API:
   the gateway state holds none. A failed public run posts one line in bot-ops and exits 1.
   Check `check_figure.py` on Oracle (Noto Sans CJK JP is only there).
+- Gestures that worked on 2026-11-23, from `chat-translator-discord` root unless said:
+  - Deploy the script: `scp ga_report/ga_report.py oracle:ga-report/` (no service to restart, cron reads it).
+  - Render without posting: `ssh oracle 'cd ~/ga-report && python3 ga_report.py --public [--weekly] --dry --dump'`,
+    then `scp` the check script `~/.claude/skills/matplotlib/scripts/check_figure.py` to `/tmp` on Oracle,
+    run it on `check_public.py` there (writes `check-<lang>.png`), copy `check-ja.png` back and look at it.
+  - Push the pictures only: `python3 -c "import ga_report as g, os; g.push_readme_image(os.path.join(g.HERE, 'public-en.png'))"`.
+  - One-off post of one language, silent, no button (kil's test, message 1574511258324177077):
+    `python3 -c "import ga_report as g, os; g.send('', open(os.path.join(g.HERE, 'public-ja.png'), 'rb').read(), g.PUBLIC_CHANNEL, silent=True)"`.
+  - Add the button to an existing post without reposting: `rest.py PATCH /channels/<stats>/messages/<id>` with
+    `components` = one action row, button style 2, label Translate, custom_id `stats_tr:daily|weekly`.
+  - Test the button for real: click it from the owner's session in `#stats` (screenshots hang on Discord after an
+    ephemeral, read the DOM or the log), then `grep "stats picture" /root/ctd/ctd.log` on the Nano. To test a
+    language, PUT the owner on role `check-<lang>` for one click, then DELETE it and read the member back.
+  - Test the failure path: `GIT_SSH_COMMAND=false python3 ga_report.py --public` on Oracle: expect exit 1, one
+    "Public stats daily failed" line in bot-ops, nothing new in `#stats`.
+- Traps: `ssh-keyscan github.com` returns no key from Oracle (add `gh api meta` ssh_keys to known_hosts);
+  the bot's gateway state has no roles (`State.Role` fails, use `GuildRoles`); a Bash heredoc eats `\n`
+  in a Python patch (write the patch with Write); the probe output with a raw.githubusercontent URL plus query
+  is blocked by the browser tool, read the bot log instead.
+- To add a language: a `TXT['<code>']` table in ga_report.py, the code in `PUBLIC_LANGS` and in `statsLangs`
+  (bot.go), its font on Oracle (Arabic also needs `arabic-reshaper` + `python-bidi`), redeploy the bot
+  (`sh bot/nano/redeploy.sh`), render, look, then wait for the 14:00 UTC run.
 - Known anomaly: TCT versions (1.0.x, 1.1.0) also land in the KCT property; the
   report counts them on a "hors 3.x" line. 1.0.0 shipped the KCT id; 1.0.2+ is unexplained.
