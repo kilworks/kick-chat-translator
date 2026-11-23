@@ -148,5 +148,16 @@ Do not rebuild or rediscover any of this: it runs on its own.
   picture: `python3 ga_report.py --dry --dump` on Oracle, copy `data.json` and `flags/`
   next to `check_render.py`, then run the matplotlib skill's
   `check_figure.py check_render.py`; only the dark legend frames may stay flagged.
+- Public report since 4d7cf1e: `ga_report.py --public` (daily, 7 days) and `--public --weekly`
+  (4 full ISO weeks) post silently (flags 4096) in Discord `#stats` 1574503842740174888,
+  cron 14:00 UTC (two local hours with a `date -u +%H = 14` guard, so DST never shifts it).
+  Only store totals and shares; any group under `K_ANON` = 3 users becomes Other
+  (`_self_check`, red with K_ANON=1). The daily picture is force-pushed as the single
+  commit of branch `stats` in both repos (deploy keys `~/.ssh/gh_stats_kct|tct`, aliases
+  gh-kct / gh-tct; GitHub host keys came from `gh api meta`, ssh-keyscan returns none from
+  Oracle) and shown in both READMEs (KCT #88, TCT #23). `store_history.csv` on Oracle logs
+  store totals daily for the weekly "vs a week ago" figure (shown once 8 days exist).
+  Offline check: `--public [--weekly] --dry --dump`, copy `public-data.json`, run
+  `check_figure.py check_public.py`.
 - Known anomaly: TCT versions (1.0.x, 1.1.0) also land in the KCT property; the
   report counts them on a "hors 3.x" line. 1.0.0 shipped the KCT id; 1.0.2+ is unexplained.
