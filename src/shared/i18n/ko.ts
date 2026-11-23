@@ -254,4 +254,6 @@ export const ko: Record<string, string> = {
   'Colour and theme': '색상 및 테마',
   'In the chat': '채팅에서',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "사용되지 않음: https:// 주소만 허용되므로 채팅 텍스트는 암호화되지 않은 상태로 전달되지 않습니다.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "저장되지 않음: 목록이 너무 길어서 브라우저를 동기화할 수 없습니다. 차단된 단어, 용어집 또는 사용자 목록을 줄이세요.",
+  "Not saved.": "저장되지 않았습니다.",
 };

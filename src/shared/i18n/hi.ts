@@ -254,4 +254,6 @@ export const hi: Record<string, string> = {
   'Colour and theme': 'रंग और थीम',
   'In the chat': 'चैट में',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "उपयोग नहीं किया गया: केवल https:// पता स्वीकार किया जाता है, इसलिए चैट टेक्स्ट कभी भी अनएन्क्रिप्टेड नहीं होता है।",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "सहेजा नहीं गया: ब्राउज़र सिंक के लिए आपकी सूचियाँ बहुत लंबी हैं। अवरुद्ध शब्दों, शब्दावली या उपयोगकर्ता सूचियों को छोटा करें।",
+  "Not saved.": "सहेजा नहीं गया.",
 };

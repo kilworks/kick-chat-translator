@@ -254,4 +254,6 @@ export const ja: Record<string, string> = {
   'Colour and theme': '色とテーマ',
   'In the chat': 'チャット内',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "使用されません: https:// アドレスのみが受け入れられるため、チャット テキストが暗号化されずに送信されることはありません。",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "保存されていません: リストが長すぎるため、ブラウザーと同期できません。ブロックされている単語、用語集、またはユーザー リストを短縮します。",
+  "Not saved.": "保存されていません。",
 };

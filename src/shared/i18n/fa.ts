@@ -254,4 +254,6 @@ export const fa: Record<string, string> = {
   'Colour and theme': 'رنگ و پوسته',
   'In the chat': 'در چت',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "استفاده نمی شود: فقط یک آدرس https:// پذیرفته می شود، بنابراین متن چت هرگز بدون رمز عبور نمی کند.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "ذخیره نشد: لیست های شما برای همگام سازی مرورگر بسیار طولانی است. کلمات مسدود شده، واژه نامه یا لیست کاربران را کوتاه کنید.",
+  "Not saved.": "ذخیره نشده است.",
 };

@@ -254,4 +254,6 @@ export const ta: Record<string, string> = {
   'Colour and theme': 'நிறம் மற்றும் தீம்',
   'In the chat': 'அரட்டையில்',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "பயன்படுத்தப்படவில்லை: https:// முகவரி மட்டுமே ஏற்றுக்கொள்ளப்படும், எனவே அரட்டை உரை மறைகுறியாக்கப்படாது.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "சேமிக்கப்படவில்லை: உலாவி ஒத்திசைக்க உங்கள் பட்டியல்கள் மிக நீளமாக உள்ளன. தடுக்கப்பட்ட சொற்கள், சொற்களஞ்சியம் அல்லது பயனர் பட்டியல்களை சுருக்கவும்.",
+  "Not saved.": "சேமிக்கப்படவில்லை.",
 };

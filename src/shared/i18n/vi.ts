@@ -254,4 +254,6 @@ export const vi: Record<string, string> = {
   'Colour and theme': 'Màu sắc và giao diện',
   'In the chat': 'Trong trò chuyện',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Không được sử dụng: chỉ địa chỉ https:// được chấp nhận, do đó, văn bản trò chuyện không bao giờ được mã hóa.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Chưa lưu: danh sách của bạn quá dài để đồng bộ hóa trình duyệt. Rút ngắn các từ bị chặn, bảng chú giải thuật ngữ hoặc danh sách người dùng.",
+  "Not saved.": "Không được lưu.",
 };

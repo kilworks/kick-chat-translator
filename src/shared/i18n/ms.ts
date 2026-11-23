@@ -254,4 +254,6 @@ export const ms: Record<string, string> = {
   'Colour and theme': 'Warna dan tema',
   'In the chat': 'Dalam sembang',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Tidak digunakan: hanya alamat https:// diterima, jadi teks sembang tidak pernah pergi tanpa disulitkan.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Tidak disimpan: senarai anda terlalu panjang untuk penyegerakan penyemak imbas. Pendekkan perkataan yang disekat, glosari atau senarai pengguna.",
+  "Not saved.": "Tidak disimpan.",
 };

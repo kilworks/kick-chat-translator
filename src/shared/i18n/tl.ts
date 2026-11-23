@@ -254,4 +254,6 @@ export const tl: Record<string, string> = {
   'Colour and theme': 'Kulay at tema',
   'In the chat': 'Sa chat',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Hindi ginagamit: isang https:// address lang ang tinatanggap, kaya ang text ng chat ay hindi kailanman naglalakbay nang hindi naka-encrypt.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Hindi na-save: masyadong mahaba ang iyong mga listahan para sa pag-sync ng browser. Paikliin ang mga naka-block na salita, ang glossary o ang mga listahan ng user.",
+  "Not saved.": "Hindi na-save.",
 };

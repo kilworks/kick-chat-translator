@@ -254,4 +254,6 @@ export const tr: Record<string, string> = {
   'Colour and theme': 'Renk ve tema',
   'In the chat': 'Sohbette',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Kullanılmıyor: yalnızca https:// adresi kabul edilir, dolayısıyla sohbet metni hiçbir zaman şifrelenmeden iletilmez.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Kaydedilmedi: Listeleriniz tarayıcı senkronizasyonu için çok uzun. Engellenen kelimeleri, sözlüğü veya kullanıcı listelerini kısaltın.",
+  "Not saved.": "Kaydedilmedi.",
 };

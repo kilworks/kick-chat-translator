@@ -254,4 +254,6 @@ export const nl: Record<string, string> = {
   'Colour and theme': 'Kleur en thema',
   'In the chat': 'In de chat',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Niet gebruikt: alleen een https://-adres wordt geaccepteerd, dus chattekst wordt nooit onversleuteld verzonden.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Niet opgeslagen: uw lijsten zijn te lang voor browsersynchronisatie. Verkort de geblokkeerde woorden, de woordenlijst of de gebruikerslijsten.",
+  "Not saved.": "Niet opgeslagen.",
 };

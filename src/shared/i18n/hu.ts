@@ -254,4 +254,6 @@ export const hu: Record<string, string> = {
   'Colour and theme': 'Szín és téma',
   'In the chat': 'A chatben',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Nem használt: csak https:// cím fogadható el, így a chatszöveg soha nem kerül titkosításra.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Nincs mentve: a listák túl hosszúak a böngésző szinkronizálásához. Rövidítse le a blokkolt szavakat, a szószedet vagy a felhasználói listákat.",
+  "Not saved.": "Nincs mentve.",
 };

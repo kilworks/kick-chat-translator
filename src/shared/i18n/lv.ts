@@ -254,4 +254,6 @@ export const lv: Record<string, string> = {
   'Colour and theme': 'Krāsa un motīvs',
   'In the chat': 'Tērzēšanā',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Netiek izmantots: tiek pieņemta tikai https:// adrese, tāpēc tērzēšanas teksts nekad netiek sūtīts nešifrēts.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Nav saglabāts: jūsu saraksti ir pārāk gari pārlūkprogrammas sinhronizēšanai. Saīsiniet bloķētos vārdus, glosāriju vai lietotāju sarakstus.",
+  "Not saved.": "Nav saglabāts.",
 };

@@ -44,6 +44,7 @@ export function App() {
     return TABS.some((tb) => tb.id === asked) ? (asked as Tab) : 'display';
   });
   const [savedAt, setSavedAt] = useState<number | undefined>(undefined);
+  const [saveError, setSaveError] = useState<string | undefined>(undefined);
   const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
 
   const locale = useLoadedLocale(resolveUiLocale(settings.uiLang));
@@ -105,9 +106,17 @@ export function App() {
   async function patch(patchValue: Partial<Settings>) {
     const res = await send({ type: 'settings.set', payload: patchValue });
     if (res.type === 'settings') {
+      setSaveError(undefined);
       setSettings(res.payload);
       setSavedAt(Date.now());
       setTimeout(() => setSavedAt(undefined), 1500);
+    } else if (res.type === 'error') {
+      // All settings are one chrome.storage.sync item, capped at 8192 bytes.
+      setSaveError(
+        /quota/i.test(res.payload.message)
+          ? t('Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.')
+          : t('Not saved.'),
+      );
     }
   }
 
@@ -129,6 +138,10 @@ export function App() {
             <UiLangPicker value={settings.uiLang} onPick={(v) => void patch({ uiLang: v })} />
           </div>
         </header>
+        {/* Always in the DOM, so a screen reader hears the message when it appears. */}
+        <p role="status" class={saveError ? 'mb-4 text-xs text-red-400' : 'sr-only'}>
+          {saveError ?? ''}
+        </p>
 
         {/* The APG tabs pattern, which this was missing entirely: without
             role=tab and aria-selected a screen reader announces six unrelated

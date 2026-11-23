@@ -254,4 +254,6 @@ export const bg: Record<string, string> = {
   'Colour and theme': 'Цвят и тема',
   'In the chat': 'В чата',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Не се използва: приема се само https:// адрес, така че текстът на чата никога не пътува некриптиран.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Не е запазено: вашите списъци са твърде дълги за синхронизиране в браузъра. Съкратете блокираните думи, речника или списъците с потребители.",
+  "Not saved.": "Не е запазено.",
 };

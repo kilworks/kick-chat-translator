@@ -254,4 +254,6 @@ export const el: Record<string, string> = {
   'Colour and theme': 'Χρώμα και θέμα',
   'In the chat': 'Στη συνομιλία',
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Δεν χρησιμοποιείται: μόνο μια διεύθυνση https:// είναι αποδεκτή, επομένως το κείμενο συνομιλίας δεν ταξιδεύει ποτέ χωρίς κρυπτογράφηση.",
+  "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Δεν αποθηκεύτηκε: οι λίστες σας είναι πολύ μεγάλες για συγχρονισμό του προγράμματος περιήγησης. Συντομεύστε τις αποκλεισμένες λέξεις, το γλωσσάρι ή τις λίστες χρηστών.",
+  "Not saved.": "Δεν αποθηκεύτηκε.",
 };
