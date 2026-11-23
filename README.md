@@ -243,6 +243,14 @@ stores.
 
 Stack: Manifest V3, Vite, TypeScript, Preact, Tailwind.
 
+### Research: on-device language identification (paused)
+
+A trained language classifier meant to replace the franc fallback is on the `feat/lid-inference` branch, in no
+release. Measured on 5,248 fresh chat lines, the branch as it stands lowers the detection cost by 27 % on Brave and
+barely moves Chrome and Firefox; a retrained model already on hand would lower it by 42 to 58 % on all three. A
+small neural network was tried and did not beat the linear model. Method, results and the seven items left before a
+release: [docs/language-identification.md](docs/language-identification.md).
+
 ## Related projects
 
 - [Twitch Chat Translator](https://github.com/kilworks/twitch-chat-translator), the same extension for Twitch chat
