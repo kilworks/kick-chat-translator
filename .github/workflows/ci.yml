@@ -65,12 +65,6 @@ jobs:
     name: browser gates (Playwright, headless)
     runs-on: ubuntu-latest
     needs: test
-    env:
-      # Pinned, and not to whatever happens to be current: Playwright 1.56 does
-      # not route requests made by the service worker, so every gate that fakes
-      # a translation engine reached the real one and failed. 1.62.1 is the
-      # version the gates are run with by hand.
-      PLAYWRIGHT_VERSION: 1.62.1
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -84,14 +78,20 @@ jobs:
           python-version: '3.12'
       - run: npm ci
       # Playwright is not a dependency of the project (see test/e2e/playwright.mjs):
-      # a copy outside the checkout, found through UX_KIT.
+      # a copy outside the checkout, found through UX_KIT, installed from the
+      # lockfile in .github/uxkit so every package is pinned by hash. Playwright
+      # stays at 1.62.1, the version the gates are run with by hand: 1.56 does not
+      # route requests made by the service worker, so every gate that fakes a
+      # translation engine reached the real one and failed.
       - name: Install Playwright outside the repository
         run: |
-          npm install --prefix "$RUNNER_TEMP/uxkit" --no-save --no-audit --no-fund "playwright@$PLAYWRIGHT_VERSION"
+          mkdir -p "$RUNNER_TEMP/uxkit"
+          cp .github/uxkit/package.json .github/uxkit/package-lock.json "$RUNNER_TEMP/uxkit/"
+          npm ci --prefix "$RUNNER_TEMP/uxkit" --no-audit --no-fund
           echo "UX_KIT=$RUNNER_TEMP/uxkit" >> "$GITHUB_ENV"
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ~/.cache/ms-playwright
-          key: ms-playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}
+          key: ms-playwright-${{ runner.os }}-${{ hashFiles('.github/uxkit/package-lock.json') }}
       - run: $UX_KIT/node_modules/.bin/playwright install --with-deps chromium
       - run: node test/e2e/run-gates.mjs --headless

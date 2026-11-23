@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Playwright for the browser gates, installed outside the checkout by npm ci (see ci.yml)",
+  "dependencies": {
+    "playwright": "1.62.1"
+  }
+}
