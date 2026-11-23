@@ -431,6 +431,14 @@ export class ComposeController {
 
   private handleInsert(): void {
     if (!this.composer || !this.lastTranslation) return;
+    // The preview stays up through the debounce after a keystroke: inserting now
+    // would swap the newer text for the translation of the older one. Translate
+    // what is there instead; the key itself stays swallowed by the caller.
+    if (readComposerText(this.composer).trim() !== this.lastSource) {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      void this.evaluate();
+      return;
+    }
     insertIntoComposer(this.composer, this.lastTranslation, this.settings.composeInsertMode);
     countUsage('compose_insert');
     noteComposeInserted();
