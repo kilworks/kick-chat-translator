@@ -237,6 +237,33 @@ describe('hasBlockedKeyword', () => {
     expect(hasBlockedKeyword('hi covfefe', s(['!fish']))).toBe(false);
     expect(hasBlockedKeyword('anything', s(['']))).toBe(false);
   });
+
+  // The help says each line is a word or a phrase. As a substring, "rat"
+  // hid "congrats" and "pirate".
+  it('matches a whole word, not a piece of one', () => {
+    expect(hasBlockedKeyword('congrats on the win', s(['rat']))).toBe(false);
+    expect(hasBlockedKeyword('pirate ship lol', s(['rat']))).toBe(false);
+    expect(hasBlockedKeyword('rat!', s(['rat']))).toBe(true);
+    expect(hasBlockedKeyword('RAT run', s(['rat']))).toBe(true);
+    expect(hasBlockedKeyword('you are a dirty rat', s(['dirty rat']))).toBe(true);
+    expect(hasBlockedKeyword('baat se', s(['bat']))).toBe(false);
+  });
+
+  it('keeps a word whole in scripts that mark word ends with signs', () => {
+    expect(hasBlockedKeyword('वो बातें करता है', s(['बात']))).toBe(false);
+    expect(hasBlockedKeyword('यह बात सही है', s(['बात']))).toBe(true);
+  });
+
+  // No spaces between words in these scripts, so a whole-word rule would never
+  // match inside a sentence: they keep the substring match.
+  it('keeps the substring match for scripts written without spaces', () => {
+    expect(hasBlockedKeyword('お前死ねよ', s(['死ね']))).toBe(true);
+    expect(hasBlockedKeyword('ไอ้ควายเอ๊ย', s(['ควาย']))).toBe(true);
+  });
+
+  it('folds case the way the rest of the filters do', () => {
+    expect(hasBlockedKeyword('İstanbul bugün', s(['istanbul']))).toBe(true);
+  });
 });
 
 // A one-word East Asian answer is a word, and the repeated-character rule took

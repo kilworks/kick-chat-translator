@@ -36,10 +36,40 @@ export function channelBlockedBy(
   return undefined;
 }
 
-/** Case-insensitive substring match: `!fish` catches `!fish` and `!fish 3`. */
+// Scripts written without spaces between words: a whole-word rule would never
+// match inside a sentence there, so their edges keep the substring match.
+const NO_SPACE_SCRIPT = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u;
+// Marks too: a Devanagari or Arabic word goes on through its vowel signs.
+const IN_WORD = /[\p{L}\p{N}\p{M}]/u;
+const compiled = new WeakMap<string[], RegExp[]>();
+
+/** One pattern per blocked word: whole word where the word has a letter at its edge. */
+function keywordPatterns(list: string[]): RegExp[] {
+  let res = compiled.get(list);
+  if (res) return res;
+  res = [];
+  for (const k of list) {
+    const w = foldCase(k);
+    const chars = Array.from(w);
+    const first = chars[0];
+    const last = chars[chars.length - 1];
+    if (first === undefined || last === undefined) continue;
+    const edge = (c: string): boolean => IN_WORD.test(c) && !NO_SPACE_SCRIPT.test(c);
+    const lead = edge(first) ? '(?<![\\p{L}\\p{N}\\p{M}])' : '';
+    const trail = edge(last) ? '(?![\\p{L}\\p{N}\\p{M}])' : '';
+    res.push(new RegExp(lead + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + trail, 'u'));
+  }
+  compiled.set(list, res);
+  return res;
+}
+
+/**
+ * Case-insensitive, whole word: `rat` catches `rat!` but not `congrats`, and
+ * `!fish` catches `!fish 3`. Compiled once per list, not per line.
+ */
 export function hasBlockedKeyword(text: string, settings: Settings): boolean {
   const t = foldCase(text);
-  return settings.blockedKeywords.some((k) => k && t.includes(foldCase(k)));
+  return keywordPatterns(settings.blockedKeywords).some((re) => re.test(t));
 }
 
 /**
