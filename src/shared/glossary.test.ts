@@ -72,15 +72,22 @@ describe('protectNames / restoreNames', () => {
   });
 
   it('puts the name back, and removes a placeholder it cannot read', () => {
-    expect(restoreNames('odeio ⟦1⟧')).toBe('odeio FACEIT');
-    expect(restoreNames('odeio ⟦ 1 ⟧ e ⟦9⟧')).toBe('odeio FACEIT e ');
+    expect(restoreNames('odeio ⟦1⟧', 'i hate ⟦1⟧')).toBe('odeio FACEIT');
+    expect(restoreNames('odeio ⟦ 1 ⟧ e ⟦9⟧', 'i hate ⟦1⟧')).toBe('odeio FACEIT e ');
   });
 
   it('never shows the pieces of a placeholder the engine pulled apart', () => {
     // MyMemory, 34 of 100 bench lines: the brackets come back around other words.
-    expect(restoreNames("no ⟦1 you can⟧'t kill him")).toBe("no you can't kill him");
-    expect(restoreNames('⟧ no kaiser ⟦1').trim()).toBe('no kaiser');
-    expect(restoreNames("i'm ⟦going to love⟧ my dad")).toBe("i'm going to love my dad");
+    expect(restoreNames("no ⟦1 you can⟧'t kill him", '⟦1⟧ line')).toBe("no you can't kill him");
+    expect(restoreNames('⟧ no kaiser ⟦1', '⟦1⟧ line').trim()).toBe('no kaiser');
+    expect(restoreNames("i'm ⟦going to love⟧ my dad", '⟦1⟧ line')).toBe("i'm going to love my dad");
+  });
+
+  // Found by the property test: a line typed with these brackets lost them.
+  it("leaves the reader's own brackets alone", () => {
+    expect(protectNames('⟦faceit⟧ ⟧')).toBe('⟦faceit⟧ ⟧');
+    expect(restoreNames('a ⟧ b', 'a ⟧ b')).toBe('a ⟧ b');
+    expect(restoreNames('⟦ ok ⟧', 'plain line')).toBe('⟦ ok ⟧');
   });
 });
 

@@ -659,7 +659,7 @@ export class TranslationPipeline {
       }
       msg = { ...msg, rowElement: rescued.row, injectionTarget: rescued.target };
     }
-    const tt = applyUserGlossary(restoreNames(result.translatedText), this.settings.glossary);
+    const tt = applyUserGlossary(restoreNames(result.translatedText, real), this.settings.glossary);
     if (!tt) {
       this.skip(msg, localised('skipGlossary', 'your glossary emptied the translation'));
       removeAllArtifacts(msg.injectionTarget);
@@ -671,7 +671,7 @@ export class TranslationPipeline {
         removeAllArtifacts(msg.injectionTarget);
         return;
       }
-      if (tt.trim().toLowerCase() === restoreNames(real).trim().toLowerCase()) {
+      if (tt.trim().toLowerCase() === restoreNames(real, real).trim().toLowerCase()) {
         // The engine handed the line straight back. On stretched chat that is
         // usually why: "BINNNNNNNGOOOOOOO" and "muuuuy biennnn" both return
         // unchanged, and flattened they come back as "BINGO" and "très bien".
@@ -709,7 +709,7 @@ export class TranslationPipeline {
       // glossary changed since applies to it. Names are restored so the compose
       // path, which reads this same cache, never shows a placeholder.
       memCache.set(real, this.effTarget, {
-        translatedText: restoreNames(result.translatedText),
+        translatedText: restoreNames(result.translatedText, real),
         detectedLang: result.detectedLang,
         provider: result.provider,
       });
