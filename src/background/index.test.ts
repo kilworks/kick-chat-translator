@@ -54,8 +54,13 @@ async function loadWorker(
   sync: Record<string, unknown>,
   local: Record<string, unknown>,
   { slowSync = false } = {},
-): Promise<{ syncWrites: Record<string, unknown>[]; ask: (m: RuntimeMessage, s: chrome.runtime.MessageSender) => Promise<RuntimeResponse> }> {
+): Promise<{
+  syncWrites: Record<string, unknown>[];
+  alarms: string[];
+  ask: (m: RuntimeMessage, s: chrome.runtime.MessageSender) => Promise<RuntimeResponse>;
+}> {
   const syncWrites: Record<string, unknown>[] = [];
+  const alarms: string[] = [];
   let listener: Listener | undefined;
   const area = (store: Record<string, unknown>, writes?: Record<string, unknown>[], slow = false) => ({
     get: async (key: string) => {
@@ -88,7 +93,7 @@ async function loadWorker(
       getURL: (p = '') => EXT + p,
       openOptionsPage: async () => undefined,
     },
-    alarms: { create: () => undefined, get: async () => undefined, onAlarm: { addListener: () => undefined } },
+    alarms: { create: (name: string) => void alarms.push(name), get: async () => undefined, onAlarm: { addListener: () => undefined } },
     commands: { onCommand: { addListener: () => undefined } },
     tabs: { query: async () => [] },
     scripting: { executeScript: async () => [] },
@@ -99,7 +104,7 @@ async function loadWorker(
     new Promise((resolve) => {
       listener!(m, s, resolve);
     });
-  return { syncWrites, ask };
+  return { syncWrites, alarms, ask };
 }
 
 const settle = async (): Promise<void> => {
@@ -124,5 +129,13 @@ describe('worker start with a DeepL key on the device', () => {
       expect(s.deeplApiKey ?? '').toBe('');
       expect(s.providerOrder).not.toContain('deepl');
     }
+  });
+});
+
+describe('cache housekeeping', () => {
+  it('schedules the daily prune at start', async () => {
+    const { alarms } = await loadWorker({}, {});
+    await settle();
+    expect(alarms).toContain('kt-cache-prune');
   });
 });

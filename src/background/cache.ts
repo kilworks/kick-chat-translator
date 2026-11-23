@@ -1,4 +1,4 @@
-import { createStore, get, set, del, keys, clear, promisifyRequest } from 'idb-keyval';
+import { createStore, get, set, del, clear, promisifyRequest } from 'idb-keyval';
 import { CACHE_DB, CACHE_STORE } from '~/shared/constants';
 import { rootLogger } from '~/shared/logger';
 import { cacheKey, normalizeForKey } from '~/shared/normalize';
@@ -96,7 +96,7 @@ export class TranslationCache {
   /**
    * Ce qu'il y a dedans, pour que le reglage qui le plafonne puisse le dire.
    *
-   * keys() est deja l'appel que fait warm(). L'age vient du Map parce qu'il est
+   * count() ne charge aucune cle. L'age vient du Map parce qu'il est
    * gratuit ; le prendre sur la base entiere couterait une lecture par cle, et
    * ce cache monte a vingt mille.
    */
@@ -108,7 +108,7 @@ export class TranslationCache {
   }> {
     let entries = this.mem.size;
     try {
-      entries = (await keys(store)).length;
+      entries = await store('readonly', (s) => promisifyRequest(s.count()));
     } catch (err: unknown) {
       log.warn('idb keys failed, falling back on the memory layer', err);
     }
@@ -122,6 +122,40 @@ export class TranslationCache {
       ...(plusVieille === undefined ? {} : { oldestMs: Date.now() - plusVieille }),
       maxEntries: this.maxEntries,
     };
+  }
+
+  /**
+   * Shrink the database itself. evict() and the TTL only ever reach entries this
+   * worker has seen since it started, so the store used to grow without bound.
+   * One readwrite pass with a cursor (some installs hold hundreds of thousands of
+   * entries, too many for getAll); run from a daily alarm, never on the start path.
+   */
+  async prune(): Promise<void> {
+    const now = Date.now();
+    const { ttlMs, maxEntries } = this;
+    try {
+      await store('readwrite', (s) => {
+        const fresh: { key: IDBValidKey; at: number }[] = [];
+        const req = s.openCursor();
+        req.onsuccess = () => {
+          const cursor = req.result;
+          if (cursor) {
+            const at = (cursor.value as Partial<CacheEntry> | undefined)?.storedAtMs ?? 0;
+            if (now - at > ttlMs) cursor.delete();
+            else fresh.push({ key: cursor.key, at });
+            cursor.continue();
+            return;
+          }
+          // Still inside the cursor's last event, so the transaction is active.
+          if (fresh.length <= maxEntries) return;
+          fresh.sort((a, b) => a.at - b.at);
+          for (const { key } of fresh.slice(0, fresh.length - maxEntries)) s.delete(key);
+        };
+        return promisifyRequest(s.transaction);
+      });
+    } catch (err: unknown) {
+      log.warn('idb prune failed', err);
+    }
   }
 
   private evict(): void {

@@ -171,6 +171,8 @@ function scheduleDeeplUsageRefresh(): void {
   }, 5 * 60_000);
 }
 
+const CACHE_PRUNE_ALARM = 'kt-cache-prune';
+
 async function init(): Promise<void> {
   settings = await loadSettings();
   applySettings(settings);
@@ -182,10 +184,18 @@ async function init(): Promise<void> {
   scheduleDeeplUsageRefresh();
   // Seed the budget pacing on startup.
   if (settings.deeplApiKey) void fetchDeeplUsage();
+  // Daily, and never on this path: a large readwrite pass would hold up the first
+  // cache reads after a start. Alarms do not survive an update, hence the check.
+  if (!(await chrome.alarms.get(CACHE_PRUNE_ALARM).catch(() => undefined))) {
+    void chrome.alarms.create(CACHE_PRUNE_ALARM, { delayInMinutes: 1, periodInMinutes: 1440 });
+  }
 }
 
 // Top level, before anything awaits: see listenKeepalive.
 listenKeepalive();
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === CACHE_PRUNE_ALARM) void cache.prune();
+});
 installUsage(
   () => settings,
   (on) => void saveSettings({ usageStats: on, usageStatsAsked: true }).then(applySettings),
