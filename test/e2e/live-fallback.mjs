@@ -33,7 +33,6 @@ const EXT = path.resolve(HERE, '../../dist');
 
 const PROVIDER_HOSTS = [
   'translate.googleapis.com',
-  'lingva.ml',
   'lingva.lunar.icu',
   'api.mymemory.translated.net',
   'api-free.deepl.com',

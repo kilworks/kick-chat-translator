@@ -78,7 +78,6 @@ export default defineManifest({
     'https://api.deepl.com/*',
     'https://api.mymemory.translated.net/*',
     'https://lingva.lunar.icu/*',
-    'https://lingva.ml/*',
   ],
   // Aucune ressource exposee aux pages du site. Le script de contenu est
   // re-bundle en un seul fichier autonome par `scripts/bundle-content.ts`, la

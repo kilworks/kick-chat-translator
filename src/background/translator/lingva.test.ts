@@ -166,7 +166,16 @@ describe('lingvaProvider', () => {
     });
   });
 
+  // The shipped pool holds one declared instance since lingva.ml left it; the
+  // failover is kept for the next one, and tested on a pool of two.
   it('tries the next pooled instance when one fails', async () => {
+    vi.resetModules();
+    vi.doMock('~/shared/constants', async (orig) => ({
+      ...(await orig<object>()),
+      LINGVA_POOL: ['https://one.example', 'https://two.example'],
+    }));
+    const { lingvaProvider: pooled } = await import('./lingva');
+    vi.doUnmock('~/shared/constants');
     const hosts: string[] = [];
     globalThis.fetch = vi.fn(async (url: unknown) => {
       hosts.push(new URL(String(url)).host);
@@ -174,7 +183,7 @@ describe('lingvaProvider', () => {
       return reply('hola');
     }) as unknown as typeof fetch;
 
-    const res = await lingvaProvider.translate(
+    const res = await pooled.translate(
       { messageId: '1', text: 'hi', targetLang: 'es' },
       { ...baseCtx, lingvaInstance: '' },
     );

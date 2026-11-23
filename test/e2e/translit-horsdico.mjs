@@ -14,7 +14,7 @@
 
 const GOOGLE = 'https://translate.googleapis.com/translate_a/single';
 const MYMEMORY = 'https://api.mymemory.translated.net/get';
-const LINGVA = ['https://lingva.lunar.icu', 'https://lingva.ml'];
+const LINGVA = ['https://lingva.lunar.icu'];
 
 const KATA = /[゠-ヿㇰ-ㇿ･-ﾟ]/u;
 

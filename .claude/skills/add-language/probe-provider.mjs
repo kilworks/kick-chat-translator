@@ -69,7 +69,7 @@ try {
 
 // 3. Lingva proxies Google but publishes a shorter list. Ask the list directly.
 try {
-  const res = await fetch('https://lingva.ml/api/v1/languages');
+  const res = await fetch('https://lingva.lunar.icu/api/v1/languages');
   const langs = (await res.json()).languages ?? [];
   const hit = langs.find((l) => l.code.toLowerCase() === code.toLowerCase());
   row('lingva', hit ? 'listed' : 'ABSENT', hit ? hit.name : `${langs.length} codes, none matching`);

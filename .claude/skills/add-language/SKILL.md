@@ -38,7 +38,7 @@ Read the output against these rules:
 - **A short greeting proves nothing.** "hello" renders identically across many related languages. Probe with a sentence that carries the grammar and vocabulary that make the language distinct.
 - **The free Google endpoint and Cloud Translation are different engines with different language lists.** The extension calls the free one (`translate.googleapis.com/translate_a/single`). Verify against that, not against `cloud.google.com/translate/docs/languages`.
 - **Google soft-blocks.** A 429 is not "unsupported". `google.ts` rotates two clients; space the probes and try both before concluding.
-- **Lingva is a Google proxy with its own shorter list.** `GET https://lingva.ml/api/v1/languages` is authoritative for it.
+- **Lingva is a Google proxy with its own shorter list.** `GET https://lingva.lunar.icu/api/v1/languages` is authoritative for it.
 
 A provider without the language must return `unsupported` so the chain cascades to the next one. It must never throw a generic error, which counts as a failure against the provider and pushes it out of rotation. Add a test for that cascade.
 
