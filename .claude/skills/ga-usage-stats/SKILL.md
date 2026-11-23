@@ -142,5 +142,11 @@ Do not rebuild or rediscover any of this: it runs on its own.
   users who opted in, so the store total is printed beside it; an unreadable store
   shows "indisponible" and the total becomes "au moins N". A failed picture adds
   "image KO" to the text and never blocks it.
+- Since d7dfe91 everything posted is in English (the Discord server is English-only,
+  kil 2026-11-23), every chart has a legend and UI languages carry a country flag
+  (`LANG_FLAG` map, flagcdn PNGs cached in `~/ga-report/flags/`). Before changing the
+  picture: `python3 ga_report.py --dry --dump` on Oracle, copy `data.json` and `flags/`
+  next to `check_render.py`, then run the matplotlib skill's
+  `check_figure.py check_render.py`; only the dark legend frames may stay flagged.
 - Known anomaly: TCT versions (1.0.x, 1.1.0) also land in the KCT property; the
   report counts them on a "hors 3.x" line. 1.0.0 shipped the KCT id; 1.0.2+ is unexplained.
