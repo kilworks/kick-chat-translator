@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kick Chat Translator, a partner note for Kick</title>
+<link rel="stylesheet" href="kit/kick-fonts.css">
+<style>
+  /* Brief
+     Domain: partnerships and developer relations at Kick. Audience: one person at Kick, two minutes.
+     Mood: precise, honest, unmistakably set in Kick's own system.
+     Rules applied from KICK Brand Guidelines V2 (Brand hub, about.kick.com/brand):
+       - Booster Polygonal Bold / Compact Bold for every headline and large use, all caps,
+         2 to 6 words, line height 100%, letter spacing 0. Above 12 pt only.
+       - Inter for all body copy and everything under 12 pt. Inter Bold for subheadings and leads,
+         Inter Regular for text. Line height 120%, lines of 45 to 90 characters.
+       - Palette: Volt Green #53FC18, Iced Out Cyan #00FFFF, Bowel Brown #4C4014, Black, White.
+         Every use of colour supports Volt Green. Pure black and white are Kick's own values.
+       - Page grammar of Kick's own documents: running header bar, caps title in a left column,
+         content on the right.
+     Fonts are Kick's own files from assets.kick.com (kit/kick-fonts.css).
+     Layout sequence (right column): black block with capture and figures, annotated captures,
+     black chart panel + tables, table + cyan comparison block, brown letter block. */
+  @page { size: 297mm 210mm; margin: 0; }
+  :root {
+    --volt: #53fc18;
+    --cyan: #00ffff;
+    --brown: #4c4014;
+    --black: #000000;
+    --white: #ffffff;
+    --rule: rgba(0, 0, 0, 0.18);
+    --rule-on-dark: rgba(255, 255, 255, 0.22);
+    --display: boosterPolygonal, "boosterPolygonal Fallback", Arial, sans-serif;
+    --compact: boosterPolygonalCompact, "boosterPolygonalCompact Fallback", Arial, sans-serif;
+    --text: Inter, system-ui, sans-serif;
+    --side: 48px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--white); color: var(--black); font: 400 13px/1.25 var(--text);
+    font-feature-settings: "tnum" 1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 1122px; height: 793px; position: relative; overflow: hidden; break-after: page; page-break-after: always; }
+  .page:last-child { break-after: auto; page-break-after: auto; }
+
+  /* Running header, as on Kick's own documents. */
+  .bar { height: 30px; background: var(--volt); display: grid; grid-template-columns: 360px 1fr 230px 40px;
+    align-items: center; padding: 0 var(--side); font: 500 11.5px/1 var(--text); }
+  .bar span:last-child { text-align: right; }
+  .foot { position: absolute; left: var(--side); bottom: 22px; font-size: 10.5px; max-width: 75ch; }
+
+  .grid { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 60px; padding: 52px var(--side) 0; }
+  h1, h2 { font-family: var(--display); font-weight: 700; text-transform: uppercase; line-height: 1; letter-spacing: 0; }
+  h1 { font-size: 40px; }
+  h2 { font-size: 34px; }
+  .lead { font-weight: 700; margin-top: 16px; max-width: 46ch; }
+  .copy { margin-top: 13px; max-width: 46ch; }
+  .note { font-size: 10.5px; margin-top: 13px; max-width: 52ch; }
+  h3 { font: 700 13px/1.25 var(--text); }
+  mark { background: var(--volt); color: var(--black); padding: 0 3px; }
+  .num { font-family: var(--compact); font-weight: 700; text-transform: uppercase; line-height: 1; letter-spacing: 0; }
+
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 7px 0; border-bottom: 1px solid var(--rule); vertical-align: baseline; }
+  th { font-weight: 700; font-size: 11px; border-bottom-color: var(--black); }
+  .r { text-align: right; white-space: nowrap; }
+  td + td.r, th + th.r { padding-left: 18px; }
+
+  /* p1 */
+  .block { background: var(--black); color: var(--white); }
+  .p1 { display: grid; grid-template-columns: 300px 1fr; gap: 30px; padding: 24px; height: 600px; }
+  .room { width: 300px; height: 552px; overflow: hidden; position: relative; }
+  .room img { position: absolute; height: 552px; left: -583px; top: 0; }
+  .figs { display: flex; flex-direction: column; justify-content: space-between; }
+  .figs div { border-top: 1px solid var(--rule-on-dark); padding-top: 10px; }
+  .figs .num { font-size: 46px; }
+  .figs p { margin-top: 6px; font-size: 12px; }
+  .cap-dark { font-size: 10.5px; margin-top: 8px; max-width: 75ch; }
+
+  /* p2 */
+  .shots { display: grid; grid-template-columns: 1fr; gap: 26px; }
+  .shots > div { display: grid; grid-template-columns: 400px 1fr; gap: 26px; align-items: start; }
+  .shots > div + div { grid-template-columns: 290px 1fr; }
+  .shots ol.keys { margin-top: 0; border-top: 1px solid var(--black); }
+  .shot { position: relative; background: var(--black); padding: 14px; }
+  .shot img { display: block; width: 100%; }
+  .pin { position: absolute; width: 20px; height: 20px; border-radius: 50%; background: var(--volt); color: var(--black);
+    font: 700 11px/20px var(--text); text-align: center; transform: translate(-50%, -50%); }
+  ol.keys { list-style: none; margin-top: 12px; }
+  ol.keys li { display: grid; grid-template-columns: 22px 1fr; padding: 6px 0; border-bottom: 1px solid var(--rule); }
+  ol.keys b { font-weight: 700; }
+
+  /* p3 */
+  .chart { background: var(--black); padding: 20px 22px 14px; }
+  .chart svg { display: block; width: 100%; height: auto; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 22px; }
+
+  /* p4 */
+  .cmp { background: var(--cyan); padding: 20px 22px; margin-top: 22px; }
+  .cmp .unit { font: 700 16px/1 var(--text); }
+  .cmp .row { display: grid; grid-template-columns: 210px 1fr; align-items: center; gap: 16px; padding: 8px 0; }
+  .cmp .num { font-size: 40px; }
+  .cmp i { display: block; height: 14px; background: var(--black); }
+  .cmp small { display: block; font-size: 11px; margin-top: 3px; }
+
+  /* p5 */
+  .letter { background: var(--brown); color: var(--white); padding: 26px 28px; }
+  .letter ol { list-style: none; counter-reset: q; }
+  .letter li { counter-increment: q; display: grid; grid-template-columns: 34px 1fr; padding: 13px 0; border-bottom: 1px solid var(--rule-on-dark); }
+  .letter li:last-child { border-bottom: 0; }
+  .letter li::before { content: counter(q); font-family: var(--compact); font-weight: 700; font-size: 22px; line-height: 1; color: var(--volt); }
+  .letter li b { display: block; margin-bottom: 4px; }
+  dl.links { display: grid; grid-template-columns: 140px 1fr; row-gap: 7px; margin-top: 22px; }
+  dl.links dt { font-weight: 700; }
+  dl.links dd { min-width: 0; }
+  table.tight td, table.tight th { padding: 4px 0; }
+  /* p2 reach */
+  .reach-top { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 60px; padding: 36px var(--side) 0; }
+  .map { padding: 10px 12px 8px; }
+  .realdata { position: absolute; left: 12px; top: 10px; z-index: 1; background: var(--volt); color: var(--black); font: 700 10.5px/1 var(--text); padding: 5px 7px; }
+  .map svg { display: block; width: 100%; height: auto; }
+  .legend { display: flex; gap: 18px; font-size: 10.5px; padding: 4px 4px 2px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; }
+  .countries { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0 18px; padding: 18px var(--side) 0; }
+  .countries h4 { font: 700 11px/1.2 var(--text); border-bottom: 1px solid var(--black); padding-bottom: 4px; margin-bottom: 2px; }
+  .c { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 6px; align-items: center; font-size: 11px; line-height: 15.5px; }
+  .c img { width: 14px; height: 14px; display: block; }
+  .c span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .c b { font-weight: 700; }
+  .c em { font-style: normal; font-weight: 400; }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="page">
+  <div class="bar"><span>KICK CHAT TRANSLATOR</span><span>Partner note, November 2026</span><span>01. Overview</span><span>1</span></div>
+  <div class="grid">
+    <div>
+      <h1>Used in 58 countries</h1>
+      <p class="lead">Kick Chat Translator lets anyone read and join any Kick chat in their own language. Since June, people in 58 countries on six continents have done exactly that.</p>
+      <p class="copy">It is a free browser extension. Every chat message gets its translation as it arrives, and a viewer's reply is shown in the channel's language before it is sent. I build it on my own, and it has grown every month since June.</p>
+      <p class="copy">This note gives the numbers behind three questions for Kick, on page 6. No account, nothing to set up, on Chrome, Brave, Edge and Firefox.</p>
+      <p class="note">Figures from the Chrome Web Store developer dashboard, read 2 November 2026.</p>
+    </div>
+    <div>
+      <div class="block p1">
+        <div class="room"><img src="kit/room.png" alt="A chat column where every Spanish message has its English translation underneath"></div>
+        <div class="figs">
+          <div><span class="num">536</span><p>installs since the listing went live on 5 June 2026</p></div>
+          <div><span class="num">212</span><p>weekly users on 1 November, up from 150 on 3 October</p></div>
+          <div><span class="num">58</span><p>countries on six continents have installed or used it</p></div>
+          <div><span class="num">43</span><p>languages, for the chat and for the extension's own interface</p></div>
+          <div><span class="num" style="color:var(--volt)">3.3.0</span><p>the version all 172 daily users run</p></div>
+        </div>
+      </div>
+      <p class="cap-dark">The extension in its own test room, laid out like a Kick channel. Usernames and messages are invented.</p>
+    </div>
+  </div>
+  <p class="foot">Independent project, not affiliated with Kick.</p>
+</section>
+
+<!-- 2: reach -->
+<section class="page">
+  <div class="bar"><span>KICK CHAT TRANSLATOR</span><span>Partner note, November 2026</span><span>02. Reach</span><span>2</span></div>
+  <div class="reach-top">
+    <div>
+      <h2>58 countries, six continents</h2>
+      <p class="lead">This is what the extension is for: a viewer in Lima or Istanbul reading and joining a chat from Tokyo or Warsaw, each in their own language.</p>
+      <p class="copy">Every country lit on this page has installed it since June, or has users this week. The points are the 366 cities, in 70 countries, where people opened its store listing this year. 65% of this week's users are outside the US, and they browse in 21 languages.</p>
+      <p class="note">Chrome Web Store dashboard CSV exports, read 2 November 2026. Number: installs since 5 June. China, the Netherlands and Nigeria have weekly users with no install recorded in the period.</p>
+    </div>
+    <div class="map block" style="position:relative"><span class="realdata">Real data, not an illustration: every lit country and every point is a measured install or visit</span><svg id="map" viewBox="0 0 640 330" role="img" aria-label="World map with the 58 countries where Kick Chat Translator is installed or used highlighted"></svg>
+      <div class="legend"><span><i style="background:#53fc18;opacity:.75"></i>58 countries, brighter means more installs</span><span><i style="background:#f2ffe9;border-radius:50%;box-shadow:0 0 6px #53fc18"></i>366 cities that opened the listing in 2026</span></div>
+    </div>
+  </div>
+  <div id="countries" class="countries"></div>
+  <p class="foot">Independent project, not affiliated with Kick.</p>
+</section>
+
+<!-- 3 -->
+<section class="page">
+  <div class="bar"><span>KICK CHAT TRANSLATOR</span><span>Partner note, November 2026</span><span>03. Product</span><span>3</span></div>
+  <div class="grid">
+    <div>
+      <h2>What a viewer sees</h2>
+      <p class="lead">A green bar above the chat says it is on. There is no account and nothing to set up.</p>
+      <p class="copy">The channel's language is read from Kick. Each message is translated under the original, live and in VODs, and a reply typed in the viewer's own language is previewed in the channel's.</p>
+      <p class="copy">With Chrome or Edge 138 and later, translation can run on the viewer's computer, and the text never leaves it.</p>
+    </div>
+    <div class="shots">
+      <div>
+        <div class="shot">
+          <img src="kit/compose.png" alt="The chat box with an English reply and its Spanish preview above it">
+          <span class="pin" style="left:16px;top:26%">1</span>
+          <span class="pin" style="left:93%;top:48%">2</span>
+          <span class="pin" style="left:30%;top:63%">3</span>
+        </div>
+        <ol class="keys">
+          <li><b>1</b><span>A Spanish message, with its English translation under it.</span></li>
+          <li><b>2</b><span>The viewer typed English. This is the Spanish that will be sent. Tab or a click puts it in the box.</span></li>
+          <li><b>3</b><span>The channel's language, read from Kick. One click changes it.</span></li>
+        </ol>
+      </div>
+      <div>
+        <div class="shot">
+          <img src="kit/languages.png" alt="A searchable grid of 43 languages">
+          <span class="pin" style="left:90%;top:9.5%">1</span>
+          <span class="pin" style="left:62%;top:17.5%">2</span>
+          <span class="pin" style="left:88%;top:69%">3</span>
+        </div>
+        <ol class="keys">
+          <li><b>1</b><span>Two letters filter the 43 languages.</span></li>
+          <li><b>2</b><span>The channel's own language is always first.</span></li>
+          <li><b>3</b><span>The reading language, which can be kept per channel.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <p class="foot">Captures from the extension's test room. Usernames and messages are invented.</p>
+</section>
+
+<!-- 3 -->
+<section class="page">
+  <div class="bar"><span>KICK CHAT TRANSLATOR</span><span>Partner note, November 2026</span><span>04. Growth</span><span>4</span></div>
+  <div class="grid">
+    <div>
+      <h2>Installs per month</h2>
+      <p class="lead">June to October 2026, Chrome Web Store. Up every month since the listing went live on 5 June.</p>
+      <p class="copy">411 installs in the last 90 days, against 125 in the 90 days before. Weekly users went from 150 on 3 October to 212 on 1 November. The best day so far was 31 October, with 29 installs.</p>
+      <p class="note">Developer dashboard and its CSV exports, read 2 November 2026.</p>
+    </div>
+    <div>
+      <div class="chart">
+        <svg id="units" role="img" aria-label="Installs per month, one square per install: June 42, July 73, August 102, September 121, October 198" style="display:block;width:100%;height:auto"></svg>
+        
+      </div>
+      <div class="two">
+        <div>
+          <h3>Browser languages, weekly users, 1 Nov</h3>
+          <table class="tight" style="margin-top:6px">
+            <tr><th>Language</th><th class="r">users</th></tr>
+            <tr><td>English (US)</td><td class="r">65</td></tr>
+            <tr><td>Japanese</td><td class="r">15</td></tr>
+            <tr><td>Turkish</td><td class="r">14</td></tr>
+            <tr><td>English (UK)</td><td class="r">12</td></tr>
+            <tr><td>Russian</td><td class="r">10</td></tr>
+            <tr><td>Spanish</td><td class="r">9</td></tr>
+            <tr><td>Polish</td><td class="r">8</td></tr>
+            <tr><td>Portuguese (Brazil)</td><td class="r">8</td></tr>
+            <tr><td>13 others, Korean to Hebrew</td><td class="r">21</td></tr>
+          </table>
+        </div>
+        <div>
+          <h3>Store listing, last 30 days</h3>
+          <p style="margin-top:6px"><span class="num" style="font-size:46px">+45%</span></p>
+          <p class="copy" style="margin-top:8px">listing views (289), from 1,163 impressions in the store.</p>
+          <p class="copy"><b>ChatGPT recommends it more than any other site:</b> 15 of the 28 listing views referred by another site came from chatgpt.com.</p>
+          <p class="copy">All 172 daily users run the current version, 3.3.0.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="foot">Independent project, not affiliated with Kick.</p>
+</section>
+
+<!-- 4 -->
+<section class="page">
+  <div class="bar"><span>KICK CHAT TRANSLATOR</span><span>Partner note, November 2026</span><span>05. Usage and speed</span><span>5</span></div>
+  <div class="grid">
+    <div>
+      <h2>Usage and latency</h2>
+      <p class="lead">Viewers who use it read and write in the chat: about 7 translated replies a day each, in the channel's language.</p>
+      <p class="copy">The usage figures come from 16 users who opted in to an anonymous daily count, over 36 active days between 5 October and 1 November 2026. It never contains message text, usernames or channels.</p>
+      <p class="copy">Latency was measured on a live Kick channel for 29 minutes, from a message appearing to its translation on screen.</p>
+    </div>
+    <div>
+      <h3>Per user, per active day (opt-in, n = 16 users)</h3>
+      <table style="margin-top:6px">
+        <tr><td>Translations shown in the chat</td><td class="r">about 3,400</td></tr>
+        <tr><td>Of those, served from the local cache</td><td class="r">about 24%</td></tr>
+        <tr><td>Reply previews shown</td><td class="r">about 37</td></tr>
+        <tr><td>Translated replies put in the chat box</td><td class="r"><mark>about 7</mark></td></tr>
+        <tr><td>Days with the 7TV extension also running, emotes kept</td><td class="r">53%</td></tr>
+      </table>
+      <div class="block" style="padding:18px 22px;margin-top:22px">
+        <h3 style="color:#fff">Median, message to translation on screen, on one time axis.</h3>
+        <div style="margin-top:12px"><svg id="lat" role="img" aria-label="Median time to a translation, one square per 20 ms: on-device 22 ms, 1 square; cloud 1,618 ms, 81 squares" style="display:block;width:100%;height:auto"></svg></div>
+      </div>
+      <p class="copy" style="max-width:78ch">About 9% of the cloud wait is the extension itself: the cache lookup and writing into the chat take 0 ms, transport 3 ms. The rest is the translation provider. Messages go out in batches, and 821 requests met no rate limit.</p>
+    </div>
+  </div>
+  <p class="foot">Sources: opt-in daily statistics (GA4); instrumented build, live Kick channel.</p>
+</section>
+
+<!-- 5 -->
+<section class="page">
+  <div class="bar"><span>KICK CHAT TRANSLATOR</span><span>Partner note, November 2026</span><span>06. Questions</span><span>6</span></div>
+  <div class="grid">
+    <div>
+      <h2>Three questions for Kick</h2>
+      <p class="lead">If the name or the icon has to follow Kick's brand guidelines, I will change both store listings.</p>
+      <p class="copy">29 releases since 1 May 2026, 930 automated tests, a 446 KiB package, MIT licence, no server of its own.</p>
+      <p class="copy" style="margin-top:34px"><b>[Your name]</b><br>Developer, Kick Chat Translator</p>
+    </div>
+    <div>
+      <div class="letter">
+        <ol>
+          <li><div><b>Would Kick promote the extension?</b>On its social accounts, the KICK Dev site, or in a Help Center article for viewers who don't speak a channel's language.</div></li>
+          <li><div><b>Can it join the KICK Dev program for apps?</b>It runs on kick.com in the viewer's browser and does not use the OAuth API today. If eligibility needs it registered as a KICK App or moved to the public API, I will make that change.</div></li>
+          <li><div><b>Is there a developer bounty it fits?</b>Current or upcoming.</div></li>
+        </ol>
+      </div>
+      <dl class="links">
+        <dt>Chrome, Brave, Edge</dt><dd>chromewebstore.google.com/detail/kick-chat-translator/<wbr>nkkjmbkmacbdkboijmnhjnblcaiclhni</dd>
+        <dt>Firefox</dt><dd>addons.mozilla.org/firefox/addon/kick-chat-translator</dd>
+        <dt>Demo video</dt><dd>youtube.com/watch?v=NoGJeUrwy9o</dd>
+        <dt>Source code</dt><dd>github.com/kilworks/kick-chat-translator</dd>
+      </dl>
+    </div>
+  </div>
+  <p class="foot">Independent project, not affiliated with Kick.</p>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="kit/countries.js"></script>
+<script src="kit/cities.js"></script>
+<script src="kit/infoviz.js"></script>
+<script>
+  const flag = iso => 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/' +
+    [...iso].map(ch => (0x1f1e6 + ch.charCodeAt(0) - 65).toString(16)).join('-') + '.svg';
+  const by = k => C.filter(c => c[3] === k);
+  const cols = [['Europe', by('Europe').slice(0, 11)], ['', by('Europe').slice(11)], ['Asia', by('Asia').slice(0, 8)], ['', by('Asia').slice(8)],
+    ['North America', by('North America')], ['South America', by('South America')], ['Africa', by('Africa'), 'Oceania', by('Oceania')]];
+  const count = k => by(k).length;
+  const row = c => `<div class="c"><img src="${flag(c[1])}" alt=""><span>${c[0]}</span><b>${c[4] || '<em>users</em>'}</b></div>`;
+  const head = k => k ? `<h4>${k}, ${count(k)}</h4>` : '<h4>&nbsp;</h4>';
+  document.getElementById('countries').innerHTML = cols.map(([k, list, k2, list2]) =>
+    `<div>${head(k)}${list.map(row).join('')}${k2 ? `<h4 style="margin-top:10px">${k2}, ${count(k2)}</h4>${list2.map(row).join('')}` : ''}</div>`).join('');
+
+  (async () => {
+    try {
+      Object.assign(window.__check, await realMap(document.getElementById('map'), { w: 640, base: '' }));
+      window.__check.barTotal = glowBars(document.getElementById('units'), [['June', 42], ['July', 73], ['August', 102], ['September', 121], ['October', 198]]);
+      window.__check.latency = latencyBeams(document.getElementById('lat'), [['on-device', 22, '#53fc18'], ['cloud engine', 1618, '#ffffff']]);
+    } catch (e) { window.__check.mapError = String(e); }
+    window.__mapReady = true;
+  })();
+</script>
+</body>
+</html>

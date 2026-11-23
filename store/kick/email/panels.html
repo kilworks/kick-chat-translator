@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Email panels, rendered to PNG</title>
+<link rel="stylesheet" href="../kit/kick-fonts.css">
+<style>
+  /* The email's images: the partner note's own components (partner-kit.html), set at 600 px for a mail
+     column and rendered at 2x. Same Kick rules: Booster caps for headlines and large figures, Inter for
+     text, Volt / Cyan / Brown / Black / White. Each .panel becomes one PNG. */
+  :root {
+    --volt: #53fc18; --cyan: #00ffff; --brown: #4c4014; --black: #000000; --white: #ffffff;
+    --rule-on-dark: rgba(255, 255, 255, 0.22);
+    --display: boosterPolygonal, Arial, sans-serif; --compact: boosterPolygonalCompact, Arial, sans-serif; --text: Inter, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e9e9e9; font: 400 13px/1.25 var(--text); color: var(--black); font-feature-settings: "tnum" 1; padding: 20px; }
+  .panel { width: 600px; background: var(--white); margin-bottom: 20px; }
+  .bar { height: 26px; background: var(--volt); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; font: 500 11px/1 var(--text); }
+  h1, h2 { font-family: var(--display); font-weight: 700; text-transform: uppercase; line-height: 1; letter-spacing: 0; }
+  h1 { font-size: 44px; }
+  h2 { font-size: 26px; }
+  .num { font-family: var(--compact); font-weight: 700; text-transform: uppercase; line-height: 1; }
+  .block { background: var(--black); color: var(--white); }
+
+  /* hero */
+  .hero-title { padding: 22px 16px 18px; }
+  .hero-title p { font-weight: 700; margin-top: 10px; max-width: 52ch; }
+  .figs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 16px; padding: 18px 16px 18px; }
+  .figs div { border-top: 1px solid var(--rule-on-dark); padding-top: 9px; }
+  .figs .num { font-size: 40px; }
+  .figs p { font-size: 11.5px; margin-top: 6px; }
+
+  /* map */
+  .map-head { padding: 16px 16px 4px; }
+  .map-head p { font-size: 12px; margin-top: 6px; max-width: 75ch; }
+  .realdata { position: absolute; left: 16px; top: 6px; z-index: 1; background: var(--volt); color: var(--black); font: 700 10.5px/1 var(--text); padding: 5px 7px; }
+  .legend { display: flex; gap: 16px; font-size: 10.5px; padding: 2px 16px 12px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; }
+  .flags { padding: 14px 16px 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .flags img { width: 22px; height: 22px; display: block; }
+  .continents { display: grid; grid-template-columns: repeat(6, auto); justify-content: space-between; padding: 8px 16px 16px; font-size: 11.5px; }
+  .continents b { font-family: var(--compact); font-size: 20px; display: block; }
+
+  /* growth */
+  .chart-pad { padding: 16px 16px 12px; }
+  .chart-pad svg { display: block; width: 100%; height: auto; }
+  .cap { font-size: 11.5px; padding: 0 16px 16px; max-width: 75ch; }
+
+  /* speed */
+  .cmp { background: var(--cyan); padding: 18px 16px; }
+  .cmp .row { display: grid; grid-template-columns: 250px 1fr; align-items: center; gap: 14px; padding: 7px 0; }
+  .cmp .num { font-size: 38px; }
+  .cmp .unit { font: 700 15px/1 var(--text); }
+  .cmp i { display: block; height: 13px; background: var(--black); }
+  .cmp small { display: block; font-size: 11px; margin-top: 3px; }
+</style>
+</head>
+<body>
+
+<div class="panel" id="hero">
+  <div class="bar"><span>KICK CHAT TRANSLATOR</span><span>Partner note, November 2026</span></div>
+  <div class="hero-title">
+    <h1>Used in 58 countries</h1>
+    <p>Read and join any Kick chat in your own language. People in 58 countries on six continents already do.</p>
+  </div>
+  <div class="block figs">
+    <div><span class="num">536</span><p>installs since 5 June 2026</p></div>
+    <div><span class="num">212</span><p>weekly users, up from 150 in 30 days</p></div>
+    <div><span class="num" style="color:var(--volt)">58</span><p>countries, six continents</p></div>
+    <div><span class="num">43</span><p>languages, chat and interface</p></div>
+  </div>
+</div>
+
+<div class="panel" id="reach">
+  <div class="block">
+    <div class="map-head"><h2>58 countries, six continents</h2><p>Installed or used since June. 65% of this week's users are outside the US.</p></div>
+    <div style="position:relative"><span class="realdata">Real data, not an illustration: every lit country and every point is a measured install or visit</span><svg id="map" viewBox="0 0 600 300" style="display:block;width:100%;height:auto"></svg></div>
+    <div class="legend"><span><i style="background:#53fc18;opacity:.75"></i>58 countries, brighter means more installs</span><span><i style="background:#f2ffe9;border-radius:50%;box-shadow:0 0 6px #53fc18"></i>366 cities that opened the listing in 2026</span></div>
+  </div>
+  <div id="flags" class="flags"></div>
+  <div id="continents" class="continents"></div>
+</div>
+
+<div class="panel" id="growth">
+  <div class="block">
+    <div class="map-head"><h2>Installs per month</h2><p>Chrome Web Store, June to October 2026. Up every month.</p></div>
+    <div class="chart-pad">
+      <svg id="units" role="img" aria-label="Installs per month, one square per install: June 42, July 73, August 102, September 121, October 198" style="display:block;width:100%;height:auto"></svg>
+    </div>
+    <p class="cap">411 in the last 90 days, against 125 in the 90 days before. ChatGPT sends the listing more visitors than any other site.</p>
+  </div>
+</div>
+
+<div class="panel" id="speed">
+  <div class="block">
+    <div class="map-head"><h2>Translated in 22 milliseconds</h2><p>Median time from a message appearing to its translation on screen, live Kick channel. On-device: Chrome and Edge 138+.</p></div>
+    <div class="chart-pad"><svg id="lat" role="img" aria-label="Median time to a translation, one square per 20 ms: on-device 22 ms, 1 square; cloud 1,618 ms, 81 squares" style="display:block;width:100%;height:auto"></svg></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="../kit/countries.js"></script>
+<script src="../kit/cities.js"></script>
+<script src="../kit/infoviz.js"></script>
+<script>
+  const flag = iso => 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/' +
+    [...iso].map(ch => (0x1f1e6 + ch.charCodeAt(0) - 65).toString(16)).join('-') + '.svg';
+  // All 58 flags, most installs first.
+  document.getElementById('flags').innerHTML = [...C].sort((a, b) => b[4] - a[4] || b[5] - a[5])
+    .map(c => `<img src="${flag(c[1])}" alt="${c[0]}" title="${c[0]}">`).join('');
+  const order = ['Europe', 'Asia', 'South America', 'North America', 'Africa', 'Oceania'];
+  document.getElementById('continents').innerHTML = order
+    .map(k => `<span><b>${C.filter(c => c[3] === k).length}</b>${k}</span>`).join('');
+  (async () => {
+    try {
+      Object.assign(window.__check, await realMap(document.getElementById('map'), { w: 600, base: '../' }));
+      window.__check.barTotal = glowBars(document.getElementById('units'), [['June', 42], ['July', 73], ['August', 102], ['September', 121], ['October', 198]]);
+      window.__check.latency = latencyBeams(document.getElementById('lat'), [['on-device', 22, '#53fc18'], ['cloud engine', 1618, '#ffffff']]);
+    } catch (e) { window.__check.mapError = String(e); }
+    window.__mapReady = true;
+  })();
+</script>
+</body>
+</html>
