@@ -504,7 +504,7 @@ export class TranslationPipeline {
           ]),
         );
       }
-      showError(msg.injectionTarget, code, () => void this.forceRetranslate(msg, real));
+      showError(msg.injectionTarget, localised('errTranslateFailed', 'Translation failed'), () => void this.forceRetranslate(msg, real));
       return;
     }
     this.applyTranslation(msg, real, outcome.result, { store: true });

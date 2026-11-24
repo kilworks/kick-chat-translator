@@ -85,6 +85,15 @@ describe('TranslationPipeline, cloud first', () => {
     expect(showError).toHaveBeenCalled();
   });
 
+  it('shows readable text on the line, never the machine code', async () => {
+    const { localEngine } = await import('./localEngine');
+    Object.assign(localEngine, { isReady: () => false });
+    sendMock.mockResolvedValue(failure('rate_limit'));
+    await reader().onDomMessage(domMsg());
+    await flush();
+    expect(vi.mocked(showError).mock.calls[0]?.[1]).toBe('Translation failed');
+  });
+
   it('leaves the channel budget alone, it is not a failure of the engine', async () => {
     sendMock.mockResolvedValue(failure('channel_budget'));
     await reader().onDomMessage(domMsg());
