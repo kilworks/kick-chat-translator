@@ -121,11 +121,12 @@ async function handleTranslate(req: TranslationRequest): Promise<TranslationOutc
     };
   }
 
+  const key = cache.key(req.text, req.targetLang);
   if (!req.noCache) {
     // IndexedDB, on the path of every single line. A hit is the fastest possible
     // answer, but a miss still pays this before anything else starts, and the
     // measured hit rate is 10%.
-    const lookup = (): Promise<Awaited<ReturnType<typeof cache.get>>> => cache.get(req.text, req.targetLang);
+    const lookup = (): Promise<Awaited<ReturnType<typeof cache.get>>> => cache.get(req.text, req.targetLang, key);
     const cached = __KT_METRICS__ ? await metrics.measure('leg.cache.lookup', lookup) : await lookup();
     if (cached) {
       const provider = cached.provider as ProviderId;
@@ -156,7 +157,7 @@ async function handleTranslate(req: TranslationRequest): Promise<TranslationOutc
     return { ok: false, error: { code: 'saturated', message: 'No provider available' } };
   }
 
-  return coalescer.submit(req);
+  return coalescer.submit(req, key);
 }
 
 interface DeeplUsage {

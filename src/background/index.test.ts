@@ -8,7 +8,11 @@ import type { Settings } from '~/shared/settings';
 vi.mock('./cache', () => ({
   TranslationCache: class {
     setConfig(): void {}
+    key(text: string, lang: string): string {
+      return `${lang}::${text}`;
+    }
     async warm(): Promise<void> {}
+    async setMany(): Promise<void> {}
     async clear(): Promise<void> {}
     async stats(): Promise<{ entries: number }> {
       return { entries: 0 };
@@ -41,6 +45,7 @@ vi.mock('./stats', () => ({
     }
     recordRequest(): void {}
     recordThrottled(): void {}
+    recordError(): void {}
     async reset(): Promise<object> {
       return {};
     }
@@ -292,9 +297,11 @@ describe('malformed requests from a Kick tab', () => {
     await settle();
     const tr = async (channel: string) =>
       JSON.stringify(await w.ask({ type: 'translate', payload: { messageId: 'm', text: 'hello there', targetLang: 'fr', channel, noCache: true } }, KICK_TAB));
-    for (let i = 0; i < 10; i++) await tr('first');
-    expect(await tr('first')).toContain('channel_budget');
-    for (let i = 0; i < 200; i++) await tr(`other-${i}`);
+    // Together: the bucket is taken before anything waits, so the 11th is refused
+    // and nothing sits through a batching window per call.
+    const burst = await Promise.all(Array.from({ length: 11 }, () => tr('first')));
+    expect(burst.at(-1)).toContain('channel_budget');
+    await Promise.all(Array.from({ length: 200 }, (_, i) => tr(`other-${i}`)));
     expect(await tr('first')).not.toContain('channel_budget');
-  }, 30_000);
+  });
 });

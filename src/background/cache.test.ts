@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { cacheKey } from '~/shared/normalize';
 
 const { idb } = vi.hoisted(() => ({
-  idb: { entries: new Map<string, unknown>(), gets: [] as string[], keyLists: 0 },
+  idb: { entries: new Map<string, unknown>(), gets: [] as string[], keyLists: 0, transactions: 0 },
 }));
 // A key range is a pair of bounds here; the store below filters on it the way
 // IndexedDB does, in key order, so warm() runs against the same contract.
@@ -73,6 +73,16 @@ vi.mock('idb-keyval', () => {
     },
     del: (k: string) => {
       idb.entries.delete(k);
+      return Promise.resolve();
+    },
+    setMany: (rows: [string, unknown][]) => {
+      idb.transactions++;
+      for (const [k, v] of rows) idb.entries.set(k, v);
+      return Promise.resolve();
+    },
+    delMany: (ks: string[]) => {
+      idb.transactions++;
+      for (const k of ks) idb.entries.delete(k);
       return Promise.resolve();
     },
     clear: () => {
@@ -288,5 +298,34 @@ describe('TranslationCache.prune', () => {
     await c.prune();
     expect([...idb.entries.keys()].sort()).toEqual(['en::fresh0', 'en::fresh1', 'en::fresh2']);
     expect((await c.stats()).entries).toBe(3);
+  });
+});
+
+// One write per translated line, and once the memory layer was full one delete
+// as well: tens of thousands of transactions an hour on a fast chat.
+describe('TranslationCache, batched writes', () => {
+  beforeEach(() => {
+    idb.entries.clear();
+    idb.transactions = 0;
+  });
+
+  it('stores a batch in one transaction and serves it from memory', async () => {
+    const c = new TranslationCache(100, 3600_000);
+    await c.setMany([1, 2, 3, 4, 5].map((n) => ({ key: `en::t${n}`, value: { translatedText: `T${n}`, detectedLang: 'es', provider: 'google' } })));
+    expect(idb.transactions).toBe(1);
+    expect(idb.entries.size).toBe(5);
+    expect((await c.get('t3', 'en', 'en::t3'))?.translatedText).toBe('T3');
+  });
+
+  it('cuts back to the cap in one transaction, only once a tenth past it', async () => {
+    const c = new TranslationCache(100, 3600_000);
+    const row = (n: number) => ({ key: `en::t${n}`, value: { translatedText: 'x', detectedLang: 'es', provider: 'google' } });
+    await c.setMany(Array.from({ length: 105 }, (_, n) => row(n)));
+    // 105 is inside the slack: nothing deleted, the batch was the one transaction.
+    expect(idb.transactions).toBe(1);
+    await c.setMany(Array.from({ length: 10 }, (_, n) => row(200 + n)));
+    // 115 is past it: one more write batch and ONE delete batch, back to 100.
+    expect(idb.transactions).toBe(3);
+    expect((await c.stats()).inMemory).toBe(100);
   });
 });

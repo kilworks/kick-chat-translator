@@ -1,4 +1,4 @@
-import { createStore, get, set, del, clear, promisifyRequest } from 'idb-keyval';
+import { createStore, get, set, setMany, del, delMany, clear, promisifyRequest } from 'idb-keyval';
 import { CACHE_DB, CACHE_STORE } from '~/shared/constants';
 import { rootLogger } from '~/shared/logger';
 import { cacheKey, normalizeForKey } from '~/shared/normalize';
@@ -22,6 +22,9 @@ export function warmTargets(readTarget: string, byLang: Record<string, number>, 
     .map(([lang]) => lang);
   return [...new Set([readTarget, ...frequent])].filter(Boolean);
 }
+
+/** How far past `maxEntries` the memory layer may grow before it is cut back. */
+const EVICT_SLACK = 1.1;
 
 interface CacheEntry {
   translatedText: string;
@@ -48,8 +51,9 @@ export class TranslationCache {
     return cacheKey(text, targetLang);
   }
 
-  async get(text: string, targetLang: string): Promise<CacheEntry | undefined> {
-    const k = this.key(text, targetLang);
+  /** `key` when the caller already derived it: normalising a line is not free, and it is asked for several times. */
+  async get(text: string, targetLang: string, key?: string): Promise<CacheEntry | undefined> {
+    const k = key ?? this.key(text, targetLang);
     let entry = this.mem.get(k);
     if (!entry) {
       try {
@@ -81,7 +85,25 @@ export class TranslationCache {
     } catch (err: unknown) {
       log.warn('idb set failed', err);
     }
-    if (this.mem.size > this.maxEntries) this.evict();
+    this.evict();
+  }
+
+  /**
+   * One transaction for a whole batch of answers. A line per transaction was one
+   * disk write per translated line, every one of them a LevelDB batch in the
+   * browser process, for as long as a fast chat stayed open.
+   */
+  async setMany(items: { key: string; value: Omit<CacheEntry, 'storedAtMs'> }[]): Promise<void> {
+    if (items.length === 0) return;
+    const storedAtMs = Date.now();
+    const rows: [string, CacheEntry][] = items.map((i) => [i.key, { ...i.value, storedAtMs }]);
+    for (const [k, e] of rows) this.mem.set(k, e);
+    try {
+      await setMany(rows, store);
+    } catch (err: unknown) {
+      log.warn('idb setMany failed', err);
+    }
+    this.evict();
   }
 
   async clear(): Promise<void> {
@@ -158,16 +180,19 @@ export class TranslationCache {
     }
   }
 
+  /**
+   * Past the cap by a tenth, drop back to the cap in one transaction. Evicting one
+   * key per insert once full made every new line a second write.
+   */
   private evict(): void {
-    const toRemove = this.mem.size - this.maxEntries;
-    if (toRemove <= 0) return;
-    let i = 0;
+    if (this.mem.size <= this.maxEntries * EVICT_SLACK) return;
+    const gone: string[] = [];
     for (const k of this.mem.keys()) {
-      if (i >= toRemove) break;
-      this.mem.delete(k);
-      void del(k, store).catch(() => undefined);
-      i += 1;
+      if (this.mem.size - gone.length <= this.maxEntries) break;
+      gone.push(k);
     }
+    for (const k of gone) this.mem.delete(k);
+    void delMany(gone, store).catch(() => undefined);
   }
 
   /**
