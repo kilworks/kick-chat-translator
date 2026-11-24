@@ -122,7 +122,8 @@ async function main(): Promise<void> {
   // Awaited: nothing is mounted yet, so the chat never shows English first.
   await loadChatTable(setContentLocale(settings.uiLang));
 
-  ensureStyles();
+  // The 58 KB stylesheet goes in with the first thing that draws (a chat route,
+  // the bar): home, browse and search pages do not get it for nothing.
   applyChatScheme(document.body, settings.chatScheme);
   applyShowOriginal(settings.showOriginal);
   applyDisplayStyle(settings.displayStyle);
@@ -173,6 +174,9 @@ async function main(): Promise<void> {
    * pose son propre bandeau sous le meme id.
    */
   let orphelin = false;
+  // The document-level listeners below die with the copy that added them: an update
+  // used to leave one more dead set (and a scroll handler) in every long-lived tab.
+  const vie = new AbortController();
   // Declare ici et pose plus bas : `estOrphelin` peut tourner pendant le montage,
   // avant la ligne du sondage, et un `const` y leverait.
   const sondage: { route?: ReturnType<typeof setInterval> } = {};
@@ -184,6 +188,8 @@ async function main(): Promise<void> {
     observer.stop();
     compose.stop();
     clearInterval(sondage.route);
+    vie.abort();
+    pipeline.dispose();
     barWatcher?.disconnect();
     themeWatch.disconnect();
     return true;
@@ -223,6 +229,10 @@ async function main(): Promise<void> {
   let barPolling = false;
   function mountBar(): void {
     if (!settings.showFloatingBar) return;
+    // No channel in the address, no chat panel to look for: on the home page, browse
+    // and search this loop restarted after every mutation and never found anything.
+    if (!extractChannelSlug(location.pathname)) return;
+    ensureStyles();
     if (barPolling) return; // a host-search loop is already running
     barPolling = true;
     const tryMount = (attempt = 0): void => {
@@ -308,7 +318,7 @@ async function main(): Promise<void> {
         barGuardTimer = undefined;
         // Presence has to be asked of the panel on screen, not of the document:
         // the id survives inside the hidden copy Kick leaves behind.
-        if (settings.showFloatingBar && !findChatPanel()?.querySelector('#kt-floating-bar'))
+        if (settings.showFloatingBar && extractChannelSlug(location.pathname) && !findChatPanel()?.querySelector('#kt-floating-bar'))
           mountBar();
       }, 500);
     });
@@ -368,6 +378,7 @@ async function main(): Promise<void> {
       return;
     }
 
+    ensureStyles();
     refresh7TV();
     logPlatform();
     observer.reset();
@@ -424,11 +435,15 @@ async function main(): Promise<void> {
     dernierChemin = location.pathname;
     attachForRoute();
   }, ROUTE_POLL_MS);
-  window.addEventListener('popstate', () => {
-    if (estOrphelin()) return;
-    dernierChemin = location.pathname;
-    attachForRoute();
-  });
+  window.addEventListener(
+    'popstate',
+    () => {
+      if (estOrphelin()) return;
+      dernierChemin = location.pathname;
+      attachForRoute();
+    },
+    { signal: vie.signal },
+  );
 
   /**
    * Hand back to the observer every line it marked but never translated.
@@ -463,11 +478,29 @@ async function main(): Promise<void> {
   }
 
   // Back on the tab: what arrived while it was hidden was skipped, not lost.
+  //
+  // While a tab is hidden and paused the list observer is disconnected: it used
+  // to keep reading every line (text, id, username, keywords) only for the
+  // pipeline to turn each one away. Coming back reattaches it, and the first scan
+  // takes the rows that came in meanwhile.
+  let stoppedWhileHidden = false;
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden || !vueLocale().enabled || !settings.pauseWhenHidden || estOrphelin())
+    if (estOrphelin()) return;
+    if (document.hidden) {
+      if (vueLocale().enabled && settings.pauseWhenHidden) {
+        observer.stop();
+        stoppedWhileHidden = true;
+      }
       return;
+    }
+    if (stoppedWhileHidden) {
+      stoppedWhileHidden = false;
+      // Whatever the settings say now: it was this handler that stopped it.
+      if (vueLocale().enabled) observer.start();
+    }
+    if (!vueLocale().enabled || !settings.pauseWhenHidden) return;
     retryUntranslated(document, 'tab visible again');
-  });
+  }, { signal: vie.signal });
 
   // Scroll-stop: rows the reader scrolls back to that were never translated.
   //
@@ -488,7 +521,7 @@ async function main(): Promise<void> {
         retryUntranslated(list, 'scroll-stop');
       }, 800);
     },
-    { capture: true, passive: true },
+    { capture: true, passive: true, signal: vie.signal },
   );
 
   // Note: the "pause when hidden" quota guard lives in the pipeline, which reads
