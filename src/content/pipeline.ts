@@ -63,17 +63,28 @@ interface RawResult {
 /**
  * Filter codes turned into something a reader can act on.
  *
- * English only, like every other string this content script shows. It has no
- * translation runtime of its own, and giving it one would put the whole UI
- * catalogue (about 67 KB) on every Kick page just to fill a tooltip.
+ * Getters, not values: the chat catalogue is installed after this module is
+ * imported, so a value built here would stay English for every UI language.
  */
 const DROP_REASON: Record<string, string> = {
-  bot: localised('dropBot', 'the sender looks like a bot'),
-  user_blacklisted: localised('dropUserBlocked', 'this user is on your blocked list'),
-  channel_blacklisted: localised('dropChannelBlocked', 'this channel is on your blocked list'),
-  channel_not_whitelisted: localised('dropChannelNotAllowed', 'this channel is not on your allowed list'),
-  lang_unknown: localised('dropLangUnknown', 'its language could not be identified'),
-  lang_not_allowed: localised('dropLangNotAllowed', 'its language is not on your allowed list'),
+  get bot() {
+    return localised('dropBot', 'the sender looks like a bot');
+  },
+  get user_blacklisted() {
+    return localised('dropUserBlocked', 'this user is on your blocked list');
+  },
+  get channel_blacklisted() {
+    return localised('dropChannelBlocked', 'this channel is on your blocked list');
+  },
+  get channel_not_whitelisted() {
+    return localised('dropChannelNotAllowed', 'this channel is not on your allowed list');
+  },
+  get lang_unknown() {
+    return localised('dropLangUnknown', 'its language could not be identified');
+  },
+  get lang_not_allowed() {
+    return localised('dropLangNotAllowed', 'its language is not on your allowed list');
+  },
 };
 
 /** How many decisions the Debug tab can look back over. */
@@ -187,7 +198,15 @@ export class TranslationPipeline {
   constructor(settings: Settings) {
     this.settings = settings;
     // Bound dedup map size.
-    setInterval(() => { if (this.userDedup.size > 200) this.userDedup.clear(); }, 60_000);
+    this.dedupTimer = setInterval(() => { if (this.userDedup.size > 200) this.userDedup.clear(); }, 60_000);
+  }
+
+  private dedupTimer: ReturnType<typeof setInterval> | undefined;
+
+  /** The copy of the script this belongs to was replaced: stop the timer it started. */
+  dispose(): void {
+    clearInterval(this.dedupTimer);
+    this.dedupTimer = undefined;
   }
 
   setChannelLang(slug: string, lang: string | undefined): void {
@@ -354,7 +373,8 @@ export class TranslationPipeline {
     // scroller to hand this row to another message, whose reason this is not.
     const sameRow = extractMessageText(msg.rowElement) === rowText;
     // Both drops are the allowlist's doing: lang_unknown only fires when one is set.
-    const byLang = prepared === DROP_REASON.lang_not_allowed || prepared === DROP_REASON.lang_unknown;
+    // Only a dropped line has a reason to compare: the getters look the catalogue up.
+    const byLang = typeof prepared === 'string' && (prepared === DROP_REASON.lang_not_allowed || prepared === DROP_REASON.lang_unknown);
     if (byLang || (typeof prepared !== 'string' && this.settings.sourceLangAllowlist.length > 0)) {
       this.langMark(msg.channel, byLang);
     }
@@ -405,7 +425,7 @@ export class TranslationPipeline {
         showLoading(msg.injectionTarget);
         const t0 = performance.now();
         try {
-          const translatedText = await localEngine.translate(localSource, target, real);
+          const translatedText = await this.onDevice(localSource, target, real);
           // Handed back as is, usually because the guessed source was wrong. The
           // cloud detects per line, so local-first asks it instead of skipping.
           // local-only has nowhere else to ask and keeps the skip below.
@@ -495,7 +515,16 @@ export class TranslationPipeline {
         removeAllArtifacts(msg.injectionTarget);
         return;
       }
-      if (code === 'saturated' || code === 'no_provider') {
+      if (code === 'saturated') {
+        // Every provider is cooling down: a fact about the moment, not about this line.
+        // The worker asked nothing of them. The line stays bare, with no error and no
+        // request, so the scroll-stop and tab-return sweeps hand it back once the
+        // cooldown is over, instead of a red marker that nothing ever re-runs.
+        this.maybeToast(localised('toastAllDown', 'Every translation provider is down. Retrying shortly.'));
+        removeAllArtifacts(msg.injectionTarget);
+        return;
+      }
+      if (code === 'no_provider') {
         this.maybeToast(localised('toastAllDown', 'Every translation provider is down. Retrying shortly.'));
       } else if (code === 'quota' || outcome.error.message?.includes('quota')) {
         this.maybeToast(
@@ -504,7 +533,7 @@ export class TranslationPipeline {
           ]),
         );
       }
-      showError(msg.injectionTarget, code, () => void this.forceRetranslate(msg, real));
+      showError(msg.injectionTarget, localised('errTranslateFailed', 'Translation failed'), () => void this.forceRetranslate(msg, real));
       return;
     }
     this.applyTranslation(msg, real, outcome.result, { store: true });
@@ -522,7 +551,7 @@ export class TranslationPipeline {
     localEngine.noteSeen(source, this.effTarget);
     if (!localEngine.isReady(source, this.effTarget)) return false;
     try {
-      const translatedText = await localEngine.translate(source, this.effTarget, real);
+      const translatedText = await this.onDevice(source, this.effTarget, real);
       this.applyTranslation(msg, real, { translatedText, detectedLang: source, provider: 'local' }, { store: true });
       void send({ type: 'stats.local', payload: { lang: source, chars: real.length } }).catch(() => undefined);
       return true;
@@ -583,6 +612,13 @@ export class TranslationPipeline {
       return;
     }
     this.applyTranslation(msg, real, outcome.result, { store: true, force: true });
+  }
+
+  /** On-device translation under the same deadline as the cloud: a stalled model left one pending line per message, for the life of the page. */
+  private async onDevice(source: string, target: string, text: string): Promise<string> {
+    const out = await withinDeadline(localEngine.translate(source, target, text), CLOUD_ANSWER_DEADLINE_MS);
+    if (out === undefined) throw new Error('local_timeout');
+    return out;
   }
 
   private async requestCloud(

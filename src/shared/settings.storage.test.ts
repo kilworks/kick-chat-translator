@@ -100,11 +100,12 @@ describe('reset and import', () => {
     expect((await loadSettings()).deeplApiKey).toBe('');
   });
 
-  it('import routes an older backup key to local, not to sync', async () => {
+  it('import ignores a key an older backup carries, and keeps the one on this device', async () => {
+    await saveSettings({ deeplApiKey: 'mine' });
     const backup = JSON.stringify({ ...defaultSettings(), deeplApiKey: 'from-backup', targetLang: 'ja' });
     const s = await importSettings(backup);
-    expect(s.deeplApiKey).toBe('from-backup');
-    expect(heldKey()).toBe('from-backup');
+    expect(s.deeplApiKey).toBe('mine');
+    expect(heldKey()).toBe('mine');
     expect(syncedBlob()?.deeplApiKey).toBe('');
     expect(syncedBlob()?.targetLang).toBe('ja');
   });
@@ -128,6 +129,41 @@ describe('settings backup files', () => {
     expect(heldKey()).toBe('secret-abc');
     expect((await loadSettings()).deeplApiKey).toBe('secret-abc');
     expect(syncedBlob()?.targetLang).toBe('ja');
+  });
+
+  it('export leaves out the credentials and the consent, and keeps the lists of the reader', async () => {
+    await saveSettings({
+      myMemoryEmail: 'me@example.com',
+      lingvaInstance: 'https://lingva.example/token123',
+      whitelistChannels: ['somechannel'],
+      blacklistUsers: ['someone'],
+      usageStats: true,
+      usageStatsAsked: true,
+      targetLang: 'fr',
+    });
+    const text = await exportSettings();
+    for (const secret of ['me@example.com', 'lingva.example']) expect(text).not.toContain(secret);
+    const file = JSON.parse(text) as Record<string, unknown>;
+    expect(file.usageStats).toBe(false);
+    expect(file.whitelistChannels).toEqual(['somechannel']);
+    expect(file.targetLang).toBe('fr');
+  });
+
+  // The restore flow: export, reset, import must give the reader's lists back.
+  it('restores the lists after a reset', async () => {
+    await saveSettings({ whitelistChannels: ['somechannel'], blacklistUsers: ['someone'], pausedChannels: ['muted_one'], channelLangs: { somechannel: 'ja' } });
+    const text = await exportSettings();
+    await resetSettings();
+    const s = await importSettings(text);
+    expect(s).toMatchObject({ whitelistChannels: ['somechannel'], blacklistUsers: ['someone'], pausedChannels: ['muted_one'], channelLangs: { somechannel: 'ja' } });
+  });
+
+  it('a file cannot switch on statistics or set the email of this device', async () => {
+    await saveSettings({ myMemoryEmail: 'me@example.com', usageStats: false, usageStatsAsked: false });
+    const s = await importSettings(
+      JSON.stringify({ ...defaultSettings(), usageStats: true, usageStatsAsked: true, myMemoryEmail: 'attacker@example.com', targetLang: 'ja' }),
+    );
+    expect(s).toMatchObject({ usageStats: false, usageStatsAsked: false, myMemoryEmail: 'me@example.com', targetLang: 'ja' });
   });
 
   it("keep this device's Lingva server, whatever the file says", async () => {

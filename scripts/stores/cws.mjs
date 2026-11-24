@@ -18,18 +18,19 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { endpoint } from './local-only.mjs';
 
 const ITEM_ID = process.env.CWS_ITEM_ID ?? 'nkkjmbkmacbdkboijmnhjnblcaiclhni';
 const CONF = path.join(os.homedir(), '.config', 'kick-chat-translator');
 const KEY_FILE = process.env.CWS_SA_KEY ?? path.join(CONF, 'cws-service-account.json');
-const TOKEN_URL = process.env.CWS_TOKEN_URL ?? 'https://oauth2.googleapis.com/token';
-const API = process.env.CWS_API ?? 'https://chromewebstore.googleapis.com';
 const SCOPE = 'https://www.googleapis.com/auth/chromewebstore';
 
 const die = (msg) => {
   console.error('cws: ' + msg);
   process.exit(1);
 };
+const TOKEN_URL = endpoint('CWS_TOKEN_URL', 'https://oauth2.googleapis.com/token', die);
+const API = endpoint('CWS_API', 'https://chromewebstore.googleapis.com', die);
 
 function publisherId() {
   if (process.env.CWS_PUBLISHER_ID) return process.env.CWS_PUBLISHER_ID;

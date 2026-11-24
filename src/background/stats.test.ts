@@ -135,3 +135,56 @@ describe('throttle counter', () => {
     expect(s.current().throttled).toBeUndefined();
   });
 });
+
+// A write per 1.5 s for as long as a chat ran, each one an onChanged event in every
+// extension context. The popup reads the memory, so the disk can wait.
+describe('StatsTracker write cadence', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  function counting() {
+    const writes: unknown[] = [];
+    vi.stubGlobal('chrome', { storage: { local: { get: async () => ({}), set: async (o: unknown) => void writes.push(o) } } });
+    return writes;
+  }
+
+  it('batches a busy chat into one write per 15 s', async () => {
+    vi.useFakeTimers();
+    const writes = counting();
+    const t = new StatsTracker();
+    for (let i = 0; i < 100; i++) t.recordRequest('google', 'es', 5, false, 'c');
+    await vi.advanceTimersByTimeAsync(14_000);
+    expect(writes).toHaveLength(0);
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(writes).toHaveLength(1);
+  });
+
+  it('flush() writes at once what is pending, then nothing more', async () => {
+    vi.useFakeTimers();
+    const writes = counting();
+    const t = new StatsTracker();
+    t.recordRequest('google', 'es', 5, false);
+    await t.flush();
+    expect(writes).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(writes).toHaveLength(1);
+  });
+});
+
+// byLang and byChannel are keyed by what a page sends: a new key past the cap is not taken.
+describe('StatsTracker key caps', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it('keeps counting known keys and stops adding new ones', () => {
+    vi.stubGlobal('chrome', { storage: { local: { get: async () => ({}), set: async () => undefined } } });
+    const t = new StatsTracker();
+    for (let i = 0; i < 400; i++) t.recordRequest('google', `l${i}`, 1, false, `c${i}`);
+    t.recordRequest('google', 'l0', 1, false, 'c0');
+    const s = t.current();
+    expect(Object.keys(s.byLang)).toHaveLength(300);
+    expect(Object.keys(s.byChannel)).toHaveLength(300);
+    expect(s.byLang.l0).toBe(2);
+    expect(s.totalRequests).toBe(401);
+  });
+});

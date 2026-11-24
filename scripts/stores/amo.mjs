@@ -19,15 +19,16 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { endpoint } from './local-only.mjs';
 
 const SLUG = process.env.AMO_SLUG ?? 'kick-chat-translator';
 const KEY_FILE = process.env.AMO_API_KEY ?? path.join(os.homedir(), '.config', 'kick-chat-translator', 'amo-api.json');
-const API = process.env.AMO_API ?? 'https://addons.mozilla.org/api/v5';
 
 const die = (msg) => {
   console.error('amo: ' + msg);
   process.exit(1);
 };
+const API = endpoint('AMO_API', 'https://addons.mozilla.org/api/v5', die);
 
 // AMO allows five minutes at most; a fresh token per request stays well inside.
 function auth() {

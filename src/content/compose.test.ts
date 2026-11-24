@@ -7,6 +7,7 @@ const ui = vi.hoisted(() => ({
   state: 'hidden',
   inserted: [] as string[],
   onInsert: undefined as (() => void) | undefined,
+  reads: 0,
 }));
 const net = vi.hoisted(() => ({ asked: [] as string[] }));
 
@@ -18,7 +19,10 @@ vi.mock('./composeUi', () => ({
   isComposePreviewVisible: () => ui.state === 'ready',
   isKickSuggestionOpen: () => false,
   mountComposePreview: (_el: HTMLElement, _lang: string, h: { onInsert: () => void }) => void (ui.onInsert = h.onInsert),
-  readComposerText: (el: HTMLElement) => el.textContent ?? '',
+  readComposerText: (el: HTMLElement) => {
+    ui.reads++;
+    return el.textContent ?? '';
+  },
   setComposeTargetLang: () => undefined,
   setComposeThrottle: () => undefined,
   unmountComposePreview: () => undefined,
@@ -116,5 +120,20 @@ describe('accepting the compose preview', () => {
     pressTab(el);
     expect(ui.inserted).toHaveLength(1);
     expect(ui.inserted[0]).toContain('que tal la partida de hoy');
+  });
+});
+
+// Every click anywhere re-read the composer through innerText, a forced layout.
+describe('clicks while the preview is bound', () => {
+  it('ignore a click on a chat line, and still follow one elsewhere (the emote picker)', async () => {
+    document.body.insertAdjacentHTML('beforeend', '<div data-index="3"><span id="line">hi</span></div><button id="picker">x</button>');
+    await vi.advanceTimersByTimeAsync(COMPOSE_DEBOUNCE_MS + 10);
+    const before = ui.reads;
+    document.getElementById('line')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(COMPOSE_DEBOUNCE_MS + 10);
+    expect(ui.reads).toBe(before);
+    document.getElementById('picker')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await vi.advanceTimersByTimeAsync(COMPOSE_DEBOUNCE_MS + 10);
+    expect(ui.reads).toBeGreaterThan(before);
   });
 });

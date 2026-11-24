@@ -275,12 +275,37 @@ export async function resetSettings(): Promise<Settings> {
 }
 
 /**
- * Export the settings as a JSON string (for backup / transfer). Without the
- * DeepL key: these files get shared, to ask for help or to pass settings on.
+ * What belongs to this device and the person at it, not to a file that gets shared.
+ *
+ * The export blanks them (a settings file goes to Discord threads and GitHub
+ * issues) and an import never replaces them: the key and the email are credentials,
+ * the Lingva server receives every chat line, and the two consent flags are an
+ * answer only that person gives.
+ *
+ * The channel and user lists are NOT here: they are the reader's own configuration,
+ * and "export, reset, import" has to give them back. They travel in the file, so a
+ * file is worth a look before it is shared, and an imported one before it is applied.
+ */
+const DEVICE_ONLY = [
+  'deeplApiKey',
+  'lingvaInstance',
+  'myMemoryEmail',
+  'usageStats',
+  'usageStatsAsked',
+] as const;
+
+function pick<K extends keyof Settings>(from: Settings, keys: readonly K[]): Pick<Settings, K> {
+  return Object.fromEntries(keys.map((k) => [k, structuredClone(from[k])])) as Pick<Settings, K>;
+}
+
+/**
+ * Export the settings as a JSON string (for backup / transfer), without what is
+ * private to this device (see DEVICE_ONLY): these files get shared, to ask for
+ * help or to pass settings on.
  */
 export async function exportSettings(): Promise<string> {
   const s = await loadSettings();
-  return JSON.stringify(withoutKey(s), null, 2);
+  return JSON.stringify({ ...s, ...pick(defaultSettings(), DEVICE_ONLY) }, null, 2);
 }
 
 /**
@@ -298,18 +323,16 @@ export function parseSettingsJson(json: string): Settings {
 /**
  * Import settings from a JSON string. Returns the settings now in force.
  *
- * Two things stay this device's own. The DeepL key: a file without one (every
- * export since 3.6.3) leaves it in place. The Lingva server: a file someone
- * else wrote would otherwise send every chat line to their server, and nothing
+ * Everything in DEVICE_ONLY stays this device's own, whatever the file says,
+ * including a DeepL key an older backup may still carry. A file someone else
+ * wrote would otherwise send every chat line to their Lingva server, put this
+ * reader's DeepL traffic on their account, or switch on statistics, and nothing
  * on screen would say so.
  */
 export async function importSettings(json: string): Promise<Settings> {
   const file = parseSettingsJson(json);
   const current = await loadSettings();
-  const next = { ...file, lingvaInstance: current.lingvaInstance, deeplApiKey: file.deeplApiKey || current.deeplApiKey };
-  // A backup written before 3.6.3 may still carry a key: it goes to local
-  // storage, never to sync.
-  if (file.deeplApiKey) await chrome.storage.local.set({ [STORAGE_KEY_DEEPL_KEY]: file.deeplApiKey });
+  const next = { ...file, ...pick(current, DEVICE_ONLY) };
   await chrome.storage.sync.set({ [STORAGE_KEY_SETTINGS]: withoutKey(next) });
   return next;
 }

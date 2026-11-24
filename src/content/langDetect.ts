@@ -2666,6 +2666,7 @@ export function confidentLanguage(text: string): string | undefined {
 const MEMO_MAX = 512;
 const LOOKUP_MEMO = new Map<string, string | undefined>();
 const DETECT_MEMO = new Map<string, string | undefined>();
+const BROWSER_MEMO = new Map<string, string | undefined>();
 
 function memo(
   table: Map<string, string | undefined>,
@@ -2719,6 +2720,9 @@ export function detectLanguage(text: string): string | undefined {
 export async function detectLanguageWithBrowser(text: string): Promise<string | undefined> {
   const guess = detectLanguage(text);
   if (confidentLanguage(text) || !globalThis.chrome?.i18n?.detectLanguage) return guess;
+  // The same line comes round again (copypasta), and each ask is a trip to the
+  // browser process that also delays the line's paint by a task.
+  if (BROWSER_MEMO.has(text)) return BROWSER_MEMO.get(text);
   let answer: chrome.i18n.LanguageDetectionResult;
   try {
     answer = await chrome.i18n.detectLanguage(text);
@@ -2727,8 +2731,10 @@ export async function detectLanguageWithBrowser(text: string): Promise<string | 
   }
   const first = answer.languages[0]?.language;
   const browser = first ? normalizeLang(first) : undefined;
-  if (answer.isReliable && browser && isSupportedLang(browser)) return browser;
-  return guess === browser ? guess : undefined;
+  const verdict = answer.isReliable && browser && isSupportedLang(browser) ? browser : guess === browser ? guess : undefined;
+  if (BROWSER_MEMO.size >= MEMO_MAX) BROWSER_MEMO.delete(BROWSER_MEMO.keys().next().value!);
+  BROWSER_MEMO.set(text, verdict);
+  return verdict;
 }
 
 function detectUncached(trimmed: string): string | undefined {

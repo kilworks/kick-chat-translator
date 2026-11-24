@@ -77,6 +77,14 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
   const last = settings.providerOrder.length - 1;
   const keyId = useId();
   const planId = useId();
+  const keyHintId = useId();
+  const lingvaHintId = useId();
+  const lingvaErrId = useId();
+  // The address is held here and saved when the reader is done with it: saving on
+  // every keystroke refused "h" as a URL, flashed "saved" per letter and showed the
+  // "not https" warning in red from the first character.
+  const [lingva, setLingva] = useState(settings.lingvaInstance);
+  useEffect(() => setLingva(settings.lingvaInstance), [settings.lingvaInstance]);
   const list = useRef<HTMLUListElement>(null);
   const refocus = useRef<string | undefined>(undefined);
   // Show the DeepL card once, then keep it: clearing the key must not unmount
@@ -232,6 +240,9 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
               aria-label={t('API key')}
               class="kt-input font-mono"
               type={showKey ? 'text' : 'password'}
+              // A password manager offering to store an API key is not what this field is for.
+              autocomplete="off"
+              aria-describedby={keyHintId}
               value={settings.deeplApiKey}
             placeholder="••••••••-••••-••••-••••-••••••••••••:fx"
               onInput={(e) => onPatch({ deeplApiKey: (e.target as HTMLInputElement).value.trim() })}
@@ -248,7 +259,7 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
               {showKey ? t('Hide key') : t('Show key')}
             </button>
           </div>
-          <p class="text-xs text-kick-muted">
+          <p id={keyHintId} class="text-xs text-kick-muted">
             {t('Free keys end with :fx.')} {t('Get a key:')}{' '}
             <a
               class="text-kick-primary underline"
@@ -303,17 +314,17 @@ export function ProviderSection({ settings, providers, onPatch }: Props) {
             id="kt-lingva-url"
             class="kt-input font-mono"
             type="url"
-            value={settings.lingvaInstance}
+            value={lingva}
             placeholder="https://lingva.lunar.icu"
-            onInput={(e) =>
-              onPatch({ lingvaInstance: (e.target as HTMLInputElement).value.trim() })
-            }
+            aria-describedby={`${lingvaHintId} ${lingvaErrId}`}
+            onInput={(e) => setLingva((e.target as HTMLInputElement).value)}
+            onChange={() => onPatch({ lingvaInstance: lingva.trim() })}
           />
-          <p class="text-xs text-kick-muted">
+          <p id={lingvaHintId} class="text-xs text-kick-muted">
             {t('Leave blank to use the default public instance.')}
           </p>
           {/* Always in the DOM, so a screen reader hears the sentence when it appears. */}
-          <p class="text-xs text-red-400" role="status">
+          <p id={lingvaErrId} class="text-xs text-red-400" role="status">
             {settings.lingvaInstance && !settings.lingvaInstance.startsWith('https://')
               ? t('Not used: only an https:// address is accepted, so chat text never travels unencrypted.')
               : ''}

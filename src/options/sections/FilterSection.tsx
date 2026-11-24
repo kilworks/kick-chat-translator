@@ -5,6 +5,7 @@ import { sortedLanguages } from '~/shared/languages';
 import { resolveUiLocale } from '~/shared/i18n';
 import { useT } from '~/shared/i18nContext';
 import { Check } from '../components/Check';
+import { NumberInput } from '../components/NumberInput';
 import { flagClass } from '~/shared/flags';
 import { KICK_BOTS } from '~/shared/constants';
 import { ignoredGlossaryLines } from '~/shared/glossary';
@@ -101,18 +102,7 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
           </div>
           {/* The heading beside it is a plain div, so nothing connects the two
               for a screen reader: axe reports the field as unlabelled. */}
-          <input
-            aria-label={t('Minimum message length')}
-            type="number"
-            class="kt-input"
-            min={1}
-            max={50}
-            value={settings.minTextLength}
-            onInput={(e) => {
-              const v = Number((e.target as HTMLInputElement).value);
-              if (Number.isInteger(v) && v >= 1 && v <= 50) onPatch({ minTextLength: v });
-            }}
-          />
+          <NumberInput label={t('Minimum message length')} min={1} max={50} value={settings.minTextLength} onCommit={(v) => onPatch({ minTextLength: v })} />
         </div>
       </section>
 
@@ -165,6 +155,8 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
               <button
                 key={l.code}
                 type="button"
+                // A name cut short by the three-column grid is read in full on hover.
+                title={l.name}
                 aria-pressed={checked}
                 class={`flex min-h-8 min-w-0 items-center gap-2 rounded border px-2 py-1 text-start text-xs transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kick-primary ${
                   checked
@@ -186,7 +178,9 @@ export function FilterSection({ settings, onPatch, stats }: Props) {
                 <span class="truncate">{l.name}</span>
                 {/* What this language actually amounted to in the chat. */}
                 {(vues[l.code] ?? 0) > 0 && (
-                  <span class="ms-auto shrink-0 tabular-nums text-xs text-kick-primary">{vues[l.code]}</span>
+                  <span class="ms-auto shrink-0 tabular-nums text-xs text-kick-primary" title={t('languages seen in chat')}>
+                    {vues[l.code]}
+                  </span>
                 )}
                 {checked && (
                   <svg class={`h-4 w-4 shrink-0 text-kick-primary ${(vues[l.code] ?? 0) > 0 ? '' : 'ms-auto'}`} aria-hidden="true">

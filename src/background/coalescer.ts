@@ -103,8 +103,9 @@ export class TranslationCoalescer {
     return chosen;
   }
 
-  submit(req: TranslationRequest): Promise<TranslationOutcome> {
-    const key = this.deps.cache.key(req.text, req.targetLang);
+  /** `key` when the caller already derived it (handleTranslate does, for its cache lookup). */
+  submit(req: TranslationRequest, knownKey?: string): Promise<TranslationOutcome> {
+    const key = knownKey ?? this.deps.cache.key(req.text, req.targetLang);
     const existing = this.byKey.get(key);
     if (existing) {
       return new Promise((resolve) => existing.resolvers.push(resolve));
@@ -139,7 +140,6 @@ export class TranslationCoalescer {
     // constant does not tell you what a reader waited through.
     const flushedAt = Date.now();
     if (__KT_METRICS__) for (const e of batch) metrics.timing('leg.coalesce.wait', flushedAt - e.at);
-    for (const e of batch) this.byKey.delete(e.key);
 
     const settings = this.deps.getSettings();
     const groups = new Map<string, Entry[]>();
@@ -162,21 +162,34 @@ export class TranslationCoalescer {
             error: { code: 'dispatch', message: 'dispatch failed' },
           }));
         }
+        const writes: { key: string; value: { translatedText: string; detectedLang: string; provider: string } }[] = [];
         entries.forEach((entry, i) => {
-          this.finalize(entry, outcomes[i] ?? { ok: false, error: { code: 'no_result', message: 'no result' } });
+          this.finalize(entry, outcomes[i] ?? { ok: false, error: { code: 'no_result', message: 'no result' } }, writes);
         });
+        // One write for the group, not one per line.
+        if (writes.length > 0) void this.deps.cache.setMany(writes);
       }),
     );
   }
 
-  private finalize(entry: Entry, outcome: TranslationOutcome): void {
-    const { cache, stats } = this.deps;
+  private finalize(
+    entry: Entry,
+    outcome: TranslationOutcome,
+    writes: { key: string; value: { translatedText: string; detectedLang: string; provider: string } }[],
+  ): void {
+    const { stats } = this.deps;
+    // Out of the dedup map only now that the answer exists: a copy of this line
+    // arriving while the provider is slow joins it instead of paying for another request.
+    this.byKey.delete(entry.key);
     const dedupCount = entry.resolvers.length;
     if (outcome.ok) {
-      void cache.set(entry.req.text, entry.req.targetLang, {
-        translatedText: outcome.result.translatedText,
-        detectedLang: outcome.result.detectedLang,
-        provider: outcome.result.provider,
+      writes.push({
+        key: entry.key,
+        value: {
+          translatedText: outcome.result.translatedText,
+          detectedLang: outcome.result.detectedLang,
+          provider: outcome.result.provider,
+        },
       });
       stats.recordRequest(outcome.result.provider, outcome.result.detectedLang, entry.req.text.length, false, entry.req.channel);
       // Extra callers that shared this in-flight translation count as cache hits.

@@ -50,6 +50,9 @@ export function showToast(message: string): void {
   if (existing) existing.remove();
   const el = document.createElement('div');
   el.className = 'kt-toast';
+  // Announced politely: "quota reached" and "every provider is down" are news a
+  // screen reader user would otherwise never get.
+  el.setAttribute('role', 'status');
   el.textContent = message;
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 3200);
@@ -300,6 +303,7 @@ export function markSkipped(targetEl: Element, reason: string): void {
 }
 
 export function removeAllArtifacts(targetEl: Element): void {
+  targetEl.removeAttribute('data-kt-tr');
   for (const child of [...targetEl.children]) {
     if (ARTIFACT_CLASSES.some((c) => child.classList.contains(c))) child.remove();
   }
@@ -363,6 +367,8 @@ export function inject(
   if (onRetry) el.appendChild(makeRetry(onRetry));
   // #8 — Click-to-copy translation.
   attachCopyHandler(el as HTMLElement, result.translatedText);
+  // The stylesheet finds the line that holds a translation by this, not by :has().
+  targetEl.setAttribute('data-kt-tr', replace ? 'replace' : inline ? 'inline' : 'block');
   targetEl.appendChild(el);
 }
 
@@ -514,6 +520,8 @@ export function mountFloatingBar(container: Element, settings: Settings, h: Floa
 
   const label = document.createElement('span');
   label.className = 'kt-float-label';
+  // Pausing and resuming change this text: a screen reader hears it.
+  label.setAttribute('role', 'status');
   bar.appendChild(label);
 
   // The reading language, on the bar. Changing it used to mean opening a page.
@@ -670,7 +678,10 @@ export function mountFloatingBar(container: Element, settings: Settings, h: Floa
   opts.type = 'button';
   opts.className = 'kt-float-opts';
   opts.title = msg('barOptionsTip', 'Options');
-  opts.textContent = '⚙';
+  // The glyph alone is read as "gear". The variation selector asks for the text form: on Windows
+  // and Apple fonts the bare character can draw as a colour emoji.
+  opts.setAttribute('aria-label', opts.title);
+  opts.textContent = '\u2699\uFE0E';
   opts.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -680,21 +691,8 @@ export function mountFloatingBar(container: Element, settings: Settings, h: Floa
 
   setBarEnabled(bar, label, settings.enabled, settings.targetLang, blockedHere(settings));
 
-  bar.addEventListener('click', (e) => {
-    const t = e.target as Node;
-    if (
-      t === opts || t === localChip || t === langHost || t === power ||
-      count.contains(t) || opts.contains(t) || localChip.contains(t) ||
-      langHost.contains(t) || power.contains(t)
-    ) {
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    const enabled = bar.dataset.enabled !== 'true';
-    setBarEnabled(bar, label, enabled, bar.dataset.lang ?? settings.targetLang);
-    h.onToggle(enabled);
-  });
+  // Only the power button toggles. The whole bar used to, and a click that
+  // missed the language button by a pixel paused the translation.
 
   host.insertBefore(bar, host.firstChild);
 }
@@ -801,16 +799,19 @@ function setBarEnabled(
       ? msg('barOnTipAuto', 'Reading chat in $LANG$ (auto)', [shown.toUpperCase()])
       : msg('barOnTip', 'Reading chat in $LANG$', [shown.toUpperCase()])
     : msg('chipPaused', 'Translation paused');
+  // The title no longer names a provider: updateActiveProvider has to write it again.
+  delete bar.dataset.provider;
   // Scoped to the bar we were handed, never to the document: there are two chat
   // panels on the page and only one of them is the one on screen.
   const picker = bar.querySelector<HTMLSelectElement>('.kt-float-lang');
   if (picker && picker.value !== lang) picker.value = lang;
   const power = bar.querySelector<HTMLElement>('.kt-float-power');
   if (power) {
-    power.textContent = enabled ? '⏸' : '▶';
+    power.textContent = enabled ? '\u23F8\uFE0E' : '\u25B6\uFE0E';
     power.title = enabled
       ? msg('barPause', 'Pause on this channel')
       : msg('barResume', 'Resume on this channel');
+    power.setAttribute('aria-label', power.title);
   }
 }
 
@@ -871,6 +872,8 @@ export function updateActiveProvider(provider: string): void {
   const bar = findBar();
   if (!bar) return;
   bar.querySelector('.kt-float-provider')?.remove();
+  // Every line names its provider, and nearly always the same one.
+  if (bar.dataset.provider === provider) return;
   bar.dataset.provider = provider;
   const label = bar.querySelector<HTMLElement>('.kt-float-label');
   if (!label) return;
@@ -884,8 +887,23 @@ export function incrementFloatingCount(): void {
   if (!count) return;
   const n = Number(count.dataset.n ?? '0') + 1;
   count.dataset.n = String(n);
+  // Five writes and a template fill per line invalidate the bar's backdrop-filter
+  // every time: once a frame is as often as anyone can read it.
+  if (countFrame) return;
+  countFrame = requestAnimationFrame(() => {
+    countFrame = 0;
+    // Looked up again: Kick may have replaced the bar since the line came in.
+    const live = findBar()?.querySelector<HTMLElement>('.kt-float-count');
+    if (live) paintCount(live);
+  });
+}
+
+let countFrame = 0;
+
+function paintCount(count: HTMLElement): void {
+  const n = count.dataset.n ?? '0';
   count.textContent = `· ${n}`;
-  const label = msg('barCount', 'Translated on this page: $N$', [String(n)]);
+  const label = msg('barCount', 'Translated on this page: $N$', [n]);
   count.title = label;
   count.setAttribute('aria-label', label);
   count.style.display = '';

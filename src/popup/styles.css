@@ -31,7 +31,16 @@
     /* Same as the options page: the list the browser opens needs the scheme on
        the control, not only on body. */
     color-scheme: dark;
+    /* The chevron the options page draws: without it a select reads as a text field. */
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%239fa6ad' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    background-size: 15px;
+    padding-inline-end: 2rem;
     transition: border-color 0.15s ease;
+  }
+  [dir='rtl'] .kt-select {
+    background-position: left 0.6rem center;
   }
   .kt-select:hover:not(:disabled) {
     @apply border-kick-stroke-strong;

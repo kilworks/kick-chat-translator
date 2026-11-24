@@ -201,3 +201,11 @@ describe('channel and user lists', () => {
     expect(css.slice(at, css.indexOf('}', at))).not.toContain('font-mono');
   });
 });
+
+// A name cut to an ellipsis in the three-column grid was unreadable.
+describe('allowlist chips', () => {
+  it('carry their full name as a tooltip', () => {
+    const el = mount();
+    for (const b of [...rows(el)].slice(0, 5)) expect(b.getAttribute('title')).toBe(b.querySelector('.truncate')?.textContent);
+  });
+});

@@ -134,6 +134,28 @@ describe('download chips', () => {
     expect(asked.every((l) => l === 'en')).toBe(true);
   });
 
+  // After a change of target the chips kept the previous target's "downloaded"
+  // ticks until all ten probes finished, and read "Download" while first probing.
+  it('claims nothing about a chip until its probe answers, and forgets the old target', async () => {
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((r) => (release = r));
+    (self as unknown as { Translator?: unknown }).Translator = {
+      availability: async (o: { sourceLanguage: string }) => {
+        if (o.sourceLanguage === 'ja') await gate;
+        return 'available';
+      },
+      create: async () => ({ translate: async (s: string) => s }),
+    };
+    mount({ targetLang: 'en' });
+    await flush();
+    // Korean answered, Japanese (first) has not: it is a spinner, not "Download".
+    expect(chip('Japanese')!.getAttribute('data-state')).toBe('checking');
+    expect(chip('Japanese')!.getAttribute('aria-label')).toBe('Japanese');
+    release();
+    await flush();
+    expect(chip('Japanese')!.getAttribute('data-state')).toBe('ready');
+  });
+
   it('names each chip by its language and what a press does', async () => {
     mount({ targetLang: 'en' });
     await flush();

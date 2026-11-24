@@ -629,7 +629,9 @@ export function updateLangChip(state: ChipState): void {
   chip.dataset.mode = state.mode;
   switch (state.mode) {
     case 'off':
-      tag.textContent = 'OFF';
+      // A pause glyph, not the English word "OFF" in every interface language. The
+      // sentence is the chip's title and accessible name, localised just below.
+      tag.textContent = '\u23F8\uFE0E';
       chip.title = msg('chipPaused', 'Translation paused');
       break;
     case 'loading':

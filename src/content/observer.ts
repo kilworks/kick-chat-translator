@@ -41,6 +41,13 @@ const PROCESSED_MARK = 'data-kt-id';
  */
 export const INSTANCE = Math.random().toString(36).slice(2, 8);
 
+/** The stamp inject() puts on a line that holds a translation: without one, nothing may hide the original. */
+function dropStaleStamp(target: Node): void {
+  if (!(target instanceof Element) || !target.hasAttribute('data-kt-tr')) return;
+  for (const child of target.children) if (child.className.toString().startsWith('kt-translation')) return;
+  target.removeAttribute('data-kt-tr');
+}
+
 export class ChatObserver {
   private listObserver: MutationObserver | undefined;
   private containerWatcher: MutationObserver | undefined;
@@ -50,8 +57,12 @@ export class ChatObserver {
   private cb: Callback;
   private running = false;
 
-  constructor(cb: Callback) {
+  /** True while a hidden tab should still be translated: "pause when hidden" is off. */
+  private attachWhenHidden: () => boolean;
+
+  constructor(cb: Callback, attachWhenHidden: () => boolean = () => false) {
     this.cb = cb;
+    this.attachWhenHidden = attachWhenHidden;
   }
 
   start(): void {
@@ -72,6 +83,7 @@ export class ChatObserver {
 
   /** Single teardown path: both observers are dropped together or neither is. */
   private detach(): void {
+    this.misses = 0;
     // A pending poll is part of what is attached: left running, it attaches a
     // second pair of observers beside the next one (two reset() calls while the
     // list is missing, measured: three pairs left connected).
@@ -87,9 +99,14 @@ export class ChatObserver {
 
   private tryAttach(): void {
     if (!this.running) return;
-    const container = findChatContainer(document);
+    // A hidden tab has nobody to translate for: no scan, and the poll below backs off.
+    // Unless the reader turned "pause when hidden" off: a channel opened in a
+    // background tab must translate without waiting for the tab to be shown.
+    const hidden = document.hidden && !this.attachWhenHidden();
+    const container = hidden ? null : findChatContainer(document);
     if (container) {
       if (__KT_METRICS__) metrics.count('dom.attach');
+      this.misses = 0;
       this.attach(container);
       return;
     }
@@ -97,7 +114,13 @@ export class ChatObserver {
     // signal is a toast the user sees once the extension is already broken; this
     // is the same fact, an hour earlier, in a number that can be read on demand.
     if (__KT_METRICS__) metrics.count('dom.container.miss');
-    this.pollHandle = setTimeout(() => this.tryAttach(), 500);
+    // 500 ms for the first ten seconds, when a chat that is about to appear should
+    // be caught at once, then slower: a channel with no chat (offline, followers
+    // only) scanned the whole document twice a second for as long as the tab lived.
+    // A hidden tab does not count and waits 2 s, so coming back to it is not a 5 s lag.
+    const delay = hidden ? 2000 : this.misses < 20 ? 500 : this.misses < 40 ? 1000 : this.misses < 60 ? 2000 : 5000;
+    if (!hidden) this.misses += 1;
+    this.pollHandle = setTimeout(() => this.tryAttach(), delay);
   }
 
   private attach(container: Element): void {
@@ -113,6 +136,9 @@ export class ChatObserver {
     this.listObserver = new MutationObserver((mutations) => {
       const candidates = new Set<Element>();
       for (const mut of mutations) {
+        // A translation taken out by the site (Kick or 7TV re-rendering the row)
+        // leaves the stamp that hides the original behind: take it off.
+        if (mut.removedNodes?.length) dropStaleStamp(mut.target);
         for (const node of mut.addedNodes) {
           if (!(node instanceof Element)) continue;
           if (matchesMessageRow(node)) candidates.add(node);
@@ -199,6 +225,9 @@ export class ChatObserver {
       usernameGuess: username || undefined,
     });
   }
+
+  /** Polls in a row that found no chat. */
+  private misses = 0;
 
   cap(maxSeen = 5000): void {
     if (this.seenIds.size <= maxSeen) return;

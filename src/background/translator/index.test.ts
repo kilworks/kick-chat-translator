@@ -223,3 +223,28 @@ describe('a provider that never answers', () => {
     expect(out.map((o) => o.ok)).toEqual([true, true]);
   });
 });
+
+// Each flush made its own pool, so two groups together ran twice the cap.
+describe('translateGroup, concurrency cap across groups', () => {
+  const originalFetch = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  it('never has more provider calls in flight than the setting, however many groups', async () => {
+    let live = 0;
+    let peak = 0;
+    globalThis.fetch = vi.fn(async (url: string) => {
+      live++;
+      peak = Math.max(peak, live);
+      await new Promise((r) => setTimeout(r, 5));
+      live--;
+      if (url.includes('mymemory')) return new Response(myMemoryBody('x'), { status: 200 });
+      return new Response(googleBody('x'), { status: 200 });
+    }) as unknown as typeof fetch;
+    const s = { ...defaultSettings(), providerOrder: ['mymemory' as const], concurrency: 2 };
+    const group = (tag: string) => translateGroup([1, 2, 3, 4].map((n) => req(`${tag}${n}`, `hello ${tag} ${n}`)), s, 2);
+    await Promise.all([group('a'), group('b'), group('c')]);
+    expect(peak).toBeLessThanOrEqual(2);
+  });
+});

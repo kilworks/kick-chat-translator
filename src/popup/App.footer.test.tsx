@@ -11,11 +11,15 @@ import { defaultSettings } from '~/shared/settings';
 const sent: { type: string }[] = [];
 let update: Record<string, unknown> | undefined;
 let asked = true;
+let setReply: unknown;
+let workerDown = false;
 const stats = { totalRequests: 3, totalCacheHits: 0, totalErrors: 0, byLang: {}, byProvider: {}, byChannel: {}, charsSent: 0, todayKey: 'today', history: [] };
 
 vi.mock('~/shared/messages', () => ({
   send: vi.fn(async (m: { type: string }) => {
     sent.push(m);
+    if (workerDown) throw new Error('No response');
+    if (m.type === 'settings.set' && setReply) return setReply;
     if (m.type === 'settings.get') return { type: 'settings', payload: { ...defaultSettings(), usageStatsAsked: asked } };
     if (m.type === 'stats.get') return { type: 'stats', payload: stats };
     if (m.type === 'update.status' && update) return { type: 'update.info', payload: update };
@@ -42,6 +46,8 @@ beforeEach(() => {
   sent.length = 0;
   update = undefined;
   asked = true;
+  setReply = undefined;
+  workerDown = false;
   vi.stubGlobal('chrome', {
     runtime: { getManifest: () => ({ version: '1.0.0' }), openOptionsPage: vi.fn() },
     tabs: { query: vi.fn(async () => [{ url: 'https://kick.com/some-channel' }]) },
@@ -115,5 +121,41 @@ describe('.kt-label in caseless scripts', () => {
     for (const lang of ['ar', 'fa', 'he', 'th', 'ja', 'zh']) expect(rule![1]).toContain(`:lang(${lang})`);
     expect(rule![2]).toMatch(/text-transform:\s*none/);
     expect(rule![2]).toMatch(/letter-spacing:\s*normal/);
+  });
+});
+
+// A popup that cannot reach the worker used to show the defaults as if they were
+// the reader's settings, and a refused change left the control where it was, mute.
+describe('when the worker does not answer', () => {
+  it('says so in the status line instead of showing defaults as fact', async () => {
+    workerDown = true;
+    const root = await mount();
+    expect(root.querySelector('[role="status"]')?.textContent).toBe('unavailable');
+  });
+
+  it('says when a change was refused', async () => {
+    setReply = { type: 'error', payload: { message: 'not allowed' } };
+    const root = await mount();
+    root.querySelector<HTMLInputElement>('input[role="switch"]')!.click();
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(root.querySelector('[role="status"]')?.textContent).toBe('Not saved.');
+  });
+});
+
+// "click Enable" does not work when the accessible name is another sentence.
+describe('the header switch', () => {
+  it('has an accessible name that starts with its visible label', async () => {
+    const root = await mount();
+    const input = root.querySelector<HTMLInputElement>('input[role="switch"]')!;
+    const visible = input.closest('label')!.textContent!.trim();
+    expect(input.getAttribute('aria-label')!.startsWith(visible)).toBe(true);
+  });
+});
+
+describe('popup select', () => {
+  it('draws the chevron the options page does', () => {
+    const css = readFileSync('src/popup/styles.css', 'utf8');
+    expect(css).toMatch(/\.kt-select\s*\{[^}]*background-image:\s*url\(/);
   });
 });

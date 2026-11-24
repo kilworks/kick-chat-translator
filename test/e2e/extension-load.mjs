@@ -83,7 +83,8 @@ await ctx.route(KICK, async (route) => {
   }
 });
 
-await page.goto('https://kick.com/', { waitUntil: 'domcontentloaded' });
+// A channel address: the style goes in on a chat route only, the home page gets none on purpose.
+await page.goto('https://kick.com/kt-fixture-channel', { waitUntil: 'domcontentloaded' });
 // `document_idle` n'est pas un evenement qu'on peut attendre : on laisse le
 // temps que Chrome injecte, puis on regarde.
 await page.waitForTimeout(3000);

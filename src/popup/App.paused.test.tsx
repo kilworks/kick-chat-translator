@@ -115,11 +115,14 @@ describe('popup for someone who has translated nothing yet', () => {
     expect(root.textContent).not.toContain(FIRST);
   });
 
-  it('says nothing to a regular on a quiet day', async () => {
+  // Everyone else on a tab that is not Kick used to see the full settings and the
+  // day's numbers with no hint that this tab would not be translated.
+  it('tells a regular once, in a line, that this tab is not Kick, and keeps the stats', async () => {
     stats = { ...fresh, history: [{ day: 'yesterday', requests: 40 }] };
     stubTab('https://example.com/');
     const root = await mount();
-    expect(root.textContent).not.toContain(FIRST);
+    expect(root.textContent).toContain(FIRST);
+    expect(root.querySelector('.kt-card')?.textContent).not.toContain(FIRST);
     expect(root.textContent).toContain('Today');
   });
 });

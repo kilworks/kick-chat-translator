@@ -25,7 +25,8 @@ function ctor(): TranslatorCtor | undefined {
 
 const COMMON_SOURCES = ['ja', 'ko', 'zh', 'es', 'pt', 'fr', 'de', 'ru', 'ar', 'tr'];
 
-export type ChipView = 'download' | 'busy' | 'ready' | 'unavailable';
+/** `checking`: the probe for this chip has not answered yet, so it claims nothing. */
+export type ChipView = 'download' | 'busy' | 'ready' | 'unavailable' | 'checking';
 
 /** What a download chip shows, from the probe answer and the click in flight. */
 export function chipView(probe: string | undefined, busy: boolean): ChipView {
@@ -39,12 +40,14 @@ const CHIP_ICON: Record<ChipView, string> = {
   busy: 'loader',
   ready: 'check',
   unavailable: 'ban',
+  checking: 'loader',
 };
 
 export function EngineCard({ settings, onPatch }: Props) {
   const t = useT();
   const present = ctor() !== undefined;
   const [probe, setProbe] = useState<Record<string, string>>({});
+  const [probing, setProbing] = useState(false);
   const dlId = useId();
   const [busy, setBusy] = useState<string | undefined>(undefined);
   const [outcome, setOutcome] = useState<{ failed: boolean; text: string } | undefined>(undefined);
@@ -52,23 +55,30 @@ export function EngineCard({ settings, onPatch }: Props) {
   // as is ("-> AUTO"). Resolved the way the chat resolves it, to the browser's.
   const target = resolveTargetLang(settings.targetLang);
   const locale = resolveUiLocale(settings.uiLang);
-  const langName = (code: string) => localLangName(code, getLang(code)?.native ?? code.toUpperCase(), locale);
+  const langName = (code: string) =>
+    localLangName(code, getLang(code)?.native ?? code.toUpperCase(), locale);
 
   useEffect(() => {
     const c = ctor();
     if (!c) return;
     let cancelled = false;
+    // The previous target's answers are about another pair: drop them, and let
+    // each chip fill in as its own answer arrives instead of after the tenth.
+    setProbe({});
+    setProbing(true);
     void (async () => {
-      const out: Record<string, string> = {};
       for (const s of COMMON_SOURCES) {
         if (s === target) continue;
+        let answer: string;
         try {
-          out[s] = await c.availability({ sourceLanguage: s, targetLanguage: target });
+          answer = await c.availability({ sourceLanguage: s, targetLanguage: target });
         } catch {
-          out[s] = 'unavailable';
+          answer = 'unavailable';
         }
+        if (cancelled) return;
+        setProbe((p) => ({ ...p, [s]: answer }));
       }
-      if (!cancelled) setProbe(out);
+      if (!cancelled) setProbing(false);
     })();
     return () => {
       cancelled = true;
@@ -89,7 +99,10 @@ export function EngineCard({ settings, onPatch }: Props) {
     } catch {
       setProbe((p) => ({ ...p, [src]: 'downloadable' }));
       // The chip silently going back to "Download" said nothing about why.
-      setOutcome({ failed: true, text: t('{lang}: download failed, try again').replace('{lang}', langName(src)) });
+      setOutcome({
+        failed: true,
+        text: t('{lang}: download failed, try again').replace('{lang}', langName(src)),
+      });
     } finally {
       setBusy(undefined);
     }
@@ -99,9 +112,7 @@ export function EngineCard({ settings, onPatch }: Props) {
     <section class="kt-card space-y-3">
       <div class="flex items-center justify-between">
         <h2 class="kt-section">{t('Engine')}</h2>
-        <span
-          class={`text-xs font-medium ${present ? 'text-kick-primary' : 'text-kick-muted'}`}
-        >
+        <span class={`text-xs font-medium ${present ? 'text-kick-primary' : 'text-kick-muted'}`}>
           {present ? t('On-device: ready') : t('On-device: not in this browser')}
         </span>
       </div>
@@ -126,7 +137,9 @@ export function EngineCard({ settings, onPatch }: Props) {
       </div>
 
       <div class="kt-row">
-        <label class="kt-label" for="kt-engine-mode">{t('Strategy')}</label>
+        <label class="kt-label" for="kt-engine-mode">
+          {t('Strategy')}
+        </label>
         <select
           id="kt-engine-mode"
           aria-label={t('Strategy')}
@@ -143,7 +156,9 @@ export function EngineCard({ settings, onPatch }: Props) {
         </select>
         <p class="text-xs text-kick-muted">
           {!present
-            ? t('This browser cannot translate on your computer, so the cloud engines translate everything.')
+            ? t(
+                'This browser cannot translate on your computer, so the cloud engines translate everything.',
+              )
             : !settings.localEnabled
               ? t('On-device is off, so the cloud engines translate everything.')
               : t(
@@ -159,36 +174,73 @@ export function EngineCard({ settings, onPatch }: Props) {
           </span>
           {/* lucide download, check, loader-circle and ban, from the kit's set. */}
           <svg width="0" height="0" class="absolute" aria-hidden="true">
-            <symbol id="i-eng-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <symbol
+              id="i-eng-download"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M12 15V3" />
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <path d="m7 10 5 5 5-5" />
             </symbol>
-            <symbol id="i-eng-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <symbol
+              id="i-eng-check"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M20 6 9 17l-5-5" />
             </symbol>
-            <symbol id="i-eng-loader" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <symbol
+              id="i-eng-loader"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M21 12a9 9 0 1 1-6.219-8.56" />
             </symbol>
-            <symbol id="i-eng-ban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <symbol
+              id="i-eng-ban"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <circle cx="12" cy="12" r="10" />
               <path d="M4.929 4.929 19.07 19.071" />
             </symbol>
           </svg>
           <div role="group" aria-labelledby={dlId} class="flex flex-wrap gap-2">
             {COMMON_SOURCES.filter((s) => s !== target).map((s) => {
-              const v = chipView(probe[s], busy === s);
+              const v: ChipView =
+                probing && probe[s] === undefined && busy !== s
+                  ? 'checking'
+                  : chipView(probe[s], busy === s);
               const name = langName(s);
               // Literal keys, so the i18n coverage test sees every one of them.
-              const label = (
-                v === 'ready'
-                  ? t('{lang}, downloaded')
-                  : v === 'unavailable'
-                    ? t('{lang}, not available')
-                    : v === 'busy'
-                      ? t('Downloading {lang}')
-                      : t('Download {lang}')
-              ).replace('{lang}', name);
+              const label =
+                v === 'checking'
+                  ? name
+                  : (v === 'ready'
+                      ? t('{lang}, downloaded')
+                      : v === 'unavailable'
+                        ? t('{lang}, not available')
+                        : v === 'busy'
+                          ? t('Downloading {lang}')
+                          : t('Download {lang}')
+                    ).replace('{lang}', name);
               return (
                 // The name and the icon carry the state, not opacity: a muted
                 // chip next to an enabled one read the same to many eyes.
@@ -206,19 +258,24 @@ export function EngineCard({ settings, onPatch }: Props) {
                   // tick: a green fill read as "selected" in a multi-select,
                   // a dashed edge as "empty" (the composer chip lost it too).
                   class={`inline-flex min-h-8 items-center gap-2 rounded-md border px-2 py-1 text-xs transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kick-primary ${
-                    v === 'ready'
-                      ? 'border-kick-stroke text-kick-text cursor-default'
-                      : v === 'unavailable'
-                        ? 'border-kick-stroke text-kick-muted cursor-not-allowed'
-                        : v === 'busy'
-                          ? 'border-kick-stroke text-kick-text cursor-progress'
-                          : 'border-kick-stroke text-kick-text hover:border-kick-primary'
+                    v === 'checking'
+                      ? 'border-kick-stroke text-kick-muted cursor-progress'
+                      : v === 'ready'
+                        ? 'border-kick-stroke text-kick-text cursor-default'
+                        : v === 'unavailable'
+                          ? 'border-kick-stroke text-kick-muted cursor-not-allowed'
+                          : v === 'busy'
+                            ? 'border-kick-stroke text-kick-text cursor-progress'
+                            : 'border-kick-stroke text-kick-text hover:border-kick-primary'
                   }`}
                   onClick={() => v === 'download' && void download(s)}
                 >
                   {flagClass(s) && <span class={flagClass(s)} aria-hidden="true" />}
                   <span>{name}</span>
-                  <svg class={`h-4 w-4 shrink-0 ${v === 'busy' ? 'animate-spin' : ''} ${v === 'ready' ? 'text-kick-primary' : ''}`} aria-hidden="true">
+                  <svg
+                    class={`h-4 w-4 shrink-0 ${v === 'busy' || v === 'checking' ? 'animate-spin' : ''} ${v === 'ready' ? 'text-kick-primary' : ''}`}
+                    aria-hidden="true"
+                  >
                     <use href={`#i-eng-${CHIP_ICON[v]}`} />
                   </svg>
                 </button>

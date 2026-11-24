@@ -10,6 +10,12 @@ export class ConcurrencyQueue {
 
   constructor(private limit: number) {}
 
+  /** Resize a queue that outlives the setting it was sized from. */
+  setLimit(limit: number): void {
+    this.limit = limit;
+    this.pump();
+  }
+
   size(): number {
     return this.queue.length + this.active;
   }

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultSettings } from './settings';
-import { fetchSettings } from './settingsClient';
+import { fetchSettings, watchSettings } from './settingsClient';
 
 /**
  * The content script's first act on a page is to ask the worker for settings, and
@@ -72,5 +72,29 @@ describe('fetchSettings on a cold worker', () => {
     await vi.runAllTimersAsync();
     expect(await settled).toBeInstanceOf(Error);
     expect(calls).toBe(3);
+  });
+});
+
+// A content script has no storage access (the worker shuts it), and a storage
+// change event carries values, the DeepL key among them. The tab is told to ask.
+describe('watchSettings', () => {
+  it('re-asks the worker when told, and never listens to storage', async () => {
+    let listener: ((m: unknown) => void) | undefined;
+    const onChanged = { addListener: vi.fn() };
+    vi.stubGlobal('chrome', {
+      storage: { onChanged },
+      runtime: {
+        lastError: undefined,
+        onMessage: { addListener: (l: typeof listener) => (listener = l), removeListener: () => undefined },
+        sendMessage: (_m: unknown, cb: (r: unknown) => void) => cb({ type: 'settings', payload: defaultSettings() }),
+      },
+    });
+    const seen: unknown[] = [];
+    watchSettings((s) => seen.push(s));
+    listener?.({ type: 'debug.decisions' });
+    listener?.({ type: 'settings.changed' });
+    await vi.runAllTimersAsync();
+    expect(seen).toHaveLength(1);
+    expect(onChanged.addListener).not.toHaveBeenCalled();
   });
 });

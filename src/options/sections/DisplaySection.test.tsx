@@ -275,3 +275,28 @@ describe('style cards at 320px', () => {
     expect(head.className).toContain('flex-wrap');
   });
 });
+
+// Picking Cyan, Violet or Amber changed nothing in the pinned preview, which is
+// there to answer "what does this look like".
+describe('accent in the preview', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('data-kt-accent');
+    document.documentElement.removeAttribute('data-kt-scheme');
+  });
+
+  it('puts the chosen accent on the page the preview is drawn under', () => {
+    mount({ accent: 'violet' });
+    expect(document.documentElement.getAttribute('data-kt-accent')).toBe('violet');
+    expect(document.documentElement.getAttribute('data-kt-scheme')).toBe('dark');
+  });
+});
+
+// A screen reader read "Text size 0.85" where the screen shows 85%.
+describe('sliders', () => {
+  it('say their value the way the screen does', () => {
+    const root = mount({});
+    const ranges = [...root.querySelectorAll<HTMLInputElement>('input[type=range]')];
+    expect(ranges.length).toBeGreaterThan(0);
+    for (const r of ranges) expect(r.getAttribute('aria-valuetext')).toMatch(/\S/);
+  });
+});

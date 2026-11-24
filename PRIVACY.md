@@ -65,7 +65,16 @@ These pieces of data live in your browser's extension storage:
   on your browser's sync, the browser itself (Google or Mozilla) copies them to
   your other devices. We never see them.
 - Your DeepL API key, if you add one. It stays on this device: it is never
-  synced, and a settings export never contains it.
+  synced, and a settings export never contains it. On Chrome the extension also
+  closes its storage to the scripts it runs inside kick.com pages, so only the
+  extension's own pages and its background worker can read the key and the
+  settings.
+- A settings export is a file you may share, so it leaves out what belongs to
+  you: the DeepL key, your MyMemory email and a custom Lingva address. It does
+  hold your channel and user lists, blocked keywords and glossary, so that
+  exporting, resetting and importing gives your configuration back: read it
+  before you share it. Importing a file never replaces the key, the email, the
+  Lingva address or your usage statistics choice.
 - A cache of recent translations (text + translation pair), keyed by text, on
   this device. Entries are deleted after the age and count set in the options
   (72 hours and 15,000 entries by default), checked once a day.

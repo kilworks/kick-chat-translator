@@ -1,5 +1,6 @@
 import { KICK_CHANNEL_API } from '~/shared/constants';
 import { normalizeLang } from '~/shared/languages';
+import { readLastLang, writeLastLang } from './pageStore';
 
 interface ChannelResponse {
   slug?: string;
@@ -9,33 +10,34 @@ interface ChannelResponse {
   livestream?: { lang_iso?: string; language?: string } | null;
 }
 
+// Known non-channel routes. Module level: this runs for every chat line.
+const RESERVED = new Set([
+  '',
+  'browse',
+  'categories',
+  'category',
+  'community',
+  'community-guidelines',
+  'following',
+  'subscriptions',
+  'help',
+  'jobs',
+  'about',
+  'tos',
+  'privacy',
+  'video',
+  'videos',
+  'clips',
+  'search',
+  'creator-program',
+  'wallet',
+  'dashboard',
+  'settings',
+  'analytics',
+  'vods',
+]);
+
 export function extractChannelSlug(pathname: string): string | undefined {
-  // Avoid known non-channel routes
-  const RESERVED = new Set([
-    '',
-    'browse',
-    'categories',
-    'category',
-    'community',
-    'community-guidelines',
-    'following',
-    'subscriptions',
-    'help',
-    'jobs',
-    'about',
-    'tos',
-    'privacy',
-    'video',
-    'videos',
-    'clips',
-    'search',
-    'creator-program',
-    'wallet',
-    'dashboard',
-    'settings',
-    'analytics',
-    'vods',
-  ]);
   const parts = pathname.split('/').filter(Boolean);
   const first = parts[0];
   if (!first) return undefined;
@@ -64,7 +66,6 @@ const inflight = new Map<string, Promise<ChannelMeta>>();
 // Persisted last-known broadcast language per channel. `lang_iso` only exists while a
 // channel is LIVE; remembering it lets compose still target the right language when you
 // open the channel offline (instead of falling back to English).
-const LASTLANG_KEY = (slug: string): string => `kt.lastlang.${slug}`;
 
 async function fetchChannelMeta(slug: string): Promise<ChannelMeta> {
   const cached = metaCache.get(slug);
@@ -89,11 +90,7 @@ async function fetchChannelMeta(slug: string): Promise<ChannelMeta> {
       };
       metaCache.set(slug, meta);
       if (meta.langIso) {
-        try {
-          void chrome.storage.local.set({ [LASTLANG_KEY(slug)]: meta.langIso });
-        } catch {
-          /* storage unavailable (e.g. unit tests) — non-fatal */
-        }
+        writeLastLang(slug, meta.langIso);
       }
       return meta;
     } catch {
@@ -114,11 +111,5 @@ async function fetchChannelMeta(slug: string): Promise<ChannelMeta> {
 export async function fetchChannelLangIso(slug: string): Promise<string | undefined> {
   const live = (await fetchChannelMeta(slug)).langIso;
   if (live) return live;
-  try {
-    const stored = await chrome.storage.local.get(LASTLANG_KEY(slug));
-    const last = stored[LASTLANG_KEY(slug)];
-    return typeof last === 'string' ? last : undefined;
-  } catch {
-    return undefined;
-  }
+  return readLastLang(slug);
 }

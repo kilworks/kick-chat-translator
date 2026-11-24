@@ -160,6 +160,20 @@ describe('TranslationPipeline, a dropped line says why', () => {
     vi.mocked(markSkipped).mockClear();
   });
 
+  // The catalogue arrives after the module is imported, so the reason has to be
+  // looked up when a line is dropped, not when the file loads.
+  it('speaks the chat language for a filter reason once the catalogue is installed', async () => {
+    const { setChatTable } = await import('./msg');
+    setChatTable({ dropUserBlocked: 'BLOQUE' });
+    try {
+      const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'en', pauseWhenHidden: false, blacklistUsers: ['user'] });
+      await p.onDomMessage(domMsg(JP));
+      expect(reasonsGiven()).toContain('BLOQUE');
+    } finally {
+      setChatTable(undefined);
+    }
+  });
+
   it('names the minimum length when the message is under it', async () => {
     const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'en', pauseWhenHidden: false, minTextLength: 5 });
     await p.onDomMessage(domMsg('abcd'));
@@ -459,6 +473,8 @@ describe('TranslationPipeline, the browser detector behind the raw answer', () =
   });
 
   it('does not put a reason on a row the scroller gave to another message', async () => {
+    // Its own text: the browser's answer is remembered per line.
+    const line = 'mano isso foi muito bom ontem tambem';
     const rowElement = document.createElement('div');
     const injectionTarget = document.createElement('div');
     const body = document.createElement('span');
@@ -604,5 +620,21 @@ describe('TranslationPipeline: names kept as they are', () => {
     await flush();
     expect(await sentText()).toBe('nienawidzę tego [1] bardzo');
     expect(await shown()).toBe('eu odeio isso');
+  });
+});
+
+// Each line the table could not name was a trip to the browser's detector, again
+// for every copy of the same line.
+describe('the browser detector, asked once per line', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('does not ask again for a line it already answered', async () => {
+    const ask = vi.fn(async () => ({ isReliable: true, languages: [{ language: 'pl', percentage: 100 }] }));
+    vi.stubGlobal('chrome', { i18n: { detectLanguage: ask } });
+    const line = 'qwlk zdrt pmnb vgyh xcsd ujik';
+    const first = await detectLanguageWithBrowser(line);
+    const again = await detectLanguageWithBrowser(line);
+    expect(again).toBe(first);
+    expect(ask).toHaveBeenCalledTimes(1);
   });
 });

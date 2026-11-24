@@ -69,11 +69,14 @@ export function App() {
   }, [locale]);
 
   async function refresh() {
-    const settingsRes = await send({ type: 'settings.get' });
+    // Together: three round trips in a row made the page wait for the sum.
+    const [settingsRes, provRes, statsRes] = await Promise.all([
+      send({ type: 'settings.get' }),
+      send({ type: 'providers.status' }),
+      send({ type: 'stats.get' }),
+    ]);
     if (settingsRes.type === 'settings') setSettings(settingsRes.payload);
-    const provRes = await send({ type: 'providers.status' });
     if (provRes.type === 'providers') setProviders(provRes.payload);
-    const statsRes = await send({ type: 'stats.get' });
     if (statsRes.type === 'stats') setStats(statsRes.payload);
   }
 
@@ -134,7 +137,11 @@ export function App() {
             </p>
           </div>
           <div class="ms-auto flex items-center gap-3">
-            {savedAt && <span class="text-xs text-kick-primary">{t('saved')}</span>}
+            {/* Always in the DOM: a live region announces what lands in it, and
+                one that appears with its text is often not announced at all. */}
+            <span role="status" class="text-xs text-kick-primary">
+              {savedAt ? t('saved') : ''}
+            </span>
             <UiLangPicker value={settings.uiLang} onPick={(v) => void patch({ uiLang: v })} />
           </div>
         </header>
@@ -284,7 +291,14 @@ function UiLangPicker({ value, onPick }: { value: Settings['uiLang']; onPick: (v
   };
 
   return (
-    <div ref={box} class="relative">
+    // Tab out of the list closes it: it used to stay open over the page.
+    <div
+      ref={box}
+      class="relative"
+      onFocusOut={(e) => {
+        if (open && !box.current?.contains(e.relatedTarget as Node | null)) setOpen(false);
+      }}
+    >
       <button
         type="button"
         class="flex items-center gap-1.5 rounded border border-kick-stroke bg-kick-surface px-1.5 py-1 text-xs text-kick-text"
@@ -295,7 +309,7 @@ function UiLangPicker({ value, onPick }: { value: Settings['uiLang']; onPick: (v
         onClick={() => setOpen(!open)}
       >
         {flag(value)}
-        <span>{label(value)}</span>
+        <span lang={value === 'auto' ? undefined : value}>{label(value)}</span>
       </button>
       {open && (
         <ul
@@ -311,13 +325,15 @@ function UiLangPicker({ value, onPick }: { value: Settings['uiLang']; onPick: (v
               role="option"
               aria-selected={l === value}
               tabIndex={-1}
-              class={`flex cursor-pointer items-center gap-2 px-2 py-1 outline-none hover:bg-kick-stroke/40 focus:bg-kick-stroke/60 ${
+              class={`flex cursor-pointer items-center gap-2 px-2 py-1 outline-none hover:bg-kick-stroke/40 focus:bg-kick-stroke/60 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-kick-primary ${
                 l === value ? 'font-semibold text-kick-primary' : ''
               }`}
               onClick={() => pick(l)}
             >
               {flag(l)}
-              <span dir="auto">{label(l)}</span>
+              <span dir="auto" lang={l === 'auto' ? undefined : l}>
+                {label(l)}
+              </span>
             </li>
           ))}
         </ul>

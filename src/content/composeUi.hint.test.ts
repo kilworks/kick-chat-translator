@@ -6,6 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // And the panel no longer hides the last chat line: it reserves room under
 // Kick's list while it is up, measured on kick.com.
 
+import { getHint, setHint } from '~/background/pageStore';
+
 vi.mock('./injector', () => ({ showToast: vi.fn() }));
 
 const stored: Record<string, unknown> = {};
@@ -19,7 +21,18 @@ beforeEach(() => {
   for (const k of Object.keys(stored)) delete stored[k];
   local.get.mockClear();
   local.set.mockClear();
-  vi.stubGlobal('chrome', { storage: { local } });
+  // The content script asks the worker, whose pageStore owns the key.
+  vi.stubGlobal('chrome', {
+    storage: { local },
+    runtime: {
+      lastError: undefined,
+      sendMessage: (m: { type: string; value: boolean | number }, cb: (r: unknown) => void) => {
+        // Called at once, not after an import: the write must land before the next line of a test.
+        if (m.type === 'hint.set') void setHint(m.value).then(() => cb({ type: 'ack' }));
+        else void getHint().then((payload) => cb({ type: 'value', payload }));
+      },
+    },
+  });
 });
 
 afterEach(() => {
@@ -51,6 +64,19 @@ describe('first-use hint', () => {
     expect(stored['kt.composeInsertHintDone']).toBe(true);
     // The glyph stays: only the words go.
     expect(document.querySelector('.kt-compose-insert')?.textContent).toBe('⇥');
+  });
+
+  // The panel is never focusable (it would steal the composer's focus), so the
+  // preview is announced as it changes and the keys are in the cue's name.
+  it('is announced and says which keys insert it', async () => {
+    const { ui } = await mounted();
+    const text = document.querySelector('.kt-compose-text')!;
+    expect(text.getAttribute('role')).toBe('status');
+    expect(text.getAttribute('aria-live')).toBe('polite');
+    const cue = document.querySelector('.kt-compose-insert')!;
+    expect(cue.getAttribute('aria-label')).toContain('Esc');
+    ui.setComposeInsertKey('ctrl-enter');
+    expect(document.querySelector('.kt-compose-insert')!.getAttribute('aria-label')).toContain('Ctrl/Cmd+Enter');
   });
 
   it('is not shown again to a reader who already inserted', async () => {

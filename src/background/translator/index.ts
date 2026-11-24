@@ -153,6 +153,8 @@ const STICKY_TTL_MS = 60_000;
 let stickyProvider: CloudProviderId | undefined;
 let stickySinceMs = 0;
 
+const itemPool = new ConcurrencyQueue(1);
+
 /** Configured + not budget-blocked (ignores transient cooldown). */
 function isConfiguredAndAllowed(id: CloudProviderId, ctx: ProviderContext): boolean {
   const p = PROVIDERS[id];
@@ -268,8 +270,11 @@ export async function translateGroup(
       }
     }
 
-    // Per-item path with concurrency cap.
-    const pool = new ConcurrencyQueue(Math.max(1, concurrency));
+    // Per-item path with concurrency cap, the same pool for every group: one
+    // per call let overlapping flushes of a fast chat run 30 to 60 side by side
+    // against a provider that was already slow.
+    itemPool.setLimit(Math.max(1, concurrency));
+    const pool = itemPool;
     let anySuccess = false;
     let anyFail = false;
     await Promise.all(
@@ -349,5 +354,7 @@ export function getProviderStatus(settings: Settings): ProviderStatus[] {
 
 export function anyProviderReady(settings: Settings): boolean {
   const ctx = buildContext(settings);
-  return eligibleOrder(settings, ctx).length > 0;
+  // eligibleOrder falls back to the cooling providers when none is live (translate
+  // itself relies on that), so "ready" means at least one is out of cooldown.
+  return eligibleOrder(settings, ctx).some((id) => health[id].cooldownUntilMs <= Date.now());
 }

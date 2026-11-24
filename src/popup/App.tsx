@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { Settings } from '~/shared/settings';
 import { defaultSettings } from '~/shared/settings';
 import { sortedLanguages } from '~/shared/languages';
-import { send } from '~/shared/messages';
+import { send, type RuntimeMessage } from '~/shared/messages';
 import { extractChannelSlug } from '~/content/kickApi';
 import { LANG_BLOCKED_ASK, channelBlockedBy } from '~/content/filters';
 import { memoriserLangueChaine, vueDeChaine } from '~/shared/channelLang';
@@ -34,6 +34,8 @@ export function App() {
   const [deepl, setDeepl] = useState<DeeplUsage | undefined>(undefined);
   const [update, setUpdate] = useState<UpdateStatus | undefined>(undefined);
   const [savedAt, setSavedAt] = useState<number | undefined>(undefined);
+  // The worker did not answer, or refused a change: said in the footer's status line.
+  const [failed, setFailed] = useState<string | undefined>(undefined);
   // Clear cache is an icon with nothing to show for a press: said for 2 s in
   // the footer's status line, which is already a polite live region.
   const [cleared, setCleared] = useState(false);
@@ -55,7 +57,7 @@ export function App() {
   const t = useMemo(() => makeT(locale), [locale]);
 
   useEffect(() => {
-    void refresh().catch(() => undefined);
+    refresh();
     void chrome.tabs
       .query({ active: true, currentWindow: true })
       .then(([tab]) => {
@@ -79,17 +81,18 @@ export function App() {
     document.documentElement.dir = isRtlLocale(locale) ? 'rtl' : 'ltr';
   }, [locale]);
 
-  async function refresh() {
-    const settingsRes = await send({ type: 'settings.get' });
-    if (settingsRes.type === 'settings') setSettings(settingsRes.payload);
-    const statsRes = await send({ type: 'stats.get' });
-    if (statsRes.type === 'stats') setStats(statsRes.payload);
-    const provRes = await send({ type: 'providers.status' });
-    if (provRes.type === 'providers') setProviders(provRes.payload);
-    const deeplRes = await send({ type: 'deepl.usage' });
-    if (deeplRes.type === 'deepl.usage') setDeepl(deeplRes.payload);
-    const upRes = await send({ type: 'update.status' });
-    if (upRes.type === 'update.info') setUpdate(upRes.payload);
+  // Five questions to the worker, asked together and each painted as it lands:
+  // deepl.usage and update.status can wait on the network and used to hold up the rest.
+  function refresh(): void {
+    const ask = (m: RuntimeMessage) => send(m).catch(() => undefined);
+    void ask({ type: 'settings.get' }).then((r) => {
+      if (r?.type === 'settings') setSettings(r.payload);
+      else setFailed(t('unavailable'));
+    });
+    void ask({ type: 'stats.get' }).then((r) => r?.type === 'stats' && setStats(r.payload));
+    void ask({ type: 'providers.status' }).then((r) => r?.type === 'providers' && setProviders(r.payload));
+    void ask({ type: 'deepl.usage' }).then((r) => r?.type === 'deepl.usage' && setDeepl(r.payload));
+    void ask({ type: 'update.status' }).then((r) => r?.type === 'update.info' && setUpdate(r.payload));
   }
 
   async function patch<K extends keyof Settings>(key: K, value: Settings[K]) {
@@ -97,11 +100,14 @@ export function App() {
   }
 
   async function patchMany(next: Partial<Settings>) {
-    const res = await send({ type: 'settings.set', payload: next });
-    if (res.type === 'settings') {
+    const res = await send({ type: 'settings.set', payload: next }).catch(() => undefined);
+    if (res?.type === 'settings') {
+      setFailed(undefined);
       setSettings(res.payload);
       setSavedAt(Date.now());
       setTimeout(() => setSavedAt(undefined), 1500);
+    } else {
+      setFailed(t('Not saved.'));
     }
   }
 
@@ -159,10 +165,17 @@ export function App() {
               checked={settings.enabled}
               onChange={(v) => void patch('enabled', v)}
               label={t('Enable')}
-              srLabel={t('Translate the chat')}
+              // Starts with the visible word: voice control says "click Enable".
+              srLabel={`${t('Enable')}: ${t('Translate the chat')}`}
             />
           </div>
         </header>
+
+        {/* A tab that is not Kick says so, whatever the stats: the settings below
+            look the same everywhere and nothing else says this tab is not translated. */}
+        {!onKick && !firstRun && (
+          <p class="text-xs text-kick-muted">{t('Open a Kick channel: its chat is translated as it arrives.')}</p>
+        )}
 
         {pausedHere && (
           <section class="kt-card flex items-center justify-between gap-2">
@@ -300,7 +313,7 @@ export function App() {
                   )
                 }
               >
-                <option value="below">{t('Below original')}</option>
+                <option value="below">{t('Below')}</option>
                 <option value="inline">{t('Inline')}</option>
                 <option value="replace">{t('Replace')}</option>
                 <option value="hover">{t('On hover')}</option>
@@ -466,11 +479,13 @@ export function App() {
               line it was cut in Greek and Tamil. Two lines rather than an
               ellipsis if a language still runs long, for the 2 s it is up. */}
           <span
-            class={`min-w-0 text-xs text-kick-muted ${cleared ? 'line-clamp-2' : 'truncate'}`}
+            class={`min-w-0 text-xs ${failed ? 'text-red-400' : 'text-kick-muted'} ${cleared ? 'line-clamp-2' : 'truncate'}`}
             role="status"
-            title={cleared ? t('Cache cleared') : undefined}
+            title={cleared ? t('Cache cleared') : failed}
           >
-            {cleared ? (
+            {failed ? (
+              failed
+            ) : cleared ? (
               t('Cache cleared')
             ) : (
               <>

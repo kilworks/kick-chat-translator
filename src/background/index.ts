@@ -1,20 +1,22 @@
 import { defaultSettings, loadSettings, resetSettings, saveSettings, watchSettings, withoutKey, type Settings } from '~/shared/settings';
-import { onMessage, type RuntimeMessage, type RuntimeResponse } from '~/shared/messages';
+import { onMessage, SETTINGS_CHANGED, type RuntimeMessage, type RuntimeResponse } from '~/shared/messages';
 import { rootLogger } from '~/shared/logger';
 import { createMetrics } from '~/shared/metrics';
 import { TranslationCache, warmTargets } from './cache';
-import { resolveTargetLang } from '~/shared/languages';
+import { isSupportedLang, resolveTargetLang } from '~/shared/languages';
 import { TokenBucket } from './queue';
 import { StatsTracker } from './stats';
 import { TranslationCoalescer } from './coalescer';
 import { anyProviderReady, getProviderStatus, setDeeplUsagePct } from './translator';
 import { armKeepalive, installKeepalive, listenKeepalive } from './keepalive';
 import { getUpdateStatus, installUpdateCheck } from './updateChecker';
-import { DEEPL_USAGE_FREE, DEEPL_USAGE_PRO } from '~/shared/constants';
+import { DEEPL_USAGE_FREE, DEEPL_USAGE_PRO, MAX_TEXT_LENGTH } from '~/shared/constants';
 import { getSemanticOverride } from '~/shared/transliterationGuard';
 import { ecrireAutourDesEmotes } from './lexicalWrite';
 import { CHAT_MESSAGES } from '~/content/i18n';
-import { addUsage, dropUsage, installUsage, recordProviderError, recordTranslation } from './usage';
+import { lockStorage } from './lockStorage';
+import { getHint, getLastLang, setHint, setLastLang } from './pageStore';
+import { addUsage, dropUsage, installUsage, recordProviderError, recordTranslation, syncUsageAlarm } from './usage';
 import type { ProviderId, TranslationOutcome, TranslationRequest } from '~/shared/types';
 
 const log = rootLogger.child('sw');
@@ -24,11 +26,42 @@ let settings: Settings = defaultSettings();
 const cache = new TranslationCache(settings.cacheMaxEntries, settings.cacheTtlHours * 3_600_000);
 const stats = new StatsTracker();
 const channelBuckets = new Map<string, TokenBucket>();
+/** All channels together, a multiple of one channel's budget: rotating channel names cannot get past it. */
+const GLOBAL_BUDGET_FACTOR = 4;
+const globalBucket = new TokenBucket(settings.perChannelBudgetPerMin * GLOBAL_BUDGET_FACTOR, settings.perChannelBudgetPerMin * GLOBAL_BUDGET_FACTOR);
 const coalescer = new TranslationCoalescer({ getSettings: () => settings, cache, stats });
+
+/** Buckets kept at once. A reader opens a handful of channels, not hundreds. */
+const CHANNEL_BUCKETS_MAX = 200;
+/** What a request from a page may carry: the content script never exceeds these. */
+const CHANNEL_RE = /^[\w.-]{1,64}$/;
+const CONTEXT_MAX = 6000;
+
+/** A message from a page is data, not a promise: check the shape before spending anything on it. */
+export function validTranslateRequest(r: unknown): r is TranslationRequest {
+  const q = r as Partial<Record<keyof TranslationRequest, unknown>> | null;
+  return (
+    typeof q === 'object' &&
+    q !== null &&
+    typeof q.messageId === 'string' &&
+    q.messageId.length <= 200 &&
+    typeof q.text === 'string' &&
+    q.text.length <= MAX_TEXT_LENGTH &&
+    typeof q.targetLang === 'string' &&
+    q.targetLang.length <= 20 &&
+    (q.channel === undefined || (typeof q.channel === 'string' && CHANNEL_RE.test(q.channel))) &&
+    (q.context === undefined || (typeof q.context === 'string' && q.context.length <= CONTEXT_MAX)) &&
+    (q.sourceLangHint === undefined || (typeof q.sourceLangHint === 'string' && q.sourceLangHint.length <= 20))
+  );
+}
 
 function bucketFor(channel: string): TokenBucket {
   let b = channelBuckets.get(channel);
   if (!b) {
+    if (channelBuckets.size >= CHANNEL_BUCKETS_MAX) {
+      const oldest = channelBuckets.keys().next();
+      if (!oldest.done) channelBuckets.delete(oldest.value);
+    }
     b = new TokenBucket(settings.perChannelBudgetPerMin, settings.perChannelBudgetPerMin);
     channelBuckets.set(channel, b);
   }
@@ -39,7 +72,9 @@ function applySettings(next: Settings): void {
   // Consent withdrawn: the day counted so far goes with it.
   if (settings.usageStats && !next.usageStats) void dropUsage();
   settings = next;
+  syncUsageAlarm(next);
   cache.setConfig(next.cacheMaxEntries, next.cacheTtlHours * 3_600_000);
+  globalBucket.setRate(next.perChannelBudgetPerMin * GLOBAL_BUDGET_FACTOR, next.perChannelBudgetPerMin * GLOBAL_BUDGET_FACTOR);
   for (const b of channelBuckets.values()) {
     b.setRate(next.perChannelBudgetPerMin, next.perChannelBudgetPerMin);
   }
@@ -47,6 +82,7 @@ function applySettings(next: Settings): void {
 }
 
 async function handleTranslate(req: TranslationRequest): Promise<TranslationOutcome> {
+  if (!validTranslateRequest(req)) return { ok: false, error: { code: 'bad_request', message: 'Invalid request' } };
   if (!settings.enabled) {
     return { ok: false, error: { code: 'disabled', message: 'Extension disabled' } };
   }
@@ -90,11 +126,12 @@ async function handleTranslate(req: TranslationRequest): Promise<TranslationOutc
     };
   }
 
+  const key = cache.key(req.text, req.targetLang);
   if (!req.noCache) {
     // IndexedDB, on the path of every single line. A hit is the fastest possible
     // answer, but a miss still pays this before anything else starts, and the
     // measured hit rate is 10%.
-    const lookup = (): Promise<Awaited<ReturnType<typeof cache.get>>> => cache.get(req.text, req.targetLang);
+    const lookup = (): Promise<Awaited<ReturnType<typeof cache.get>>> => cache.get(req.text, req.targetLang, key);
     const cached = __KT_METRICS__ ? await metrics.measure('leg.cache.lookup', lookup) : await lookup();
     if (cached) {
       const provider = cached.provider as ProviderId;
@@ -112,7 +149,9 @@ async function handleTranslate(req: TranslationRequest): Promise<TranslationOutc
     }
   }
 
-  if (req.channel && !bucketFor(req.channel).tryTake()) {
+  // Taken first and for every request, a missing channel included: the per-channel
+  // bucket below is the fair share, this one is the ceiling a hostile page cannot rotate around.
+  if (!globalBucket.tryTake() || (req.channel && !bucketFor(req.channel).tryTake())) {
     // Compte le refus : sans lui, le reglage qui plafonne ce seau ne peut pas
     // dire s'il a deja servi a quelque chose, et le lecteur regle un nombre a
     // l'aveugle.
@@ -125,7 +164,7 @@ async function handleTranslate(req: TranslationRequest): Promise<TranslationOutc
     return { ok: false, error: { code: 'saturated', message: 'No provider available' } };
   }
 
-  return coalescer.submit(req);
+  return coalescer.submit(req, key);
 }
 
 interface DeeplUsage {
@@ -173,9 +212,17 @@ function scheduleDeeplUsageRefresh(): void {
 
 const CACHE_PRUNE_ALARM = 'kt.cachePrune';
 
+/** Settled once the settings are read: what a cold worker answers first, before the cache warms. */
+let settingsLoaded: () => void = () => undefined;
+const settingsReady = new Promise<void>((r) => (settingsLoaded = r));
+
 async function init(): Promise<void> {
-  settings = await loadSettings();
-  applySettings(settings);
+  try {
+    settings = await loadSettings();
+    applySettings(settings);
+  } finally {
+    settingsLoaded();
+  }
   await stats.load();
   await cache.warm(200, warmTargets(resolveTargetLang(settings.targetLang), stats.current().byLang));
   log.info('Service worker initialized');
@@ -191,6 +238,12 @@ async function init(): Promise<void> {
   }
 }
 
+// Counts are written every few seconds, not on every line: this is the last chance
+// before the browser stops an idle worker. Chrome's MV3 worker is stopped without
+// this event, so there the bound is the debounce itself: at most 15 s of display
+// counters (stats) and 5 s of opt-in usage counts are lost when it stops.
+// Firefox event pages do fire it.
+chrome.runtime.onSuspend?.addListener(() => void stats.flush());
 // Top level, before anything awaits: see listenKeepalive.
 listenKeepalive();
 chrome.alarms.onAlarm.addListener((alarm) => {
@@ -210,7 +263,21 @@ if (__KT_DEV__) {
 // An event can wake the worker and arrive before init() has read storage:
 // every handler waits for it, or it would act on the defaults.
 const ready = init().catch((e: unknown) => log.error('init failed', e));
-watchSettings(applySettings);
+watchSettings((next) => {
+  applySettings(next);
+  void tellTabs();
+});
+// First thing at load, before any handler runs: see lockStorage.
+void lockStorage();
+
+/** Content scripts cannot watch storage any more: say it, they ask for the settings. */
+async function tellTabs(): Promise<void> {
+  // No url filter: it drops www.kick.com, which the manifest does not list as a host. A tab without the script is a swallowed error.
+  const tabs = await chrome.tabs.query({}).catch(() => []);
+  for (const tab of tabs) {
+    if (tab.id !== undefined) void chrome.tabs.sendMessage(tab.id, { type: SETTINGS_CHANGED }).catch(() => undefined);
+  }
+}
 
 /**
  * What a Kick tab may ask. A page is the least trusted context that reaches
@@ -230,6 +297,10 @@ const PAGE_MESSAGES = new Set<RuntimeMessage['type']>([
   'settings.set',
   'open.options',
   'compose.write',
+  'lastlang.get',
+  'lastlang.set',
+  'hint.get',
+  'hint.set',
   'ping',
 ]);
 const PAGE_SETTINGS = new Set<string>([
@@ -244,8 +315,20 @@ const pageMayWrite = (patch: Partial<Settings>): boolean =>
   Object.keys(patch).every((k) => k !== 'deeplApiKey' && (__KT_DEV__ || PAGE_SETTINGS.has(k)));
 const NOT_ALLOWED: RuntimeResponse = { type: 'error', payload: { message: 'not allowed' } };
 
+/** Answerable from the settings alone: they no longer wait for the stats and the cache warm (10 to 30 ms on a cold worker). */
+const SETTINGS_ONLY = new Set<RuntimeMessage['type']>([
+  'settings.get',
+  'i18n.chat',
+  'open.options',
+  'lastlang.get',
+  'lastlang.set',
+  'hint.get',
+  'hint.set',
+  'ping',
+]);
+
 onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
-  await ready;
+  await (SETTINGS_ONLY.has(msg.type) ? settingsReady : ready);
   // Chrome gives chrome-extension://<id>/, Firefox moz-extension://<uuid>/.
   const fromPage = !sender.url?.startsWith(chrome.runtime.getURL(''));
   if (fromPage && !PAGE_MESSAGES.has(msg.type)) return NOT_ALLOWED;
@@ -271,15 +354,20 @@ onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
       }
       return { type: 'translate.result', payload: outcome };
     }
-    case 'stats.local':
-      stats.recordRequest('local', msg.payload.lang, msg.payload.chars, false);
+    case 'stats.local': {
+      const { lang, chars } = (msg.payload ?? {}) as Partial<{ lang: unknown; chars: unknown }>;
+      // From a page: a number that adds up and a language the product knows, or nothing.
+      if (typeof lang !== 'string' || !isSupportedLang(lang) || typeof chars !== 'number' || !Number.isFinite(chars) || chars < 0 || chars > MAX_TEXT_LENGTH) return NOT_ALLOWED;
+      stats.recordRequest('local', lang, chars, false);
       void recordTranslation('local', false);
       return { type: 'ack' };
+    }
     case 'usage.add':
       await addUsage(msg.counts, msg.env);
       return { type: 'ack' };
     case 'i18n.chat':
-      return { type: 'i18n.chat', payload: CHAT_MESSAGES[msg.locale] };
+      // An own key only: "constructor" or "__proto__" are not catalogues.
+      return { type: 'i18n.chat', payload: Object.hasOwn(CHAT_MESSAGES, msg.locale) ? CHAT_MESSAGES[msg.locale] : undefined };
     case 'settings.get':
       return { type: 'settings', payload: fromPage ? withoutKey(settings) : settings };
     case 'settings.set': {
@@ -324,6 +412,14 @@ onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
       });
       return res?.result === true ? { type: 'ack' } : { type: 'error', payload: { message: 'no editor' } };
     }
+    case 'lastlang.get':
+      return { type: 'value', payload: await getLastLang(msg.slug) };
+    case 'lastlang.set':
+      return (await setLastLang(msg.slug, msg.lang)) ? { type: 'ack' } : NOT_ALLOWED;
+    case 'hint.get':
+      return { type: 'value', payload: await getHint() };
+    case 'hint.set':
+      return (await setHint(msg.value)) ? { type: 'ack' } : NOT_ALLOWED;
     case 'ping':
       return { type: 'ack' };
     default:

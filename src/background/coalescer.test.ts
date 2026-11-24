@@ -30,7 +30,7 @@ function makeCoalescer() {
   const recordError = vi.fn();
   const cache = {
     key: (text: string, target: string) => `${target}:${text}`,
-    set: vi.fn(async () => undefined),
+    setMany: vi.fn(async () => undefined),
   } as unknown as TranslationCache;
   const stats = { recordRequest, recordError } as unknown as StatsTracker;
   const coalescer = new TranslationCoalescer({
@@ -38,7 +38,7 @@ function makeCoalescer() {
     cache,
     stats,
   });
-  return { coalescer, recordRequest, recordError };
+  return { coalescer, recordRequest, recordError, cache };
 }
 
 function req(text: string, targetLang = 'en', messageId = text): TranslationRequest {
@@ -190,5 +190,36 @@ describe('TranslationCoalescer window', () => {
     // window collects more than one line.
     const waited = await waitedMs(60);
     expect(waited).toBeGreaterThanOrEqual(BATCH_WINDOW_MS - 5);
+  });
+});
+
+describe('TranslationCoalescer, writes and in-flight copies', () => {
+  beforeEach(() => {
+    mockTranslateGroup.mockReset();
+    mockTranslateGroup.mockImplementation((reqs: TranslationRequest[]) => Promise.resolve(reqs.map(okOutcome)));
+  });
+
+  // One transaction per translated line was the worker's steadiest disk churn.
+  it('writes a whole batch to the cache once, not once per line', async () => {
+    const { coalescer, cache } = makeCoalescer();
+    await Promise.all([coalescer.submit(req('uno')), coalescer.submit(req('dos')), coalescer.submit(req('tres'))]);
+    const many = (cache as unknown as { setMany: Mock }).setMany;
+    expect(many).toHaveBeenCalledTimes(1);
+    expect(many.mock.calls[0]![0]).toHaveLength(3);
+  });
+
+  // The dedup ended when the batch was SENT: copypasta arriving while a slow
+  // provider was still answering paid one request per copy.
+  it('joins a copy of a line whose request is still in flight', async () => {
+    let answer: (o: TranslationOutcome[]) => void = () => undefined;
+    mockTranslateGroup.mockImplementationOnce(() => new Promise<TranslationOutcome[]>((r) => (answer = r)));
+    const { coalescer } = makeCoalescer();
+    const first = coalescer.submit(req('kappa', 'en', 'a'));
+    await new Promise((r) => setTimeout(r, MIN_BATCH_WINDOW_MS + 30));
+    expect(mockTranslateGroup).toHaveBeenCalledTimes(1);
+    const copy = coalescer.submit(req('kappa', 'en', 'b'));
+    answer([okOutcome(req('kappa'))]);
+    await Promise.all([first, copy]);
+    expect(mockTranslateGroup).toHaveBeenCalledTimes(1);
   });
 });

@@ -166,3 +166,82 @@ describe('waiting for the list', () => {
     expect(vivants()).toHaveLength(0);
   });
 });
+
+// With no chat on the page (offline channel, followers only) the poll rescanned the
+// whole document twice a second for as long as the tab lived.
+describe('waiting for a chat that is not there', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    document.body.innerHTML = '<div id="channel-chatroom"></div>';
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('backs off, and still attaches the moment a chat appears', async () => {
+    const scans = vi.spyOn(document, 'querySelectorAll');
+    const obs = new ChatObserver(() => undefined);
+    obs.start();
+    await vi.advanceTimersByTimeAsync(10_000);
+    const firstTen = scans.mock.calls.length;
+    scans.mockClear();
+    await vi.advanceTimersByTimeAsync(10_000);
+    // Same wall time, fewer scans: it is on the 1 s step by now.
+    expect(scans.mock.calls.length).toBeLessThan(firstTen);
+    await vi.advanceTimersByTimeAsync(120_000);
+    scans.mockClear();
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(scans.mock.calls.length).toBeLessThan(firstTen / 3);
+    obs.stop();
+  });
+
+  it('does not scan the page while the tab is hidden', async () => {
+    vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    const scans = vi.spyOn(document, 'querySelectorAll');
+    const obs = new ChatObserver(() => undefined);
+    obs.start();
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(scans).not.toHaveBeenCalled();
+    obs.stop();
+  });
+});
+
+// A channel opened in a background tab by a reader who turned "pause when hidden"
+// off must translate at once, not when the tab is shown.
+describe('a hidden tab when pausing is off', () => {
+  afterEach(() => vi.restoreAllMocks());
+  it('attaches while hidden if told to, and not otherwise', () => {
+    vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    const attachedIn = (allow: boolean): number => {
+      created.length = 0;
+      const obs = new ChatObserver(() => undefined, () => allow);
+      obs.start();
+      const n = created.length;
+      obs.stop();
+      return n;
+    };
+    expect(attachedIn(true)).toBeGreaterThan(0);
+    expect(attachedIn(false)).toBe(0);
+  });
+});
+
+// The hide rule keys off a stamp. If the site drops our translation node but keeps
+// the host element, the stamp stayed and the original stayed at font-size 0.
+describe('a translation removed by the site', () => {
+  it('takes the stamp off the line, and leaves it while a translation is still there', () => {
+    const obs = new ChatObserver(() => undefined);
+    obs.start();
+    const cb = created.find((c) => c.cb)?.cb;
+    const host = document.querySelector('[data-index]')!;
+    host.setAttribute('data-kt-tr', 'block');
+    host.insertAdjacentHTML('beforeend', '<div class="kt-translation">x</div>');
+    const gone = document.createElement('div');
+    cb?.([{ target: host, removedNodes: [gone], addedNodes: [] } as unknown as MutationRecord], {} as MutationObserver);
+    expect(host.getAttribute('data-kt-tr')).toBe('block');
+    host.querySelector('.kt-translation')!.remove();
+    cb?.([{ target: host, removedNodes: [gone], addedNodes: [] } as unknown as MutationRecord], {} as MutationObserver);
+    expect(host.hasAttribute('data-kt-tr')).toBe(false);
+    obs.stop();
+  });
+});

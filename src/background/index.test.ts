@@ -3,12 +3,20 @@ import { STORAGE_KEY_DEEPL_KEY, STORAGE_KEY_SETTINGS } from '~/shared/constants'
 import type { RuntimeMessage, RuntimeResponse } from '~/shared/messages';
 import type { Settings } from '~/shared/settings';
 
+const gate = vi.hoisted(() => ({ warm: Promise.resolve() as Promise<void> }));
+
 // The worker module wires listeners at import time. Its heavy neighbours (IndexedDB
 // cache, alarms, usage counters) are not what these tests are about.
 vi.mock('./cache', () => ({
   TranslationCache: class {
     setConfig(): void {}
-    async warm(): Promise<void> {}
+    key(text: string, lang: string): string {
+      return `${lang}::${text}`;
+    }
+    async warm(): Promise<void> {
+      await gate.warm;
+    }
+    async setMany(): Promise<void> {}
     async clear(): Promise<void> {}
     async stats(): Promise<{ entries: number }> {
       return { entries: 0 };
@@ -28,6 +36,7 @@ vi.mock('./updateChecker', () => ({
 }));
 vi.mock('./usage', () => ({
   installUsage: () => undefined,
+  syncUsageAlarm: () => undefined,
   addUsage: async () => undefined,
   dropUsage: async () => undefined,
   recordProviderError: async () => undefined,
@@ -40,6 +49,8 @@ vi.mock('./stats', () => ({
       return { byLang: {} };
     }
     recordRequest(): void {}
+    recordThrottled(): void {}
+    recordError(): void {}
     async reset(): Promise<object> {
       return {};
     }
@@ -59,16 +70,23 @@ async function loadWorker(
 ): Promise<{
   syncWrites: Record<string, unknown>[];
   alarms: string[];
+  levels: string[];
+  told: { tab: number; msg: unknown }[];
+  changed: (area: string, changes: Record<string, unknown>) => void;
   ask: (m: RuntimeMessage, s: chrome.runtime.MessageSender) => Promise<RuntimeResponse>;
 }> {
   const syncWrites: Record<string, unknown>[] = [];
   const alarms: string[] = [];
+  const levels: string[] = [];
+  const told: { tab: number; msg: unknown }[] = [];
+  let onChanged: ((changes: Record<string, unknown>, area: string) => void) | undefined;
   let listener: Listener | undefined;
   const area = (store: Record<string, unknown>, writes?: Record<string, unknown>[], slow = false) => ({
-    get: async (key: string) => {
+    get: async (keys: string | string[]) => {
       if (slow) await new Promise((r) => setTimeout(r, 5));
-      return key in store ? { [key]: structuredClone(store[key]) } : {};
+      return Object.fromEntries([keys].flat().filter((k) => k in store).map((k) => [k, structuredClone(store[k])]));
     },
+    setAccessLevel: async ({ accessLevel }: { accessLevel: string }) => void levels.push(accessLevel),
     set: async (obj: Record<string, unknown>) => {
       writes?.push(structuredClone(obj));
       Object.assign(store, structuredClone(obj));
@@ -84,20 +102,23 @@ async function loadWorker(
       sync: area(structuredClone(sync), syncWrites, slowSync),
       local: area(structuredClone(local)),
       session: area({}),
-      onChanged: { addListener: () => undefined, removeListener: () => undefined },
+      onChanged: { addListener: (l: typeof onChanged) => (onChanged = l), removeListener: () => undefined },
     },
     runtime: {
       id: 'abcdefghijklmnop',
       lastError: undefined,
       onMessage: { addListener: (l: Listener) => (listener = l) },
       onInstalled: { addListener: () => undefined },
-      getManifest: () => ({ version: '3.6.2', content_scripts: [] }),
+      getManifest: () => ({ version: '3.6.2', content_scripts: [{ matches: ['https://kick.com/*'] }] }),
       getURL: (p = '') => EXT + p,
       openOptionsPage: async () => undefined,
     },
     alarms: { create: (name: string) => void alarms.push(name), get: async () => undefined, onAlarm: { addListener: () => undefined } },
     commands: { onCommand: { addListener: () => undefined } },
-    tabs: { query: async () => [] },
+    tabs: {
+      query: async (q: { url?: unknown }) => (q.url ? [] : [{ id: 7 }]), // a url filter drops a host the manifest does not grant
+      sendMessage: async (tab: number, msg: unknown) => void told.push({ tab, msg }),
+    },
     scripting: { executeScript: async () => [] },
   });
   vi.resetModules();
@@ -106,7 +127,7 @@ async function loadWorker(
     new Promise((resolve) => {
       listener!(m, s, resolve);
     });
-  return { syncWrites, alarms, ask };
+  return { syncWrites, alarms, levels, told, changed: (area, changes) => onChanged?.(changes, area), ask };
 }
 
 const settle = async (): Promise<void> => {
@@ -201,5 +222,145 @@ describe('a message that wakes the worker', () => {
     const { ask } = await loadWorker({ [STORAGE_KEY_SETTINGS]: { targetLang: 'ja', engineModeMoved: true } }, {}, { slowSync: true });
     const res = await ask({ type: 'settings.get' }, OPTIONS_PAGE);
     expect((res as { payload: Settings }).payload.targetLang).toBe('ja');
+  });
+});
+
+/**
+ * A content script reads storage itself unless the worker shuts it. It could take
+ * the DeepL key from storage.local and write the settings blob in storage.sync,
+ * which made every gate above decoration.
+ */
+describe('storage is shut to content scripts', () => {
+  const key = { [STORAGE_KEY_DEEPL_KEY]: 'secret-key:fx' };
+  const stored = { [STORAGE_KEY_SETTINGS]: { targetLang: 'ja', engineModeMoved: true } };
+
+  it('limits both areas to trusted contexts when the worker starts', async () => {
+    const { levels } = await loadWorker(stored, key);
+    await settle();
+    expect(levels).toEqual(['TRUSTED_CONTEXTS', 'TRUSTED_CONTEXTS']);
+  });
+
+  it("keeps an existing reader's key and settings for the extension's own pages", async () => {
+    const { ask } = await loadWorker(stored, key);
+    await settle();
+    const res = (await ask({ type: 'settings.get' }, OPTIONS_PAGE)) as { payload: Settings };
+    expect(res.payload.deeplApiKey).toBe('secret-key:fx');
+    expect(res.payload.targetLang).toBe('ja');
+  });
+
+  it('tells open Kick tabs to ask again, without sending any value', async () => {
+    const { changed, told } = await loadWorker(stored, key);
+    await settle();
+    changed('local', { [STORAGE_KEY_DEEPL_KEY]: { newValue: 'new-secret:fx' } });
+    await settle();
+    expect(told).toEqual([{ tab: 7, msg: { type: 'settings.changed' } }]);
+    expect(JSON.stringify(told)).not.toContain('secret');
+  });
+
+  it('remembers a channel language and the compose hint for a tab, and refuses junk', async () => {
+    const { ask } = await loadWorker(stored, key);
+    await settle();
+    expect((await ask({ type: 'lastlang.set', slug: 'chan_1', lang: 'ja' }, KICK_TAB)).type).toBe('ack');
+    expect(await ask({ type: 'lastlang.get', slug: 'chan_1' }, KICK_TAB)).toEqual({ type: 'value', payload: 'ja' });
+    expect((await ask({ type: 'lastlang.set', slug: '../x', lang: 'ja' }, KICK_TAB)).type).toBe('error');
+    expect((await ask({ type: 'hint.set', value: true }, KICK_TAB)).type).toBe('ack');
+    expect(await ask({ type: 'hint.get' }, KICK_TAB)).toEqual({ type: 'value', payload: true });
+    expect((await ask({ type: 'hint.set', value: 'x' as unknown as boolean }, KICK_TAB)).type).toBe('error');
+  });
+});
+
+/** What a page sends is data, checked before the worker spends a quota or a map slot on it. */
+describe('malformed requests from a Kick tab', () => {
+  const stored = { [STORAGE_KEY_SETTINGS]: { engineModeMoved: true, perChannelBudgetPerMin: 10 } };
+  const ask = async (m: RuntimeMessage) => {
+    const w = await loadWorker(stored, {});
+    await settle();
+    return w.ask(m, KICK_TAB);
+  };
+
+  it('refuses a translate request with the wrong shape', async () => {
+    const bad = [
+      { messageId: 'm', text: 'x'.repeat(801), targetLang: 'fr' },
+      { messageId: 'm', text: 'hello', targetLang: 'fr', channel: '../../x' },
+      { messageId: 'm', text: 5, targetLang: 'fr' },
+    ];
+    for (const payload of bad) {
+      const res = (await ask({ type: 'translate', payload } as unknown as RuntimeMessage)) as { payload: { ok: boolean; error?: { code: string } } };
+      expect(res.payload).toMatchObject({ ok: false, error: { code: 'bad_request' } });
+    }
+  });
+
+  it('answers no catalogue for a locale that is a prototype key', async () => {
+    const res = await ask({ type: 'i18n.chat', locale: 'constructor' });
+    expect(res).toEqual({ type: 'i18n.chat', payload: undefined });
+    const real = await ask({ type: 'i18n.chat', locale: 'fr' });
+    expect((real as { payload?: object }).payload).toBeTypeOf('object');
+  });
+
+  it('forgets the oldest channel rather than growing the map without bound', async () => {
+    const w = await loadWorker(stored, {});
+    await settle();
+    const tr = async (channel: string) =>
+      JSON.stringify(await w.ask({ type: 'translate', payload: { messageId: 'm', text: 'hello there', targetLang: 'fr', channel, noCache: true } }, KICK_TAB));
+    // Together: the bucket is taken before anything waits, so the 11th is refused
+    // and nothing sits through a batching window per call.
+    const burst = await Promise.all(Array.from({ length: 11 }, () => tr('first')));
+    expect(burst.at(-1)).toContain('channel_budget');
+    await Promise.all(Array.from({ length: 200 }, (_, i) => tr(`other-${i}`)));
+    // Two minutes on, the shared ceiling has refilled; 'first' was evicted and starts fresh.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(Date.now() + 120_000);
+    try {
+      expect(await tr('first')).not.toContain('channel_budget');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // The cap above bounds memory only: a name that is new each time got a full
+  // bucket each time, so the per-channel budget meant nothing to a hostile page.
+  it('stops a page that rotates channel names, with a ceiling over all channels', async () => {
+    const w = await loadWorker(stored, {});
+    await settle();
+    const tr = async (channel: string) =>
+      JSON.stringify(await w.ask({ type: 'translate', payload: { messageId: 'm', text: 'hello there', targetLang: 'fr', channel, noCache: true } }, KICK_TAB));
+    const out = await Promise.all(Array.from({ length: 60 }, (_, i) => tr(`rot-${i}`)));
+    // Budget 10 a channel, 4 channels' worth overall: 40 get through.
+    expect(out.filter((o) => o.includes('channel_budget'))).toHaveLength(20);
+  });
+
+  // stats.local is a page message too: a string for `chars` was concatenated into the
+  // persisted sum, and any language string became a key.
+  it('refuses a stats.local payload that would corrupt the counters', async () => {
+    const w = await loadWorker(stored, {});
+    await settle();
+    for (const payload of [{ lang: 'xx-evil', chars: 5 }, { lang: 'ja', chars: 'abc' }, { lang: 'ja', chars: -1 }, { lang: 'ja', chars: 1e9 }, undefined]) {
+      expect((await w.ask({ type: 'stats.local', payload } as unknown as RuntimeMessage, KICK_TAB)).type).toBe('error');
+    }
+    expect((await w.ask({ type: 'stats.local', payload: { lang: 'ja', chars: 12 } }, KICK_TAB)).type).toBe('ack');
+  });
+});
+
+// Every message waited for the cache to warm, the settings ones included: the
+// content script's first act on a page is to ask for them.
+describe('a cold worker', () => {
+  it('answers the settings before the cache has warmed, and holds a translation for it', async () => {
+    let open: () => void = () => undefined;
+    gate.warm = new Promise<void>((r) => (open = r));
+    try {
+      const { ask } = await loadWorker({ [STORAGE_KEY_SETTINGS]: { targetLang: 'ja', engineModeMoved: true } }, {});
+      const got = await Promise.race([ask({ type: 'settings.get' }, KICK_TAB), new Promise((r) => setTimeout(() => r('stuck'), 200))]);
+      expect(got).not.toBe('stuck');
+      expect((got as { payload: Settings }).payload.targetLang).toBe('ja');
+      const held = await Promise.race([
+        ask({ type: 'stats.get' }, OPTIONS_PAGE),
+        new Promise((r) => setTimeout(() => r('held'), 100)),
+      ]);
+      expect(held).toBe('held');
+      open();
+    } finally {
+      open();
+      gate.warm = Promise.resolve();
+    }
   });
 });

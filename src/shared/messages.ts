@@ -38,7 +38,15 @@ export type RuntimeMessage =
   | { type: 'usage.add'; counts: UsageCounts; env?: UsageEnv }
   /** The chat catalogue for one locale, kept out of the page script. */
   | { type: 'i18n.chat'; locale: string }
+  /** What a Kick tab remembers, held by the worker (background/pageStore.ts). */
+  | { type: 'lastlang.get'; slug: string }
+  | { type: 'lastlang.set'; slug: string; lang: string }
+  | { type: 'hint.get' }
+  | { type: 'hint.set'; value: boolean | number }
   | { type: 'ping' };
+
+/** Worker to tab: the settings changed, ask again. Carries no settings, so no key. */
+export const SETTINGS_CHANGED = 'settings.changed';
 
 export type RuntimeResponse =
   | { type: 'translate.result'; payload: TranslationOutcome }
@@ -50,6 +58,7 @@ export type RuntimeResponse =
   | { type: 'update.info'; payload: UpdateStatus }
   | { type: 'debug.decisions'; payload: Decision[] }
   | { type: 'i18n.chat'; payload?: Record<string, string> }
+  | { type: 'value'; payload?: unknown }
   | { type: 'ack' }
   | { type: 'error'; payload: { message: string } };
 

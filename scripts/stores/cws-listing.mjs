@@ -10,6 +10,7 @@
  *   node scripts/stores/cws-listing.mjs launch     # Brave on a dedicated profile, debugging on
  *   node scripts/stores/cws-listing.mjs inspect    # read-only: what the listing page holds
  *   node scripts/stores/cws-listing.mjs paste      # store/chrome/description/<lang>.txt, every language
+ *   node scripts/stores/cws-listing.mjs close      # shut that browser and forget its debugging port
  *
  * Signing in is a person's job, once: `launch` opens the dashboard in a
  * profile kept under ~/.config/kick-chat-translator/cws-browser, the person
@@ -17,6 +18,7 @@
  * script never types a credential and stops if Google asks for one.
  */
 import { spawn, spawnSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -24,8 +26,19 @@ import { fileURLToPath } from 'node:url';
 import { LISTINGS, chromeCode } from './languages.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const PORT = Number(process.env.CWS_CDP_PORT ?? 9222);
 const PROFILE = path.join(os.homedir(), '.config', 'kick-chat-translator', 'cws-browser');
+// The debugging port is picked at random by `launch` and kept beside the profile,
+// readable by this user only: a fixed 9222 let any local process drive the signed-in
+// dashboard session. CWS_CDP_PORT still wins, for a test that runs its own browser.
+const PORT_FILE = path.join(PROFILE, 'kt-cdp-port');
+const readPort = () => {
+  try {
+    return Number(fs.readFileSync(PORT_FILE, 'utf8'));
+  } catch {
+    return 0;
+  }
+};
+let PORT = Number(process.env.CWS_CDP_PORT) || readPort();
 const PUBLISHER = 'ef2a9029-0a4d-4858-bb63-4ca619ffd657';
 const ITEM = 'nkkjmbkmacbdkboijmnhjnblcaiclhni';
 // CWS_EDIT_URL points the script at a stand-in page for its own test.
@@ -88,6 +101,8 @@ async function launch() {
   const exe = BROWSERS.find((b) => fs.existsSync(b));
   if (!exe) throw new Error('no Brave or Chrome found; set CWS_BROWSER');
   fs.mkdirSync(PROFILE, { recursive: true });
+  PORT = Number(process.env.CWS_CDP_PORT) || 20000 + crypto.randomInt(40000);
+  fs.writeFileSync(PORT_FILE, String(PORT), { mode: 0o600 });
   const child = spawn(exe, [`--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`, '--no-first-run', EDIT_URL], {
     detached: true,
     stdio: 'ignore',
@@ -104,6 +119,20 @@ async function launch() {
     }
   }
   throw new Error(`no debugging endpoint on ${PORT} after 15s`);
+}
+
+/** Shut the browser `launch` started, and forget its port: the session needs no debugging door open between runs. */
+async function closeBrowser() {
+  if (!PORT) throw new Error('no browser launched by this script (no port recorded)');
+  const v = await (await fetch(`http://127.0.0.1:${PORT}/json/version`)).json();
+  const ws = new WebSocket(v.webSocketDebuggerUrl);
+  await new Promise((ok, ko) => {
+    ws.onopen = ok;
+    ws.onerror = () => ko(new Error('cannot reach the browser'));
+  });
+  ws.send(JSON.stringify({ id: 1, method: 'Browser.close' }));
+  fs.rmSync(PORT_FILE, { force: true });
+  console.log('browser closed');
 }
 
 /** Read-only survey of the page, the basis for every selector `paste` uses. */
@@ -551,10 +580,11 @@ else if (cmd === 'status') await status();
 else if (cmd === 'justify') await justify(process.argv.includes('--dry'));
 else if (cmd === 'why') await why();
 else if (cmd === 'launch') await launch();
+else if (cmd === 'close') await closeBrowser();
 else if (cmd === 'inspect') await inspect(process.argv[3]);
 else if (cmd === 'paste') await paste(process.argv.includes('--dry'));
 else if (cmd === 'verify') await verify();
 else {
-  console.error('usage: cws-listing.mjs launch | status | inspect | paste [--dry] | verify | why | links');
+  console.error('usage: cws-listing.mjs launch | close | status | inspect | paste [--dry] | verify | why | links');
   process.exit(2);
 }
