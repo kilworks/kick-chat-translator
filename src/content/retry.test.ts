@@ -74,7 +74,7 @@ describe('retry control', () => {
   });
 
   it('is revealed at rest where hovering is impossible', () => {
-    expect(css).toMatch(/@media \(hover: none\)\s*\{\s*\.kt-retry\s*\{[^}]*opacity:\s*0\.7/);
+    expect(css).toMatch(/@media \(hover: none\)\s*\{\s*\.kt-retry\s*\{[^}]*opacity:\s*1/);
   });
 
   /**

@@ -221,18 +221,25 @@
    mutation anywhere in the chat: measured on the offline chat at 20 messages a
    second, the unscoped replace rule alone took style recalculation from 66 ms
    to 249 ms per 10 s, with no line in the replace style on screen. Scoped to
-   the attribute applyDisplayStyle sets, it costs nothing until it can match. */
-.kt-hide-original div:has(> .kt-translation) :is(span.font-normal, .seventv-text-token),
-.kt-hide-original div:has(> .kt-translation-inline) :is(span.font-normal, .seventv-text-token),
-html[data-kt-display='replace'] div:has(> .kt-translation-replace) :is(span.font-normal, .seventv-text-token) {
+   the attribute applyDisplayStyle sets, it costs nothing until it can match.
+
+   The holder is found by `data-kt-tr`, which inject() stamps on the line it
+   draws into and removeAllArtifacts takes off. That is the element the old
+   relational rules matched, found without one: with "keep original" off the
+   class on the root was set for everyone, so every div of the page was
+   re-evaluated on each chat mutation (about 180 ms of style recalculation per
+   10 s at 20 lines a second, from the measurement above). */
+.kt-hide-original [data-kt-tr='block'] :is(span.font-normal, .seventv-text-token),
+.kt-hide-original [data-kt-tr='inline'] :is(span.font-normal, .seventv-text-token),
+html[data-kt-display='replace'] [data-kt-tr='replace'] :is(span.font-normal, .seventv-text-token) {
   font-size: 0;
   line-height: 0;
   letter-spacing: 0;
   word-spacing: 0;
 }
-.kt-hide-original div:has(> .kt-translation) :is(span.font-normal, .seventv-text-token) :is(img, svg, video),
-.kt-hide-original div:has(> .kt-translation-inline) :is(span.font-normal, .seventv-text-token) :is(img, svg, video),
-html[data-kt-display='replace'] div:has(> .kt-translation-replace) :is(span.font-normal, .seventv-text-token) :is(img, svg, video) {
+.kt-hide-original [data-kt-tr='block'] :is(span.font-normal, .seventv-text-token) :is(img, svg, video),
+.kt-hide-original [data-kt-tr='inline'] :is(span.font-normal, .seventv-text-token) :is(img, svg, video),
+html[data-kt-display='replace'] [data-kt-tr='replace'] :is(span.font-normal, .seventv-text-token) :is(img, svg, video) {
   font-size: 1rem;
   line-height: normal;
 }

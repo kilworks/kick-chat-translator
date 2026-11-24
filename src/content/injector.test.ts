@@ -671,11 +671,11 @@ describe('injector artifacts', () => {
       // gone in all three.
       expect(rule).toMatch(/font-size:\s*0/);
       expect(rule, 'display:none would take the emotes too').not.toMatch(/display:\s*none/);
-      for (const cls of ['kt-translation', 'kt-translation-inline', 'kt-translation-replace']) {
-        // The holder is matched by its child, never by a sibling of the text:
-        // in a reply Kick nests the message a level deeper and a sibling rule
-        // cannot reach it.
-        expect(rule).toContain(`div:has(> .${cls})`);
+      for (const style of ['block', 'inline', 'replace']) {
+        // The holder is matched by the stamp inject() puts on it, never by a
+        // sibling of the text: in a reply Kick nests the message a level deeper
+        // and a sibling rule cannot reach it.
+        expect(rule).toContain(`[data-kt-tr='${style}']`);
       }
       expect(rule).not.toContain('~ .kt-translation');
       // Two renderings of the same original have to go: the span Kick writes,
@@ -693,10 +693,10 @@ describe('injector artifacts', () => {
     it('hands the emote its own size back', () => {
       const exempt = injectCss
         .split('\n')
-        .filter((l) => l.includes('img') && l.includes('div:has('));
+        .filter((l) => l.includes('img') && l.includes('[data-kt-tr='));
       expect(exempt.length, 'nothing exempts the emote from the zeroed type').toBeGreaterThan(0);
-      for (const cls of ['kt-translation', 'kt-translation-inline', 'kt-translation-replace']) {
-        expect(exempt.some((l) => l.includes(`div:has(> .${cls})`))).toBe(true);
+      for (const style of ['block', 'inline', 'replace']) {
+        expect(exempt.some((l) => l.includes(`[data-kt-tr='${style}']`))).toBe(true);
       }
       const body = /:is\(img, svg, video\)\s*\{([^}]*)\}/.exec(injectCss)?.[1] ?? '';
       expect(body).toMatch(/font-size:\s*1rem/);
@@ -720,7 +720,7 @@ describe('injector artifacts', () => {
     it('hides the original for replace without waiting for the toggle', () => {
       const line = injectCss
         .split('\n')
-        .find((l) => l.includes('div:has(> .kt-translation-replace)'));
+        .find((l) => l.includes("[data-kt-tr='replace']"));
       expect(line, 'no hide rule reaches the replace style').toBeDefined();
       expect(line).not.toContain('.kt-hide-original');
     });
@@ -728,10 +728,26 @@ describe('injector artifacts', () => {
     // A `div:has()` rule with nothing above it is re-checked on every mutation
     // of Kick's page. Each one is scoped to something on the root, so it costs
     // nothing until a line could match it.
-    it('scopes every div:has() rule to the root', () => {
-      const lines = injectCss.split('\n').filter((l) => l.includes('div:has('));
+    it('scopes every hide rule to the root, and leaves no div:has() to re-check on every mutation', () => {
+      const lines = injectCss.split('\n').filter((l) => l.includes('[data-kt-tr='));
       expect(lines.length).toBeGreaterThan(0);
       for (const l of lines) expect(l).toMatch(/^(\.kt-hide-original|html\[data-kt-display='replace'\]) /);
+      expect(injectCss).not.toContain('div:has(');
+    });
+
+    it('stamps the line it drew into, and takes the stamp off with the translation', () => {
+      for (const [style, stamp] of [
+        ['below', 'block'],
+        ['inline', 'inline'],
+        ['replace', 'replace'],
+      ] as const) {
+        const target = document.createElement('div');
+        inject(target, result('hola'), settingsWith(style));
+        expect(target.getAttribute('data-kt-tr')).toBe(stamp);
+        removeAllArtifacts(target);
+        expect(target.hasAttribute('data-kt-tr')).toBe(false);
+      }
+      applyDisplayStyle('below');
     });
 
     it('stamps the root when a replace line is drawn, whoever draws it', () => {
@@ -778,7 +794,7 @@ describe('7TV', () => {
     // rule inside this check instead of silently outside it.
     const rules = injectCss
       .split('\n')
-      .filter((l) => l.includes('font-normal') && l.includes('div:has('));
+      .filter((l) => l.includes('font-normal') && l.includes('[data-kt-tr='));
     expect(rules.length, 'no rule reaches the message text').toBeGreaterThan(0);
     for (const rule of rules) {
       expect(rule, `this rule ignores 7TV: ${rule.trim()}`).toContain('seventv-text-token');

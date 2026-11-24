@@ -303,6 +303,7 @@ export function markSkipped(targetEl: Element, reason: string): void {
 }
 
 export function removeAllArtifacts(targetEl: Element): void {
+  targetEl.removeAttribute('data-kt-tr');
   for (const child of [...targetEl.children]) {
     if (ARTIFACT_CLASSES.some((c) => child.classList.contains(c))) child.remove();
   }
@@ -366,6 +367,8 @@ export function inject(
   if (onRetry) el.appendChild(makeRetry(onRetry));
   // #8 — Click-to-copy translation.
   attachCopyHandler(el as HTMLElement, result.translatedText);
+  // The stylesheet finds the line that holds a translation by this, not by :has().
+  targetEl.setAttribute('data-kt-tr', replace ? 'replace' : inline ? 'inline' : 'block');
   targetEl.appendChild(el);
 }
 
