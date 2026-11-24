@@ -100,11 +100,12 @@ describe('reset and import', () => {
     expect((await loadSettings()).deeplApiKey).toBe('');
   });
 
-  it('import routes an older backup key to local, not to sync', async () => {
+  it('import ignores a key an older backup carries, and keeps the one on this device', async () => {
+    await saveSettings({ deeplApiKey: 'mine' });
     const backup = JSON.stringify({ ...defaultSettings(), deeplApiKey: 'from-backup', targetLang: 'ja' });
     const s = await importSettings(backup);
-    expect(s.deeplApiKey).toBe('from-backup');
-    expect(heldKey()).toBe('from-backup');
+    expect(s.deeplApiKey).toBe('mine');
+    expect(heldKey()).toBe('mine');
     expect(syncedBlob()?.deeplApiKey).toBe('');
     expect(syncedBlob()?.targetLang).toBe('ja');
   });
@@ -128,6 +129,44 @@ describe('settings backup files', () => {
     expect(heldKey()).toBe('secret-abc');
     expect((await loadSettings()).deeplApiKey).toBe('secret-abc');
     expect(syncedBlob()?.targetLang).toBe('ja');
+  });
+
+  it('export leaves out what is private to this device', async () => {
+    await saveSettings({
+      myMemoryEmail: 'me@example.com',
+      lingvaInstance: 'https://lingva.example/token123',
+      whitelistChannels: ['somechannel'],
+      blacklistChannels: ['other'],
+      channelLangs: { somechannel: 'ja' },
+      pausedChannels: ['muted_one'],
+      blacklistUsers: ['someone'],
+      extraBots: ['abot'],
+      usageStats: true,
+      usageStatsAsked: true,
+      targetLang: 'fr',
+    });
+    const text = await exportSettings();
+    for (const secret of ['me@example.com', 'lingva.example', 'somechannel', 'muted_one', 'someone', 'abot']) {
+      expect(text).not.toContain(secret);
+    }
+    const file = JSON.parse(text) as Record<string, unknown>;
+    expect(file.usageStats).toBe(false);
+    expect(file.targetLang).toBe('fr');
+  });
+
+  it('a file cannot switch on statistics, set the email or replace the lists of this device', async () => {
+    await saveSettings({ myMemoryEmail: 'me@example.com', blacklistUsers: ['mine'], usageStats: false, usageStatsAsked: false });
+    const s = await importSettings(
+      JSON.stringify({
+        ...defaultSettings(),
+        usageStats: true,
+        usageStatsAsked: true,
+        myMemoryEmail: 'attacker@example.com',
+        blacklistUsers: ['theirs'],
+        targetLang: 'ja',
+      }),
+    );
+    expect(s).toMatchObject({ usageStats: false, usageStatsAsked: false, myMemoryEmail: 'me@example.com', blacklistUsers: ['mine'], targetLang: 'ja' });
   });
 
   it("keep this device's Lingva server, whatever the file says", async () => {
