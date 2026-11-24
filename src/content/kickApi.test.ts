@@ -129,3 +129,12 @@ describe('channel metadata requests', () => {
     expect(await fetchChannelLangIso('kt-test-persist-offline')).toBe('ja');
   });
 });
+
+describe('extractChannelSlug', () => {
+  it('names the channel, lowercased, and refuses site routes', () => {
+    expect(extractChannelSlug('/SomeChannel/videos')).toBe('somechannel');
+    expect(extractChannelSlug('/browse')).toBeUndefined();
+    expect(extractChannelSlug('/Categories/x')).toBeUndefined();
+    expect(extractChannelSlug('/')).toBeUndefined();
+  });
+});

@@ -10,33 +10,34 @@ interface ChannelResponse {
   livestream?: { lang_iso?: string; language?: string } | null;
 }
 
+// Known non-channel routes. Module level: this runs for every chat line.
+const RESERVED = new Set([
+  '',
+  'browse',
+  'categories',
+  'category',
+  'community',
+  'community-guidelines',
+  'following',
+  'subscriptions',
+  'help',
+  'jobs',
+  'about',
+  'tos',
+  'privacy',
+  'video',
+  'videos',
+  'clips',
+  'search',
+  'creator-program',
+  'wallet',
+  'dashboard',
+  'settings',
+  'analytics',
+  'vods',
+]);
+
 export function extractChannelSlug(pathname: string): string | undefined {
-  // Avoid known non-channel routes
-  const RESERVED = new Set([
-    '',
-    'browse',
-    'categories',
-    'category',
-    'community',
-    'community-guidelines',
-    'following',
-    'subscriptions',
-    'help',
-    'jobs',
-    'about',
-    'tos',
-    'privacy',
-    'video',
-    'videos',
-    'clips',
-    'search',
-    'creator-program',
-    'wallet',
-    'dashboard',
-    'settings',
-    'analytics',
-    'vods',
-  ]);
   const parts = pathname.split('/').filter(Boolean);
   const first = parts[0];
   if (!first) return undefined;

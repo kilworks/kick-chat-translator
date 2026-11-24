@@ -473,6 +473,8 @@ describe('TranslationPipeline, the browser detector behind the raw answer', () =
   });
 
   it('does not put a reason on a row the scroller gave to another message', async () => {
+    // Its own text: the browser's answer is remembered per line.
+    const line = 'mano isso foi muito bom ontem tambem';
     const rowElement = document.createElement('div');
     const injectionTarget = document.createElement('div');
     const body = document.createElement('span');
@@ -618,5 +620,21 @@ describe('TranslationPipeline: names kept as they are', () => {
     await flush();
     expect(await sentText()).toBe('nienawidzę tego [1] bardzo');
     expect(await shown()).toBe('eu odeio isso');
+  });
+});
+
+// Each line the table could not name was a trip to the browser's detector, again
+// for every copy of the same line.
+describe('the browser detector, asked once per line', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('does not ask again for a line it already answered', async () => {
+    const ask = vi.fn(async () => ({ isReliable: true, languages: [{ language: 'pl', percentage: 100 }] }));
+    vi.stubGlobal('chrome', { i18n: { detectLanguage: ask } });
+    const line = 'qwlk zdrt pmnb vgyh xcsd ujik';
+    const first = await detectLanguageWithBrowser(line);
+    const again = await detectLanguageWithBrowser(line);
+    expect(again).toBe(first);
+    expect(ask).toHaveBeenCalledTimes(1);
   });
 });

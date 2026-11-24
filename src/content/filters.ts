@@ -399,6 +399,9 @@ function dedupeWords(t: string): string {
   return keep.length / toks.length <= 0.35 ? keep.join(' ') : t;
 }
 
+const BYPASS_SUFFIX = new RegExp(String.raw`^(.*\p{L}.*?(?:${EMO}))\s+(\p{L}+)$`, 'u');
+const HAS_EMOJI = /\p{Extended_Pictographic}/u;
+
 /**
  * "fala pro salve kosky krlh 👺 qqqq", then "👺 q", "👺 qaqa", "👺 aaaa": the
  * same line resent with junk after an emoji to get past Kick's duplicate check.
@@ -410,7 +413,10 @@ function dedupeWords(t: string): string {
  * and real words ("te amo ❤️ mucho") stay.
  */
 function trimBypassSuffix(t: string): string {
-  const m = t.match(new RegExp(String.raw`^(.*\p{L}.*?(?:${EMO}))\s+(\p{L}+)$`, 'u'));
+  // The pattern backtracks quadratically on a long line without an emoji, and
+  // needs one to match at all.
+  if (!HAS_EMOJI.test(t)) return t;
+  const m = t.match(BYPASS_SUFFIX);
   if (!m) return t;
   const junk = m[2]!;
   const ok = new Set(junk.toLowerCase()).size <= 2 && (junk.length === 1 || junk.length >= 3);

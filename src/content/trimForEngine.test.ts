@@ -151,3 +151,14 @@ describe('real sentences', () => {
     expect(changed).toEqual([]);
   });
 });
+
+// A long line with no emoji made the pattern backtrack quadratically, and it was
+// compiled again on every call.
+describe('trimForEngine on a long line without an emoji', () => {
+  it('stays fast and leaves the line alone', () => {
+    const line = Array.from({ length: 150 }, (_, i) => `palabra${i}`).join(' ').slice(0, 800).trim();
+    const t0 = performance.now();
+    for (let i = 0; i < 200; i++) expect(trimForEngine(line)).toBe(line);
+    expect(performance.now() - t0).toBeLessThan(500);
+  });
+});
