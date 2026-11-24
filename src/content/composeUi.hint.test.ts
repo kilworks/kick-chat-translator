@@ -66,6 +66,19 @@ describe('first-use hint', () => {
     expect(document.querySelector('.kt-compose-insert')?.textContent).toBe('⇥');
   });
 
+  // The panel is never focusable (it would steal the composer's focus), so the
+  // preview is announced as it changes and the keys are in the cue's name.
+  it('is announced and says which keys insert it', async () => {
+    const { ui } = await mounted();
+    const text = document.querySelector('.kt-compose-text')!;
+    expect(text.getAttribute('role')).toBe('status');
+    expect(text.getAttribute('aria-live')).toBe('polite');
+    const cue = document.querySelector('.kt-compose-insert')!;
+    expect(cue.getAttribute('aria-label')).toContain('Esc');
+    ui.setComposeInsertKey('ctrl-enter');
+    expect(document.querySelector('.kt-compose-insert')!.getAttribute('aria-label')).toContain('Ctrl/Cmd+Enter');
+  });
+
   it('is not shown again to a reader who already inserted', async () => {
     stored['kt.composeInsertHintDone'] = true;
     const { hint } = await mounted();

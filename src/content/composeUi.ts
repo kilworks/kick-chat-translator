@@ -83,6 +83,10 @@ export function mountComposePreview(
   const textEl = document.createElement('span');
   textEl.className = 'kt-compose-text';
   textEl.dir = 'auto'; // render RTL languages (Arabic/Hebrew/Persian) correctly
+  // The preview appears above the box as the reader types, and nothing said so to a
+  // screen reader. A live region and not a focusable panel: focus must stay in the composer.
+  textEl.setAttribute('role', 'status');
+  textEl.setAttribute('aria-live', 'polite');
   panel.appendChild(textEl);
 
   // Subtle insert cue. The whole chip is clickable; this just signals the action.
@@ -362,6 +366,9 @@ function marquerInsertion(el: HTMLElement): void {
     el.append(hint);
   }
   el.title = tip;
+  // The keys are only a tooltip otherwise, and Tab or Ctrl+Enter insert without warning.
+  el.setAttribute('role', 'img');
+  el.setAttribute('aria-label', tip);
 }
 
 /**
