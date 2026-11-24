@@ -6,6 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // And the panel no longer hides the last chat line: it reserves room under
 // Kick's list while it is up, measured on kick.com.
 
+import { getHint, setHint } from '~/background/pageStore';
+
 vi.mock('./injector', () => ({ showToast: vi.fn() }));
 
 const stored: Record<string, unknown> = {};
@@ -19,7 +21,18 @@ beforeEach(() => {
   for (const k of Object.keys(stored)) delete stored[k];
   local.get.mockClear();
   local.set.mockClear();
-  vi.stubGlobal('chrome', { storage: { local } });
+  // The content script asks the worker, whose pageStore owns the key.
+  vi.stubGlobal('chrome', {
+    storage: { local },
+    runtime: {
+      lastError: undefined,
+      sendMessage: (m: { type: string; value: boolean | number }, cb: (r: unknown) => void) => {
+        // Called at once, not after an import: the write must land before the next line of a test.
+        if (m.type === 'hint.set') void setHint(m.value).then(() => cb({ type: 'ack' }));
+        else void getHint().then((payload) => cb({ type: 'value', payload }));
+      },
+    },
+  });
 });
 
 afterEach(() => {

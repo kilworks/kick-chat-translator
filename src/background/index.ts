@@ -1,5 +1,5 @@
 import { defaultSettings, loadSettings, resetSettings, saveSettings, watchSettings, withoutKey, type Settings } from '~/shared/settings';
-import { onMessage, type RuntimeMessage, type RuntimeResponse } from '~/shared/messages';
+import { onMessage, SETTINGS_CHANGED, type RuntimeMessage, type RuntimeResponse } from '~/shared/messages';
 import { rootLogger } from '~/shared/logger';
 import { createMetrics } from '~/shared/metrics';
 import { TranslationCache, warmTargets } from './cache';
@@ -14,6 +14,8 @@ import { DEEPL_USAGE_FREE, DEEPL_USAGE_PRO } from '~/shared/constants';
 import { getSemanticOverride } from '~/shared/transliterationGuard';
 import { ecrireAutourDesEmotes } from './lexicalWrite';
 import { CHAT_MESSAGES } from '~/content/i18n';
+import { lockStorage } from './lockStorage';
+import { getHint, getLastLang, setHint, setLastLang } from './pageStore';
 import { addUsage, dropUsage, installUsage, recordProviderError, recordTranslation } from './usage';
 import type { ProviderId, TranslationOutcome, TranslationRequest } from '~/shared/types';
 
@@ -210,7 +212,20 @@ if (__KT_DEV__) {
 // An event can wake the worker and arrive before init() has read storage:
 // every handler waits for it, or it would act on the defaults.
 const ready = init().catch((e: unknown) => log.error('init failed', e));
-watchSettings(applySettings);
+watchSettings((next) => {
+  applySettings(next);
+  void tellTabs();
+});
+// First thing at load, before any handler runs: see lockStorage.
+void lockStorage();
+
+/** Content scripts cannot watch storage any more: say it, they ask for the settings. */
+async function tellTabs(): Promise<void> {
+  const tabs = await chrome.tabs.query({ url: chrome.runtime.getManifest().content_scripts?.[0]?.matches ?? [] }).catch(() => []);
+  for (const tab of tabs) {
+    if (tab.id !== undefined) void chrome.tabs.sendMessage(tab.id, { type: SETTINGS_CHANGED }).catch(() => undefined);
+  }
+}
 
 /**
  * What a Kick tab may ask. A page is the least trusted context that reaches
@@ -230,6 +245,10 @@ const PAGE_MESSAGES = new Set<RuntimeMessage['type']>([
   'settings.set',
   'open.options',
   'compose.write',
+  'lastlang.get',
+  'lastlang.set',
+  'hint.get',
+  'hint.set',
   'ping',
 ]);
 const PAGE_SETTINGS = new Set<string>([
@@ -324,6 +343,14 @@ onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
       });
       return res?.result === true ? { type: 'ack' } : { type: 'error', payload: { message: 'no editor' } };
     }
+    case 'lastlang.get':
+      return { type: 'value', payload: await getLastLang(msg.slug) };
+    case 'lastlang.set':
+      return (await setLastLang(msg.slug, msg.lang)) ? { type: 'ack' } : NOT_ALLOWED;
+    case 'hint.get':
+      return { type: 'value', payload: await getHint() };
+    case 'hint.set':
+      return (await setHint(msg.value)) ? { type: 'ack' } : NOT_ALLOWED;
     case 'ping':
       return { type: 'ack' };
     default:

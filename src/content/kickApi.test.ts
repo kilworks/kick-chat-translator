@@ -88,26 +88,43 @@ describe('channel metadata requests', () => {
 
   it('remembers the language of a channel that has since gone offline', async () => {
     const stored: Record<string, unknown> = {};
+    // The content script has no storage of its own: the worker's pageStore answers.
+    const { getLastLang, setLastLang } = await import('~/background/pageStore');
     vi.stubGlobal('chrome', {
       storage: {
         local: {
-          get: (k: string) => Promise.resolve({ [k]: stored[k] }),
+          get: (k: string | string[]) => Promise.resolve(Object.fromEntries([k].flat().filter((x) => x in stored).map((x) => [x, stored[x]]))),
           set: (obj: Record<string, unknown>) => {
             Object.assign(stored, obj);
             return Promise.resolve();
           },
+          remove: (k: string) => {
+            delete stored[k];
+            return Promise.resolve();
+          },
+        },
+      },
+      runtime: {
+        lastError: undefined,
+        sendMessage: (m: { type: string; slug: string; lang: string }, cb: (r: unknown) => void) => {
+          if (m.type === 'lastlang.set') void setLastLang(m.slug, m.lang).then(() => cb({ type: 'ack' }));
+          else void getLastLang(m.slug).then((payload) => cb({ type: 'value', payload }));
         },
       },
     });
 
     mockFetch({ chatroom: { id: 1 }, livestream: { lang_iso: 'ja' } });
     expect(await fetchChannelLangIso('kt-test-persist')).toBe('ja');
-    expect(stored['kt.lastlang.kt-test-persist']).toBe('ja');
+    await Promise.resolve();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(JSON.stringify(stored['kt.lastlang.v2'])).toContain('kt-test-persist');
+    expect(stored['kt.lastlang.kt-test-persist']).toBeUndefined();
 
     // Same channel, now offline: the live field is gone but compose should still
     // target Japanese rather than falling back to English.
     mockFetch({ chatroom: { id: 1 }, livestream: null });
     expect(await fetchChannelLangIso('kt-test-persist-offline')).toBeUndefined();
+    // A channel remembered by an earlier build (one key per channel) is still read.
     stored['kt.lastlang.kt-test-persist-offline'] = 'ja';
     expect(await fetchChannelLangIso('kt-test-persist-offline')).toBe('ja');
   });

@@ -15,8 +15,7 @@
  * translation is already a message to that same worker.
  */
 import type { Settings } from './settings';
-import { send } from './messages';
-import { STORAGE_KEY_DEEPL_KEY, STORAGE_KEY_SETTINGS } from './constants';
+import { send, SETTINGS_CHANGED } from './messages';
 
 /**
  * Current settings, straight from the worker that owns them.
@@ -56,22 +55,16 @@ export async function patchSettings(patch: Partial<Settings>): Promise<Settings>
 /**
  * Call back whenever settings change, wherever the change came from.
  *
- * Watches both areas because item 101 moved the DeepL key to storage.local, and
- * re-asks the worker rather than reading the changed value: the payload of a sync
- * change carries an empty key, and the payload of a local change carries only the
- * key. Only the worker can hand back a whole Settings.
+ * The worker tells the tab (SETTINGS_CHANGED) and this re-asks it. Reading
+ * chrome.storage.onChanged here is what it replaced: a content script no longer
+ * has storage access (background/lockStorage.ts), and a change event carries the
+ * values, which for the DeepL key is the key itself.
  */
 export function watchSettings(cb: (next: Settings) => void): () => void {
-  const handler = (
-    changes: { [key: string]: chrome.storage.StorageChange },
-    area: chrome.storage.AreaName,
-  ): void => {
-    const touched =
-      (area === 'sync' && changes[STORAGE_KEY_SETTINGS] !== undefined) ||
-      (area === 'local' && changes[STORAGE_KEY_DEEPL_KEY] !== undefined);
-    if (!touched) return;
+  const handler = (m: unknown): void => {
+    if ((m as { type?: string } | undefined)?.type !== SETTINGS_CHANGED) return;
     void fetchSettings().then(cb).catch(() => undefined);
   };
-  chrome.storage.onChanged.addListener(handler);
-  return () => chrome.storage.onChanged.removeListener(handler);
+  chrome.runtime.onMessage.addListener(handler);
+  return () => chrome.runtime.onMessage.removeListener(handler);
 }

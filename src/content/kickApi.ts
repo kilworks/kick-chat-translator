@@ -1,5 +1,6 @@
 import { KICK_CHANNEL_API } from '~/shared/constants';
 import { normalizeLang } from '~/shared/languages';
+import { readLastLang, writeLastLang } from './pageStore';
 
 interface ChannelResponse {
   slug?: string;
@@ -64,7 +65,6 @@ const inflight = new Map<string, Promise<ChannelMeta>>();
 // Persisted last-known broadcast language per channel. `lang_iso` only exists while a
 // channel is LIVE; remembering it lets compose still target the right language when you
 // open the channel offline (instead of falling back to English).
-const LASTLANG_KEY = (slug: string): string => `kt.lastlang.${slug}`;
 
 async function fetchChannelMeta(slug: string): Promise<ChannelMeta> {
   const cached = metaCache.get(slug);
@@ -89,11 +89,7 @@ async function fetchChannelMeta(slug: string): Promise<ChannelMeta> {
       };
       metaCache.set(slug, meta);
       if (meta.langIso) {
-        try {
-          void chrome.storage.local.set({ [LASTLANG_KEY(slug)]: meta.langIso });
-        } catch {
-          /* storage unavailable (e.g. unit tests) — non-fatal */
-        }
+        writeLastLang(slug, meta.langIso);
       }
       return meta;
     } catch {
@@ -114,11 +110,5 @@ async function fetchChannelMeta(slug: string): Promise<ChannelMeta> {
 export async function fetchChannelLangIso(slug: string): Promise<string | undefined> {
   const live = (await fetchChannelMeta(slug)).langIso;
   if (live) return live;
-  try {
-    const stored = await chrome.storage.local.get(LASTLANG_KEY(slug));
-    const last = stored[LASTLANG_KEY(slug)];
-    return typeof last === 'string' ? last : undefined;
-  } catch {
-    return undefined;
-  }
+  return readLastLang(slug);
 }

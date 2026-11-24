@@ -59,16 +59,23 @@ async function loadWorker(
 ): Promise<{
   syncWrites: Record<string, unknown>[];
   alarms: string[];
+  levels: string[];
+  told: { tab: number; msg: unknown }[];
+  changed: (area: string, changes: Record<string, unknown>) => void;
   ask: (m: RuntimeMessage, s: chrome.runtime.MessageSender) => Promise<RuntimeResponse>;
 }> {
   const syncWrites: Record<string, unknown>[] = [];
   const alarms: string[] = [];
+  const levels: string[] = [];
+  const told: { tab: number; msg: unknown }[] = [];
+  let onChanged: ((changes: Record<string, unknown>, area: string) => void) | undefined;
   let listener: Listener | undefined;
   const area = (store: Record<string, unknown>, writes?: Record<string, unknown>[], slow = false) => ({
-    get: async (key: string) => {
+    get: async (keys: string | string[]) => {
       if (slow) await new Promise((r) => setTimeout(r, 5));
-      return key in store ? { [key]: structuredClone(store[key]) } : {};
+      return Object.fromEntries([keys].flat().filter((k) => k in store).map((k) => [k, structuredClone(store[k])]));
     },
+    setAccessLevel: async ({ accessLevel }: { accessLevel: string }) => void levels.push(accessLevel),
     set: async (obj: Record<string, unknown>) => {
       writes?.push(structuredClone(obj));
       Object.assign(store, structuredClone(obj));
@@ -84,20 +91,23 @@ async function loadWorker(
       sync: area(structuredClone(sync), syncWrites, slowSync),
       local: area(structuredClone(local)),
       session: area({}),
-      onChanged: { addListener: () => undefined, removeListener: () => undefined },
+      onChanged: { addListener: (l: typeof onChanged) => (onChanged = l), removeListener: () => undefined },
     },
     runtime: {
       id: 'abcdefghijklmnop',
       lastError: undefined,
       onMessage: { addListener: (l: Listener) => (listener = l) },
       onInstalled: { addListener: () => undefined },
-      getManifest: () => ({ version: '3.6.2', content_scripts: [] }),
+      getManifest: () => ({ version: '3.6.2', content_scripts: [{ matches: ['https://kick.com/*'] }] }),
       getURL: (p = '') => EXT + p,
       openOptionsPage: async () => undefined,
     },
     alarms: { create: (name: string) => void alarms.push(name), get: async () => undefined, onAlarm: { addListener: () => undefined } },
     commands: { onCommand: { addListener: () => undefined } },
-    tabs: { query: async () => [] },
+    tabs: {
+      query: async () => [{ id: 7 }],
+      sendMessage: async (tab: number, msg: unknown) => void told.push({ tab, msg }),
+    },
     scripting: { executeScript: async () => [] },
   });
   vi.resetModules();
@@ -106,7 +116,7 @@ async function loadWorker(
     new Promise((resolve) => {
       listener!(m, s, resolve);
     });
-  return { syncWrites, alarms, ask };
+  return { syncWrites, alarms, levels, told, changed: (area, changes) => onChanged?.(changes, area), ask };
 }
 
 const settle = async (): Promise<void> => {
@@ -201,5 +211,49 @@ describe('a message that wakes the worker', () => {
     const { ask } = await loadWorker({ [STORAGE_KEY_SETTINGS]: { targetLang: 'ja', engineModeMoved: true } }, {}, { slowSync: true });
     const res = await ask({ type: 'settings.get' }, OPTIONS_PAGE);
     expect((res as { payload: Settings }).payload.targetLang).toBe('ja');
+  });
+});
+
+/**
+ * A content script reads storage itself unless the worker shuts it. It could take
+ * the DeepL key from storage.local and write the settings blob in storage.sync,
+ * which made every gate above decoration.
+ */
+describe('storage is shut to content scripts', () => {
+  const key = { [STORAGE_KEY_DEEPL_KEY]: 'secret-key:fx' };
+  const stored = { [STORAGE_KEY_SETTINGS]: { targetLang: 'ja', engineModeMoved: true } };
+
+  it('limits both areas to trusted contexts when the worker starts', async () => {
+    const { levels } = await loadWorker(stored, key);
+    await settle();
+    expect(levels).toEqual(['TRUSTED_CONTEXTS', 'TRUSTED_CONTEXTS']);
+  });
+
+  it("keeps an existing reader's key and settings for the extension's own pages", async () => {
+    const { ask } = await loadWorker(stored, key);
+    await settle();
+    const res = (await ask({ type: 'settings.get' }, OPTIONS_PAGE)) as { payload: Settings };
+    expect(res.payload.deeplApiKey).toBe('secret-key:fx');
+    expect(res.payload.targetLang).toBe('ja');
+  });
+
+  it('tells open Kick tabs to ask again, without sending any value', async () => {
+    const { changed, told } = await loadWorker(stored, key);
+    await settle();
+    changed('local', { [STORAGE_KEY_DEEPL_KEY]: { newValue: 'new-secret:fx' } });
+    await settle();
+    expect(told).toEqual([{ tab: 7, msg: { type: 'settings.changed' } }]);
+    expect(JSON.stringify(told)).not.toContain('secret');
+  });
+
+  it('remembers a channel language and the compose hint for a tab, and refuses junk', async () => {
+    const { ask } = await loadWorker(stored, key);
+    await settle();
+    expect((await ask({ type: 'lastlang.set', slug: 'chan_1', lang: 'ja' }, KICK_TAB)).type).toBe('ack');
+    expect(await ask({ type: 'lastlang.get', slug: 'chan_1' }, KICK_TAB)).toEqual({ type: 'value', payload: 'ja' });
+    expect((await ask({ type: 'lastlang.set', slug: '../x', lang: 'ja' }, KICK_TAB)).type).toBe('error');
+    expect((await ask({ type: 'hint.set', value: true }, KICK_TAB)).type).toBe('ack');
+    expect(await ask({ type: 'hint.get' }, KICK_TAB)).toEqual({ type: 'value', payload: true });
+    expect((await ask({ type: 'hint.set', value: 'x' as unknown as boolean }, KICK_TAB)).type).toBe('error');
   });
 });
