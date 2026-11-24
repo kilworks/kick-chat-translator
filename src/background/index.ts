@@ -239,7 +239,10 @@ async function init(): Promise<void> {
 }
 
 // Counts are written every few seconds, not on every line: this is the last chance
-// before the browser stops an idle worker.
+// before the browser stops an idle worker. Chrome's MV3 worker is stopped without
+// this event, so there the bound is the debounce itself: at most 15 s of display
+// counters (stats) and 5 s of opt-in usage counts are lost when it stops.
+// Firefox event pages do fire it.
 chrome.runtime.onSuspend?.addListener(() => void stats.flush());
 // Top level, before anything awaits: see listenKeepalive.
 listenKeepalive();

@@ -41,6 +41,13 @@ const PROCESSED_MARK = 'data-kt-id';
  */
 export const INSTANCE = Math.random().toString(36).slice(2, 8);
 
+/** The stamp inject() puts on a line that holds a translation: without one, nothing may hide the original. */
+function dropStaleStamp(target: Node): void {
+  if (!(target instanceof Element) || !target.hasAttribute('data-kt-tr')) return;
+  for (const child of target.children) if (child.className.toString().startsWith('kt-translation')) return;
+  target.removeAttribute('data-kt-tr');
+}
+
 export class ChatObserver {
   private listObserver: MutationObserver | undefined;
   private containerWatcher: MutationObserver | undefined;
@@ -129,6 +136,9 @@ export class ChatObserver {
     this.listObserver = new MutationObserver((mutations) => {
       const candidates = new Set<Element>();
       for (const mut of mutations) {
+        // A translation taken out by the site (Kick or 7TV re-rendering the row)
+        // leaves the stamp that hides the original behind: take it off.
+        if (mut.removedNodes?.length) dropStaleStamp(mut.target);
         for (const node of mut.addedNodes) {
           if (!(node instanceof Element)) continue;
           if (matchesMessageRow(node)) candidates.add(node);

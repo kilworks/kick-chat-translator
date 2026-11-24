@@ -225,3 +225,23 @@ describe('a hidden tab when pausing is off', () => {
     expect(attachedIn(false)).toBe(0);
   });
 });
+
+// The hide rule keys off a stamp. If the site drops our translation node but keeps
+// the host element, the stamp stayed and the original stayed at font-size 0.
+describe('a translation removed by the site', () => {
+  it('takes the stamp off the line, and leaves it while a translation is still there', () => {
+    const obs = new ChatObserver(() => undefined);
+    obs.start();
+    const cb = created.find((c) => c.cb)?.cb;
+    const host = document.querySelector('[data-index]')!;
+    host.setAttribute('data-kt-tr', 'block');
+    host.insertAdjacentHTML('beforeend', '<div class="kt-translation">x</div>');
+    const gone = document.createElement('div');
+    cb?.([{ target: host, removedNodes: [gone], addedNodes: [] } as unknown as MutationRecord], {} as MutationObserver);
+    expect(host.getAttribute('data-kt-tr')).toBe('block');
+    host.querySelector('.kt-translation')!.remove();
+    cb?.([{ target: host, removedNodes: [gone], addedNodes: [] } as unknown as MutationRecord], {} as MutationObserver);
+    expect(host.hasAttribute('data-kt-tr')).toBe(false);
+    obs.stop();
+  });
+});

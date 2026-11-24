@@ -31,6 +31,26 @@ describe('lockStorage', () => {
   });
 });
 
+describe('lockStorage, signals', () => {
+  it('says so when the browser refuses, instead of failing silently', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    vi.stubGlobal('chrome', { storage: { local: { setAccessLevel: () => Promise.reject(new Error('no')) }, sync: {} } });
+    await lockStorage();
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  // The content-side metrics sink writes storage from the page's world: in a metrics
+  // build the lock would silently empty it.
+  it('stays out of the way in a metrics build', async () => {
+    const calls: string[] = [];
+    vi.stubGlobal('__KT_METRICS__', true);
+    vi.stubGlobal('chrome', { storage: { local: { setAccessLevel: async () => void calls.push('l') }, sync: {} } });
+    await lockStorage();
+    expect(calls).toEqual([]);
+  });
+});
+
 describe('pageStore', () => {
   function fakeLocal(init: Record<string, unknown> = {}) {
     const store = { ...init };
