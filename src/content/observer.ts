@@ -50,8 +50,12 @@ export class ChatObserver {
   private cb: Callback;
   private running = false;
 
-  constructor(cb: Callback) {
+  /** True while a hidden tab should still be translated: "pause when hidden" is off. */
+  private attachWhenHidden: () => boolean;
+
+  constructor(cb: Callback, attachWhenHidden: () => boolean = () => false) {
     this.cb = cb;
+    this.attachWhenHidden = attachWhenHidden;
   }
 
   start(): void {
@@ -89,7 +93,10 @@ export class ChatObserver {
   private tryAttach(): void {
     if (!this.running) return;
     // A hidden tab has nobody to translate for: no scan, and the poll below backs off.
-    const container = document.hidden ? null : findChatContainer(document);
+    // Unless the reader turned "pause when hidden" off: a channel opened in a
+    // background tab must translate without waiting for the tab to be shown.
+    const hidden = document.hidden && !this.attachWhenHidden();
+    const container = hidden ? null : findChatContainer(document);
     if (container) {
       if (__KT_METRICS__) metrics.count('dom.attach');
       this.misses = 0;
@@ -104,8 +111,8 @@ export class ChatObserver {
     // be caught at once, then slower: a channel with no chat (offline, followers
     // only) scanned the whole document twice a second for as long as the tab lived.
     // A hidden tab does not count and waits 2 s, so coming back to it is not a 5 s lag.
-    const delay = document.hidden ? 2000 : this.misses < 20 ? 500 : this.misses < 40 ? 1000 : this.misses < 60 ? 2000 : 5000;
-    if (!document.hidden) this.misses += 1;
+    const delay = hidden ? 2000 : this.misses < 20 ? 500 : this.misses < 40 ? 1000 : this.misses < 60 ? 2000 : 5000;
+    if (!hidden) this.misses += 1;
     this.pollHandle = setTimeout(() => this.tryAttach(), delay);
   }
 

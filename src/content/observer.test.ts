@@ -206,3 +206,22 @@ describe('waiting for a chat that is not there', () => {
     obs.stop();
   });
 });
+
+// A channel opened in a background tab by a reader who turned "pause when hidden"
+// off must translate at once, not when the tab is shown.
+describe('a hidden tab when pausing is off', () => {
+  afterEach(() => vi.restoreAllMocks());
+  it('attaches while hidden if told to, and not otherwise', () => {
+    vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    const attachedIn = (allow: boolean): number => {
+      created.length = 0;
+      const obs = new ChatObserver(() => undefined, () => allow);
+      obs.start();
+      const n = created.length;
+      obs.stop();
+      return n;
+    };
+    expect(attachedIn(true)).toBeGreaterThan(0);
+    expect(attachedIn(false)).toBe(0);
+  });
+});
