@@ -31,11 +31,20 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      # The zips built here are the ones published: no dependency install script runs in this job.
+      - run: npm ci --ignore-scripts
 
       - name: The tag is the version in package.json
         if: github.event_name == 'push'
         run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+
+      # A tag can be pushed on any commit, reviewed or not, and it ships to both
+      # stores. Only a commit that is on master may be released.
+      - name: The tagged commit is on master
+        if: github.event_name == 'push'
+        run: |
+          git fetch --no-tags origin master
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/master
 
       - run: npm run release:check
       - name: Store clients against fake stores

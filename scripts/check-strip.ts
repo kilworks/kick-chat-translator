@@ -126,11 +126,15 @@ function main(): void {
     return;
   }
 
-  // The dev reload hook lets any page reload the extension: never in a release.
-  const devHits = [...sources].filter(([, src]) => src.includes('kt-dev-reload')).map(([name]) => name);
-  if (process.env.KT_DEV !== '1' && devHits.length > 0) {
-    console.error(`[check-strip] RELEASE BUILD CARRIES THE DEV RELOAD HOOK in ${devHits.join(', ')}`);
-    process.exit(1);
+  // The dev hooks let any page reload the extension or patch its settings (the
+  // Lingva server among them): never in a release. Each is its own marker, so a
+  // refactor that moves one out of the __KT_DEV__ block cannot ship unnoticed.
+  for (const hook of ['kt-dev-reload', 'kt-dev-settings', 'kt-dev-locale', 'ktSettings']) {
+    const devHits = [...sources].filter(([, src]) => src.includes(hook)).map(([name]) => name);
+    if (process.env.KT_DEV !== '1' && devHits.length > 0) {
+      console.error(`[check-strip] RELEASE BUILD CARRIES THE DEV HOOK "${hook}" in ${devHits.join(', ')}`);
+      process.exit(1);
+    }
   }
 
   if (hits.length > 0) {
