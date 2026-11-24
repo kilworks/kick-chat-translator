@@ -53,3 +53,17 @@ describe('usage helpers', () => {
     expect(percentile([1, 2, 3, 4, 100], 50)).toBe(3);
   });
 });
+
+// A count arrives from a page. A string "5" used to be concatenated into the sum
+// and shipped to GA as text; a huge number skewed the day.
+describe('counts from a page', () => {
+  it('ignores what is not a positive finite number and bounds the rest', () => {
+    const out = addCounts({ tr_google: 1 }, {
+      tr_google: '5' as unknown as number,
+      skipped: -3,
+      tr_cache: Number.NaN,
+      compose_insert: 1e12,
+    });
+    expect(out).toEqual({ tr_google: 1, compose_insert: 10_000 });
+  });
+});

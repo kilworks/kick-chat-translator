@@ -10,7 +10,7 @@ import { TranslationCoalescer } from './coalescer';
 import { anyProviderReady, getProviderStatus, setDeeplUsagePct } from './translator';
 import { armKeepalive, installKeepalive, listenKeepalive } from './keepalive';
 import { getUpdateStatus, installUpdateCheck } from './updateChecker';
-import { DEEPL_USAGE_FREE, DEEPL_USAGE_PRO } from '~/shared/constants';
+import { DEEPL_USAGE_FREE, DEEPL_USAGE_PRO, MAX_TEXT_LENGTH } from '~/shared/constants';
 import { getSemanticOverride } from '~/shared/transliterationGuard';
 import { ecrireAutourDesEmotes } from './lexicalWrite';
 import { CHAT_MESSAGES } from '~/content/i18n';
@@ -28,9 +28,37 @@ const stats = new StatsTracker();
 const channelBuckets = new Map<string, TokenBucket>();
 const coalescer = new TranslationCoalescer({ getSettings: () => settings, cache, stats });
 
+/** Buckets kept at once. A reader opens a handful of channels, not hundreds. */
+const CHANNEL_BUCKETS_MAX = 200;
+/** What a request from a page may carry: the content script never exceeds these. */
+const CHANNEL_RE = /^[\w.-]{1,64}$/;
+const CONTEXT_MAX = 6000;
+
+/** A message from a page is data, not a promise: check the shape before spending anything on it. */
+export function validTranslateRequest(r: unknown): r is TranslationRequest {
+  const q = r as Partial<Record<keyof TranslationRequest, unknown>> | null;
+  return (
+    typeof q === 'object' &&
+    q !== null &&
+    typeof q.messageId === 'string' &&
+    q.messageId.length <= 200 &&
+    typeof q.text === 'string' &&
+    q.text.length <= MAX_TEXT_LENGTH &&
+    typeof q.targetLang === 'string' &&
+    q.targetLang.length <= 20 &&
+    (q.channel === undefined || (typeof q.channel === 'string' && CHANNEL_RE.test(q.channel))) &&
+    (q.context === undefined || (typeof q.context === 'string' && q.context.length <= CONTEXT_MAX)) &&
+    (q.sourceLangHint === undefined || (typeof q.sourceLangHint === 'string' && q.sourceLangHint.length <= 20))
+  );
+}
+
 function bucketFor(channel: string): TokenBucket {
   let b = channelBuckets.get(channel);
   if (!b) {
+    if (channelBuckets.size >= CHANNEL_BUCKETS_MAX) {
+      const oldest = channelBuckets.keys().next();
+      if (!oldest.done) channelBuckets.delete(oldest.value);
+    }
     b = new TokenBucket(settings.perChannelBudgetPerMin, settings.perChannelBudgetPerMin);
     channelBuckets.set(channel, b);
   }
@@ -49,6 +77,7 @@ function applySettings(next: Settings): void {
 }
 
 async function handleTranslate(req: TranslationRequest): Promise<TranslationOutcome> {
+  if (!validTranslateRequest(req)) return { ok: false, error: { code: 'bad_request', message: 'Invalid request' } };
   if (!settings.enabled) {
     return { ok: false, error: { code: 'disabled', message: 'Extension disabled' } };
   }
@@ -298,7 +327,8 @@ onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
       await addUsage(msg.counts, msg.env);
       return { type: 'ack' };
     case 'i18n.chat':
-      return { type: 'i18n.chat', payload: CHAT_MESSAGES[msg.locale] };
+      // An own key only: "constructor" or "__proto__" are not catalogues.
+      return { type: 'i18n.chat', payload: Object.hasOwn(CHAT_MESSAGES, msg.locale) ? CHAT_MESSAGES[msg.locale] : undefined };
     case 'settings.get':
       return { type: 'settings', payload: fromPage ? withoutKey(settings) : settings };
     case 'settings.set': {

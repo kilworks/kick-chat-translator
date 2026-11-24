@@ -40,6 +40,7 @@ vi.mock('./stats', () => ({
       return { byLang: {} };
     }
     recordRequest(): void {}
+    recordThrottled(): void {}
     async reset(): Promise<object> {
       return {};
     }
@@ -256,4 +257,44 @@ describe('storage is shut to content scripts', () => {
     expect(await ask({ type: 'hint.get' }, KICK_TAB)).toEqual({ type: 'value', payload: true });
     expect((await ask({ type: 'hint.set', value: 'x' as unknown as boolean }, KICK_TAB)).type).toBe('error');
   });
+});
+
+/** What a page sends is data, checked before the worker spends a quota or a map slot on it. */
+describe('malformed requests from a Kick tab', () => {
+  const stored = { [STORAGE_KEY_SETTINGS]: { engineModeMoved: true, perChannelBudgetPerMin: 10 } };
+  const ask = async (m: RuntimeMessage) => {
+    const w = await loadWorker(stored, {});
+    await settle();
+    return w.ask(m, KICK_TAB);
+  };
+
+  it('refuses a translate request with the wrong shape', async () => {
+    const bad = [
+      { messageId: 'm', text: 'x'.repeat(801), targetLang: 'fr' },
+      { messageId: 'm', text: 'hello', targetLang: 'fr', channel: '../../x' },
+      { messageId: 'm', text: 5, targetLang: 'fr' },
+    ];
+    for (const payload of bad) {
+      const res = (await ask({ type: 'translate', payload } as unknown as RuntimeMessage)) as { payload: { ok: boolean; error?: { code: string } } };
+      expect(res.payload).toMatchObject({ ok: false, error: { code: 'bad_request' } });
+    }
+  });
+
+  it('answers no catalogue for a locale that is a prototype key', async () => {
+    const res = await ask({ type: 'i18n.chat', locale: 'constructor' });
+    expect(res).toEqual({ type: 'i18n.chat', payload: undefined });
+    const real = await ask({ type: 'i18n.chat', locale: 'fr' });
+    expect((real as { payload?: object }).payload).toBeTypeOf('object');
+  });
+
+  it('forgets the oldest channel rather than growing the map without bound', async () => {
+    const w = await loadWorker(stored, {});
+    await settle();
+    const tr = async (channel: string) =>
+      JSON.stringify(await w.ask({ type: 'translate', payload: { messageId: 'm', text: 'hello there', targetLang: 'fr', channel, noCache: true } }, KICK_TAB));
+    for (let i = 0; i < 10; i++) await tr('first');
+    expect(await tr('first')).toContain('channel_budget');
+    for (let i = 0; i < 200; i++) await tr(`other-${i}`);
+    expect(await tr('first')).not.toContain('channel_budget');
+  }, 30_000);
 });

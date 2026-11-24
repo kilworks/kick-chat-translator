@@ -35,12 +35,17 @@ export interface UsageEnv {
   localApi: boolean;
 }
 
+/** The most one counter can take from one flush. */
+const COUNT_MAX = 10_000;
+
 /** Fold one batch of counts into another. */
 export function addCounts(into: UsageCounts, from: UsageCounts): UsageCounts {
   const out: UsageCounts = { ...into };
   for (const k of USAGE_COUNTERS) {
     const n = from[k];
-    if (n) out[k] = (out[k] ?? 0) + n;
+    // A count from a page: a number or nothing (a string would be concatenated
+    // and shipped), and bounded, one minute of chat does not make a million.
+    if (typeof n === 'number' && Number.isFinite(n) && n > 0) out[k] = (out[k] ?? 0) + Math.min(Math.floor(n), COUNT_MAX);
   }
   return out;
 }

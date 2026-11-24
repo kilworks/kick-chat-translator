@@ -69,7 +69,7 @@ export async function addUsage(counts: UsageCounts, env?: UsageEnv): Promise<voi
   if (!(await usageAllowed(getSettings()))) return;
   const d = await rollover();
   d.counts = addCounts(d.counts, counts);
-  if (env) d.env = env;
+  if (env && typeof env.has7tv === 'boolean' && typeof env.localApi === 'boolean') d.env = { has7tv: env.has7tv, localApi: env.localApi };
   save();
 }
 
