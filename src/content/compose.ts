@@ -76,6 +76,12 @@ export class ComposeController {
   private settings: Settings;
   private composer: HTMLElement | undefined;
   private readonly onInput = (): void => this.scheduleEvaluate();
+  // A click on a chat line cannot change the composer or open its picker, and
+  // each evaluate reads innerText, which forces a layout on a page a fast chat keeps dirty.
+  private readonly onClick = (e: MouseEvent): void => {
+    if ((e.target as Element | null)?.closest?.('div[data-index]')) return;
+    this.scheduleEvaluate();
+  };
   private readonly onKeydown = (e: KeyboardEvent): void => this.handleKeydown(e);
   private debounceTimer: ReturnType<typeof setTimeout> | undefined;
   private pollTimer: ReturnType<typeof setTimeout> | undefined;
@@ -245,7 +251,7 @@ export class ComposeController {
     // one, and blurred the box on Escape before we could stop it (measured).
     window.addEventListener('keydown', this.onKeydown, true);
     // Kick's emote picker opens on a click, with no key to wake evaluate().
-    window.addEventListener('click', this.onInput, true);
+    window.addEventListener('click', this.onClick, true);
     mountComposePreview(composer, this.resolveTarget(), {
       onInsert: () => this.handleInsert(),
     });
@@ -266,7 +272,7 @@ export class ComposeController {
     this.composer?.removeEventListener('input', this.onInput);
     this.composer?.removeEventListener('keyup', this.onInput);
     window.removeEventListener('keydown', this.onKeydown, true);
-    window.removeEventListener('click', this.onInput, true);
+    window.removeEventListener('click', this.onClick, true);
     this.composer = undefined;
   }
 
