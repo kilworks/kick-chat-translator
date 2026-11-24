@@ -160,6 +160,20 @@ describe('TranslationPipeline, a dropped line says why', () => {
     vi.mocked(markSkipped).mockClear();
   });
 
+  // The catalogue arrives after the module is imported, so the reason has to be
+  // looked up when a line is dropped, not when the file loads.
+  it('speaks the chat language for a filter reason once the catalogue is installed', async () => {
+    const { setChatTable } = await import('./msg');
+    setChatTable({ dropUserBlocked: 'BLOQUE' });
+    try {
+      const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'en', pauseWhenHidden: false, blacklistUsers: ['user'] });
+      await p.onDomMessage(domMsg(JP));
+      expect(reasonsGiven()).toContain('BLOQUE');
+    } finally {
+      setChatTable(undefined);
+    }
+  });
+
   it('names the minimum length when the message is under it', async () => {
     const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'en', pauseWhenHidden: false, minTextLength: 5 });
     await p.onDomMessage(domMsg('abcd'));

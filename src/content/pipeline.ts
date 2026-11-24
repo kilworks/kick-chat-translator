@@ -63,17 +63,28 @@ interface RawResult {
 /**
  * Filter codes turned into something a reader can act on.
  *
- * English only, like every other string this content script shows. It has no
- * translation runtime of its own, and giving it one would put the whole UI
- * catalogue (about 67 KB) on every Kick page just to fill a tooltip.
+ * Getters, not values: the chat catalogue is installed after this module is
+ * imported, so a value built here would stay English for every UI language.
  */
 const DROP_REASON: Record<string, string> = {
-  bot: localised('dropBot', 'the sender looks like a bot'),
-  user_blacklisted: localised('dropUserBlocked', 'this user is on your blocked list'),
-  channel_blacklisted: localised('dropChannelBlocked', 'this channel is on your blocked list'),
-  channel_not_whitelisted: localised('dropChannelNotAllowed', 'this channel is not on your allowed list'),
-  lang_unknown: localised('dropLangUnknown', 'its language could not be identified'),
-  lang_not_allowed: localised('dropLangNotAllowed', 'its language is not on your allowed list'),
+  get bot() {
+    return localised('dropBot', 'the sender looks like a bot');
+  },
+  get user_blacklisted() {
+    return localised('dropUserBlocked', 'this user is on your blocked list');
+  },
+  get channel_blacklisted() {
+    return localised('dropChannelBlocked', 'this channel is on your blocked list');
+  },
+  get channel_not_whitelisted() {
+    return localised('dropChannelNotAllowed', 'this channel is not on your allowed list');
+  },
+  get lang_unknown() {
+    return localised('dropLangUnknown', 'its language could not be identified');
+  },
+  get lang_not_allowed() {
+    return localised('dropLangNotAllowed', 'its language is not on your allowed list');
+  },
 };
 
 /** How many decisions the Debug tab can look back over. */
