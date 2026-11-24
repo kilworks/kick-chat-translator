@@ -94,6 +94,18 @@ describe('TranslationPipeline, cloud first', () => {
     expect(vi.mocked(showError).mock.calls[0]?.[1]).toBe('Translation failed');
   });
 
+  // With every provider cooling down the worker refuses at once. A red marker on each
+  // line in that window is never re-run; a bare line is, by the next sweep.
+  it('leaves a line bare when every provider is cooling down, so a later sweep can retry it', async () => {
+    const { localEngine } = await import('./localEngine');
+    Object.assign(localEngine, { isReady: () => false });
+    sendMock.mockResolvedValue(failure('saturated'));
+    await reader().onDomMessage(domMsg());
+    await flush();
+    expect(showError).not.toHaveBeenCalled();
+    expect(sendMock.mock.calls.filter((c) => c[0]?.type === 'translate')).toHaveLength(1);
+  });
+
   it('leaves the channel budget alone, it is not a failure of the engine', async () => {
     sendMock.mockResolvedValue(failure('channel_budget'));
     await reader().onDomMessage(domMsg());

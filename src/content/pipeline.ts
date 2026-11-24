@@ -373,7 +373,8 @@ export class TranslationPipeline {
     // scroller to hand this row to another message, whose reason this is not.
     const sameRow = extractMessageText(msg.rowElement) === rowText;
     // Both drops are the allowlist's doing: lang_unknown only fires when one is set.
-    const byLang = prepared === DROP_REASON.lang_not_allowed || prepared === DROP_REASON.lang_unknown;
+    // Only a dropped line has a reason to compare: the getters look the catalogue up.
+    const byLang = typeof prepared === 'string' && (prepared === DROP_REASON.lang_not_allowed || prepared === DROP_REASON.lang_unknown);
     if (byLang || (typeof prepared !== 'string' && this.settings.sourceLangAllowlist.length > 0)) {
       this.langMark(msg.channel, byLang);
     }
@@ -514,7 +515,16 @@ export class TranslationPipeline {
         removeAllArtifacts(msg.injectionTarget);
         return;
       }
-      if (code === 'saturated' || code === 'no_provider') {
+      if (code === 'saturated') {
+        // Every provider is cooling down: a fact about the moment, not about this line.
+        // The worker asked nothing of them. The line stays bare, with no error and no
+        // request, so the scroll-stop and tab-return sweeps hand it back once the
+        // cooldown is over, instead of a red marker that nothing ever re-runs.
+        this.maybeToast(localised('toastAllDown', 'Every translation provider is down. Retrying shortly.'));
+        removeAllArtifacts(msg.injectionTarget);
+        return;
+      }
+      if (code === 'no_provider') {
         this.maybeToast(localised('toastAllDown', 'Every translation provider is down. Retrying shortly.'));
       } else if (code === 'quota' || outcome.error.message?.includes('quota')) {
         this.maybeToast(
