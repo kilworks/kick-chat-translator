@@ -138,7 +138,8 @@ Display.
 - **Filters**: bots, users, channels, keywords (matched as whole words), source languages, and a glossary of
   replacements
 - **Advanced**: cache size and lifetime, concurrent requests, a per-channel rate limit, backup and restore
-  (the file never holds your DeepL key, and importing one keeps your own key and Lingva server)
+  (the file never holds your DeepL key, MyMemory email, Lingva address, channel lists or user lists, and importing one
+  keeps all of them, and your usage statistics choice, as they are on this device)
 - **Activity**: messages translated, cache hits, every language seen in chat, and why each of the last 50
   lines was translated or left alone
 - **Keyboard**: Alt+T turns chat translation on or off, Alt+W the compose preview
@@ -237,7 +238,7 @@ No. It is an independent open-source project, not affiliated with Kick.
 In 3.6.3:
 
 - Tab no longer inserts the translation of an older version of what you typed
-- Your DeepL key stays on the device: never synced, never in a settings export, and removing DeepL from the order sticks
+- Your DeepL key stays on the device: never synced, never in a settings export, closed to the scripts that run inside kick.com pages on Chrome, and removing DeepL from the order sticks
 - Blocked words match whole words: blocking "rat" no longer hides "congrats"
 - The options page says when your lists are too long for browser sync to save
 - The remembered channel language stays in its own tab, repeated lines get the glossary once, and the cache cleans itself daily

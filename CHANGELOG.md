@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **Storage is closed to the page's scripts on Chrome.** The DeepL key and the
+  settings blob were readable and writable from the content script, so the
+  worker's gates (no key to a page, a page writes only six settings) did not
+  hold against a compromised page context. The worker now restricts local and
+  sync storage to trusted contexts, tabs ask it instead, and it tells them when
+  settings change. Firefox has no such switch, the key is still never sent to a
+  tab there.
+- **Settings files keep to what can be shared.** An export leaves out the
+  MyMemory email, the Lingva address, the channel and user lists. An import no
+  longer carries a DeepL key, the usage statistics choice, the email or those
+  lists over this device's own.
+- **The worker checks what a page sends**: request shape and size, channel
+  names, usage counts, locale names, and the number of channel buckets.
+- **Releases only ship commits that are on master**, install without running
+  dependency scripts, and the MCP helper in the repo is pinned. The release
+  check now rejects every dev hook, not only the reload one. The store tools
+  refuse an endpoint override that is not loopback and use a random debugging
+  port.
+
+### Fixed
+
+- **Every provider cooling down now fails fast**, as the code always said it did,
+  instead of asking all of them again on each flush.
+- **Failed lines say "Translation failed"** in the interface language, not a code
+  such as `rate_limit`. The reasons shown for left-alone lines follow the
+  interface language too.
+- **Toasts show with reduced motion on**, and are announced, as are the bar's
+  state, the compose preview and "saved". The retry arrow and the native name
+  on a hovered language row meet contrast.
+- **Popup and options**: a chevron on the popup selects, a message when the
+  worker does not answer or refuses a change, a line on tabs that are not Kick,
+  numbers saved when done instead of per keystroke, the Lingva address checked
+  when done, the accent shown in the style preview, language names tagged for
+  speech and CJK glyphs, a visible focus and Tab out on the interface language
+  list, the on-device chips claim nothing until probed.
+- The bar toggles only from its power button, and its icon buttons are named.
+- The compose chip shows a glyph, not the English word OFF.
+
+### Performance
+
+- The worker writes the cache once per batch, derives each key once, shares one
+  provider pool, joins copies of a line still being translated, writes stats and
+  usage every few seconds, remembers the Firefox consent, drops the update alarm
+  on store installs and the usage alarm without consent, and answers settings
+  before the cache has warmed.
+- The content script finds a translated line by a stamp instead of `:has()`
+  (about 180 ms of style recalculation per 10 s on fast chats with the original
+  hidden), stops reading a hidden paused tab, polls less for an absent chat,
+  skips the bar loop and the stylesheet off chat pages, creates each on-device
+  model once, bounds it with the cloud deadline, and cleans up after a replaced
+  copy.
+
 ## [3.6.3] - 2026-11-23
 
 ### Fixed
