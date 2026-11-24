@@ -326,7 +326,6 @@ html[data-kt-scheme='light'] .kt-translation-replace {
   font-family: var(--kt-font-ui);
   font-size: var(--kt-fs-md);
   color: var(--kt-text-2);
-  cursor: pointer;
   user-select: none;
   position: relative;
   z-index: 50;
@@ -1019,6 +1018,12 @@ html[data-kt-scheme='light'] .kt-compose-insert {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+  /* The toast's fade ENDS at opacity 0, and a 0.01 ms animation that holds its
+     last frame is a toast that never shows. Without the animation it stays up
+     until showToast removes it. */
+  .kt-toast {
+    animation: none;
   }
 }
 

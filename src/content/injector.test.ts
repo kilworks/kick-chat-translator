@@ -3,10 +3,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defaultSettings } from '~/shared/settings';
 import type { Settings } from '~/shared/settings';
 import type { TranslationResult } from '~/shared/types';
-import { HANDLED_SELECTOR, applyDisplayStyle, applyShowOriginal, armHoverTranslate, incrementFloatingCount, inject, markSkipped, mountFloatingBar, updateActiveProvider, removeAllArtifacts, showError, showLangBlocked, showLoading, showThrottleIndicator, unmountFloatingBar, updateFloatingBar } from './injector';
+import { HANDLED_SELECTOR, showToast, applyDisplayStyle, applyShowOriginal, armHoverTranslate, incrementFloatingCount, inject, markSkipped, mountFloatingBar, updateActiveProvider, removeAllArtifacts, showError, showLangBlocked, showLoading, showThrottleIndicator, unmountFloatingBar, updateFloatingBar } from './injector';
 // Read from disk: vitest runs with CSS processing off, so `?inline` imports
 // resolve to an empty string and would make these assertions pass on anything.
 const injectCss = readFileSync('src/content/inject.css', 'utf8');
+
+/** The bar paints its counter once a frame. */
+const frame = (): Promise<void> => new Promise((r) => setTimeout(r, 50));
 
 const result = (translatedText: string): TranslationResult => ({
   messageId: '1',
@@ -311,7 +314,7 @@ describe('injector artifacts', () => {
     // The counter and the provider tooltip are updated on every translated
     // line. Finding the panel on screen means asking for boxes, which forces a
     // layout right after the line was written: one per message on a fast chat.
-    it('reaches the bar on every line without measuring the page', () => {
+    it('reaches the bar on every line without measuring the page', async () => {
       const host = twoPanels();
       mountFloatingBar(host, { ...defaultSettings(), enabled: true, targetLang: 'fr' }, barHandlers());
       const rects = vi.spyOn(Element.prototype, 'getClientRects');
@@ -324,19 +327,21 @@ describe('injector artifacts', () => {
       expect(boxes).not.toHaveBeenCalled();
       rects.mockRestore();
       boxes.mockRestore();
-      // Control: the updates did land, on the live bar.
+      // Control: the updates did land, on the live bar (the count, once a frame).
+      await frame();
       const live = document.querySelectorAll('#kt-floating-bar')[1]!;
       expect(live.querySelector('.kt-float-count')?.textContent).toBe('· 5');
       expect((live as HTMLElement).dataset.provider).toBe('google');
     });
 
     // A bar Kick's re-render threw away is not the live one any more.
-    it('finds the bar again once the one it knew is gone', () => {
+    it('finds the bar again once the one it knew is gone', async () => {
       const host = twoPanels();
       mountFloatingBar(host, { ...defaultSettings(), enabled: true, targetLang: 'fr' }, barHandlers());
       document.querySelectorAll('#kt-floating-bar')[1]!.remove();
       mountFloatingBar(host, { ...defaultSettings(), enabled: false, targetLang: 'fr' }, barHandlers());
       incrementFloatingCount();
+      await frame();
       const live = document.querySelectorAll('#kt-floating-bar')[1]!;
       expect(live.querySelector('.kt-float-count')?.textContent).toBe('· 1');
     });
@@ -360,11 +365,12 @@ describe('injector artifacts', () => {
     });
 
     // `· 12` alone said nothing, to the eye or to a screen reader.
-    it('names what the counter counts', () => {
+    it('names what the counter counts', async () => {
       const host = twoPanels();
       mountFloatingBar(host, { ...defaultSettings(), enabled: true, targetLang: 'fr' }, barHandlers());
       incrementFloatingCount();
       incrementFloatingCount();
+      await frame();
       const count = document.querySelectorAll('#kt-floating-bar')[1]!.querySelector<HTMLElement>('.kt-float-count')!;
       expect(count.title).toBe('Translated on this page: 2');
       expect(count.getAttribute('aria-label')).toBe('Translated on this page: 2');
@@ -581,6 +587,26 @@ describe('injector artifacts', () => {
       const pick = bar.querySelector<HTMLSelectElement>('.kt-float-lang')!;
       pick.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       expect(h.onToggle).not.toHaveBeenCalled();
+    });
+
+    // A click that missed the language button by a pixel paused the translation.
+    it('does not pause on a click anywhere else on the bar', () => {
+      const h = handlers();
+      const bar = mount(h);
+      bar.querySelector<HTMLElement>('.kt-float-label')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      bar.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(h.onToggle).not.toHaveBeenCalled();
+    });
+
+    // The glyphs alone were announced as "gear" and drew as colour emoji on some systems.
+    it('names its icon buttons, and announces its state', () => {
+      const bar = mount(handlers());
+      const power = bar.querySelector<HTMLElement>('.kt-float-power')!;
+      expect(power.getAttribute('aria-label')).toBe(power.title);
+      const opts = bar.querySelector<HTMLElement>('.kt-float-opts')!;
+      expect(opts.getAttribute('aria-label')).toBe('Options');
+      expect(opts.textContent).toContain('\uFE0E');
+      expect(bar.querySelector('.kt-float-label')?.getAttribute('role')).toBe('status');
     });
 
     it('pauses and resumes from its own button', () => {
@@ -1078,5 +1104,15 @@ describe('floating bar, remounted by the guard', () => {
     remove.mockRestore();
     unmountFloatingBar();
     document.body.innerHTML = '';
+  });
+});
+
+describe('toast', () => {
+  it('is announced, and survives the reduced-motion rule that would hide it', () => {
+    showToast('Quota reached');
+    expect(document.querySelector('.kt-toast')?.getAttribute('role')).toBe('status');
+    // The fade ends at opacity 0 and the blanket rule makes it last 0.01 ms.
+    const block = injectCss.slice(injectCss.indexOf('@media (prefers-reduced-motion: reduce)'));
+    expect(block.slice(0, block.indexOf('}\n\n'))).toMatch(/\.kt-toast\s*\{\s*animation:\s*none/);
   });
 });
