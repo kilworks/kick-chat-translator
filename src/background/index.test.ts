@@ -3,6 +3,8 @@ import { STORAGE_KEY_DEEPL_KEY, STORAGE_KEY_SETTINGS } from '~/shared/constants'
 import type { RuntimeMessage, RuntimeResponse } from '~/shared/messages';
 import type { Settings } from '~/shared/settings';
 
+const gate = vi.hoisted(() => ({ warm: Promise.resolve() as Promise<void> }));
+
 // The worker module wires listeners at import time. Its heavy neighbours (IndexedDB
 // cache, alarms, usage counters) are not what these tests are about.
 vi.mock('./cache', () => ({
@@ -11,7 +13,9 @@ vi.mock('./cache', () => ({
     key(text: string, lang: string): string {
       return `${lang}::${text}`;
     }
-    async warm(): Promise<void> {}
+    async warm(): Promise<void> {
+      await gate.warm;
+    }
     async setMany(): Promise<void> {}
     async clear(): Promise<void> {}
     async stats(): Promise<{ entries: number }> {
@@ -304,5 +308,29 @@ describe('malformed requests from a Kick tab', () => {
     expect(burst.at(-1)).toContain('channel_budget');
     await Promise.all(Array.from({ length: 200 }, (_, i) => tr(`other-${i}`)));
     expect(await tr('first')).not.toContain('channel_budget');
+  });
+});
+
+// Every message waited for the cache to warm, the settings ones included: the
+// content script's first act on a page is to ask for them.
+describe('a cold worker', () => {
+  it('answers the settings before the cache has warmed, and holds a translation for it', async () => {
+    let open: () => void = () => undefined;
+    gate.warm = new Promise<void>((r) => (open = r));
+    try {
+      const { ask } = await loadWorker({ [STORAGE_KEY_SETTINGS]: { targetLang: 'ja', engineModeMoved: true } }, {});
+      const got = await Promise.race([ask({ type: 'settings.get' }, KICK_TAB), new Promise((r) => setTimeout(() => r('stuck'), 200))]);
+      expect(got).not.toBe('stuck');
+      expect((got as { payload: Settings }).payload.targetLang).toBe('ja');
+      const held = await Promise.race([
+        ask({ type: 'stats.get' }, OPTIONS_PAGE),
+        new Promise((r) => setTimeout(() => r('held'), 100)),
+      ]);
+      expect(held).toBe('held');
+      open();
+    } finally {
+      open();
+      gate.warm = Promise.resolve();
+    }
   });
 });

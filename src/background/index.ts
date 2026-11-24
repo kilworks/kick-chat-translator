@@ -206,9 +206,17 @@ function scheduleDeeplUsageRefresh(): void {
 
 const CACHE_PRUNE_ALARM = 'kt.cachePrune';
 
+/** Settled once the settings are read: what a cold worker answers first, before the cache warms. */
+let settingsLoaded: () => void = () => undefined;
+const settingsReady = new Promise<void>((r) => (settingsLoaded = r));
+
 async function init(): Promise<void> {
-  settings = await loadSettings();
-  applySettings(settings);
+  try {
+    settings = await loadSettings();
+    applySettings(settings);
+  } finally {
+    settingsLoaded();
+  }
   await stats.load();
   await cache.warm(200, warmTargets(resolveTargetLang(settings.targetLang), stats.current().byLang));
   log.info('Service worker initialized');
@@ -297,8 +305,20 @@ const pageMayWrite = (patch: Partial<Settings>): boolean =>
   Object.keys(patch).every((k) => k !== 'deeplApiKey' && (__KT_DEV__ || PAGE_SETTINGS.has(k)));
 const NOT_ALLOWED: RuntimeResponse = { type: 'error', payload: { message: 'not allowed' } };
 
+/** Answerable from the settings alone: they no longer wait for the stats and the cache warm (10 to 30 ms on a cold worker). */
+const SETTINGS_ONLY = new Set<RuntimeMessage['type']>([
+  'settings.get',
+  'i18n.chat',
+  'open.options',
+  'lastlang.get',
+  'lastlang.set',
+  'hint.get',
+  'hint.set',
+  'ping',
+]);
+
 onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
-  await ready;
+  await (SETTINGS_ONLY.has(msg.type) ? settingsReady : ready);
   // Chrome gives chrome-extension://<id>/, Firefox moz-extension://<uuid>/.
   const fromPage = !sender.url?.startsWith(chrome.runtime.getURL(''));
   if (fromPage && !PAGE_MESSAGES.has(msg.type)) return NOT_ALLOWED;
