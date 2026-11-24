@@ -1,3 +1,5 @@
+import { isSupportedLang } from '~/shared/languages';
+
 /**
  * What a Kick tab may remember, kept by the worker.
  *
@@ -27,10 +29,21 @@ export async function getLastLang(slug: string): Promise<string | undefined> {
   return typeof v === 'string' ? v : undefined;
 }
 
-export async function setLastLang(slug: string, lang: string): Promise<boolean> {
-  if (!SLUG_RE.test(slug) || !LANG_RE.test(lang)) return false;
+/** One write at a time: two tabs setting different channels used to lose one entry. */
+let lastLangQueue: Promise<unknown> = Promise.resolve();
+
+export function setLastLang(slug: string, lang: string): Promise<boolean> {
+  const run = lastLangQueue.then(() => writeLastLang(slug, lang));
+  lastLangQueue = run.catch(() => undefined);
+  return run;
+}
+
+async function writeLastLang(slug: string, lang: string): Promise<boolean> {
+  if (!SLUG_RE.test(slug) || !LANG_RE.test(lang) || !isSupportedLang(lang)) return false;
   const got = await chrome.storage.local.get(LASTLANG_KEY);
   const prev = got[LASTLANG_KEY] as LastLangs | undefined;
+  // Same answer as the one held: nothing to write (this is sent on every channel load).
+  if (Array.isArray(prev) && prev.at(-1)?.[0] === slug && prev.at(-1)?.[1] === lang) return true;
   const list = (Array.isArray(prev) ? prev : []).filter((e) => e[0] !== slug);
   list.push([slug, lang]);
   await chrome.storage.local.set({ [LASTLANG_KEY]: list.slice(-LASTLANG_MAX) });

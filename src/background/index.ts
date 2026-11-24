@@ -3,7 +3,7 @@ import { onMessage, SETTINGS_CHANGED, type RuntimeMessage, type RuntimeResponse 
 import { rootLogger } from '~/shared/logger';
 import { createMetrics } from '~/shared/metrics';
 import { TranslationCache, warmTargets } from './cache';
-import { resolveTargetLang } from '~/shared/languages';
+import { isSupportedLang, resolveTargetLang } from '~/shared/languages';
 import { TokenBucket } from './queue';
 import { StatsTracker } from './stats';
 import { TranslationCoalescer } from './coalescer';
@@ -26,6 +26,9 @@ let settings: Settings = defaultSettings();
 const cache = new TranslationCache(settings.cacheMaxEntries, settings.cacheTtlHours * 3_600_000);
 const stats = new StatsTracker();
 const channelBuckets = new Map<string, TokenBucket>();
+/** All channels together, a multiple of one channel's budget: rotating channel names cannot get past it. */
+const GLOBAL_BUDGET_FACTOR = 4;
+const globalBucket = new TokenBucket(settings.perChannelBudgetPerMin * GLOBAL_BUDGET_FACTOR, settings.perChannelBudgetPerMin * GLOBAL_BUDGET_FACTOR);
 const coalescer = new TranslationCoalescer({ getSettings: () => settings, cache, stats });
 
 /** Buckets kept at once. A reader opens a handful of channels, not hundreds. */
@@ -71,6 +74,7 @@ function applySettings(next: Settings): void {
   settings = next;
   syncUsageAlarm(next);
   cache.setConfig(next.cacheMaxEntries, next.cacheTtlHours * 3_600_000);
+  globalBucket.setRate(next.perChannelBudgetPerMin * GLOBAL_BUDGET_FACTOR, next.perChannelBudgetPerMin * GLOBAL_BUDGET_FACTOR);
   for (const b of channelBuckets.values()) {
     b.setRate(next.perChannelBudgetPerMin, next.perChannelBudgetPerMin);
   }
@@ -145,7 +149,9 @@ async function handleTranslate(req: TranslationRequest): Promise<TranslationOutc
     }
   }
 
-  if (req.channel && !bucketFor(req.channel).tryTake()) {
+  // Taken first and for every request, a missing channel included: the per-channel
+  // bucket below is the fair share, this one is the ceiling a hostile page cannot rotate around.
+  if (!globalBucket.tryTake() || (req.channel && !bucketFor(req.channel).tryTake())) {
     // Compte le refus : sans lui, le reglage qui plafonne ce seau ne peut pas
     // dire s'il a deja servi a quelque chose, et le lecteur regle un nombre a
     // l'aveugle.
@@ -344,10 +350,14 @@ onMessage(async (msg, sender): Promise<RuntimeResponse | void> => {
       }
       return { type: 'translate.result', payload: outcome };
     }
-    case 'stats.local':
-      stats.recordRequest('local', msg.payload.lang, msg.payload.chars, false);
+    case 'stats.local': {
+      const { lang, chars } = (msg.payload ?? {}) as Partial<{ lang: unknown; chars: unknown }>;
+      // From a page: a number that adds up and a language the product knows, or nothing.
+      if (typeof lang !== 'string' || !isSupportedLang(lang) || typeof chars !== 'number' || !Number.isFinite(chars) || chars < 0 || chars > MAX_TEXT_LENGTH) return NOT_ALLOWED;
+      stats.recordRequest('local', lang, chars, false);
       void recordTranslation('local', false);
       return { type: 'ack' };
+    }
     case 'usage.add':
       await addUsage(msg.counts, msg.env);
       return { type: 'ack' };

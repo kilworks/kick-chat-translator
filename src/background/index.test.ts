@@ -307,7 +307,37 @@ describe('malformed requests from a Kick tab', () => {
     const burst = await Promise.all(Array.from({ length: 11 }, () => tr('first')));
     expect(burst.at(-1)).toContain('channel_budget');
     await Promise.all(Array.from({ length: 200 }, (_, i) => tr(`other-${i}`)));
-    expect(await tr('first')).not.toContain('channel_budget');
+    // Two minutes on, the shared ceiling has refilled; 'first' was evicted and starts fresh.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(Date.now() + 120_000);
+    try {
+      expect(await tr('first')).not.toContain('channel_budget');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // The cap above bounds memory only: a name that is new each time got a full
+  // bucket each time, so the per-channel budget meant nothing to a hostile page.
+  it('stops a page that rotates channel names, with a ceiling over all channels', async () => {
+    const w = await loadWorker(stored, {});
+    await settle();
+    const tr = async (channel: string) =>
+      JSON.stringify(await w.ask({ type: 'translate', payload: { messageId: 'm', text: 'hello there', targetLang: 'fr', channel, noCache: true } }, KICK_TAB));
+    const out = await Promise.all(Array.from({ length: 60 }, (_, i) => tr(`rot-${i}`)));
+    // Budget 10 a channel, 4 channels' worth overall: 40 get through.
+    expect(out.filter((o) => o.includes('channel_budget'))).toHaveLength(20);
+  });
+
+  // stats.local is a page message too: a string for `chars` was concatenated into the
+  // persisted sum, and any language string became a key.
+  it('refuses a stats.local payload that would corrupt the counters', async () => {
+    const w = await loadWorker(stored, {});
+    await settle();
+    for (const payload of [{ lang: 'xx-evil', chars: 5 }, { lang: 'ja', chars: 'abc' }, { lang: 'ja', chars: -1 }, { lang: 'ja', chars: 1e9 }, undefined]) {
+      expect((await w.ask({ type: 'stats.local', payload } as unknown as RuntimeMessage, KICK_TAB)).type).toBe('error');
+    }
+    expect((await w.ask({ type: 'stats.local', payload: { lang: 'ja', chars: 12 } }, KICK_TAB)).type).toBe('ack');
   });
 });
 

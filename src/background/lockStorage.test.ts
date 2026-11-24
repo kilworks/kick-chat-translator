@@ -70,3 +70,34 @@ describe('pageStore', () => {
     expect(await setHint(3)).toBe(true);
   });
 });
+
+// Two tabs saving different channels at once read the same list and one entry was lost,
+// and the same answer was written again on every channel load.
+describe('pageStore, last language writes', () => {
+  it('keeps both entries of two writes started together', async () => {
+    const store: Record<string, unknown> = {};
+    vi.stubGlobal('chrome', {
+      storage: {
+        local: {
+          get: async (k: string | string[]) => {
+            await new Promise((r) => setTimeout(r, 5));
+            return Object.fromEntries([k].flat().filter((x) => x in store).map((x) => [x, store[x]]));
+          },
+          set: async (o: Record<string, unknown>) => void Object.assign(store, o),
+          remove: async (k: string) => void delete store[k],
+        },
+      },
+    });
+    await Promise.all([setLastLang('one', 'ja'), setLastLang('two', 'ko')]);
+    expect(await getLastLang('one')).toBe('ja');
+    expect(await getLastLang('two')).toBe('ko');
+  });
+
+  it('refuses a code the product does not know, and skips a write that changes nothing', async () => {
+    const sets = vi.fn(async () => undefined);
+    vi.stubGlobal('chrome', { storage: { local: { get: async () => ({ 'kt.lastlang.v2': [['one', 'ja']] }), set: sets, remove: async () => undefined } } });
+    expect(await setLastLang('x', 'qq')).toBe(false);
+    expect(await setLastLang('one', 'ja')).toBe(true);
+    expect(sets).not.toHaveBeenCalled();
+  });
+});

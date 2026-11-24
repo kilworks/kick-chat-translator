@@ -172,3 +172,19 @@ describe('StatsTracker write cadence', () => {
     expect(writes).toHaveLength(1);
   });
 });
+
+// byLang and byChannel are keyed by what a page sends: a new key past the cap is not taken.
+describe('StatsTracker key caps', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it('keeps counting known keys and stops adding new ones', () => {
+    vi.stubGlobal('chrome', { storage: { local: { get: async () => ({}), set: async () => undefined } } });
+    const t = new StatsTracker();
+    for (let i = 0; i < 400; i++) t.recordRequest('google', `l${i}`, 1, false, `c${i}`);
+    t.recordRequest('google', 'l0', 1, false, 'c0');
+    const s = t.current();
+    expect(Object.keys(s.byLang)).toHaveLength(300);
+    expect(Object.keys(s.byChannel)).toHaveLength(300);
+    expect(s.byLang.l0).toBe(2);
+    expect(s.totalRequests).toBe(401);
+  });
+});
