@@ -217,3 +217,32 @@ describe('TranslationPipeline, waiting on the worker', () => {
     expect(hidden()).toBe(1);
   });
 });
+
+// A model that never answers left one pending line per message, holding its row,
+// for the life of the page. The cloud path had a deadline; this one had none.
+describe('TranslationPipeline, an on-device model that stalls', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    sendMock.mockReset();
+    vi.mocked(showError).mockClear();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('gives up on it after the same deadline as the cloud, and shows the failure', async () => {
+    const { localEngine } = await import('./localEngine');
+    Object.assign(localEngine, { present: () => true, isReady: () => true, translate: () => new Promise<string>(() => undefined) });
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: false, error: { code: 'no_provider', message: 'x' } } });
+    const rowElement = document.createElement('div');
+    const injectionTarget = document.createElement('span');
+    injectionTarget.className = 'font-normal';
+    injectionTarget.textContent = 'jestem tutaj dzisiaj wieczorem';
+    rowElement.appendChild(injectionTarget);
+    document.body.appendChild(rowElement);
+    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'fr', pauseWhenHidden: false });
+    await p.onDomMessage({ rowElement, injectionTarget, id: 'stall', text: injectionTarget.textContent, channel: 'chan', username: 'u', isBot: false });
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(showError).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(25_000);
+    expect(showError).toHaveBeenCalledTimes(1);
+  });
+});

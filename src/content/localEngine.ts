@@ -52,6 +52,7 @@ type StateListener = () => void;
 class LocalEngine {
   private state = new Map<string, PairState>();
   private instances = new Map<string, TranslatorInstance>();
+  private creating = new Map<string, Promise<TranslatorInstance>>();
   private progress = new Map<string, number>();
   // Keyed by the API's tags, valued with the codes the caller used, so a pair
   // offered for download carries `zh-tw` back to a caller that compares it with
@@ -185,8 +186,15 @@ class LocalEngine {
     let inst = this.instances.get(key);
     if (!inst) {
       if (this.state.get(key) !== 'available') throw new Error('not_ready');
-      // 'available' means create() works without a gesture.
-      inst = await c.create({ sourceLanguage: s, targetLanguage: t });
+      // 'available' means create() works without a gesture. One creation per
+      // pair: a burst of lines arriving while the first create() loads the model
+      // each started their own, and only the last instance was kept.
+      let creating = this.creating.get(key);
+      if (!creating) {
+        creating = c.create({ sourceLanguage: s, targetLanguage: t }).finally(() => this.creating.delete(key));
+        this.creating.set(key, creating);
+      }
+      inst = await creating;
       this.instances.set(key, inst);
     }
     const out = await inst.translate(text);

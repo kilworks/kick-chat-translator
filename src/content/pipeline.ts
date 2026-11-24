@@ -416,7 +416,7 @@ export class TranslationPipeline {
         showLoading(msg.injectionTarget);
         const t0 = performance.now();
         try {
-          const translatedText = await localEngine.translate(localSource, target, real);
+          const translatedText = await this.onDevice(localSource, target, real);
           // Handed back as is, usually because the guessed source was wrong. The
           // cloud detects per line, so local-first asks it instead of skipping.
           // local-only has nowhere else to ask and keeps the skip below.
@@ -533,7 +533,7 @@ export class TranslationPipeline {
     localEngine.noteSeen(source, this.effTarget);
     if (!localEngine.isReady(source, this.effTarget)) return false;
     try {
-      const translatedText = await localEngine.translate(source, this.effTarget, real);
+      const translatedText = await this.onDevice(source, this.effTarget, real);
       this.applyTranslation(msg, real, { translatedText, detectedLang: source, provider: 'local' }, { store: true });
       void send({ type: 'stats.local', payload: { lang: source, chars: real.length } }).catch(() => undefined);
       return true;
@@ -594,6 +594,13 @@ export class TranslationPipeline {
       return;
     }
     this.applyTranslation(msg, real, outcome.result, { store: true, force: true });
+  }
+
+  /** On-device translation under the same deadline as the cloud: a stalled model left one pending line per message, for the life of the page. */
+  private async onDevice(source: string, target: string, text: string): Promise<string> {
+    const out = await withinDeadline(localEngine.translate(source, target, text), CLOUD_ANSWER_DEADLINE_MS);
+    if (out === undefined) throw new Error('local_timeout');
+    return out;
   }
 
   private async requestCloud(

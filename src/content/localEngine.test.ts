@@ -119,4 +119,25 @@ describe('localEngine', () => {
     await localEngine.probe('ko', 'zh-tw');
     expect(localEngine.downloadablePairs()).toContainEqual({ src: 'ko', tgt: 'zh-tw' });
   });
+
+  // A burst arriving while the first create() loads the model used to start one
+  // creation per line.
+  it('creates the model of a pair once, however many lines arrive meanwhile', async () => {
+    let creates = 0;
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((r) => (release = r));
+    vi.stubGlobal('Translator', {
+      availability: () => Promise.resolve('available'),
+      create: async () => {
+        creates++;
+        await gate;
+        return { translate: (t: string) => Promise.resolve(`[${t}]`) };
+      },
+    });
+    await localEngine.probe('nl', 'da');
+    const lines = Promise.all(['een', 'twee', 'drie', 'vier'].map((w) => localEngine.translate('nl', 'da', w)));
+    release();
+    await lines;
+    expect(creates).toBe(1);
+  });
 });
