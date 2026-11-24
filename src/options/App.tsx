@@ -69,11 +69,14 @@ export function App() {
   }, [locale]);
 
   async function refresh() {
-    const settingsRes = await send({ type: 'settings.get' });
+    // Together: three round trips in a row made the page wait for the sum.
+    const [settingsRes, provRes, statsRes] = await Promise.all([
+      send({ type: 'settings.get' }),
+      send({ type: 'providers.status' }),
+      send({ type: 'stats.get' }),
+    ]);
     if (settingsRes.type === 'settings') setSettings(settingsRes.payload);
-    const provRes = await send({ type: 'providers.status' });
     if (provRes.type === 'providers') setProviders(provRes.payload);
-    const statsRes = await send({ type: 'stats.get' });
     if (statsRes.type === 'stats') setStats(statsRes.payload);
   }
 
@@ -134,7 +137,11 @@ export function App() {
             </p>
           </div>
           <div class="ms-auto flex items-center gap-3">
-            {savedAt && <span class="text-xs text-kick-primary">{t('saved')}</span>}
+            {/* Always in the DOM: a live region announces what lands in it, and
+                one that appears with its text is often not announced at all. */}
+            <span role="status" class="text-xs text-kick-primary">
+              {savedAt ? t('saved') : ''}
+            </span>
             <UiLangPicker value={settings.uiLang} onPick={(v) => void patch({ uiLang: v })} />
           </div>
         </header>

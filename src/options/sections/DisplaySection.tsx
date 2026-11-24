@@ -7,6 +7,8 @@ import { useT } from '~/shared/i18nContext';
 import { Check } from '../components/Check';
 import { Segmented } from '../components/Segmented';
 import {
+  applyAccent,
+  applyChatScheme,
   applyShowOriginal,
   applyTypography,
   ensureStyles,
@@ -301,6 +303,11 @@ function StylePreview({ settings }: { settings: Settings }) {
     // montre celle du lecteur, et un reglage de lisibilite qu'il faut aller
     // verifier ailleurs ne sera pas regle.
     applyTypography(settings);
+    // The accent is a pair of attributes on the root, and its colours only match
+    // under a scheme. The options page is dark, so that is the preview's scheme:
+    // "Always light" is not shown here (it would turn this whole page light).
+    applyChatScheme(document.body, 'dark');
+    applyAccent(settings.accent);
 
     el.textContent = '';
     const row = document.createElement('div');

@@ -275,3 +275,18 @@ describe('style cards at 320px', () => {
     expect(head.className).toContain('flex-wrap');
   });
 });
+
+// Picking Cyan, Violet or Amber changed nothing in the pinned preview, which is
+// there to answer "what does this look like".
+describe('accent in the preview', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('data-kt-accent');
+    document.documentElement.removeAttribute('data-kt-scheme');
+  });
+
+  it('puts the chosen accent on the page the preview is drawn under', () => {
+    mount({ accent: 'violet' });
+    expect(document.documentElement.getAttribute('data-kt-accent')).toBe('violet');
+    expect(document.documentElement.getAttribute('data-kt-scheme')).toBe('dark');
+  });
+});
