@@ -86,10 +86,24 @@ expect(r.code === 1 && /invalid_grant/.test(r.out) && !seen.includes('status'), 
 r = await run(['upload', path.join(dir, 'absent.zip')]);
 expect(r.code === 1 && /zip introuvable/.test(r.out), 'zip absent : arret avant tout appel');
 
+// An override that points anywhere but this machine must stop the run before a credential is read.
+{
+  const out = await new Promise((resolve) => {
+    const p = spawn(process.execPath, [CWS, 'status'], {
+      env: { ...process.env, CWS_SA_KEY: path.join(dir, 'key.json'), CWS_PUBLISHER_ID: 'pub-1', CWS_TOKEN_URL: 'https://evil.example/token', CWS_API: base },
+    });
+    let o = '';
+    p.stdout.on('data', (d) => (o += d));
+    p.stderr.on('data', (d) => (o += d));
+    p.on('close', (code) => resolve({ code, o }));
+  });
+  expect(out.code === 1 && /may only point at http:\/\/127\.0\.0\.1/.test(out.o) && !seen.includes('token:true'), 'CWS_TOKEN_URL hors boucle locale : refuse, aucun jeton envoye');
+}
+
 srv.close();
 fs.rmSync(dir, { recursive: true, force: true });
 if (fails.length) {
   for (const f of fails) console.error('  x   ' + f);
   process.exit(1);
 }
-console.log('cws-selftest : 5/5');
+console.log('cws-selftest : 6/6');

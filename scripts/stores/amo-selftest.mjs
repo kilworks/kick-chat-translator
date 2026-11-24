@@ -103,10 +103,22 @@ seen.length = 0;
 r = await run(['status'], 'wrong.json');
 expect(r.code === 1 && seen.includes('auth:false'), 'mauvais secret : refuse, sortie en erreur');
 
+// An override that points anywhere but this machine must stop the run before the JWT is built.
+{
+  const out = await new Promise((resolve) => {
+    const p = spawn(process.execPath, [AMO, 'status'], { env: { ...process.env, AMO_API_KEY: path.join(dir, 'key.json'), AMO_API: 'https://evil.example/api/v5' } });
+    let o = '';
+    p.stdout.on('data', (d) => (o += d));
+    p.stderr.on('data', (d) => (o += d));
+    p.on('close', (code) => resolve({ code, o }));
+  });
+  expect(out.code === 1 && /may only point at http:\/\/127\.0\.0\.1/.test(out.o), 'AMO_API hors boucle locale : refuse avant tout JWT');
+}
+
 srv.close();
 fs.rmSync(dir, { recursive: true, force: true });
 if (fails.length) {
   for (const f of fails) console.error('  x   ' + f);
   process.exit(1);
 }
-console.log('amo-selftest : 5/5');
+console.log('amo-selftest : 6/6');
