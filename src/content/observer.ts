@@ -72,6 +72,7 @@ export class ChatObserver {
 
   /** Single teardown path: both observers are dropped together or neither is. */
   private detach(): void {
+    this.misses = 0;
     // A pending poll is part of what is attached: left running, it attaches a
     // second pair of observers beside the next one (two reset() calls while the
     // list is missing, measured: three pairs left connected).
@@ -87,9 +88,11 @@ export class ChatObserver {
 
   private tryAttach(): void {
     if (!this.running) return;
-    const container = findChatContainer(document);
+    // A hidden tab has nobody to translate for: no scan, and the poll below backs off.
+    const container = document.hidden ? null : findChatContainer(document);
     if (container) {
       if (__KT_METRICS__) metrics.count('dom.attach');
+      this.misses = 0;
       this.attach(container);
       return;
     }
@@ -97,7 +100,13 @@ export class ChatObserver {
     // signal is a toast the user sees once the extension is already broken; this
     // is the same fact, an hour earlier, in a number that can be read on demand.
     if (__KT_METRICS__) metrics.count('dom.container.miss');
-    this.pollHandle = setTimeout(() => this.tryAttach(), 500);
+    // 500 ms for the first ten seconds, when a chat that is about to appear should
+    // be caught at once, then slower: a channel with no chat (offline, followers
+    // only) scanned the whole document twice a second for as long as the tab lived.
+    // A hidden tab does not count and waits 2 s, so coming back to it is not a 5 s lag.
+    const delay = document.hidden ? 2000 : this.misses < 20 ? 500 : this.misses < 40 ? 1000 : this.misses < 60 ? 2000 : 5000;
+    if (!document.hidden) this.misses += 1;
+    this.pollHandle = setTimeout(() => this.tryAttach(), delay);
   }
 
   private attach(container: Element): void {
@@ -199,6 +208,9 @@ export class ChatObserver {
       usernameGuess: username || undefined,
     });
   }
+
+  /** Polls in a row that found no chat. */
+  private misses = 0;
 
   cap(maxSeen = 5000): void {
     if (this.seenIds.size <= maxSeen) return;

@@ -166,3 +166,43 @@ describe('waiting for the list', () => {
     expect(vivants()).toHaveLength(0);
   });
 });
+
+// With no chat on the page (offline channel, followers only) the poll rescanned the
+// whole document twice a second for as long as the tab lived.
+describe('waiting for a chat that is not there', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    document.body.innerHTML = '<div id="channel-chatroom"></div>';
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('backs off, and still attaches the moment a chat appears', async () => {
+    const scans = vi.spyOn(document, 'querySelectorAll');
+    const obs = new ChatObserver(() => undefined);
+    obs.start();
+    await vi.advanceTimersByTimeAsync(10_000);
+    const firstTen = scans.mock.calls.length;
+    scans.mockClear();
+    await vi.advanceTimersByTimeAsync(10_000);
+    // Same wall time, fewer scans: it is on the 1 s step by now.
+    expect(scans.mock.calls.length).toBeLessThan(firstTen);
+    await vi.advanceTimersByTimeAsync(120_000);
+    scans.mockClear();
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(scans.mock.calls.length).toBeLessThan(firstTen / 3);
+    obs.stop();
+  });
+
+  it('does not scan the page while the tab is hidden', async () => {
+    vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    const scans = vi.spyOn(document, 'querySelectorAll');
+    const obs = new ChatObserver(() => undefined);
+    obs.start();
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(scans).not.toHaveBeenCalled();
+    obs.stop();
+  });
+});
