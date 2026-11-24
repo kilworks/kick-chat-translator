@@ -349,5 +349,7 @@ export function getProviderStatus(settings: Settings): ProviderStatus[] {
 
 export function anyProviderReady(settings: Settings): boolean {
   const ctx = buildContext(settings);
-  return eligibleOrder(settings, ctx).length > 0;
+  // eligibleOrder falls back to the cooling providers when none is live (translate
+  // itself relies on that), so "ready" means at least one is out of cooldown.
+  return eligibleOrder(settings, ctx).some((id) => health[id].cooldownUntilMs <= Date.now());
 }
