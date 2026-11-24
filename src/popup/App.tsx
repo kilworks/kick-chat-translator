@@ -313,7 +313,7 @@ export function App() {
                   )
                 }
               >
-                <option value="below">{t('Below original')}</option>
+                <option value="below">{t('Below')}</option>
                 <option value="inline">{t('Inline')}</option>
                 <option value="replace">{t('Replace')}</option>
                 <option value="hover">{t('On hover')}</option>

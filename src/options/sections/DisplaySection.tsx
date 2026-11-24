@@ -415,6 +415,8 @@ function RangeRow({
           max={max}
           step={step}
           value={value}
+          // "0.85" is what the screen reader read where the screen shows 85%.
+          aria-valuetext={format(value)}
           onInput={(e) => onChange(Number((e.target as HTMLInputElement).value))}
         />
         <span class="text-[12px] text-kick-muted tabular-nums w-10 text-end">

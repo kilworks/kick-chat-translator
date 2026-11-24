@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { NumberInput } from '../components/NumberInput';
 import { exportSettings, importSettings, type Settings } from '~/shared/settings';
 import { send } from '~/shared/messages';
 import { useT } from '~/shared/i18nContext';
@@ -102,18 +103,7 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
           hint={t('Larger = more hits across sessions, more disk space.')}
           live={remplissage}
           input={
-            <input
-              aria-label={t('Cache max entries')}
-              type="number"
-              class="kt-input"
-              min={100}
-              max={20000}
-              step={100}
-              value={settings.cacheMaxEntries}
-              onInput={(e) =>
-                onPatch({ cacheMaxEntries: Number((e.target as HTMLInputElement).value) })
-              }
-            />
+            <NumberInput label={t('Cache max entries')} min={100} max={20000} step={100} value={settings.cacheMaxEntries} onCommit={(v) => onPatch({ cacheMaxEntries: v })} />
           }
         />
         <Row
@@ -121,17 +111,7 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
           hint={t('Older translations are dropped and fetched again when needed.')}
           live={plusVieille}
           input={
-            <input
-              aria-label={t('Keep translations for (hours)')}
-              type="number"
-              class="kt-input"
-              min={1}
-              max={720}
-              value={settings.cacheTtlHours}
-              onInput={(e) =>
-                onPatch({ cacheTtlHours: Number((e.target as HTMLInputElement).value) })
-              }
-            />
+            <NumberInput label={t('Keep translations for (hours)')} min={1} max={720} value={settings.cacheTtlHours} onCommit={(v) => onPatch({ cacheTtlHours: v })} />
           }
         />
         <Row
@@ -143,17 +123,7 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
               : `${t('Requests sent through this limit:')} ${reseau.toLocaleString()}`
           }
           input={
-            <input
-              aria-label={t('Concurrent translations')}
-              type="number"
-              class="kt-input"
-              min={1}
-              max={16}
-              value={settings.concurrency}
-              onInput={(e) =>
-                onPatch({ concurrency: Number((e.target as HTMLInputElement).value) })
-              }
-            />
+            <NumberInput label={t('Concurrent translations')} min={1} max={16} value={settings.concurrency} onCommit={(v) => onPatch({ concurrency: v })} />
           }
         />
         <Row
@@ -169,17 +139,7 @@ export function AdvancedSection({ settings, onPatch, stats }: Props) {
                 : `${t('Messages held back by this cap:')} ${bloques.toLocaleString()}`
           }
           input={
-            <input
-              aria-label={t('Per-channel budget (req/min)')}
-              type="number"
-              class="kt-input"
-              min={10}
-              max={2000}
-              value={settings.perChannelBudgetPerMin}
-              onInput={(e) =>
-                onPatch({ perChannelBudgetPerMin: Number((e.target as HTMLInputElement).value) })
-              }
-            />
+            <NumberInput label={t('Per-channel budget (req/min)')} min={10} max={2000} value={settings.perChannelBudgetPerMin} onCommit={(v) => onPatch({ perChannelBudgetPerMin: v })} />
           }
         />
       </section>

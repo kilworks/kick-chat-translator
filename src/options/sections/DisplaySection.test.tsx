@@ -290,3 +290,13 @@ describe('accent in the preview', () => {
     expect(document.documentElement.getAttribute('data-kt-scheme')).toBe('dark');
   });
 });
+
+// A screen reader read "Text size 0.85" where the screen shows 85%.
+describe('sliders', () => {
+  it('say their value the way the screen does', () => {
+    const root = mount({});
+    const ranges = [...root.querySelectorAll<HTMLInputElement>('input[type=range]')];
+    expect(ranges.length).toBeGreaterThan(0);
+    for (const r of ranges) expect(r.getAttribute('aria-valuetext')).toMatch(/\S/);
+  });
+});

@@ -219,3 +219,36 @@ describe('one column for switches', () => {
     for (const s of switches) expect(s.hasAttribute('data-reverse'), s.textContent ?? '').toBe(true);
   });
 });
+
+// Typing a Lingva address saved "h" (refused as a URL), flashed "saved" on every
+// letter and showed the https warning from the first character.
+describe('Lingva address field', () => {
+  it('saves when the reader is done, and says what it holds only then', async () => {
+    const { act } = await import('preact/test-utils');
+    const patches: Partial<Settings>[] = [];
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    void act(() => render(<ProviderSection settings={defaultSettings()} providers={[]} onPatch={(p) => patches.push(p)} />, root));
+    const input = root.querySelector<HTMLInputElement>('#kt-lingva-url')!;
+    for (const text of ['h', 'ht', 'http://x.example']) {
+      await act(() => {
+        input.value = text;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    }
+    expect(patches).toEqual([]);
+    await act(() => void input.dispatchEvent(new Event('change', { bubbles: true })));
+    expect(patches).toEqual([{ lingvaInstance: 'http://x.example' }]);
+    // Hint and warning are tied to the field.
+    expect(input.getAttribute('aria-describedby')!.split(' ')).toHaveLength(2);
+    render(null, root);
+  });
+
+  it('keeps a password manager away from the DeepL key', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    render(<ProviderSection settings={{ ...defaultSettings(), providerOrder: ['deepl', 'google'] }} providers={[]} onPatch={() => {}} />, root);
+    expect(root.querySelector('input[aria-label="API key"]')?.getAttribute('autocomplete')).toBe('off');
+    render(null, root);
+  });
+});
