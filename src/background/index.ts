@@ -272,7 +272,8 @@ void lockStorage();
 
 /** Content scripts cannot watch storage any more: say it, they ask for the settings. */
 async function tellTabs(): Promise<void> {
-  const tabs = await chrome.tabs.query({ url: chrome.runtime.getManifest().content_scripts?.[0]?.matches ?? [] }).catch(() => []);
+  // No url filter: it drops www.kick.com, which the manifest does not list as a host. A tab without the script is a swallowed error.
+  const tabs = await chrome.tabs.query({}).catch(() => []);
   for (const tab of tabs) {
     if (tab.id !== undefined) void chrome.tabs.sendMessage(tab.id, { type: SETTINGS_CHANGED }).catch(() => undefined);
   }

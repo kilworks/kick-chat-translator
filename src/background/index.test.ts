@@ -116,7 +116,7 @@ async function loadWorker(
     alarms: { create: (name: string) => void alarms.push(name), get: async () => undefined, onAlarm: { addListener: () => undefined } },
     commands: { onCommand: { addListener: () => undefined } },
     tabs: {
-      query: async () => [{ id: 7 }],
+      query: async (q: { url?: unknown }) => (q.url ? [] : [{ id: 7 }]), // a url filter drops a host the manifest does not grant
       sendMessage: async (tab: number, msg: unknown) => void told.push({ tab, msg }),
     },
     scripting: { executeScript: async () => [] },

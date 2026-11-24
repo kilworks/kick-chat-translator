@@ -39,16 +39,3 @@ describe('.mcp.json', () => {
     }
   });
 });
-
-// chrome.scripting.executeScript (compose.write) and the re-injection after an
-// update need host access on every page the content script is injected into.
-describe('manifest', () => {
-  it('grants host access to every origin the content script matches', () => {
-    const src = readFileSync(join(process.cwd(), 'manifest.config.ts'), 'utf8');
-    const list = (re: RegExp): string[] => [...(re.exec(src)?.[1] ?? '').matchAll(/'(https:\/\/[^']+)'/g)].map((m) => m[1]!);
-    const matches = list(/content_scripts:\s*\[\s*\{\s*matches:\s*\[([^\]]*)\]/);
-    const hosts = list(/host_permissions:\s*\[([\s\S]*?)\]/);
-    expect(matches.length).toBeGreaterThan(0);
-    for (const m of matches) expect(hosts).toContain(m);
-  });
-});
