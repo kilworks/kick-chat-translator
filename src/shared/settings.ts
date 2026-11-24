@@ -279,19 +279,17 @@ export async function resetSettings(): Promise<Settings> {
  *
  * The export blanks them (a settings file goes to Discord threads and GitHub
  * issues) and an import never replaces them: the key and the email are credentials,
- * the Lingva server receives every chat line, the channel and user lists say what
- * someone watches, and the two consent flags are an answer only that person gives.
+ * the Lingva server receives every chat line, and the two consent flags are an
+ * answer only that person gives.
+ *
+ * The channel and user lists are NOT here: they are the reader's own configuration,
+ * and "export, reset, import" has to give them back. They travel in the file, so a
+ * file is worth a look before it is shared, and an imported one before it is applied.
  */
 const DEVICE_ONLY = [
   'deeplApiKey',
   'lingvaInstance',
   'myMemoryEmail',
-  'whitelistChannels',
-  'blacklistChannels',
-  'channelLangs',
-  'pausedChannels',
-  'blacklistUsers',
-  'extraBots',
   'usageStats',
   'usageStatsAsked',
 ] as const;

@@ -16,10 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sync storage to trusted contexts, tabs ask it instead, and it tells them when
   settings change. Firefox has no such switch, the key is still never sent to a
   tab there.
-- **Settings files keep to what can be shared.** An export leaves out the
-  MyMemory email, the Lingva address, the channel and user lists. An import no
-  longer carries a DeepL key, the usage statistics choice, the email or those
-  lists over this device's own.
+- **Settings files keep credentials and consent on the device.** An export leaves
+  out the MyMemory email and the Lingva address (as before, the DeepL key). An
+  import no longer carries a DeepL key, the usage statistics choice, the email
+  or the Lingva address over this device's own. Channel and user lists stay in
+  the file, so a restore gives them back.
 - **The worker checks what a page sends**: request shape and size, channel
   names, usage counts, locale names, and the number of channel buckets.
 - **Releases only ship commits that are on master**, install without running

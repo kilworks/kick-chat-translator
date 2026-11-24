@@ -138,8 +138,8 @@ Display.
 - **Filters**: bots, users, channels, keywords (matched as whole words), source languages, and a glossary of
   replacements
 - **Advanced**: cache size and lifetime, concurrent requests, a per-channel rate limit, backup and restore
-  (the file never holds your DeepL key, MyMemory email, Lingva address, channel lists or user lists, and importing one
-  keeps all of them, and your usage statistics choice, as they are on this device)
+  (the file never holds your DeepL key, MyMemory email or Lingva address, and importing one keeps those, and your
+  usage statistics choice, as they are on this device; it does hold your channel and user lists, so read it before sharing)
 - **Activity**: messages translated, cache hits, every language seen in chat, and why each of the last 50
   lines was translated or left alone
 - **Keyboard**: Alt+T turns chat translation on or off, Alt+W the compose preview
