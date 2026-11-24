@@ -133,7 +133,9 @@
 .kt-error:hover .kt-retry,
 /* Focus reveals it too, or tabbing to it lands on nothing visible. */
 .kt-retry:focus-visible {
-  opacity: 0.7;
+  /* 1, not 0.7: at 0.63 effective alpha the glyph read 2.7 to 2.9:1 in the light
+     and cyan/amber themes, under the 3:1 of WCAG 1.4.11. */
+  opacity: 1;
 }
 .kt-retry:focus-visible {
   outline: 2px solid var(--kt-green);
@@ -146,7 +148,7 @@
    at zero opacity with no way to reach it. */
 @media (hover: none) {
   .kt-retry {
-    opacity: 0.7;
+    opacity: 1;
   }
 }
 .kt-retry:hover {
@@ -1481,6 +1483,14 @@ html[data-kt-scheme='light'] .kt-chip[data-mode='error'] {
    stays at 12px), set back by colour only. */
 .kt-lang-native {
   color: var(--kt-lp-muted);
+}
+/* On the hovered or focused row the muted step falls to 3.81:1 (dark): the name
+   is read while the pointer is on it, so it takes the secondary text colour. */
+.kt-lang-row:hover .kt-lang-native,
+.kt-lang-row:focus-visible .kt-lang-native,
+.kt-chip-row:hover .kt-lang-native,
+.kt-chip-row:focus-visible .kt-lang-native {
+  color: var(--kt-text-2);
 }
 
 /* Le liseré des drapeaux vient de flags.css, calibre pour une surface sombre :

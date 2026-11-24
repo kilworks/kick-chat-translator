@@ -556,3 +556,30 @@ describe('the composer chip draws the same edge as the bar button', () => {
     expect(rule('pinned')).toMatch(/background:\s*var\(--kt-green-bed\)/);
   });
 });
+
+// "OFF" was the English word in every interface language; the sentence lives in
+// the title and the accessible name, which the catalogue does translate.
+describe('the composer chip when translation is paused', () => {
+  it('shows a glyph, not an English word, and names itself in words', () => {
+    const { composer } = makeComposerRow();
+    mountLangChip(composer, state({ mode: 'off' }), noop);
+    const chip = document.querySelector<HTMLElement>('.kt-chip')!;
+    expect(chip.textContent).not.toContain('OFF');
+    expect(chip.getAttribute('aria-label')).toBe('Translation paused');
+  });
+});
+
+// Two contrast misses the audit measured: the native name on the hovered row
+// (3.81:1 dark) and the retry arrow once revealed (about 2.9:1 light).
+describe('contrast states in inject.css', () => {
+  const css = readFileSync('src/content/inject.css', 'utf8');
+  it('lifts the native name on a hovered or focused language row', () => {
+    expect(css).toMatch(/\.kt-lang-row:hover \.kt-lang-native[^{]*\{\s*color:\s*var\(--kt-text-2\)/);
+    expect(css).toMatch(/\.kt-chip-row:focus-visible \.kt-lang-native[^{]*\{\s*color:\s*var\(--kt-text-2\)/);
+  });
+  it('shows the retry arrow at full strength once revealed', () => {
+    const rule = css.match(/\.kt-retry:focus-visible\s*\{[^}]*opacity:\s*([\d.]+)/);
+    expect(rule?.[1]).toBe('1');
+    expect(css).not.toMatch(/\.kt-retry\s*\{\s*opacity:\s*0\.7/);
+  });
+});
