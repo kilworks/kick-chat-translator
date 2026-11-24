@@ -16,7 +16,7 @@ import { ecrireAutourDesEmotes } from './lexicalWrite';
 import { CHAT_MESSAGES } from '~/content/i18n';
 import { lockStorage } from './lockStorage';
 import { getHint, getLastLang, setHint, setLastLang } from './pageStore';
-import { addUsage, dropUsage, installUsage, recordProviderError, recordTranslation } from './usage';
+import { addUsage, dropUsage, installUsage, recordProviderError, recordTranslation, syncUsageAlarm } from './usage';
 import type { ProviderId, TranslationOutcome, TranslationRequest } from '~/shared/types';
 
 const log = rootLogger.child('sw');
@@ -69,6 +69,7 @@ function applySettings(next: Settings): void {
   // Consent withdrawn: the day counted so far goes with it.
   if (settings.usageStats && !next.usageStats) void dropUsage();
   settings = next;
+  syncUsageAlarm(next);
   cache.setConfig(next.cacheMaxEntries, next.cacheTtlHours * 3_600_000);
   for (const b of channelBuckets.values()) {
     b.setRate(next.perChannelBudgetPerMin, next.perChannelBudgetPerMin);
@@ -223,6 +224,9 @@ async function init(): Promise<void> {
   }
 }
 
+// Counts are written every few seconds, not on every line: this is the last chance
+// before the browser stops an idle worker.
+chrome.runtime.onSuspend?.addListener(() => void stats.flush());
 // Top level, before anything awaits: see listenKeepalive.
 listenKeepalive();
 chrome.alarms.onAlarm.addListener((alarm) => {

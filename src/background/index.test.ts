@@ -32,6 +32,7 @@ vi.mock('./updateChecker', () => ({
 }));
 vi.mock('./usage', () => ({
   installUsage: () => undefined,
+  syncUsageAlarm: () => undefined,
   addUsage: async () => undefined,
   dropUsage: async () => undefined,
   recordProviderError: async () => undefined,

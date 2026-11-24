@@ -161,3 +161,36 @@ describe('update badge on the toolbar icon', () => {
     expect(running.alarms.create).not.toHaveBeenCalled();
   });
 });
+
+// A store copy never checks, yet the six-hour alarm woke the worker four times a day.
+describe('the six-hour alarm', () => {
+  function withAlarms(id: string) {
+    const created: string[] = [];
+    const cleared: string[] = [];
+    vi.stubGlobal('fetch', vi.fn());
+    vi.stubGlobal('chrome', {
+      runtime: { id, getManifest: () => ({ version: '2.8.0' }) },
+      storage: { local: { get: async () => ({}), set: async () => undefined } },
+      alarms: {
+        get: async () => undefined,
+        create: async (n: string) => void created.push(n),
+        clear: async (n: string) => void cleared.push(n),
+        onAlarm: { hasListener: () => false, addListener: () => undefined },
+      },
+    });
+    return { created, cleared };
+  }
+
+  it('is not created for a store install, and one left by an older build is cleared', () => {
+    const { created, cleared } = withAlarms(CHROME_STORE_ID);
+    installUpdateCheck();
+    expect(created).toEqual([]);
+    expect(cleared).toHaveLength(1);
+  });
+
+  it('is still created for a zip install, which has no store to update it', () => {
+    const { created } = withAlarms('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz');
+    installUpdateCheck();
+    return Promise.resolve().then(() => expect(created).toHaveLength(1));
+  });
+});

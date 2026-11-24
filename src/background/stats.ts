@@ -37,6 +37,13 @@ export function archiveDay(prev: UsageStats, keep: number = HISTORY_DAYS): DaySt
   return [...prior, entry].slice(-keep);
 }
 
+/**
+ * How long counts wait in memory before one write. Every storage write also wakes
+ * an onChanged listener in every extension context, and a busy chat made about
+ * 2,400 a day-hour of them at 1.5 s. The popup reads the memory, not the disk.
+ */
+const STATS_FLUSH_MS = 15_000;
+
 export class StatsTracker {
   private state: UsageStats = empty();
   private dirty = false;
@@ -108,7 +115,16 @@ export class StatsTracker {
     this.flushHandle = setTimeout(() => {
       this.flushHandle = undefined;
       if (this.dirty) void this.persist();
-    }, 1500);
+    }, STATS_FLUSH_MS);
+  }
+
+  /** Write what is pending now: the worker is about to stop, and the timer would not outlive it. */
+  async flush(): Promise<void> {
+    if (this.flushHandle) {
+      clearTimeout(this.flushHandle);
+      this.flushHandle = undefined;
+    }
+    if (this.dirty) await this.persist();
   }
 
   private async persist(): Promise<void> {
