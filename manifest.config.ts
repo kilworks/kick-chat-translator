@@ -72,6 +72,9 @@ export default defineManifest({
   permissions: ['storage', 'alarms', 'scripting'],
   host_permissions: [
     'https://kick.com/*',
+    // The content script matches www too: executeScript and the tab re-injection
+    // need the permission on every page it runs on.
+    'https://www.kick.com/*',
     'https://translate.googleapis.com/*',
     'https://api-free.deepl.com/*',
     'https://api.deepl.com/*',
