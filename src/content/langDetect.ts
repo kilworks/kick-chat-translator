@@ -2431,7 +2431,25 @@ function cantonaisOuChinois(text: string): string | undefined {
 }
 
 /** Unicode script → language mapping. More reliable than franc on short texts. */
-function detectByScript(text: string): string | undefined {
+// A name or a link says nothing about the language of the sentence around it: a Chinese
+// line that addresses a viewer whose name is in kana was read as Japanese.
+const MENTION_OR_URL = /[@＠][^\s,.!?，。！？]{1,40}|https?:\/\/\S+/g;
+
+/** Kana LETTERS. The middle dot, the long-vowel mark and the combining marks are not letters of Japanese alone. */
+function isKanaLetter(c: number): boolean {
+  return (
+    (c >= 0x3041 && c <= 0x3096) || (c >= 0x309d && c <= 0x309f) || (c >= 0x30a1 && c <= 0x30fa) || (c >= 0x30fd && c <= 0x30ff) ||
+    (c >= 0x31f0 && c <= 0x31ff) || (c >= 0xff66 && c <= 0xff6f) || (c >= 0xff71 && c <= 0xff9d)
+  );
+}
+/** Marks Chinese writes too: counted in the total so a kana plus a long-vowel mark keeps two characters, never counted as kana. */
+function isKanaMark(c: number): boolean {
+  return c === 0x30fb || c === 0x30fc || c === 0x30a0 || (c >= 0x3099 && c <= 0x309c) || c === 0xff70;
+}
+
+function detectByScript(input: string): string | undefined {
+  const text = input.replace(MENTION_OR_URL, ' ');
+  let kanaMarks = 0;
   // Count non-ASCII, non-space chars by script range.
   let han = 0; // CJK ideographs — ambiguous between Chinese and Japanese
   let kana = 0; // hiragana / katakana — exclusive to Japanese
@@ -2463,7 +2481,8 @@ function detectByScript(text: string): string | undefined {
   for (const ch of text) {
     const c = ch.codePointAt(0)!;
     if (c <= 0x7f || /\s/.test(ch)) continue;
-    if (c >= 0x3040 && c <= 0x30ff) kana++;
+    if (isKanaLetter(c)) kana++;
+    else if (isKanaMark(c)) kanaMarks++;
     else if ((c >= 0x3400 && c <= 0x9fff) || (c >= 0xf900 && c <= 0xfaff)) han++;
     // Syllables, plus the compatibility jamo Korean chat writes on their own
     // (ㅋㅋ, ㅠㅠ, ㅇㅇ). Sans eux, une ligne de jamo nus ne nourrit aucune ecriture
@@ -2499,7 +2518,7 @@ function detectByScript(text: string): string | undefined {
   // tombait pareil et franc reprenait la main pour repondre PERSAN sur de
   // l'arabe. Un chat sans emoji n'existe pas, donc ce n'etait pas un cas limite.
   const total =
-    kana + han + hangul + arabic + hebrew + cyrillic + thai + devanagari + bengali + tamil + greek;
+    kana + kanaMarks + han + hangul + arabic + hebrew + cyrillic + thai + devanagari + bengali + tamil + greek;
   // Le plancher reste a deux, et c'est lui qui empeche un seul caractere
   // etranger de voler une ligne latine : un homoglyphe cyrillique dans un mot
   // anglais compte 1, et a un plancher de 1 la ligne entiere devient russe.

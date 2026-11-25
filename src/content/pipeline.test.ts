@@ -265,15 +265,28 @@ describe('TranslationPipeline, the last decisions are kept for the Debug tab', (
   // for. They used to share a wording, so the Debug tab showed two verdicts for
   // what looked like one case.
   it('tells what it decided itself apart from what the service decided', async () => {
-    // Our detector reads this as Japanese, so it goes out to the service, which
+    // Our detector reads this as Spanish, so it goes out to the service, which
     // then reports the source was English, which is the reading language.
     sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: true, result: { translatedText: 'x', detectedLang: 'en', provider: 'google' } } });
     const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'en', pauseWhenHidden: false, ignoreEnglish: true, minTextLength: 5 });
-    await p.onDomMessage(liveMsg(JP));
+    await p.onDomMessage(liveMsg('hola amigos'));
     await flush();
     const outcome = p.recentDecisions()[0]?.outcome ?? '';
     expect(outcome).toMatch(/translation service/i);
     expect(outcome).not.toBe('it is already in your language');
+  });
+
+  // The service answers `en` for much short traditional Chinese. A line with a letter
+  // English does not write is not English, whoever says so, so it is still shown.
+  it('does not delete a Japanese or Chinese line because the service called it English', async () => {
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: true, result: { translatedText: 'x', detectedLang: 'en', provider: 'google' } } });
+    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'en', pauseWhenHidden: false, ignoreEnglish: true, minTextLength: 2 });
+    await p.onDomMessage(liveMsg(JP));
+    await p.onDomMessage(liveMsg('這個問題很難'));
+    await flush();
+    const outcomes = p.recentDecisions().map((d) => d.outcome);
+    expect(outcomes).toHaveLength(2);
+    for (const o of outcomes) expect(o).not.toMatch(/translation service|already in your language/i);
   });
 
   // The table shows one line and hangs the rest on the hover, so the ring has to

@@ -109,6 +109,27 @@ export function isSameLanguageAsTarget(detected: string | undefined, target: str
   return baseLang(detected) === baseLang(target);
 }
 
+/**
+ * An English verdict that the line contradicts is not evidence. The engine answers
+ * `en` for much short traditional Chinese, and a line with a letter English does not
+ * write cannot be English. Returning undefined lets the caller fall back to `auto`,
+ * which only lifts a deletion and never adds one.
+ */
+export function trustedVerdict(verdict: string | undefined, text: string): string | undefined {
+  if (verdict && baseLang(verdict) === 'en' && hasNonEnglishLetter(text)) return undefined;
+  return verdict;
+}
+
+/** Gate 1: a confident local answer naming the reader's language ends the line before any request. */
+export function skipOnHint(hint: string | undefined, target: string): boolean {
+  return isSameLanguageAsTarget(hint, target);
+}
+
+/** Gate 2: the answer the engine sent back names the reader's language (only when the reader skips such lines). */
+export function skipOnVerdict(verdict: string | undefined, target: string, ignoreEnglish: boolean): boolean {
+  return isSameLanguageAsTarget(verdict, target) && ignoreEnglish;
+}
+
 const EMOJI_OR_SYMBOL = /[\p{Emoji_Presentation}\p{Extended_Pictographic}\p{P}\p{S}\s]/u;
 
 /**
