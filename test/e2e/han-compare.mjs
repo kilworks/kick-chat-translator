@@ -93,7 +93,7 @@ function rng(seed) {
 }
 const units = [...new Set(ref.map((r) => r.unit))];
 const idx = new Map(units.map((u, i) => [u, i]));
-for (const reader of ['en', 'ja']) {
+for (const reader of READERS) {
   const d = new Float64Array(units.length);
   ref.forEach((r, i) => { d[idx.get(r.unit)] += cost(contrib(cand[i], reader)) - cost(contrib(r, reader)); });
   const rnd = rng(0);
