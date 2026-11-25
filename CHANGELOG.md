@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Lines in Han-script languages are no longer deleted or sent with the wrong language.** An engine verdict of English is ignored when the line carries a letter English does not write (the service answers English for much short traditional Chinese), kana inside a mention or a link no longer makes a Chinese line Japanese, the middle dot and the long-vowel mark are not counted as kana, half-width katakana counts, the traditional-character table is replaced by the most frequent traditional characters, two characters shared with Japanese are no longer read as Chinese-only, bopomofo reads as traditional Chinese, and a short list of Chinese function characters reads as Chinese. Counts and limits: `docs/han-detection.md`.
+
 ### Security
 
 - **Storage is closed to the page's scripts on Chrome.** The DeepL key and the

@@ -90,3 +90,15 @@ Cantonese gold, so nothing here measures Cantonese.
   0.011 to 0.011), `W` and `S` unchanged in every cell. The `zh` list cell 468 to 461, the three-language Chinese list
   101 to 94. Costs on the Tatoeba bench: 13 traditional lines and 1 Cantonese line now read as `zh` (3 to 17 wrong
   answers of 5,037), and a Cantonese line made of shared characters plus one of the 18 reads as `zh`.
+
+## Second change: tables and bopomofo, on `design`, without engine verdicts
+
+Reference: the code after the first change. Counts over all 3,608 lines.
+
+- Japanese han-only lines read as Chinese: 3.2 percent to 1.1 percent. Silence on han-only Chinese lines: 58.3 percent to 56.6 percent after the table swap.
+- `S`: Japanese class 20 to 16. `W` of the Chinese readers on Japanese lines 39 to 35; the `zh,zh-tw,yue` list 179 to 168 then 166; the `ja` reader on Chinese lines 6 to 7 (within the 2-line limit).
+- Reported without a criterion: the Chinese-only list deletes more lines, 773 to 790 after the tables and 798 after bopomofo, because more lines are now read as Chinese.
+- Cost per unit, paired: `en` -0.158 [-0.295, -0.037], `zh` -0.495 [-0.928, -0.114] for the tables; every reader below 0 for bopomofo.
+- Known price: the 11 traditional Tatoeba lines the old table recognised only through characters that left it are now answered by the fallback as simplified Chinese.
+
+The held-out set was not read for this change: the engine verdict collection was cut by a rate limit. This change stays a draft until it is.
