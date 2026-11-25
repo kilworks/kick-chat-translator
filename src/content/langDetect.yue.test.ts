@@ -46,7 +46,7 @@ describe('standard Chinese is read by its script, not mistaken for Cantonese', (
   // These used to come back undefined and franc then called every one of them
   // `zh`, traditional included. The script rule answers them now.
   it('names traditional characters as traditional', () => {
-    for (const line of ['這個位置真的很好', '他們去哪裡了', '我學會了開車']) {
+    for (const line of ['當然位置真的很好', '他們去哪裡了', '我學會了開車']) {
       expect(confidentLanguage(line), line).toBe('zh-tw');
     }
   });
@@ -76,7 +76,7 @@ describe('standard Chinese is read by its script, not mistaken for Cantonese', (
   // unrelated words. Six lines built on that defect took four markers out of the
   // rule; these are the ones that stayed out.
   it('is not fooled by a marker straddling two unrelated words', () => {
-    expect(confidentLanguage('反而家裡更安靜')).toBeUndefined(); // 反而 + 家裡
+    expect(confidentLanguage('反而家裡更安靜')).toBe('zh-tw'); // 反而 + 家裡: not yue, and 裡 is traditional
     expect(confidentLanguage('我依家長的意思去做')).toBeUndefined(); // 依 + 家長
     expect(confidentLanguage('大家一起食飯吧')).toBeUndefined(); // Taiwanese Mandarin writes 食飯 too
   });
@@ -102,14 +102,13 @@ describe('what the rule deliberately does not catch', () => {
     expect(confidentLanguage('收皮啦你')).toBeUndefined();
   });
 
-  // A Cantonese line with no Cantonese marker left in it is, by what is written,
-  // standard Chinese in traditional characters, and the script rule now names it
-  // that. Measured against the real engine before accepting the trade: on this
-  // line and three others, sl=zh-TW and sl=auto return the identical
-  // translation, so naming the script costs nothing and the 120 traditional
-  // lines it fixes are pure gain.
-  it('falls back to the script when the Cantonese markers are all gone', () => {
-    expect(confidentLanguage('幾時再開台')).toBe('zh-tw');
+  // A Cantonese line with no Cantonese marker left in it is standard Chinese in
+  // traditional characters, and the script rule names it when it carries a
+  // character only the traditional writing uses. This line no longer does: the
+  // open character left the traditional table (Japanese writes it the same), so
+  // it carries no marker of either writing and stays unnamed.
+  it('stays unnamed when the Cantonese markers are gone and no script marker is left', () => {
+    expect(confidentLanguage('幾時再開台')).toBeUndefined();
   });
 
   // The two-character floor in detectByScript predates this and still applies: a

@@ -31,7 +31,7 @@ describe('les ecritures non latines, sur du chat', () => {
 
   it('ne se trompe plus une seule fois sur cent dix', () => {
     // 97 / 13 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
-    expect(plain(SURE.total)).toEqual({ right: 98, silent: 12, wrong: 0 });
+    expect(plain(SURE.total)).toEqual({ right: 97, silent: 13, wrong: 0 });
   });
 
   // LES DEUX ERREURS ETAIENT DU PERSAN ECRIT ENTIEREMENT AVEC LE JEU ARABE,
@@ -64,7 +64,7 @@ describe('les ecritures non latines, sur du chat', () => {
   // le piege documente en tete de `cantonaisOuChinois`. Quatre lignes sur dix
   // restent donc muettes et deux d'entre elles le resteront.
   it('lit le chinois traditionnel sur du chat, ce qu il ne faisait pas', () => {
-    expect(parLangue('zh-tw')).toBe(6);
+    expect(parLangue('zh-tw')).toBe(5);
   });
 
   // La limite qui reste, et elle est irreductible au niveau du caractere : une

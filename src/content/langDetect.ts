@@ -2371,7 +2371,7 @@ function cyrilliqueQuelleLangue(text: string): string | undefined {
  * particule finale la plus courante du chinois standard.
  */
 const CARACTERES_CANTONAIS =
-  /[唔嘅喺咗哋佢啲嘢冇嗰嚟㗎乜攰嘥噉喎嘞咁睇諗嗮畀冚瞓啱嬲攞搵唞嚿冧揼孭喐嗌]|(?<!咩)咩(?!咩)|\u{282E2}/u;
+  /[唔嘅喺咗哋佢啲嘢冇嗰嚟㗎乜攰嘥噉喎嘞咁睇諗嗮畀冚瞓啱攞搵唞嚿冧揼孭喐嗌]|(?<!咩)咩(?!咩)|\u{282E2}/u;
 const MOTS_CANTONAIS =
   /點解|點樣|邊個|邊度|得閒|屋企|傾偈|靚仔|靚女|鍾意|呢[個度啲隻件間排粒張本]/u;
 
@@ -2412,9 +2412,9 @@ const MOTS_CANTONAIS =
  * traditionnelle. Inverser les deux tests rendrait `zh-tw` sur du cantonais.
  */
 const CARACTERES_TRADITIONNELS =
-  /[這們麼說來對樣學實發應經覺讀體萬與樂區醫點關會單賣輕轉邊團圖廣壓國兩驗歲聲總濟開聽權氣灣嗎]/u;
+  /[沒會嗎麼點樣說對覺們邊實寶戲圖經關錢搶氣應兩當變發單裡聽續歡體內讓戰壞隨幫裝國團惡轉虧學樂]/u;
 const CARACTERES_SIMPLIFIES =
-  /[这们么说对样实发应经觉读乐卖轻转边团图广压两验岁声总济开关听权气湾吗]/u;
+  /[这们么说对样实发应经觉读乐卖轻转边团图广压两验岁总济开关听权气吗]/u;
 
 function cantonaisOuChinois(text: string): string | undefined {
   if (CARACTERES_CANTONAIS.test(text) || MOTS_CANTONAIS.test(text)) return 'yue';

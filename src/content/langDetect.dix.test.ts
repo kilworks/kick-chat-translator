@@ -103,7 +103,7 @@ describe('le chinois passe par franc, pas par la table', () => {
   // exactement la meme traduction. Annoncer l'ecriture ne coute rien.
   it('ne nomme que ce que son ecriture nomme', () => {
     const nommees = CHINOIS.filter((t) => confidentLanguage(t) !== undefined);
-    expect(nommees).toHaveLength(9);
+    expect(nommees).toHaveLength(8);
     expect([...new Set(CHINOIS.map((t) => confidentLanguage(t)))]).toEqual(['zh', undefined]);
   });
 
