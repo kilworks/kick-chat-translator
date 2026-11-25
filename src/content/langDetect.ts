@@ -2454,6 +2454,7 @@ function detectByScript(input: string): string | undefined {
   let han = 0; // CJK ideographs — ambiguous between Chinese and Japanese
   let kana = 0; // hiragana / katakana — exclusive to Japanese
   let hangul = 0;
+  let bopomofo = 0; // phonetic letters of Taiwan, counted as han too
   let arabic = 0;
   let cyrillic = 0;
   // L'hebreu est aussi peu ambigu que l'arabe depuis son ecriture, et il
@@ -2483,7 +2484,10 @@ function detectByScript(input: string): string | undefined {
     if (c <= 0x7f || /\s/.test(ch)) continue;
     if (isKanaLetter(c)) kana++;
     else if (isKanaMark(c)) kanaMarks++;
-    else if ((c >= 0x3400 && c <= 0x9fff) || (c >= 0xf900 && c <= 0xfaff)) han++;
+    else if ((c >= 0x3105 && c <= 0x312f) || (c >= 0x31a0 && c <= 0x31bf)) {
+      han++;
+      bopomofo++;
+    } else if ((c >= 0x3400 && c <= 0x9fff) || (c >= 0xf900 && c <= 0xfaff)) han++;
     // Syllables, plus the compatibility jamo Korean chat writes on their own
     // (ㅋㅋ, ㅠㅠ, ㅇㅇ). Sans eux, une ligne de jamo nus ne nourrit aucune ecriture
     // et le denominateur ci-dessous vaut zero, donc plus rien n'est lu. Ce
@@ -2530,7 +2534,8 @@ function detectByScript(input: string): string | undefined {
   // franc so Chinese isn't mislabelled as Japanese.
   if (kana > 0) return 'ja';
   if (pct(hangul)) return 'ko';
-  if (pct(han)) return cantonaisOuChinois(text);
+  // Bopomofo is written in Taiwan only; a Cantonese marker still wins over it.
+  if (pct(han)) return bopomofo > 0 && hangul === 0 ? (cantonaisOuChinois(text) === 'yue' ? 'yue' : 'zh-tw') : cantonaisOuChinois(text);
   if (pct(arabic)) return arabeOuPersan(text);
   if (pct(hebrew)) return 'he';
   if (pct(greek)) return 'el';

@@ -44,3 +44,18 @@ describe('han script layer: simplified and traditional tables', () => {
     expect(confidentLanguage('你別嬲了')).toBeUndefined();
   });
 });
+
+describe('han script layer: bopomofo', () => {
+  it('reads bopomofo letters as traditional Chinese', () => {
+    expect(confidentLanguage('\u310f\u310f')).toBe('zh-tw'); // two phonetic letters, nothing else
+    expect(confidentLanguage('\u4f60\u597d\u3105')).toBe('zh-tw'); // a phonetic letter among han with no marker
+    expect(confidentLanguage('\u31a0\u31a1')).toBe('zh-tw'); // extended block U+31A0
+  });
+  it('keeps a Cantonese marker ahead of bopomofo', () => {
+    expect(confidentLanguage('\u5514\u3105\u3105')).toBe('yue');
+  });
+  it('does not take bopomofo for Japanese or Korean writing', () => {
+    expect(confidentLanguage('\u3042\u3044\u3105')).toBe('ja'); // kana wins
+    expect(confidentLanguage('\uac00\uac01\uac02\u3105')).toBe('ko'); // hangul wins
+  });
+});
