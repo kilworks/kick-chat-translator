@@ -3,12 +3,13 @@
 //   node test/e2e/han-compare.mjs ref.json cand.json [--only-answered]
 import { readFileSync } from 'node:fs';
 
-const [refPath, candPath] = process.argv.slice(2);
+const [refPath, candPath] = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const load = (p) => JSON.parse(readFileSync(p, 'utf-8')).rows;
 let ref = load(refPath);
 let cand = load(candPath);
 if (ref.length !== cand.length) throw new Error('row count differs');
-const keep = ref.map((r, i) => r.hasVerdict && cand[i].hasVerdict);
+// Default: every row (the verdict gate sees no answer on rows without one). --answered keeps only rows with a stored engine verdict.
+const keep = ref.map((r, i) => !process.argv.includes('--answered') || (r.hasVerdict && cand[i].hasVerdict));
 ref = ref.filter((_, i) => keep[i]);
 cand = cand.filter((_, i) => keep[i]);
 

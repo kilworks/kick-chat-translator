@@ -57,3 +57,15 @@ or fewer than 200 lines, or fewer than 10 units carrying lines the criterion con
 The `frais` reading happens once, after the code freeze: each prefix of the second change set against the code after the
 first one. The second change set is the longest prefix with no FAIL; later steps are removed by removal commits, never by a
 second reading. Any change after the reading invalidates it for that change.
+
+## First change: results on `design`
+
+Reference: the extraction commit. Candidate: the engine-verdict guard and the mention and mark fixes. Engine verdicts exist for 1,133 of the 3,608 lines (the collection was cut by a rate limit), so the verdict gate is scored on those 1,133 only and the rest of the table on all 3,608 lines; the held-out set is not read for this change.
+
+- `W` (deleted although not in the reader's language), `en` reader: 329 to 0 over the lines answered (14 Japanese, 315 Chinese). Every other reader and list cell: no rise above 1 line (`ja,ko` list on Korean 49 to 50; `zh` lists down 4 to 2).
+- `S` (wrong source hint): Chinese class 6 to 3, no class up. Silence on han-only Chinese 0.581 to 0.583; leak of han-only Japanese read as Chinese 0.032 to 0.032.
+- Cost, paired bootstrap by unit (202 units): `en` reader mean change per unit -16.35, 95 percent interval [-22.98, -10.15]; `ja` reader -0.218, [-0.510, -0.005].
+- `K` of the `en` reader on Latin lines: 34 to 34 and 20 to 20 (no rise).
+- Speed: median 0.96 and p95 1.02 times the reference (three alternated runs). Weight: content.js gzip 99,330 to 99,564 bytes.
+- Parity of the bench with the pipeline: 53 lines, identical decisions. Real Brave proof with a faked service: a traditional line answered `en` is skipped by the published build and translated by the candidate; an English line answered `en` is skipped by both.
+- Not proven: Kick chat (the sets are Twitch plus PC chat), Cantonese (no data), the held-out set, and the verdict gate on the 2,475 lines without a stored verdict.
