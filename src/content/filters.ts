@@ -109,6 +109,16 @@ export function isSameLanguageAsTarget(detected: string | undefined, target: str
   return baseLang(detected) === baseLang(target);
 }
 
+/** Gate 1: a confident local answer naming the reader's language ends the line before any request. */
+export function skipOnHint(hint: string | undefined, target: string): boolean {
+  return isSameLanguageAsTarget(hint, target);
+}
+
+/** Gate 2: the answer the engine sent back names the reader's language (only when the reader skips such lines). */
+export function skipOnVerdict(verdict: string | undefined, target: string, ignoreEnglish: boolean): boolean {
+  return isSameLanguageAsTarget(verdict, target) && ignoreEnglish;
+}
+
 const EMOJI_OR_SYMBOL = /[\p{Emoji_Presentation}\p{Extended_Pictographic}\p{P}\p{S}\s]/u;
 
 /**
