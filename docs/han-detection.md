@@ -62,7 +62,7 @@ second reading. Any change after the reading invalidates it for that change.
 
 Reference: the extraction commit. Candidate: the engine-verdict guard and the mention and mark fixes. Engine verdicts exist for 1,133 of the 3,608 lines (the collection was cut by a rate limit), so the verdict gate is scored on those 1,133 only and the rest of the table on all 3,608 lines; the held-out set is not read for this change.
 
-- `W` (deleted although not in the reader's language), `en` reader: 329 to 0 over the lines answered (14 Japanese, 315 Chinese). Every other reader and list cell: no rise above 1 line (`ja,ko` list on Korean 49 to 50; `zh` lists down 4 to 2).
+- `W` (deleted although not in the reader's language), `en` reader: 329 to 0 over the lines answered (14 Japanese, 315 Chinese). Every other reader and list cell: no rise above 1 line (`ja,ko` list on Korean 49 to 50; the two Chinese lists down by 4 and 2).
 - `S` (wrong source hint): Chinese class 6 to 3, no class up. Silence on han-only Chinese 0.581 to 0.583; leak of han-only Japanese read as Chinese 0.032 to 0.032.
 - Cost, paired bootstrap by unit (202 units): `en` reader mean change per unit -16.35, 95 percent interval [-22.98, -10.15]; `ja` reader -0.218, [-0.510, -0.005].
 - `K` of the `en` reader on Latin lines: 34 to 34 and 20 to 20 (no rise).
