@@ -69,3 +69,24 @@ Reference: the extraction commit. Candidate: the engine-verdict guard and the me
 - Speed: median 0.96 and p95 1.02 times the reference (three alternated runs). Weight: content.js gzip 99,330 to 99,564 bytes.
 - Parity of the bench with the pipeline: 53 lines, identical decisions. Real Brave proof with a faked service: a traditional line answered `en` is skipped by the published build and translated by the candidate; an English line answered `en` is skipped by both.
 - Not proven: Kick chat (the sets are Twitch plus PC chat), Cantonese (no data), the held-out set, and the verdict gate on the 2,475 lines without a stored verdict.
+
+## Second change: additive steps (d) to (f) on `design`
+
+The lists behind these steps were chosen on the even lines of a separate chat file, so the thresholds are computed on the
+2,174 `design` lines whose normalized text is not one of those lines (76 han-only Japanese, 814 han-only Chinese); the whole
+`design` figures (188 and 1,452) are given beside. The reference for each step is the code before it. `design` has no
+Cantonese gold, so nothing here measures Cantonese.
+
+- (d) Japanese-only forms (256 characters): ABANDONED. Han-only Japanese lines named `ja`: 16 of 76 (21.1 percent; whole
+  29 of 188), above the 10 percent threshold. Han-only Chinese lines that receive `ja`: 2 of 814 (whole 4 of 1,452), above
+  1 in 500. Every flagged line is real Chinese from one unit written with a Japanese form of one character (the caveat of the
+  plan). Of the han-only lines named `ja`, 2 of 18 are Chinese (whole 4 of 33). Silence 0.550 to 0.548.
+- (e) Compact lists: ABANDONED. List A (first 200 traditional, first 200 simplified, plus the 256 Japanese-only forms):
+  silence 0.550 to 0.431 (whole 0.566 to 0.448), Japanese leak 0 of 76 (whole 4 of 188 against 2 of 188 before), but `ja`
+  reader on Chinese lines `W` 3 to 5 and `S` 3 to 5 (the same flagged lines as (d)). List B (first 100 of each plus the 145
+  top Japanese forms): silence 0.550 to 0.484 (whole 0.500), `W` and `S` unchanged, leak 0. B is 5.3 points above A, more
+  than the 3 points allowed, so A is the candidate and A fails the no-rise rule.
+- (f) 18 Chinese function characters: KEPT. Silence 0.550 to 0.381 (whole 0.566 to 0.399), Japanese leak 0 to 0 (whole
+  0.011 to 0.011), `W` and `S` unchanged in every cell. The `zh` list cell 468 to 461, the three-language Chinese list
+  101 to 94. Costs on the Tatoeba bench: 13 traditional lines and 1 Cantonese line now read as `zh` (3 to 17 wrong
+  answers of 5,037), and a Cantonese line made of shared characters plus one of the 18 reads as `zh`.
