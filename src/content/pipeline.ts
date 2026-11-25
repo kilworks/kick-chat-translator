@@ -13,7 +13,7 @@ import { extractMessageText, findAllRows } from './selectors';
 import { confidentLanguage, detectLanguageWithBrowser } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
 import { isContextCritical } from '~/shared/langTiers';
-import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, skipOnHint, skipOnVerdict, trimForEngine } from './filters';
+import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, skipOnHint, skipOnVerdict, trimForEngine, trustedVerdict } from './filters';
 import { HANDLED_SELECTOR, inject, incrementFloatingCount, armHoverTranslate, markSkipped, removeAllArtifacts, showError, showLangBlocked, showLoading, showThrottleIndicator, showToast, updateActiveProvider } from './injector';
 import { localEngine } from './localEngine';
 import { memCache } from './memcache';
@@ -695,6 +695,9 @@ export class TranslationPipeline {
       }
       msg = { ...msg, rowElement: rescued.row, injectionTarget: rescued.target };
     }
+    // Every caller reaches here, the tab cache and the service worker cache included, so a
+    // bad `en` verdict that was stored earlier is dropped on the way back in.
+    result = { ...result, detectedLang: trustedVerdict(result.detectedLang, real) ?? 'auto' };
     const tt = applyUserGlossary(restoreNames(result.translatedText, real), this.settings.glossary);
     if (!tt) {
       this.skip(msg, localised('skipGlossary', 'your glossary emptied the translation'));
