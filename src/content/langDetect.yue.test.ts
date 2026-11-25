@@ -61,7 +61,7 @@ describe('standard Chinese is read by its script, not mistaken for Cantonese', (
   // picks a side, so nothing is said.
   it('declines a line that carries no marker from either script', () => {
     expect(confidentLanguage('笑死我了')).toBeUndefined();
-    expect(confidentLanguage('我現在真的很累')).toBeUndefined();
+    expect(confidentLanguage('我現在真的累了')).toBeUndefined();
   });
 
   // Japanese simplified its own kanji, and some of its forms match traditional
@@ -78,7 +78,7 @@ describe('standard Chinese is read by its script, not mistaken for Cantonese', (
   it('is not fooled by a marker straddling two unrelated words', () => {
     expect(confidentLanguage('反而家裡更安靜')).toBe('zh-tw'); // 反而 + 家裡: not yue, and 裡 is traditional
     expect(confidentLanguage('我依家長的意思去做')).toBeUndefined(); // 依 + 家長
-    expect(confidentLanguage('大家一起食飯吧')).toBeUndefined(); // Taiwanese Mandarin writes 食飯 too
+    expect(confidentLanguage('大家一起食飯吧')).toBe('zh'); // Taiwanese Mandarin writes 食飯 too; the particle now reads as Chinese
   });
 
   // 咩 is Cantonese except when it is a sheep, and a sheep is always doubled.
@@ -99,7 +99,9 @@ describe('what the rule deliberately does not catch', () => {
   // distinguishable from standard Chinese by looking at it. Naming it would be a
   // guess, and `confidentLanguage` exists to refuse guesses.
   it('says nothing about a line with no marker in either alphabet', () => {
-    expect(confidentLanguage('收皮啦你')).toBeUndefined();
+    expect(confidentLanguage('收皮啦')).toBeUndefined();
+    // The price of the function characters: with a Chinese pronoun added, the same Cantonese line reads as zh.
+    expect(confidentLanguage('收皮啦你')).toBe('zh');
   });
 
   // A Cantonese line with no Cantonese marker left in it is standard Chinese in

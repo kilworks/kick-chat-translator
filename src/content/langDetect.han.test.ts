@@ -41,7 +41,7 @@ describe('han script layer: simplified and traditional tables', () => {
     expect(confidentLanguage('公開')).toBeUndefined(); // public opening, traditional open
   });
   it('does not read U+5B32 as Cantonese', () => {
-    expect(confidentLanguage('你別嬲了')).toBeUndefined();
+    expect(confidentLanguage('你別嬲了')).toBe('zh'); // no longer yue: the pronoun now reads as Chinese
   });
 });
 
@@ -57,5 +57,26 @@ describe('han script layer: bopomofo', () => {
   it('does not take bopomofo for Japanese or Korean writing', () => {
     expect(confidentLanguage('\u3042\u3044\u3105')).toBe('ja'); // kana wins
     expect(confidentLanguage('\uac00\uac01\uac02\u3105')).toBe('ko'); // hangul wins
+  });
+});
+
+describe('han script layer: Chinese function characters', () => {
+  it('reads a han-only line with a Chinese function character as zh', () => {
+    expect(confidentLanguage('你好')).toBe('zh'); // you, good
+    expect(confidentLanguage('好吧')).toBe('zh'); // sentence-final particle
+  });
+  it('lets a traditional or simplified marker, or a Cantonese one, keep deciding', () => {
+    expect(confidentLanguage('你當然')).toBe('zh-tw');
+    expect(confidentLanguage('你这')).toBe('zh');
+    expect(confidentLanguage('你唔')).toBe('yue');
+  });
+  it('stays silent when both families are present', () => {
+    expect(confidentLanguage('你當这')).toBeUndefined();
+  });
+  it('says nothing about a line without such a character', () => {
+    expect(confidentLanguage('天地')).toBeUndefined();
+  });
+  it('does not touch Japanese lines', () => {
+    expect(confidentLanguage('你は')).toBe('ja');
   });
 });
