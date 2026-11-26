@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Han-only lines that carry a character only Japanese writes are now named Japanese.** A list of 151 characters (new forms such as the ones Japanese uses for "both" or "ride") chosen from lines of known origin names the line `ja` when the Chinese character lists say nothing. On a fresh set: 16.77 percent of Han-only Japanese lines named Japanese instead of left unanswered, no Chinese origin more than 0.01 point of its lines named Japanese, `content.js` gzip +539 bytes.
 - **Traditional and Simplified Chinese are told apart far more often, and fewer Japanese lines read as Chinese.** The two lists of 45 hand-picked characters are replaced by lists chosen from about 340,000 lines of known origin (Taiwan, mainland China, Hong Kong, Japan), each character added only while the Japanese lines it flags stay under a budget. On a held-out split: Taiwanese lines named Traditional 59.3 to 77.8 percent, mainland lines named Simplified 37.8 to 82.4 percent, Han-only Japanese lines read as Chinese 1.13 to 0.73 percent, `content.js` gzip +3,275 bytes, detection speed unchanged. Price: Cantonese lines written without a Cantonese marker are more often named Traditional (25.1 to 36.6 percent), so a Traditional Chinese reader skips more of them as already in their language.
 
 ### Security
