@@ -56,3 +56,39 @@ describe('stream prior', () => {
     expect(p.family()).toBeUndefined();
   });
 });
+
+describe('Cantonese share of a stream', () => {
+  it('is not decided before 30 Chinese answers', () => {
+    const p = new StreamPrior();
+    feed(p, many('yue', 29));
+    expect(p.cantonese()).toBe(false);
+    p.observe('yue');
+    expect(p.cantonese()).toBe(true);
+  });
+
+  it('is Cantonese when a quarter of the Chinese answers are yue', () => {
+    const p = new StreamPrior();
+    feed(p, [...many('zh-tw', 40), ...many('yue', 20)]);
+    expect(p.cantonese()).toBe(true);
+  });
+
+  it('stays off on a Taiwan, mainland or Japanese stream', () => {
+    const tw = new StreamPrior();
+    feed(tw, [...many('zh-tw', 200), 'yue']);
+    expect(tw.cantonese()).toBe(false);
+    const ja = new StreamPrior();
+    feed(ja, many('ja', 200));
+    expect(ja.cantonese()).toBe(false);
+  });
+
+  it('forgets, and reset clears it', () => {
+    const p = new StreamPrior();
+    feed(p, many('yue', 60));
+    feed(p, many('zh-tw', 800));
+    expect(p.cantonese()).toBe(false);
+    feed(p, many('yue', 200));
+    expect(p.cantonese()).toBe(true);
+    p.reset();
+    expect(p.cantonese()).toBe(false);
+  });
+});

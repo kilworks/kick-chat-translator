@@ -476,9 +476,12 @@ export function skipOnVerdictForStream(
   text: string,
   hint: string | undefined,
   prior: Family | undefined,
+  cantonese = false,
 ): boolean {
   if (!skipOnVerdict(verdict, target, ignoreEnglish)) return false;
   if (hint !== undefined || !HAN_ONLY.test(text)) return true;
+  // A Cantonese stream: a Han-only line the engine calls Chinese is probably Cantonese, so it is not the reader's own.
+  if (cantonese && familyOf(verdict) === 'zh') return false;
   const family = familyOf(verdict);
   return family !== undefined && family === prior;
 }
@@ -490,8 +493,16 @@ export function skipOnVerdictForStream(
  * service. The other direction (a line named Japanese in a Chinese channel) is not vetoed: replayed on
  * collected chat the prior was missing for most of those lines, so the veto did not hold.
  */
-export function skipOnHintForStream(hint: string | undefined, target: string, text: string, prior: Family | undefined): boolean {
+export function skipOnHintForStream(
+  hint: string | undefined,
+  target: string,
+  text: string,
+  prior: Family | undefined,
+  cantonese = false,
+): boolean {
   if (!skipOnHint(hint, target)) return false;
+  // A Cantonese stream: a Han-only line named Traditional is probably written Cantonese, which a Traditional reader still needs.
+  if (cantonese && hint === 'zh-tw' && HAN_ONLY.test(text)) return false;
   if (prior === 'ja' && familyOf(hint) === 'zh' && HAN_ONLY.test(text)) return false;
   return true;
 }
@@ -501,7 +512,13 @@ export function skipOnHintForStream(hint: string | undefined, target: string, te
  * service's own detection otherwise, and it mixes Japanese and Chinese up; the family of the stream is the better
  * guess (right for 93 to 100 percent of the lines checked by hand), so it is sent as the source when it exists.
  */
-export function sourceHintForStream(hint: string | undefined, text: string, prior: Family | undefined): string | undefined {
+export function sourceHintForStream(
+  hint: string | undefined,
+  text: string,
+  prior: Family | undefined,
+  cantonese = false,
+): string | undefined {
+  if (cantonese && hint === 'zh-tw' && HAN_ONLY.test(text)) return 'yue';
   if (hint !== undefined) return hint;
   return prior !== undefined && HAN_ONLY.test(text) ? prior : undefined;
 }
