@@ -168,3 +168,16 @@ A FAIL is published as it is. `ds4` is not read again for this candidate.
 4. Weight: gzip 102,839 to 103,378, +539 bytes against a margin of 725. Speed, three alternated runs: median 1.05 times, p95 1.03 times. PASS.
 
 Informational, not used to choose: on 33,852 real Twitch lines declared Chinese, 0.1 percent (about 34 lines) are now named `ja`; the benefit and this price are both small, and a Japanese reader would skip those lines as already in their language.
+
+## Pass B2, calibrated logistic model with a larger budget: pre-registered rule
+
+Pre-registered before the fresh set `ds5` is read. The owner relaxed the weight rule from +4,000 to +16,000 bytes gzip over `master` for this pass, so the model may weigh up to about 12,000 bytes beyond what the lists and the Japanese-only characters already use (3,814). Candidate: a softmax logistic regression on Han unigrams and bigrams, four classes (Traditional, Simplified, Cantonese, Japanese), trained on the train lines that the rules leave unanswered, features cut with a chi-squared test to the number that fits the byte budget, probabilities as the model gives them, answering only above a confidence set on dev so that at most 1 percent of the answered dev lines are wrong. The model answers Traditional, Simplified or Cantonese; it never returns Japanese on its own. Reference: `master` after pull request 93 plus the Japanese-only characters.
+
+`ds5` is fresh chat-like lines of at most 20 characters from sources never used before: forum ranges not read, microblog posts, Cantonese Common Crawl files not read, Niconico 2016 archives. On the lines the rules leave unanswered, read once:
+
+1. Taiwanese lines named Traditional rise by at least 5 points, or mainland lines named Simplified rise by at least 5 points.
+2. Taiwanese lines named Simplified and mainland lines named Traditional each rise by at most 0.3 points; Cantonese lines named Cantonese do not fall by more than 0.5 points.
+3. Japanese lines read as Chinese do not rise.
+4. Weight: gzip at most 16,000 bytes over `master` in total. Speed: median at most 1.10 times, p95 at most 1.25 times.
+
+A FAIL is published as it is. `ds5` is not read again for this candidate.
