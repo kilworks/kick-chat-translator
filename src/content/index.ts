@@ -34,7 +34,7 @@ import {
   pickInjectionTarget,
 } from './selectors';
 import { extractChannelSlug, fetchChannelLangIso } from './kickApi';
-import { LANG_BLOCKED_ASK } from './filters';
+import { LANG_BLOCKED_ASK, START_ASK, START_SET } from './filters';
 import { localEngine } from './localEngine';
 import { logPlatform, refresh7TV } from './platform';
 import { resolveBrowserLang, withFavorite } from '~/shared/languages';
@@ -162,6 +162,8 @@ async function main(): Promise<void> {
    */
   // Channels the reader switched on in this tab; read once, rewritten by the bar in the manual start mode.
   let started: ReadonlySet<string> = readStarted();
+  // Manual start: this tab's channel is held back until the reader switches it on.
+  const isWaiting = (): boolean => settings.startMode === 'manual' && !!currentSlug && !started.has(currentSlug);
   function vueLocale(base: Settings = settings, slug = currentSlug): Settings {
     return vueDeChaine(base, slug, started);
   }
@@ -258,12 +260,7 @@ async function main(): Promise<void> {
             // le bouton retombe sur l'interrupteur general.
             if (!slug) return void patchSettings({ enabled });
             // Manual start: the bar switches the open channel on or off for this tab. Nothing is written to the settings.
-            if (settings.startMode === 'manual') {
-              const before = vueLocale();
-              started = setStarted(slug, enabled);
-              applySettings(settings, before);
-              return;
-            }
+            if (settings.startMode === 'manual') return void startHere(slug, enabled);
             const sansElle = settings.pausedChannels.filter((c) => c !== slug);
             void patchSettings({
               pausedChannels: enabled
@@ -300,7 +297,7 @@ async function main(): Promise<void> {
             const pairs = localEngine.downloadablePairs().filter((p) => p.tgt === tgt);
             void localEngine.download(pairs.length ? pairs : localEngine.downloadablePairs());
           },
-        });
+        }, isWaiting());
         refreshChip();
         barPolling = false;
         return;
@@ -378,7 +375,7 @@ async function main(): Promise<void> {
     const vue = vueLocale(settings, slug);
     pipeline.updateSettings(vue);
     compose.updateSettings(vue);
-    updateFloatingBar(vue);
+    updateFloatingBar(vue, isWaiting());
 
     if (!slug) {
       observer.stop();
@@ -592,6 +589,13 @@ async function main(): Promise<void> {
     pipeline.reapplyBlocked();
   }
 
+  // Manual start: switch a channel on or off for this tab (the bar and the popup both come here).
+  function startHere(slug: string, on: boolean): void {
+    const before = vueLocale();
+    started = setStarted(slug, on);
+    applySettings(settings, before);
+  }
+
   const applySettings = (next: Settings, before?: Settings): void => {
     // Une copie remplacee recoit encore les reglages, et sans ceci un
     // changement relancerait son observateur et son bandeau.
@@ -615,7 +619,7 @@ async function main(): Promise<void> {
     // Ahead of everything that redraws below, so the bar and the chip come back
     // in the language that was just chosen rather than one change late.
     void loadChatTable(setContentLocale(next.uiLang));
-    updateFloatingBar(vue);
+    updateFloatingBar(vue, isWaiting());
     applyShowOriginal(next.showOriginal);
     applyDisplayStyle(next.displayStyle);
     refreshChip();
@@ -645,6 +649,11 @@ async function main(): Promise<void> {
     } else if (msg?.type === LANG_BLOCKED_ASK) {
       // The popup's one line about the language allowlist, from the same count as the bar.
       sendResponse({ count: pipeline.langBlockedCount() });
+    } else if (msg?.type === START_ASK) {
+      sendResponse({ waiting: isWaiting() });
+    } else if (msg?.type === START_SET) {
+      if (currentSlug && settings.startMode === 'manual') startHere(currentSlug, true);
+      sendResponse({ waiting: isWaiting() });
     }
     return false;
   });

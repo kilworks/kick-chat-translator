@@ -4,7 +4,7 @@ import { defaultSettings } from '~/shared/settings';
 import { sortedLanguages } from '~/shared/languages';
 import { send, type RuntimeMessage } from '~/shared/messages';
 import { extractChannelSlug } from '~/content/kickApi';
-import { LANG_BLOCKED_ASK, channelBlockedBy } from '~/content/filters';
+import { LANG_BLOCKED_ASK, START_ASK, START_SET, channelBlockedBy } from '~/content/filters';
 import { memoriserLangueChaine, vueDeChaine } from '~/shared/channelLang';
 import { I18nProvider, useLoadedLocale } from '~/shared/i18nContext';
 import { DiscordLink } from '~/shared/discord';
@@ -48,6 +48,9 @@ export function App() {
   // Recent lines of this tab's chat the language allowlist left untranslated,
   // as the chat's own bar counts them. 0 when none, or when the tab cannot say.
   const [langBlocked, setLangBlocked] = useState(0);
+  // Manual start: this tab's channel waits for the reader. The page knows, so the popup asks it.
+  const [tabId, setTabId] = useState<number>();
+  const [waiting, setWaiting] = useState(false);
 
   const locale = useLoadedLocale(resolveUiLocale(settings.uiLang));
   // Named for the reader and sorted with their locale's collation. Keyed on the
@@ -72,9 +75,19 @@ export function App() {
           .then((res: { count?: number } | undefined) => setLangBlocked(res?.count ?? 0))
           // No content script in that tab (not reloaded since an update): say nothing.
           .catch(() => undefined);
+        setTabId(tab.id);
       })
       .catch(() => undefined);
   }, []);
+
+  // Manual start only: auto mode has nothing to ask. Frame 0 is the page itself, not an embed that also runs the script.
+  useEffect(() => {
+    if (tabId === undefined || settings.startMode !== 'manual') return;
+    void chrome.tabs
+      .sendMessage(tabId, { type: START_ASK }, { frameId: 0 })
+      .then((res: { waiting?: boolean } | undefined) => setWaiting(res?.waiting === true))
+      .catch(() => undefined);
+  }, [tabId, settings.startMode]);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -111,6 +124,17 @@ export function App() {
     }
   }
 
+  // Resume: lift the pause kept in the settings, or start the channel in the tab (manual start).
+  async function resumeHere(): Promise<void> {
+    if (pausedHere) return patch('pausedChannels', settings.pausedChannels.filter((c) => c !== channel));
+    if (tabId === undefined) return;
+    const res = (await chrome.tabs.sendMessage(tabId, { type: START_SET }, { frameId: 0 }).catch(() => undefined)) as
+      | { waiting?: boolean }
+      | undefined;
+    setWaiting(res?.waiting === true);
+  }
+
+  const waitingHere = settings.enabled && !!channel && settings.startMode === 'manual' && waiting;
   const pausedHere = settings.enabled && !!channel && settings.pausedChannels.includes(channel);
   // A channel list that keeps this channel out, said here with the way to it:
   // the Advanced tab's own advice was "reset everything" when this happened.
@@ -132,12 +156,12 @@ export function App() {
   // Added on top, it put the popup at 612 to 642px (Tamil, measure-popup).
   const updating = !!update?.updateAvailable;
   const asking =
-    !settings.usageStatsAsked && !pausedHere && !firstRun && !blockedHere && !updating;
+    !settings.usageStatsAsked && !pausedHere && !waitingHere && !firstRun && !blockedHere && !updating;
   // One green button per state: the action this state is about takes it, and
   // Options steps down to a ghost while that action is on screen. The stats
   // question has no green of its own (equal answers), so Options steps down
   // there too and the question is the one thing in focus.
-  const otherPrimary = firstRun || pausedHere || !!blockedHere;
+  const otherPrimary = firstRun || pausedHere || waitingHere || !!blockedHere;
 
   function openOptions() {
     void chrome.runtime.openOptionsPage();
@@ -177,18 +201,10 @@ export function App() {
           <p class="text-xs text-kick-muted">{t('Open a Kick channel: its chat is translated as it arrives.')}</p>
         )}
 
-        {pausedHere && (
-          <section class="kt-card flex items-center justify-between gap-2">
+        {(pausedHere || waitingHere) && (
+          <section class="kt-card flex items-center justify-between gap-2" role="status">
             <span class="text-xs text-kick-text">{t('Paused on this channel')}</span>
-            <button
-              class="kt-btn"
-              onClick={() =>
-                void patch(
-                  'pausedChannels',
-                  settings.pausedChannels.filter((c) => c !== channel),
-                )
-              }
-            >
+            <button class="kt-btn" onClick={() => void resumeHere()}>
               {t('Resume')}
             </button>
           </section>

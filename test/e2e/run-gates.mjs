@@ -69,6 +69,7 @@ const GATES = [
   // lequel Chrome injecte. Elle ouvre une fenetre, parce que sans fenetre
   // l'extension n'est pas chargee du tout, et la pousse hors de l'ecran.
   ['extension-load', 'node', ['test/e2e/extension-load.mjs']],
+  ['manual-start', 'node', ['test/e2e/manual-start.mjs']],
   // Le produit fait une seule chose et rien hors ligne ne la verifiait : un
   // message arrive, sa traduction apparait dessous. Meme fenetre hors ecran.
   ['translate-offline', 'node', ['test/e2e/translate-offline.mjs']],

@@ -42,7 +42,7 @@ A user turns on manual mode and forgets that new channels start silent; the bar 
 
 - The setting is a single toggle in the display options, so one new string (in the 42 catalogs and `keys.json`) instead of four; the bar reuses its existing off state ("Translation off", "Resume on this channel"), so no bar string was added.
 - The started channels live in `sessionStorage` (`src/shared/startedChannels.ts`) and enter through `vueDeChaine`, the view every module already reads, so the pipeline, the compose preview and the bar needed no change of their own.
-- The popup does not show the started state of the active tab: it lives in the page, and showing it needs a message to the content script. Not done.
+- The popup asks the chat tab (`start.state`), shows its existing pause card with Resume while the channel waits, and Resume starts the channel in that tab (`start.set`). The bar says "Translation paused" while a channel waits, reusing an existing string.
 - Twitch Chat Translator: see its own pull request.
 
 
