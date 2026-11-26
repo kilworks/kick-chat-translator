@@ -287,4 +287,10 @@ export const zh: Record<string, string> = {
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "未使用：仅接受 https:// 地址，因此聊天文本绝不会在未加密的情况下传输。",
   "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "未保存：您的列表太长，无法同步浏览器。缩短被阻止的单词、词汇表或用户列表。",
   "Not saved.": "没有保存。",
+  "The research behind it": "其背后的研究",
+  "Knowing which language a short line is in is the hard part of a chat translator: two Han characters can be Chinese or Japanese. Each question is measured on labelled data before the code changes, and the results are public.": "知道短句是哪种语言是聊天翻译的难点：两个汉字可以是中文或日文。每个问题都会在代码更改之前根据标记数据进行测量，并且结果是公开的。",
+  "Japanese or Chinese: lines made only of Han characters are told apart with character lists chosen from labelled data, and with the language the channel speaks.": "日语或中文：仅由汉字组成的行通过从标记数据中选择的字符列表以及频道使用的语言进行区分。",
+  "Cantonese: a mostly Cantonese chat is recognised from its own lines, so its lines are translated instead of skipped as already in your language.": "粤语：主要是粤语聊天是通过其自己的台词进行识别的，因此其台词会被翻译，而不是像您的语言那样跳过。",
+  "Language detection: a small network and a plain linear model were compared on real chat lines, and the network did not do better.": "语言检测：在真实的聊天线上比较了小型网络和简单的线性模型，网络并没有做得更好。",
+  "Reader requests: each request is kept as a case file with what was measured, what changed and what was not proven.": "读者请求：每个请求都作为案例文件保存，其中包含已测量的内容、已更改的内容以及未证实的内容。",
 };

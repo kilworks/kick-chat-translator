@@ -186,7 +186,7 @@ await popup.close();
  * there are stats, which this stub serves.
  */
 // Display: 3 cards (h2) plus the Text, Colour and theme, In the chat groups (h3).
-const TABS = { providers: 4, display: 6, filters: 4, advanced: 4, activity: 2, about: 3 };
+const TABS = { providers: 4, display: 6, filters: 4, advanced: 4, activity: 2, about: 4 };
 const OPTIONS = path.join(OUT, 'options');
 fs.mkdirSync(OPTIONS, { recursive: true });
 // rtl-surfaces audits every file here: a stale page from an old tab id would be

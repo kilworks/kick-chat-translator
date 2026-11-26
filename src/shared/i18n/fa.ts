@@ -257,4 +257,10 @@ export const fa: Record<string, string> = {
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "استفاده نمی شود: فقط یک آدرس https:// پذیرفته می شود، بنابراین متن چت هرگز بدون رمز عبور نمی کند.",
   "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "ذخیره نشد: لیست های شما برای همگام سازی مرورگر بسیار طولانی است. کلمات مسدود شده، واژه نامه یا لیست کاربران را کوتاه کنید.",
   "Not saved.": "ذخیره نشده است.",
+  "The research behind it": "تحقیقات پشت آن",
+  "Knowing which language a short line is in is the hard part of a chat translator: two Han characters can be Chinese or Japanese. Each question is measured on labelled data before the code changes, and the results are public.": "دانستن اینکه یک خط کوتاه به کدام زبان است، بخش سخت مترجم چت است: دو کاراکتر هان می توانند چینی یا ژاپنی باشند. هر سوال قبل از تغییر کد روی داده‌های برچسب‌گذاری شده اندازه‌گیری می‌شود و نتایج عمومی هستند.",
+  "Japanese or Chinese: lines made only of Han characters are told apart with character lists chosen from labelled data, and with the language the channel speaks.": "ژاپنی یا چینی: خطوطی که فقط از نویسه‌های هان ساخته شده‌اند، با فهرست کاراکترهای انتخاب‌شده از داده‌های برچسب‌گذاری‌شده، و با زبانی که کانال صحبت می‌کند، جدا می‌شوند.",
+  "Cantonese: a mostly Cantonese chat is recognised from its own lines, so its lines are translated instead of skipped as already in your language.": "کانتونی: یک چت عمدتاً کانتونی از خطوط خودش تشخیص داده می‌شود، بنابراین خطوط آن به‌جای رد شدن از قبل در زبان شما ترجمه می‌شوند.",
+  "Language detection: a small network and a plain linear model were compared on real chat lines, and the network did not do better.": "تشخیص زبان: یک شبکه کوچک و یک مدل خطی ساده در خطوط چت واقعی مقایسه شدند و شبکه بهتر عمل نکرد.",
+  "Reader requests: each request is kept as a case file with what was measured, what changed and what was not proven.": "درخواست های خواننده: هر درخواست به عنوان پرونده با آنچه اندازه گیری شده است، آنچه تغییر کرده و آنچه ثابت نشده است نگهداری می شود.",
 };

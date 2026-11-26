@@ -104,7 +104,7 @@ export function AboutSection({
             langue, qui est l'etape qui decide de tout le reste : c'est elle qui
             dit a quel moteur envoyer, et c'est elle qui decide si un message est
             saute parce qu'il est deja dans ta langue. */}
-        <ol class="list-inside list-decimal space-y-2 text-sm text-kick-muted">
+        <ol class="kt-prose list-outside list-decimal ps-5 space-y-2 text-sm text-kick-muted">
           <li>{t('The message is read from the page, emotes and links set aside.')}</li>
           <li>
             {t(
@@ -141,6 +141,48 @@ export function AboutSection({
           </div>
         </section>
       )}
+
+      <section class="kt-card space-y-3">
+        <h3 class="kt-section">{t('The research behind it')}</h3>
+        {/* Why a translator publishes research: the hard part is not translating, it is knowing which language a short line is in. */}
+        <p class="text-sm leading-relaxed text-kick-muted">
+          {t(
+            'Knowing which language a short line is in is the hard part of a chat translator: two Han characters can be Chinese or Japanese. Each question is measured on labelled data before the code changes, and the results are public.',
+          )}
+        </p>
+        <ul class="kt-prose list-outside list-disc ps-5 space-y-2 text-sm text-kick-muted">
+          <li>
+            {t(
+              'Japanese or Chinese: lines made only of Han characters are told apart with character lists chosen from labelled data, and with the language the channel speaks.',
+            )}
+          </li>
+          <li>
+            {t(
+              'Cantonese: a mostly Cantonese chat is recognised from its own lines, so its lines are translated instead of skipped as already in your language.',
+            )}
+          </li>
+          <li>
+            {t(
+              'Language detection: a small network and a plain linear model were compared on real chat lines, and the network did not do better.',
+            )}
+          </li>
+          <li>
+            {t(
+              'Reader requests: each request is kept as a case file with what was measured, what changed and what was not proven.',
+            )}
+          </li>
+        </ul>
+        {/* Repository names are proper nouns, like the Twitch link below: no catalogue key. */}
+        <ul class="space-y-2 text-sm">
+          <Lien
+            href="https://github.com/kilworks/kick-chat-translator/blob/master/docs/han-detection.md"
+            label="docs/han-detection.md"
+          />
+          <Lien href="https://github.com/kilworks/kct-detection-langue" label="kct-detection-langue" />
+          <Lien href="https://github.com/kilworks/kick-chat-translator-request" label="kick-chat-translator-request" />
+          <Lien href="https://github.com/kilworks/kick-translator-research" label="kick-translator-research" />
+        </ul>
+      </section>
 
       <section class="kt-card space-y-3">
         <h3 class="kt-section">{t('Links')}</h3>

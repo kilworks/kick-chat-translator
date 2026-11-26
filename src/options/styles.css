@@ -50,7 +50,8 @@
   .kt-card p,
   .kt-card .kt-hint,
   .kt-card-lead p,
-  .kt-card-lead .kt-hint {
+  .kt-card-lead .kt-hint,
+  .kt-card .kt-prose {
     max-inline-size: 68ch;
   }
 

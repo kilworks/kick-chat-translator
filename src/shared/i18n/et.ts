@@ -257,4 +257,10 @@ export const et: Record<string, string> = {
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Ei kasutata: aktsepteeritakse ainult https:// aadressi, seega ei liigu vestlustekst kunagi krüptimata.",
   "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Pole salvestatud: teie loendid on brauseri sünkroonimiseks liiga pikad. Lühendage blokeeritud sõnu, sõnastikku või kasutajaloendeid.",
   "Not saved.": "Pole salvestatud.",
+  "The research behind it": "Uuringud selle taga",
+  "Knowing which language a short line is in is the hard part of a chat translator: two Han characters can be Chinese or Japanese. Each question is measured on labelled data before the code changes, and the results are public.": "Vestlustõlgi raske osa on teada, millises keeles lühike rida on: kaks hani tähemärki võivad olla hiina või jaapani keeled. Iga küsimust mõõdetakse märgistatud andmetel enne koodi muutumist ja tulemused on avalikud.",
+  "Japanese or Chinese: lines made only of Han characters are told apart with character lists chosen from labelled data, and with the language the channel speaks.": "Jaapani või hiina keel: ainult Han-märkidest koosnevad read eristatakse märgistatud andmetest valitud märgiloenditega ja keelega, mida kanal räägib.",
+  "Cantonese: a mostly Cantonese chat is recognised from its own lines, so its lines are translated instead of skipped as already in your language.": "Kantoni keel: valdavalt kantoni vestlust tuntakse ära oma ridade järgi, nii et selle read tõlgitakse, mitte ei jäeta vahele, nagu juba teie keeles.",
+  "Language detection: a small network and a plain linear model were compared on real chat lines, and the network did not do better.": "Keele tuvastamine: väikest võrku ja tavalist lineaarset mudelit võrreldi päris vestlusliinidel ning võrgul ei läinud paremini.",
+  "Reader requests: each request is kept as a case file with what was measured, what changed and what was not proven.": "Lugeja päringud: iga päring säilitatakse juhtumitoimikuna, kus on kirjas, mida mõõdeti, mis muutus ja mida ei tõestatud.",
 };
