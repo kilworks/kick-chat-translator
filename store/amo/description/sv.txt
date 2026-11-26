@@ -30,5 +30,5 @@ Chattext går bara till den översättningsmotor du valt. Med Google, MyMemory e
 
 GRATIS OCH ÖPPEN KÄLLKOD
 
-MIT-licens, varje kodrad är offentlig: github.com/Pkkls/kick-chat-translator
+MIT-licens, varje kodrad är offentlig: github.com/kilworks/kick-chat-translator
 Felrapporter och önskemål om språk är välkomna där.

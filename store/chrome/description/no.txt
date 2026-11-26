@@ -31,5 +31,5 @@ Tillatelsene med vanlige ord: lagring for innstillingene dine og oversettelsesbu
 
 GRATIS OG ÅPEN KILDEKODE
 
-MIT-lisens, hver kodelinje er offentlig: github.com/Pkkls/kick-chat-translator
+MIT-lisens, hver kodelinje er offentlig: github.com/kilworks/kick-chat-translator
 Feilrapporter og språkønsker er velkomne der, og hva som er endret i hver versjon står på utgivelsessiden.

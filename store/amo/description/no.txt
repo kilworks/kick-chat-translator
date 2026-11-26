@@ -30,5 +30,5 @@ Chatteksten går bare til oversettelsesmotoren du har valgt. Med Google, MyMemor
 
 GRATIS OG ÅPEN KILDEKODE
 
-MIT-lisens, hver kodelinje er offentlig: github.com/Pkkls/kick-chat-translator
+MIT-lisens, hver kodelinje er offentlig: github.com/kilworks/kick-chat-translator
 Feilrapporter og språkønsker er velkomne der.

@@ -30,5 +30,5 @@ Sohbet metni yalnızca seçtiğin çeviri motoruna gider. Google, MyMemory ya da
 
 ÜCRETSİZ VE AÇIK KAYNAK
 
-MIT lisansı, kodun her satırı herkese açık: github.com/Pkkls/kick-chat-translator
+MIT lisansı, kodun her satırı herkese açık: github.com/kilworks/kick-chat-translator
 Hata bildirimleri ve dil istekleri orada memnuniyetle karşılanır.

@@ -31,5 +31,5 @@ The permissions, in plain words: storage for your settings and its translation c
 
 FREE AND OPEN SOURCE
 
-MIT licence, every line of code public: github.com/Pkkls/kick-chat-translator
+MIT licence, every line of code public: github.com/kilworks/kick-chat-translator
 Bug reports and language requests are welcome there, and what changed in each version is on the releases page.

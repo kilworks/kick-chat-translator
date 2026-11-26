@@ -30,5 +30,5 @@ Besedilo chata gre samo v prevajalski pogon, ki ste ga izbrali. Pri Googlu, MyMe
 
 BREZPLAČNO IN ODPRTOKODNO
 
-Licenca MIT, vsaka vrstica kode je javna: github.com/Pkkls/kick-chat-translator
+Licenca MIT, vsaka vrstica kode je javna: github.com/kilworks/kick-chat-translator
 Prijave napak in želje po novih jezikih so tam dobrodošle.

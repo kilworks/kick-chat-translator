@@ -30,5 +30,5 @@ Chatin teksti menee vain valitsemallesi käännösmoottorille. Googlen, MyMemory
 
 ILMAINEN JA AVOIN LÄHDEKOODI
 
-MIT-lisenssi, jokainen koodirivi on julkinen: github.com/Pkkls/kick-chat-translator
+MIT-lisenssi, jokainen koodirivi on julkinen: github.com/kilworks/kick-chat-translator
 Virheraportit ja kielitoiveet ovat tervetulleita sinne, ja lähdekoodi on kaikkien luettavissa.

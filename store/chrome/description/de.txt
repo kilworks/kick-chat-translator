@@ -31,5 +31,5 @@ Die Berechtigungen in einfachen Worten: Speicher für deine Einstellungen und de
 
 KOSTENLOS UND OPEN SOURCE
 
-MIT-Lizenz, jede Codezeile ist öffentlich: github.com/Pkkls/kick-chat-translator
+MIT-Lizenz, jede Codezeile ist öffentlich: github.com/kilworks/kick-chat-translator
 Fehlerberichte und Sprachwünsche sind dort willkommen, und was sich in jeder Version geändert hat, steht auf der Releases-Seite.

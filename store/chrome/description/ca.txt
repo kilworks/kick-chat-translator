@@ -31,5 +31,5 @@ Els permisos, en paraules clares: emmagatzematge per a la teva configuració i l
 
 GRATUÏT I DE CODI OBERT
 
-Llicència MIT, cada línia de codi és pública: github.com/Pkkls/kick-chat-translator
+Llicència MIT, cada línia de codi és pública: github.com/kilworks/kick-chat-translator
 Els informes d'errors i les peticions d'idiomes són benvinguts allà, i el que ha canviat a cada versió és a la pàgina de versions.

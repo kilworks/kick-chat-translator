@@ -31,5 +31,5 @@ Kebenaran, dalam bahasa mudah: storan untuk tetapan dan cache terjemahan; akses 
 
 PERCUMA DAN SUMBER TERBUKA
 
-Lesen MIT, setiap baris kod terbuka kepada umum: github.com/Pkkls/kick-chat-translator
+Lesen MIT, setiap baris kod terbuka kepada umum: github.com/kilworks/kick-chat-translator
 Laporan pepijat dan permintaan bahasa dialu-alukan di sana, dan perubahan dalam setiap versi ada di halaman keluaran.

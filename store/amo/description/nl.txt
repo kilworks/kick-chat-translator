@@ -30,5 +30,5 @@ De chattekst gaat alleen naar de vertaalengine die je hebt gekozen. Bij Google, 
 
 GRATIS EN OPEN SOURCE
 
-MIT-licentie, elke regel code is openbaar: github.com/Pkkls/kick-chat-translator
+MIT-licentie, elke regel code is openbaar: github.com/kilworks/kick-chat-translator
 Bugmeldingen en taalverzoeken zijn daar welkom.

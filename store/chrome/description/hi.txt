@@ -31,5 +31,5 @@ Kick Chat Translator, Kick के लिए एक मुफ़्त लाइ�
 
 मुफ़्त और ओपन सोर्स
 
-MIT लाइसेंस, कोड की हर लाइन सार्वजनिक: github.com/Pkkls/kick-chat-translator
+MIT लाइसेंस, कोड की हर लाइन सार्वजनिक: github.com/kilworks/kick-chat-translator
 बग रिपोर्ट और भाषाओं के अनुरोध वहाँ स्वागत योग्य हैं, और हर वर्शन में क्या बदला, यह रिलीज़ पेज पर है।

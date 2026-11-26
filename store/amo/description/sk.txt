@@ -30,5 +30,5 @@ Text z chatu ide len do prekladového enginu, ktorý ste zvolili. Pri Google, My
 
 ZADARMO A S OTVORENÝM KÓDOM
 
-Licencia MIT, každý riadok kódu je verejný: github.com/Pkkls/kick-chat-translator
+Licencia MIT, každý riadok kódu je verejný: github.com/kilworks/kick-chat-translator
 Hlásenia chýb a žiadosti o nové jazyky tam radi privítame.

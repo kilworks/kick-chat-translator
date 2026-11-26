@@ -30,5 +30,5 @@ Kick Chat Translator: бесплатный переводчик чата для 
 
 БЕСПЛАТНО И С ОТКРЫТЫМ КОДОМ
 
-Лицензия MIT, весь код открыт: github.com/Pkkls/kick-chat-translator
+Лицензия MIT, весь код открыт: github.com/kilworks/kick-chat-translator
 Там же можно сообщить об ошибке или попросить новый язык.

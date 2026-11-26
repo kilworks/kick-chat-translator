@@ -12,7 +12,7 @@ Kick のどの配信のチャットも自分の言語で読み、チャンネル
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Firefox Add-on](https://img.shields.io/amo/v/kick-chat-translator?label=Firefox%20Add-on&color=53fc18)](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)
-[![CI](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml)
+[![CI](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [English](README.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português (Portugal)](README.pt-PT.md) · [Português (Brasil)](README.pt-BR.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Svenska](README.sv.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Українська](README.uk.md) · [Türkçe](README.tr.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [ไทย](README.th.md) · [Tiếng Việt](README.vi.md) · [Bahasa Indonesia](README.id.md) · [हिन्दी](README.hi.md) · [Suomi](README.fi.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Ελληνικά](README.el.md) · [Magyar](README.hu.md) · [Български](README.bg.md) · [Català](README.ca.md) · [Slovenščina](README.sl.md) · [Eesti](README.et.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [فارسی](README.fa.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Bahasa Melayu](README.ms.md) · [Filipino](README.tl.md) · [粵語](README.yue.md)
@@ -64,7 +64,7 @@ Kick のどの配信のチャットも自分の言語で読み、チャンネル
 <details>
 <summary>リリースの zip から手動でインストール</summary>
 
-[Releases](https://github.com/Pkkls/kick-chat-translator/releases/latest) からブラウザに合った zip をダウンロードして展開します。
+[Releases](https://github.com/kilworks/kick-chat-translator/releases/latest) からブラウザに合った zip をダウンロードして展開します。
 
 - Chrome、Brave、Edge（`…-chromium.zip`）: `chrome://extensions` を開き、デベロッパーモードをオンにして「パッケージ化されていない拡張機能を読み込む」からフォルダを選びます。
 - Firefox 121 以降（`…-firefox.zip`）: `about:debugging#/runtime/this-firefox` を開き、「一時的なアドオンを読み込む」から `manifest.json` を選びます。
@@ -114,7 +114,7 @@ Chromium 内蔵の翻訳機はどれよりも速く動きます。ライブ配�
 設定のアクティビティタブで「決定を読む」を押してください。直近 50 行と、それぞれを訳した理由、訳さなかった理由が表示されます。飛ばされた行のほとんどは意図的です。あるライブ配信では、234 行のうち 213 行が同じユーザーの繰り返し、9 行が短すぎ、7 行が絵文字や笑いだけ、1 行がすでに読む言語でした。タブに何も表示されない場合は拡張機能がチャットを見つけられていないので、issue を開いてください。
 
 **緑のバーが消えた。**
-ページを再読み込みしてください。また起きたら、チャンネルとその前にしたことを添えて [issue](https://github.com/Pkkls/kick-chat-translator/issues) を開いてください。
+ページを再読み込みしてください。また起きたら、チャンネルとその前にしたことを添えて [issue](https://github.com/kilworks/kick-chat-translator/issues) を開いてください。
 
 **翻訳の質を上げるには？**
 設定で無料の DeepL キーを追加してください。無料枠は月 100 万文字で、DeepL は無料エンジンより良くなる言語ペアにだけ使われます。
@@ -129,7 +129,7 @@ Chromium 内蔵の翻訳機はどれよりも速く動きます。ライブ配�
 はい、ライブ配信と同じように動きます。
 
 **Kick の更新のあとで動かなくなった。**
-Kick はときどきチャットの構造を変えます。[issue](https://github.com/Pkkls/kick-chat-translator/issues) を開いてもらえれば修正します。
+Kick はときどきチャットの構造を変えます。[issue](https://github.com/kilworks/kick-chat-translator/issues) を開いてもらえれば修正します。
 
 **Kick の公式？**
 いいえ。Kick とは関係のない、独立したオープンソースのプロジェクトです。
@@ -143,12 +143,12 @@ Kick はときどきチャットの構造を変えます。[issue](https://githu
 - 表示言語のメニューには各言語の国旗が表示され、キーボードでも操作できます
 
 各リリースの変更点とその裏付けの計測は
-[Releases](https://github.com/Pkkls/kick-chat-translator/releases) と [CHANGELOG.md](CHANGELOG.md) にあります。
+[Releases](https://github.com/kilworks/kick-chat-translator/releases) と [CHANGELOG.md](CHANGELOG.md) にあります。
 
 ## 開発
 
 ```bash
-git clone https://github.com/Pkkls/kick-chat-translator.git
+git clone https://github.com/kilworks/kick-chat-translator.git
 cd kick-chat-translator
 npm ci
 npm run release:check    # typecheck, lint, unit tests, build: the gate every package goes through

@@ -31,5 +31,5 @@ Kick Chat Translator هو مترجم الدردشة المباشرة على Kick
 
 مجانية ومفتوحة المصدر
 
-رخصة MIT، وكل سطر من الشيفرة منشور للعموم: github.com/Pkkls/kick-chat-translator
+رخصة MIT، وكل سطر من الشيفرة منشور للعموم: github.com/kilworks/kick-chat-translator
 بلاغات الأخطاء وطلبات اللغات مرحّب بها هناك، وما تغيّر في كل إصدار موجود في صفحة الإصدارات.

@@ -31,5 +31,5 @@ Oprávnění jednoduše řečeno: úložiště pro vaše nastavení a mezipamě�
 
 ZDARMA A S OTEVŘENÝM KÓDEM
 
-Licence MIT, každý řádek kódu je veřejný: github.com/Pkkls/kick-chat-translator
+Licence MIT, každý řádek kódu je veřejný: github.com/kilworks/kick-chat-translator
 Hlášení chyb a žádosti o nové jazyky tam uvítáme a co se v které verzi změnilo, najdete na stránce vydání.

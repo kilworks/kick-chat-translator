@@ -30,5 +30,5 @@ O texto do chat vai apenas para o motor de tradução que escolheste. Com o Goog
 
 GRATUITO E DE CÓDIGO ABERTO
 
-Licença MIT, todas as linhas de código são públicas: github.com/Pkkls/kick-chat-translator
+Licença MIT, todas as linhas de código são públicas: github.com/kilworks/kick-chat-translator
 Os relatórios de erros e os pedidos de línguas são bem-vindos aí.

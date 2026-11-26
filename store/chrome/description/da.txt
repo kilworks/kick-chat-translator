@@ -31,5 +31,5 @@ Tilladelserne med almindelige ord: lager til dine indstillinger og oversættelse
 
 GRATIS OG OPEN SOURCE
 
-MIT-licens, hver kodelinje er offentlig: github.com/Pkkls/kick-chat-translator
+MIT-licens, hver kodelinje er offentlig: github.com/kilworks/kick-chat-translator
 Fejlrapporter og sprogønsker er velkomne dér, og hvad der er ændret i hver version, står på udgivelsessiden.

@@ -30,5 +30,5 @@ Kick Chat Translator は、Kick 用の無料ライブチャット翻訳拡張機
 
 無料・オープンソース
 
-MIT ライセンスで、すべてのコードを公開しています：github.com/Pkkls/kick-chat-translator
+MIT ライセンスで、すべてのコードを公開しています：github.com/kilworks/kick-chat-translator
 バグ報告や言語の要望はそちらで歓迎します。

@@ -12,7 +12,7 @@
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Firefox Add-on](https://img.shields.io/amo/v/kick-chat-translator?label=Firefox%20Add-on&color=53fc18)](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)
-[![CI](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml)
+[![CI](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [English](README.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português (Portugal)](README.pt-PT.md) · [Português (Brasil)](README.pt-BR.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Svenska](README.sv.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Українська](README.uk.md) · [Türkçe](README.tr.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [ไทย](README.th.md) · [Tiếng Việt](README.vi.md) · [Bahasa Indonesia](README.id.md) · [हिन्दी](README.hi.md) · [Suomi](README.fi.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Ελληνικά](README.el.md) · [Magyar](README.hu.md) · [Български](README.bg.md) · [Català](README.ca.md) · [Slovenščina](README.sl.md) · [Eesti](README.et.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [فارسی](README.fa.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Bahasa Melayu](README.ms.md) · [Filipino](README.tl.md) · [粵語](README.yue.md)
@@ -68,7 +68,7 @@
 <details>
 <summary>從發行的 zip 手動安裝</summary>
 
-從 [Releases](https://github.com/Pkkls/kick-chat-translator/releases/latest) 下載適用於你瀏覽器的 zip 並解壓縮。
+從 [Releases](https://github.com/kilworks/kick-chat-translator/releases/latest) 下載適用於你瀏覽器的 zip 並解壓縮。
 
 - Chrome、Brave、Edge（`…-chromium.zip`）：打開 `chrome://extensions`，開啟開發人員模式，按一下「載入未封裝項目」，選擇該資料夾。
 - Firefox 121+（`…-firefox.zip`）：打開 `about:debugging#/runtime/this-firefox`，按一下「載入暫時性附加元件」，選擇 `manifest.json`。
@@ -126,7 +126,7 @@ Chromium 內建的翻譯器比上面所有的都快。在真實頻道上實測�
 7 則只有表情符號或笑聲，1 則本來就是閱讀語言。如果分頁裡完全沒有東西，代表擴充功能沒看到聊天室：請開一個 issue。
 
 **綠色列不見了。**
-重新整理頁面。如果又發生，請開一個 [issue](https://github.com/Pkkls/kick-chat-translator/issues)，
+重新整理頁面。如果又發生，請開一個 [issue](https://github.com/kilworks/kick-chat-translator/issues)，
 附上頻道和你之前做了什麼。
 
 **怎麼讓翻譯更好？**
@@ -142,7 +142,7 @@ Chromium 內建的翻譯器比上面所有的都快。在真實頻道上實測�
 可以，跟直播一樣。
 
 **Kick 更新後壞掉了。**
-Kick 有時會改動聊天室的架構。開一個 [issue](https://github.com/Pkkls/kick-chat-translator/issues)，
+Kick 有時會改動聊天室的架構。開一個 [issue](https://github.com/kilworks/kick-chat-translator/issues)，
 就會修好。
 
 **這是 Kick 官方做的嗎？**
@@ -157,12 +157,12 @@ Kick 有時會改動聊天室的架構。開一個 [issue](https://github.com/Pk
 - 介面語言選單會顯示每種語言的旗幟，也可以用鍵盤操作
 
 每個版本的完整內容，包括改了什麼和背後的實測數據：
-[Releases](https://github.com/Pkkls/kick-chat-translator/releases) 和 [CHANGELOG.md](CHANGELOG.md)。
+[Releases](https://github.com/kilworks/kick-chat-translator/releases) 和 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 開發
 
 ```bash
-git clone https://github.com/Pkkls/kick-chat-translator.git
+git clone https://github.com/kilworks/kick-chat-translator.git
 cd kick-chat-translator
 npm ci
 npm run release:check    # typecheck, lint, unit tests, build: the gate every package goes through

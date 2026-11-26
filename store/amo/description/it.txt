@@ -30,5 +30,5 @@ Il testo della chat va solo al motore di traduzione che hai scelto. Con Google, 
 
 GRATUITO E OPEN SOURCE
 
-Licenza MIT, ogni riga di codice è pubblica: github.com/Pkkls/kick-chat-translator
+Licenza MIT, ogni riga di codice è pubblica: github.com/kilworks/kick-chat-translator
 Segnalazioni di bug e richieste di lingue sono benvenute lì.

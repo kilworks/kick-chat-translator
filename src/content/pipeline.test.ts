@@ -738,4 +738,25 @@ describe('TranslationPipeline: the stream as the source language of a Han-only l
     await p.onDomMessage(dom(AMBIGUOUS, 100));
     expect(lastHint()).toBeUndefined();
   });
+
+  // Cantonese stream counter: a Traditional reader keeps a Han-only Traditional line there, read as Cantonese.
+  const YUE_LINE = (i: number) => `我唔知佢去咬邊度${i}`; // invented Cantonese chat (marker characters)
+  const makeTraditional = () => new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'zh-tw', pauseWhenHidden: false, minTextLength: 2 });
+
+  it('translates a Traditional Han-only line for a Traditional reader in a Cantonese stream, as Cantonese', async () => {
+    const p = makeTraditional();
+    for (let i = 0; i < 40; i++) await p.onDomMessage(dom(YUE_LINE(i), i));
+    sendMock.mockClear();
+    await p.onDomMessage(dom(ZH_LINE(100), 100));
+    expect(sendMock).toHaveBeenCalled();
+    expect(lastHint()).toBe('yue');
+  });
+
+  it('still skips that line for a Traditional reader in a Taiwan stream', async () => {
+    const p = makeTraditional();
+    for (let i = 0; i < 40; i++) await p.onDomMessage(dom(ZH_LINE(i), i));
+    sendMock.mockClear();
+    await p.onDomMessage(dom(ZH_LINE(100), 100));
+    expect(sendMock).not.toHaveBeenCalled();
+  });
 });

@@ -31,5 +31,5 @@ Atļaujas vienkāršos vārdos: krātuve taviem iestatījumiem un tulkojumu keš
 
 BEZMAKSAS UN AR ATVĒRTO KODU
 
-MIT licence, katra koda rindiņa ir publiska: github.com/Pkkls/kick-chat-translator
+MIT licence, katra koda rindiņa ir publiska: github.com/kilworks/kick-chat-translator
 Kļūdu ziņojumi un jaunu valodu pieprasījumi tur ir gaidīti, un to, kas mainījies katrā versijā, vari redzēt laidienu lapā.
