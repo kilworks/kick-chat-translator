@@ -29,3 +29,16 @@ describe('han script layer: what counts as Japanese writing', () => {
     expect(detectLanguage('\uff76\uff85\uff9d')).toBe('ja');
   });
 });
+
+describe('marker lists chosen from lines of known origin', () => {
+  it('names Traditional and Simplified lines the old 45-character lists missed', () => {
+    expect(confidentLanguage('\u4ed6\u4eca\u5929\u6c92\u6709\u4f86\u4e0a\u73ed')).toBe('zh-tw');
+    expect(confidentLanguage('\u8fd9\u4e2a\u4e3b\u64ad\u597d\u5389\u5bb3')).toBe('zh');
+  });
+
+  it('keeps words Japanese also writes out of the Chinese answer', () => {
+    expect(confidentLanguage('\u958b\u59cb')).toBeUndefined();
+    expect(confidentLanguage('\u58f0\u512a\u6700\u9ad8')).toBeUndefined();
+    expect(confidentLanguage('\u6e7e\u5cb8')).toBeUndefined();
+  });
+});

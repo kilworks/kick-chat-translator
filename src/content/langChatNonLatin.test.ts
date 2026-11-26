@@ -31,7 +31,8 @@ describe('les ecritures non latines, sur du chat', () => {
 
   it('ne se trompe plus une seule fois sur cent dix', () => {
     // 97 / 13 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
-    expect(plain(SURE.total)).toEqual({ right: 98, silent: 12, wrong: 0 });
+    // 98 / 12 / 0 before the data-driven Han lists: one Cantonese line with no Cantonese marker is now named Traditional (2026-11-26)
+    expect(plain(SURE.total)).toEqual({ right: 98, silent: 11, wrong: 1 });
   });
 
   // LES DEUX ERREURS ETAIENT DU PERSAN ECRIT ENTIEREMENT AVEC LE JEU ARABE,
@@ -44,7 +45,8 @@ describe('les ecritures non latines, sur du chat', () => {
   // l'assertion : une confusion qui reapparait ici est une regression.
   it('ne se trompe plus du tout, et c est ce qui est asserte', () => {
     const rows = [...SURE.confusions.entries()].map(([p, n]) => `${p}=${n}`);
-    expect(rows).toEqual([]);
+    // The one confusion is the documented price of the longer Traditional list: written Cantonese without a marker reads Traditional.
+    expect(rows).toEqual(['yue->zh-tw=1']);
   });
 
   // LE RESULTAT QUI A SERVI A QUELQUE CHOSE.

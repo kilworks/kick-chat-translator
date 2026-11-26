@@ -84,3 +84,25 @@ On the test split, read once, against the lists on `master`:
 6. Tests that pin totals are re-pinned with the confusion diff.
 
 One reading. A FAIL is published as it is.
+
+## Data-driven marker lists: results (test split, read once)
+
+Lists: 506 Traditional and 592 Simplified characters, selected on train with a 0.3 percent Japanese budget (budget picked on dev among 0.3, 1.0 and 2.3 percent). Test split, Han-only lines, subtitles left out. First figure `master`, second the candidate.
+
+| Origin (lines) | zh-tw | zh | yue | none |
+|---|---|---|---|---|
+| Taiwan (1,889) | 59.3 to 77.8 | 0 to 0.16 | 0.1 to 0.1 | 40.6 to 21.9 |
+| Hong Kong standard written (3,907) | 18.8 to 34.8 | 0 to 0.13 | 40.3 to 40.3 | 40.9 to 24.8 |
+| Cantonese (6,492) | 25.1 to 36.6 | 0 to 0.09 | 52.0 to 52.0 | 23.0 to 11.3 |
+| Mainland (4,505) | 0.27 to 0.47 | 37.8 to 82.4 | 0.09 to 0.09 | 61.8 to 17.0 |
+| Japan (16,209) | 0.68 to 0.44 | 0.44 to 0.28 | 0.01 to 0.01 | 98.9 to 99.3 |
+
+1. Japanese leak: 1.13 to 0.73 percent. PASS.
+2. Recall: Taiwan +18.5 points, mainland +44.6 points. PASS.
+3. Wrong script: Taiwanese lines read `zh` +0.16, mainland lines read `zh-tw` +0.20. PASS.
+4. Cantonese read `yue`: 52.0 to 52.0. PASS. Price, reported: Cantonese lines read `zh-tw` 25.1 to 36.6 percent.
+5. Weight: `content.js` gzip 99,564 to 102,839 bytes (+3,275). Speed, three alternated runs: median 0.95 times, p95 0.84 times the reference. PASS.
+6. Tests re-pinned with the confusion diff: Tatoeba `confidentLanguage` 3,676 right and 1,361 silent to 3,715 and 1,322 (3 wrong in both), short lines 1,056 to 1,075 right, `detectLanguage` Traditional lines answered Simplified 15 to 4, one Cantonese chat line now named Traditional.
+
+Limits: the Japanese side is Niconico comments, subtitles and Wikipedia; the Chinese sides are Common Voice sentences, Bilibili comments, forum posts and Wikipedia, not Twitch or Kick chat; Cantonese markers were not changed; the Hong Kong standard written set is mostly colloquial Cantonese in practice.
+

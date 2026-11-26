@@ -103,13 +103,15 @@ describe('le chinois passe par franc, pas par la table', () => {
   // exactement la meme traduction. Annoncer l'ecriture ne coute rien.
   it('ne nomme que ce que son ecriture nomme', () => {
     const nommees = CHINOIS.filter((t) => confidentLanguage(t) !== undefined);
-    expect(nommees).toHaveLength(9);
+    expect(nommees).toHaveLength(14); // 9 before the data-driven Han lists
     expect([...new Set(CHINOIS.map((t) => confidentLanguage(t)))]).toEqual(['zh', undefined]);
   });
 
   // Le prix du renvoi a franc : sous trois caracteres han, plus personne ne
   // repond. Deux caracteres est une phrase entiere en chinois.
-  it('et se tait sous trois caracteres', () => {
-    expect(detectLanguage('稳了')).toBeUndefined();
+  it('et se tait sous trois caracteres sans caractere propre a une ecriture', () => {
+    expect(detectLanguage('好的')).toBeUndefined();
+    // 稳 is Simplified only, so two characters are enough to name the script
+    expect(detectLanguage('稳了')).toBe('zh');
   });
 });

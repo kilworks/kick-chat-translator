@@ -38,12 +38,12 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
     // ajoute (2026-11-04) : cinq lignes de juste a muet, aucune de plus fausse.
     // 3710 / 1327 / 3 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
     // 3709 / 1328 / 3 avant la revue linguiste (2026-11-04)
-    expect(plain(CONFIDENT.total)).toEqual({ right: 3676, silent: 1361, wrong: 3 });
+    expect(plain(CONFIDENT.total)).toEqual({ right: 3715, silent: 1322, wrong: 3 });
   });
 
   it('confidentLanguage on short lines, the regime a chat lives in', () => {
     // 1071 / 606 / 3 avant la revue linguiste (2026-11-04)
-    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1056, silent: 621, wrong: 3 });
+    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1075, silent: 602, wrong: 3 });
   });
 
   // The expensive one. This is the answer that deletes a message in silence when
@@ -58,12 +58,12 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
     // 4146 / 392 / 502 avant la revue linguiste (2026-11-04) : les lignes que le
     // chemin sur ne nomme plus retombent sur franc, et les penchants n'en
     // rattrapent que 13 fausses sur 19.
-    expect(plain(DETECT.total)).toEqual({ right: 4135, silent: 397, wrong: 508 });
+    expect(plain(DETECT.total)).toEqual({ right: 4147, silent: 396, wrong: 497 });
   });
 
   it('detectLanguage is wrong on a quarter of short lines', () => {
     // 1214 / 236 / 230 avant la revue linguiste (2026-11-04)
-    expect(plain(DETECT.shortOnly)).toEqual({ right: 1206, silent: 238, wrong: 236 });
+    expect(plain(DETECT.shortOnly)).toEqual({ right: 1210, silent: 238, wrong: 232 });
   });
 });
 
@@ -242,7 +242,7 @@ describe('the two Chinese scripts, fixed 2026-09-21', () => {
     // no marker from either script, so the rule declines, and franc then answers
     // the way it always has, `cmn` for the whole of Han, which FRANC_MAP sends
     // to `zh`. Closing those needs franc out of this path, not a longer list.
-    expect(DETECT.confusions.get('zh-tw->zh')).toBe(15);
+    expect(DETECT.confusions.get('zh-tw->zh')).toBe(4); // 15 before the data-driven Han lists
     expect(zeroRight(DETECT)).not.toContain('zh-tw');
   });
 
@@ -256,7 +256,7 @@ describe('the two Chinese scripts, fixed 2026-09-21', () => {
     // yue is expected and is the price of the rule: Cantonese is written in
     // traditional characters, so a yue line with every Cantonese word gone can
     // only be read by its script. zh-tw->zh is the franc fallback above.
-    expect(intoChinese).toEqual(['yue->zh-tw=1', 'yue->zh=5', 'zh-tw->zh=15']);
+    expect(intoChinese).toEqual(['yue->zh-tw=1', 'yue->zh=5', 'zh-tw->zh=4']);
   });
 
   // The confident path is the one that matters for this trade, because it is

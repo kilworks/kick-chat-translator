@@ -76,7 +76,7 @@ describe('standard Chinese is read by its script, not mistaken for Cantonese', (
   // unrelated words. Six lines built on that defect took four markers out of the
   // rule; these are the ones that stayed out.
   it('is not fooled by a marker straddling two unrelated words', () => {
-    expect(confidentLanguage('反而家裡更安靜')).toBeUndefined(); // 反而 + 家裡
+    expect(confidentLanguage('反而家裡更安靜')).toBe('zh-tw'); // 反而 + 家裡 is not a Cantonese marker; 裡 is Traditional only
     expect(confidentLanguage('我依家長的意思去做')).toBeUndefined(); // 依 + 家長
     expect(confidentLanguage('大家一起食飯吧')).toBeUndefined(); // Taiwanese Mandarin writes 食飯 too
   });
