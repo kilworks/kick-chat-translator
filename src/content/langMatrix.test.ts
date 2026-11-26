@@ -38,13 +38,12 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
     // ajoute (2026-11-04) : cinq lignes de juste a muet, aucune de plus fausse.
     // 3710 / 1327 / 3 avant fight/night, -iyor turc, hitto, -уть et коли ukrainiens (2026-11-04)
     // 3709 / 1328 / 3 avant la revue linguiste (2026-11-04)
-    // 3665 / 1372 / 3 before the Chinese function characters: 17 lines named right, 14 named wrong (13 traditional read as zh, 1 yue read as zh).
-    expect(plain(CONFIDENT.total)).toEqual({ right: 3682, silent: 1341, wrong: 17 });
+    expect(plain(CONFIDENT.total)).toEqual({ right: 3665, silent: 1372, wrong: 3 });
   });
 
   it('confidentLanguage on short lines, the regime a chat lives in', () => {
     // 1071 / 606 / 3 avant la revue linguiste (2026-11-04)
-    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1058, silent: 613, wrong: 9 });
+    expect(plain(CONFIDENT.shortOnly)).toEqual({ right: 1049, silent: 628, wrong: 3 });
   });
 
   // The expensive one. This is the answer that deletes a message in silence when
@@ -59,7 +58,7 @@ describe('baseline, 2026-09-21, Tatoeba corpus', () => {
     // 4146 / 392 / 502 avant la revue linguiste (2026-11-04) : les lignes que le
     // chemin sur ne nomme plus retombent sur franc, et les penchants n'en
     // rattrapent que 13 fausses sur 19.
-    expect(plain(DETECT.total)).toEqual({ right: 4125, silent: 396, wrong: 519 });
+    expect(plain(DETECT.total)).toEqual({ right: 4124, silent: 397, wrong: 519 });
   });
 
   it('detectLanguage is wrong on a quarter of short lines', () => {
@@ -264,8 +263,7 @@ describe('the two Chinese scripts, fixed 2026-09-21', () => {
   // what reaches the engine. There, the same leak is two lines out of 120.
   it('costs two Cantonese lines on the path that reaches the engine', () => {
     const leak = [...CONFIDENT.confusions.entries()].filter(([p]) => /->zh(-tw)?$/.test(p));
-    // 2 before the Chinese function characters: 14 more, 13 traditional lines read as zh and 1 yue line.
-    expect(leak.reduce((s, [, n]) => s + n, 0)).toBe(16);
+    expect(leak.reduce((s, [, n]) => s + n, 0)).toBe(2);
   });
 });
 
@@ -380,7 +378,7 @@ describe('the Cyrillic fallback, fixed 2026-09-21', () => {
   // that are left, two are a corpus defect rather than a detector defect.
   it('is down to three wrong answers, and they are these', () => {
     const rows = [...CONFIDENT.confusions.entries()].map(([p, n]) => `${p}=${n}`).sort();
-    expect(rows).toEqual(['ms->ar=1', 'yue->zh-tw=1', 'yue->zh=2', 'zh-tw->zh=13']);
+    expect(rows).toEqual(['ms->ar=1', 'yue->zh-tw=1', 'yue->zh=1']);
   });
 
   // The half of the result that was not the point and matters more than the

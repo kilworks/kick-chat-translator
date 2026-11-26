@@ -31,7 +31,7 @@ describe('les ecritures non latines, sur du chat', () => {
 
   it('ne se trompe plus une seule fois sur cent dix', () => {
     // 97 / 13 / 0 avant les mots partages retires (vse, iz, mia, давай) et le lexique ajoute (2026-11-04)
-    expect(plain(SURE.total)).toEqual({ right: 97, silent: 12, wrong: 1 });
+    expect(plain(SURE.total)).toEqual({ right: 97, silent: 13, wrong: 0 });
   });
 
   // LES DEUX ERREURS ETAIENT DU PERSAN ECRIT ENTIEREMENT AVEC LE JEU ARABE,
@@ -44,8 +44,7 @@ describe('les ecritures non latines, sur du chat', () => {
   // l'assertion : une confusion qui reapparait ici est une regression.
   it('ne se trompe plus du tout, et c est ce qui est asserte', () => {
     const rows = [...SURE.confusions.entries()].map(([p, n]) => `${p}=${n}`);
-    // One traditional line now reads as zh through a function character (the same text translates identically with sl=zh-CN).
-    expect(rows).toEqual(['zh-tw->zh=1']);
+    expect(rows).toEqual([]);
   });
 
   // LE RESULTAT QUI A SERVI A QUELQUE CHOSE.
@@ -71,6 +70,6 @@ describe('les ecritures non latines, sur du chat', () => {
   // La limite qui reste, et elle est irreductible au niveau du caractere : une
   // ligne ecrite entierement avec ce que les deux ecritures partagent.
   it('reste muet sur une ligne que les deux ecritures partagent en entier', () => {
-    expect(confidentLanguage('今天真的好笑')).toBeUndefined();
+    expect(confidentLanguage('今天玩得很好')).toBeUndefined();
   });
 });

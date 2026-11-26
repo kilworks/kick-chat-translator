@@ -86,7 +86,7 @@ Cantonese gold, so nothing here measures Cantonese.
   reader on Chinese lines `W` 3 to 5 and `S` 3 to 5 (the same flagged lines as (d)). List B (first 100 of each plus the 145
   top Japanese forms): silence 0.550 to 0.484 (whole 0.500), `W` and `S` unchanged, leak 0. B is 5.3 points above A, more
   than the 3 points allowed, so A is the candidate and A fails the no-rise rule.
-- (f) 18 Chinese function characters: KEPT. Silence 0.550 to 0.381 (whole 0.566 to 0.399), Japanese leak 0 to 0 (whole
+- (f) 18 Chinese function characters: KEPT on this set, REMOVED later (see the external sets below). Silence 0.550 to 0.381 (whole 0.566 to 0.399), Japanese leak 0 to 0 (whole
   0.011 to 0.011), `W` and `S` unchanged in every cell. The `zh` list cell 468 to 461, the three-language Chinese list
   101 to 94. Costs on the Tatoeba bench: 13 traditional lines and 1 Cantonese line now read as `zh` (3 to 17 wrong
   answers of 5,037), and a Cantonese line made of shared characters plus one of the 18 reads as `zh`.
@@ -116,3 +116,9 @@ Full change (all three steps):
 Shorter prefixes, same reading: the table swap alone gives `en` and `ja` cost -0.094 [-0.307, 0.114] and the table swap plus bopomofo -0.139 [-0.352, 0.064], intervals that include 0 (13 and 11 units up). By the rule the longest prefix with no FAIL is the full change, so nothing is removed.
 
 The `zh` list rises (708 to 721, 773 to 798 on `design`), so by the merge rule this change is left ready for the owner to merge. Not measured here: the engine verdict gate, the price on the Tatoeba check (3 to 17 wrong answers of the confident path), Kick chat, Cantonese.
+
+## Second change: step (f) removed after sets with a known origin
+
+Lines cut from public corpora whose origin is known (Common Voice sentence lists, subtitle files, Bilibili comments, forum posts; counts in the request repository, case 002) show what the function-character step does: it answers `zh` (Simplified) on characters both scripts share. Share of han-only Taiwanese lines read as `zh`, master then with (f): subtitles 1.4 to 22.7 percent, Common Voice 0 to 8.3, forum 0.2 to 11.7. Hong Kong lines read as `zh`: 0 to 4.7 (Common Voice), 0.1 to 3.7 (forum). With the tables and bopomofo but without (f): Taiwanese subtitles 1.5, forum 0.2, Common Voice 0. The price of removing it: the mainland gain came from (f) too (silence on mainland Common Voice 69.7 with master, 52.4 with (f), 70.8 without; Bilibili 61.7, 43.6, 62.0).
+
+Step (f) is therefore removed by a revert. What this leaves: tables and bopomofo only. On the held-out reading that prefix has cost intervals that include 0 for the `en` and `ja` readers (-0.139 [-0.352, 0.064]), so the criterion on cost is not met for it; the owner decides.
