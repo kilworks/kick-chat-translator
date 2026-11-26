@@ -106,3 +106,65 @@ Lists: 506 Traditional and 592 Simplified characters, selected on train with a 0
 
 Limits: the Japanese side is Niconico comments, subtitles and Wikipedia; the Chinese sides are Common Voice sentences, Bilibili comments, forum posts and Wikipedia, not Twitch or Kick chat; Cantonese markers were not changed; the Hong Kong standard written set is mostly colloquial Cantonese in practice.
 
+
+## Pass A2, characters only Japanese writes: pre-registered rule
+
+Pre-registered before the chat-like fresh set `ds3` (lines of at most 20 characters, never used to select or tune anything; forum sentences, video comments, Cantonese and Japanese short lines) is read for this candidate. Candidate: a list of Han characters that occur in at least 10 Japanese train lines and in at most 1 Chinese train line (all origins, subtitles included). A Han-only line that the rules leave unanswered and that contains one of them is named `ja`. Reference: the lists of pull request 93.
+
+On `ds3`, read once, against the reference:
+
+1. Han-only Japanese lines named `ja` rise by at least 10 points.
+2. Chinese lines (Taiwan, Cantonese, mainland) named `ja` rise by at most 0.02 points each.
+3. No other answer changes (the candidate only turns no answer into `ja`).
+4. Weight: gzip at most 725 bytes over pull request 93. Speed: median at most 1.10 times, p95 at most 1.25 times.
+
+A FAIL is published as it is. `ds3` is not read again for this candidate.
+
+## Pass A2, characters only Japanese writes: results (chat-like fresh set, read once): FAIL
+
+175 characters. Reference: the lists of pull request 93. Set `ds3`, Han-only lines of at most 20 characters, first figure reference, second candidate.
+
+| Origin (lines) | answer `ja` | other answers |
+|---|---|---|
+| Japan (203,812) | 0 to 20.09 | no answer 98.68 to 78.58, read as Chinese 1.29 to 1.29 |
+| Taiwan (15,383) | 0 to 0.07 | `zh-tw` 74.03 unchanged |
+| Cantonese (19,205) | 0 to 0.03 | `yue` 60.03 unchanged |
+| Mainland (270,309) | 0 to 0.01 | `zh` 78.98 unchanged |
+
+1. Japanese lines named `ja`: +20.09 points. PASS.
+2. Chinese lines named `ja`: Taiwan +0.07 (11 lines), Cantonese +0.03 (6 lines), mainland +0.01 (27 lines), against 0.02 allowed. FAIL for Taiwan and Cantonese.
+3. No other answer changed. PASS.
+4. Weight: gzip 102,839 to 103,446, +607 bytes against a margin of 725. PASS. Speed not measured for this record.
+
+A near miss on a small Taiwanese set (15,383 lines). By the rule it is a FAIL and the list is not tuned on this set. A stricter candidate (characters absent from every Chinese train line) is registered on its own branch with a new fresh set.
+
+## Pass A2b, stricter Japanese-only characters: pre-registered rule
+
+Pre-registered before the fresh set `ds4` is read (TED2020 lines of at most 20 characters for Taiwan and the mainland, Cantonese lines longer than 20 characters, Japanese Han-only lines longer than 20 characters; none used to select or tune anything). Candidate: the same wiring as pass A2 with the list of characters that occur in at least 10 Japanese train lines and in no Chinese train line (151 characters). Reference: the lists of pull request 93.
+
+On `ds4`, read once, against the reference:
+
+1. Han-only Japanese lines named `ja` rise by at least 10 points.
+2. Chinese lines (Taiwan, Cantonese, mainland) named `ja` rise by at most 0.02 points each.
+3. No other answer changes.
+4. Weight: gzip at most 725 bytes over pull request 93. Speed: median at most 1.10 times, p95 at most 1.25 times.
+
+A FAIL is published as it is. `ds4` is not read again for this candidate.
+
+## Pass A2b, stricter Japanese-only characters: results (fresh set, read once): PASS
+
+151 characters. Reference: the lists of pull request 93. Set `ds4`, Han-only lines, first figure reference, second candidate.
+
+| Origin (lines) | answer `ja` | other answers |
+|---|---|---|
+| Japan, longer than 20 characters (29,301) | 0 to 16.77 | no answer 97.04 to 80.27, read as Chinese 1.71 to 1.71 |
+| Taiwan, at most 20 characters (100,000) | 0 to 0.01 (1 line) | `zh-tw` 84.49 unchanged |
+| Cantonese, longer than 20 characters (26,925) | 0 to 0.00 | `yue` 81.14 unchanged |
+| Mainland, at most 20 characters (100,000) | 0 to 0.00 | `zh` 94.03 unchanged |
+
+1. Japanese lines named `ja`: +16.77 points. PASS.
+2. Chinese lines named `ja`: Taiwan +0.01, Cantonese and mainland +0.00, against 0.02 allowed. PASS.
+3. No other answer changed. PASS.
+4. Weight: gzip 102,839 to 103,378, +539 bytes against a margin of 725. Speed, three alternated runs: median 1.05 times, p95 1.03 times. PASS.
+
+Informational, not used to choose: on 33,852 real Twitch lines declared Chinese, 0.1 percent (about 34 lines) are now named `ja`; the benefit and this price are both small, and a Japanese reader would skip those lines as already in their language.
