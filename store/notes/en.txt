@@ -1,3 +1,9 @@
+New option, off by default: translate a channel only after you switch it on. Turn on "Translate a channel only after I switch it on in the bar" in the Display tab. Every channel then stays untranslated until you press play on the bar, or Resume in the popup, and the choice lasts for that tab only.
+
+Chinese and Japanese chat reads better. Short lines written only with Han characters are no longer hidden or mistaken for the other language, Taiwanese and mainland Chinese are told apart far more often, and a mostly Cantonese chat is recognised, so its lines are translated instead of skipped.
+
+The About tab now explains the research behind the translator and links the public repositories.
+
 Pressing Tab right after typing no longer swaps in the translation of what you had typed a moment earlier: the extension translates your current text first.
 
 Your DeepL key stays on this device. It is no longer copied to browser sync, never written into a settings export, and removing DeepL from the engine order now sticks. If you ever shared a settings file, change your DeepL key in your DeepL account.

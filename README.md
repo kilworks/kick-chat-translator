@@ -60,7 +60,7 @@ changed in the settings, and a reading language can be remembered per channel.
 - **Four display styles**: under the message, on the same line, in place of it, or only on hover
 - **Pause one channel** from the chat bar without stopping the others. Switching channels or updating the
   extension keeps open tabs translating, no reload
-- **Start on demand**: an option leaves every new channel untranslated until you switch it on from the chat bar;
+- **Start on demand**: an option leaves every new channel untranslated until you switch it on from the chat bar or the toolbar popup;
   the choice lasts for that tab and nothing is added to a list
 - **Chrome, Brave, Edge and Firefox**
 
@@ -133,8 +133,8 @@ Click the gear on the chat bar, or right-click the extension icon and choose Opt
 Display.
 
 - **Display**: target language, display style, original text and language badge, text size, line spacing,
-  typeface, density, accent colour, chat theme, the compose preview, what clicking it does and which key
-  swaps in the translation
+  typeface, density, accent colour, chat theme, the compose preview, what clicking it does, which key
+  swaps in the translation, and whether channels start on their own or on demand
 - **Providers**: engine order with each engine's state, the mode (on-device first, cloud first, or
   on-device only), and your DeepL key once DeepL is in the order
 - **Filters**: bots, users, channels, keywords (matched as whole words), source languages, and a glossary of
@@ -144,6 +144,7 @@ Display.
   usage statistics choice, as they are on this device; it does hold your channel and user lists, so read it before sharing)
 - **Activity**: messages translated, cache hits, every language seen in chat, and why each of the last 50
   lines was translated or left alone
+- **About**: this copy's version, how a message becomes a translation, and the research behind it with links to the public repositories
 - **Keyboard**: Alt+T turns chat translation on or off, Alt+W the compose preview
 - The language button in the chat's action bar: one click switches between the channel's language and
   your last pick, press and hold opens the list, typing two letters filters it
@@ -237,12 +238,14 @@ No. It is an independent open-source project, not affiliated with Kick.
 
 ## What's new
 
-In 3.6.3:
+In 3.7.0:
 
+- Start on demand: an option that keeps every channel untranslated until you switch it on from the chat bar or the popup
+- Chinese and Japanese lines written only with Han characters are no longer hidden or mistaken for the other language: the channel's language settles them, Traditional and Simplified are told apart far more often, and a mostly Cantonese chat is recognised
 - Tab no longer inserts the translation of an older version of what you typed
 - Your DeepL key stays on the device: never synced, never in a settings export, closed to the scripts that run inside kick.com pages on Chrome, and removing DeepL from the order sticks
 - Blocked words match whole words: blocking "rat" no longer hides "congrats"
-- The options page says when your lists are too long for browser sync to save
+- The options page says when your lists are too long for browser sync to save, and its About tab explains the research behind the translator
 - The remembered channel language stays in its own tab, repeated lines get the glossary once, and the cache cleans itself daily
 - The popup opens with 84 % less code
 - Chat text no longer goes to lingva.ml, a custom Lingva server must use https, and one permission is gone
@@ -336,6 +339,10 @@ release: [docs/language-identification.md](docs/language-identification.md).
 ## Related projects
 
 - [Twitch Chat Translator](https://github.com/kilworks/twitch-chat-translator), the same extension for Twitch chat
+- [kick-chat-translator-request](https://github.com/kilworks/kick-chat-translator-request), the requests users made and the research done to answer each one
+- [kct-detection-langue](https://github.com/kilworks/kct-detection-langue), language identification research, with a live demo
+- [kick-translator-research](https://github.com/kilworks/kick-translator-research), the linguistic and architectural limits of real-time chat translation, measured on this extension
+- [docs/han-detection.md](docs/han-detection.md), the measurements behind the Chinese, Japanese and Cantonese changes
 
 ## Usage stats
 
