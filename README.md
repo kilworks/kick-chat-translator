@@ -242,13 +242,11 @@ In 3.7.0:
 
 - Start on demand: an option that keeps every channel untranslated until you switch it on from the chat bar or the popup
 - Chinese and Japanese lines written only with Han characters are no longer hidden or mistaken for the other language: the channel's language settles them, Traditional and Simplified are told apart far more often, and a mostly Cantonese chat is recognised
-- Tab no longer inserts the translation of an older version of what you typed
-- Your DeepL key stays on the device: never synced, never in a settings export, closed to the scripts that run inside kick.com pages on Chrome, and removing DeepL from the order sticks
-- Blocked words match whole words: blocking "rat" no longer hides "congrats"
-- The options page says when your lists are too long for browser sync to save, and its About tab explains the research behind the translator
-- The remembered channel language stays in its own tab, repeated lines get the glossary once, and the cache cleans itself daily
-- The popup opens with 84 % less code
-- Chat text no longer goes to lingva.ml, a custom Lingva server must use https, and one permission is gone
+- Your settings and DeepL key are closed to the scripts that run inside kick.com pages on Chrome, and importing a settings file can no longer change your usage statistics choice, MyMemory email or Lingva address
+- Failed lines say "Translation failed" in your language, and fast chats cost less to read (no heavy style search, hidden tabs left alone)
+- The options About tab explains the research behind the translator
+
+In 3.6.3, safer and lighter: your DeepL key stays on this device (never synced, never in a settings export), blocked words match whole words, Tab never inserts the translation of an older text, chat text no longer goes to lingva.ml, and the popup opens with 84 % less code.
 
 In 3.6.0, the settings were redesigned around switches and swatches, each engine started saying whether it is ready, and the popup fits in all 43 interface languages.
 
