@@ -168,3 +168,9 @@ A FAIL is published as it is. `ds4` is not read again for this candidate.
 4. Weight: gzip 102,839 to 103,378, +539 bytes against a margin of 725. Speed, three alternated runs: median 1.05 times, p95 1.03 times. PASS.
 
 Informational, not used to choose: on 33,852 real Twitch lines declared Chinese, 0.1 percent (about 34 lines) are now named `ja`; the benefit and this price are both small, and a Japanese reader would skip those lines as already in their language.
+
+## Pass B, character n-gram model: pre-registered experiment
+
+Pre-registered before the chat-like set `ds3` is read for this candidate. The weight margin left under the +4,000 bytes rule after passes 93 and A2b is 186 bytes, which cannot hold a model, so this pass is run offline and reports the cost of its gain, not a product change. Candidate: a multinomial model on Han unigrams and bigrams over four classes (Traditional, Simplified, Cantonese, Japanese), trained on the train lines that the rules leave unanswered with balanced priors, features cut to the N with the largest log-odds, answering only above a confidence set on dev so that at most 1 percent of the answered dev lines are wrong. Read on the `ds3` lines that the rules leave unanswered, once, for N from 50 to 20,000 with the estimated gzip weight of each.
+
+Criterion: a model qualifies for the product only if, at a weight of at most 186 bytes, it names at least 3 points more of Taiwanese or mainland lines correctly with at most 0.3 point of wrong answers per origin, and never names Japanese lines Chinese more often. Otherwise the curve of gain against weight is published as the result and the model stays out.
