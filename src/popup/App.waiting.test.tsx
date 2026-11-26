@@ -77,6 +77,8 @@ describe('popup, manual start', () => {
     stubTab(true);
     const root = await mount();
     expect(root.textContent).toContain('Paused on this channel');
+    // Like a pause: the stats card steps aside, or the popup passes the 600px a browser gives it (610 to 634 px, measured).
+    expect(root.textContent).not.toContain('Today');
     resume(root)!.click();
     for (let i = 0; i < 4; i++) await new Promise((r) => setTimeout(r, 0));
     expect(sendMessage).toHaveBeenCalledWith(7, { type: 'start.set' }, { frameId: 0 });

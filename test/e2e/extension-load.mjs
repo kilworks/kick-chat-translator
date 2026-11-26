@@ -87,7 +87,9 @@ await ctx.route(KICK, async (route) => {
 await page.goto('https://kick.com/kt-fixture-channel', { waitUntil: 'domcontentloaded' });
 // `document_idle` n'est pas un evenement qu'on peut attendre : on laisse le
 // temps que Chrome injecte, puis on regarde.
-await page.waitForTimeout(3000);
+// Wait for the condition, not a fixed 3 s: under the 24 parallel windows of run-gates the injection was seen
+// to take longer and the gate failed with the script merely late. Absent after 20 s still fails.
+await page.waitForFunction(() => !!document.getElementById('kt-inject-style'), null, { timeout: 20000 }).catch(() => undefined);
 
 const vu = await page.evaluate(() => ({
   style: !!document.getElementById('kt-inject-style'),
