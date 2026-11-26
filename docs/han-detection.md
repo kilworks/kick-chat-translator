@@ -183,3 +183,13 @@ Naive Bayes over Han unigrams and bigrams, four classes, trained on the 48,777 t
 - N = 200 to 20,000 (1.5 KB to 41 KB): no confidence up to 0.99 reached 1 percent wrong on dev, so the model answered nothing at the operating point. The posteriors of a naive Bayes model are overconfident, and the residue the rules leave is made of lines that carry little script evidence.
 
 Criterion: at most 186 bytes and at least 3 points of correct answers with at most 0.3 point wrong per origin. Not met: the smallest useful model is over twice the margin and names Taiwanese lines wrongly more often than rightly. Reading of the result: on the lines the rules leave unanswered, character unigrams and bigrams do not separate the origins at a usable precision; the model stays out of the product. Not tried: a calibrated logistic model, and word-level features (no segmenter fits the budget).
+
+## Pass C, script and language answered separately: feasibility measured, not implemented
+
+The idea: skip a line as "already in my language" only when the language is sure, not the script alone. For a `zh-tw` reader that means skipping a Traditional line only when it carries a marker of Mandarin. This is a feasibility measurement on the labelled set (train chooses, dev measures), not a candidate read on a fresh set.
+
+Mandarin markers (unigrams and bigrams) were chosen among lines already read Traditional, taking Taiwanese lines as positives and Cantonese lines as negatives, with at most 0.5 percent of the Cantonese train lines flagged: 256 markers. On dev they are present in 33.8 percent of the Taiwanese lines read Traditional and in 3.1 percent of the Cantonese ones. Share of lines skipped for a `zh-tw` reader, current rule then marker rule: Taiwan 77.0 to 26.1, Cantonese 35.6 to 1.3, Hong Kong written 36.1 to 1.3, mainland 82.7 to 82.4, Japan 0.8 to 0.3.
+
+Cost per 1,000 lines with weight 10 for a Cantonese line skipped and 1 for a Taiwanese line kept: a Taiwanese chat with 2 percent Cantonese goes from 297 to 727 (worse); a Hong Kong chat with 90 percent Cantonese goes from 3,224 to 187 (much better). The rule helps exactly where the stream is Cantonese and hurts where it is Taiwanese, and the line alone cannot say which stream it is in.
+
+Decision: not implemented. A global change is a loss in Taiwanese streams. What would work is a stream-level input (the declared language of the channel, which the Twitch extension reads for its composer) choosing between the two rules; that is a product change and is left to the owner.
