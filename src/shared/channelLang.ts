@@ -35,9 +35,11 @@ export function memoriserLangueChaine(
 export function vueDeChaine(s: Settings, slug: string | undefined, started?: ReadonlySet<string>): Settings {
   if (!slug) return s;
   let vue = s;
-  if (s.pausedChannels.includes(slug)) vue = { ...vue, enabled: false };
   // Manual start: a channel nobody switched on in this tab stays off, like a paused one.
-  if (s.startMode === 'manual' && !started?.has(slug)) vue = { ...vue, enabled: false };
+  // A channel switched on by hand wins over an older pause, or the bar click would do nothing.
+  const manual = s.startMode === 'manual';
+  const on = manual && !!started?.has(slug);
+  if ((manual && !on) || (!on && s.pausedChannels.includes(slug))) vue = { ...vue, enabled: false };
   const retenue = s.rememberChannelLang ? s.channelLangs[slug] : undefined;
   if (retenue && retenue !== s.targetLang) vue = { ...vue, targetLang: retenue };
   return vue;

@@ -86,4 +86,11 @@ describe('vueDeChaine', () => {
     expect(vueDeChaine(paused, 'b').enabled).toBe(true);
     expect(vueDeChaine(paused, undefined).enabled).toBe(true);
   });
+
+  it('manual start: a started channel is on even if it was paused before', () => {
+    const m = { ...base, enabled: true, startMode: 'manual' as const, pausedChannels: ['a'] };
+    expect(vueDeChaine(m, 'a', new Set(['a'])).enabled).toBe(true);
+    expect(vueDeChaine(m, 'a', new Set()).enabled).toBe(false);
+    expect(vueDeChaine(m, 'b', new Set(['a'])).enabled).toBe(false);
+  });
 });

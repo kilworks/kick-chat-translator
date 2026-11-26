@@ -1,6 +1,6 @@
 # Manual start of translation on a new channel: design
 
-Status: written for review, nothing implemented. Date: 2026-11-27. Applies to Kick Chat Translator, then Twitch Chat Translator.
+Status: implemented (see "As built" below). Date: 2026-11-27. Applies to Kick Chat Translator, then Twitch Chat Translator.
 
 ## Request
 
