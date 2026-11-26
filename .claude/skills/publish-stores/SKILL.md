@@ -7,7 +7,7 @@ description: Ship a release to the Chrome Web Store and addons.mozilla.org. A ta
 
 ## A release, since 3.0.0
 
-1. **On master**, merged through a pull request with CI green: bump `package.json`, move `## [Unreleased]` in CHANGELOG under the new version, write `store/notes/en.txt` for it (what changed; English only since 3.6.3, AMO falls back to it in every locale). **The file is replaced at each release**: until you write it, it still holds the previous release's notes (`git show vX.Y.Z:store/notes/en.txt`), so write only what is new since the last tag, never prepend (3.7.0 first went out with the 3.6.3 notes underneath). The README "What's new" block follows the same rule: new block on top, the previous release folded into one sentence. Then check locally:
+1. **On master**, merged through a pull request with CI green: bump `package.json`, move `## [Unreleased]` in CHANGELOG under the new version, write `store/notes/en.txt` for it (what changed; English only since 3.6.3, AMO falls back to it in every locale). **The file is replaced at each release**: until you write it, it still holds the previous release's notes (`git show vX.Y.Z:store/notes/en.txt`), so write only what is new since the last tag, never prepend (for 3.7.0 the release commit still held the 3.6.3 notes under the new paragraphs; it was caught before the merge). The README "What's new" block follows the same rule: new block on top, the previous release folded into one sentence. Then check locally:
    ```bash
    npm run release:check && npm run package:all && npm run stores:payloads -- <scratchpad>/stores
    ```
@@ -90,7 +90,7 @@ The API does not touch the listing. When a file in `store/chrome/description/` c
 No API sets the listing and no extension may act on the dashboard. `scripts/stores/cws-listing.mjs` speaks the Chrome DevTools Protocol itself, over the WebSocket built into Node, to a browser the user started with debugging on a dedicated profile:
 
 ```powershell
-& "C:\Program Files\BraveSoftware\Brave-Browser\Applicationrave.exe" --remote-debugging-port=9222 --user-data-dir="$env:USERPROFILE\.config\kick-chat-translator\cws-browser" --no-first-run <listing URL>
+& "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" --remote-debugging-port=9222 --user-data-dir="$env:USERPROFILE\.config\kick-chat-translator\cws-browser" --no-first-run <listing URL>
 ```
 
 **Start it yourself, whenever needed: `node scripts/stores/cws-listing.mjs launch`.** kil authorized it on 2026-10-12 and set it to allow: do not ask first, do not hand them a command. Run it whenever the debugging port does not answer (`ECONNREFUSED 127.0.0.1:<port>`): `launch` picks a random port and records it in `kt-cdp-port` inside the profile, so there is no fixed 9222 for another local process to find. `cws-listing.mjs close` shuts that browser when the listing work is done. Signing in stays the user's step: the profile is signed in and stays so; if Google asks for a sign-in, stop and ask. The user added the allow rule `Bash(node scripts/stores/cws-listing.mjs:*)`; run the script exactly as `node scripts/stores/cws-listing.mjs <cmd>` from the repository root, never prefixed with `cd`, or the rule does not match and the call is refused.
