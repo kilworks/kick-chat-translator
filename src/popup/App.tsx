@@ -76,13 +76,18 @@ export function App() {
           // No content script in that tab (not reloaded since an update): say nothing.
           .catch(() => undefined);
         setTabId(tab.id);
-        void chrome.tabs
-          .sendMessage(tab.id, { type: START_ASK })
-          .then((res: { waiting?: boolean } | undefined) => setWaiting(res?.waiting === true))
-          .catch(() => undefined);
       })
       .catch(() => undefined);
   }, []);
+
+  // Manual start only: auto mode has nothing to ask. Frame 0 is the page itself, not an embed that also runs the script.
+  useEffect(() => {
+    if (tabId === undefined || settings.startMode !== 'manual') return;
+    void chrome.tabs
+      .sendMessage(tabId, { type: START_ASK }, { frameId: 0 })
+      .then((res: { waiting?: boolean } | undefined) => setWaiting(res?.waiting === true))
+      .catch(() => undefined);
+  }, [tabId, settings.startMode]);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -123,7 +128,7 @@ export function App() {
   async function resumeHere(): Promise<void> {
     if (pausedHere) return patch('pausedChannels', settings.pausedChannels.filter((c) => c !== channel));
     if (tabId === undefined) return;
-    const res = (await chrome.tabs.sendMessage(tabId, { type: START_SET }).catch(() => undefined)) as
+    const res = (await chrome.tabs.sendMessage(tabId, { type: START_SET }, { frameId: 0 }).catch(() => undefined)) as
       | { waiting?: boolean }
       | undefined;
     setWaiting(res?.waiting === true);

@@ -79,7 +79,7 @@ describe('popup, manual start', () => {
     expect(root.textContent).toContain('Paused on this channel');
     resume(root)!.click();
     for (let i = 0; i < 4; i++) await new Promise((r) => setTimeout(r, 0));
-    expect(sendMessage).toHaveBeenCalledWith(7, { type: 'start.set' });
+    expect(sendMessage).toHaveBeenCalledWith(7, { type: 'start.set' }, { frameId: 0 });
     expect(resume(root)).toBeUndefined();
   });
 
@@ -100,6 +100,8 @@ describe('popup, manual start', () => {
     settings = { ...settings, startMode: 'auto' };
     stubTab(true);
     expect(resume(await mount())).toBeUndefined();
+    // Auto mode has nothing to ask the tab.
+    expect(sendMessage).not.toHaveBeenCalledWith(7, { type: 'start.state' }, { frameId: 0 });
   });
 
   it('shows nothing when the tab has no content script', async () => {

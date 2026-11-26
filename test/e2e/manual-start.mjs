@@ -75,9 +75,13 @@ async function run(mode) {
     await add(page, 'hola amigos como estan todos hoy', 10);
     await page.waitForTimeout(5000);
     out.before = await shown(page, 'hola amigos como estan todos hoy');
+    const label = () => page.evaluate(() => document.querySelector('#kt-floating-bar .kt-float-label')?.textContent ?? null);
+    out.labelBefore = await label();
     out.askBefore = (await ask('start.state'))?.waiting;
     out.set = (await ask('start.set'))?.waiting;
     out.askAfter = (await ask('start.state'))?.waiting;
+    await page.waitForTimeout(500);
+    out.labelAfter = await label();
     await add(page, 'buenas noches a todos los presentes', 11);
     await page.waitForTimeout(6000);
     out.after = await shown(page, 'buenas noches a todos los presentes');
@@ -92,6 +96,7 @@ try {
   const man = await run('manual');
   const aut = await run('auto');
   check('manual: the tab says it is waiting', man.askBefore === true);
+  check('manual: the bar says the translation is paused, then that it translates', man.labelBefore === 'Translation paused' && man.labelAfter === 'Translating');
   check('manual: a line before the start is not translated', man.before === false);
   check('manual: start.set answers that it no longer waits', man.set === false && man.askAfter === false);
   check('manual: the next line is translated after start.set', man.after === true);

@@ -162,6 +162,8 @@ async function main(): Promise<void> {
    */
   // Channels the reader switched on in this tab; read once, rewritten by the bar in the manual start mode.
   let started: ReadonlySet<string> = readStarted();
+  // Manual start: this tab's channel is held back until the reader switches it on.
+  const isWaiting = (): boolean => settings.startMode === 'manual' && !!currentSlug && !started.has(currentSlug);
   function vueLocale(base: Settings = settings, slug = currentSlug): Settings {
     return vueDeChaine(base, slug, started);
   }
@@ -295,7 +297,7 @@ async function main(): Promise<void> {
             const pairs = localEngine.downloadablePairs().filter((p) => p.tgt === tgt);
             void localEngine.download(pairs.length ? pairs : localEngine.downloadablePairs());
           },
-        });
+        }, isWaiting());
         refreshChip();
         barPolling = false;
         return;
@@ -373,7 +375,7 @@ async function main(): Promise<void> {
     const vue = vueLocale(settings, slug);
     pipeline.updateSettings(vue);
     compose.updateSettings(vue);
-    updateFloatingBar(vue);
+    updateFloatingBar(vue, isWaiting());
 
     if (!slug) {
       observer.stop();
@@ -587,9 +589,6 @@ async function main(): Promise<void> {
     pipeline.reapplyBlocked();
   }
 
-  // Manual start: this tab's channel is held back until the reader switches it on.
-  const isWaiting = (): boolean => settings.startMode === 'manual' && !!currentSlug && !started.has(currentSlug);
-
   // Manual start: switch a channel on or off for this tab (the bar and the popup both come here).
   function startHere(slug: string, on: boolean): void {
     const before = vueLocale();
@@ -620,7 +619,7 @@ async function main(): Promise<void> {
     // Ahead of everything that redraws below, so the bar and the chip come back
     // in the language that was just chosen rather than one change late.
     void loadChatTable(setContentLocale(next.uiLang));
-    updateFloatingBar(vue);
+    updateFloatingBar(vue, isWaiting());
     applyShowOriginal(next.showOriginal);
     applyDisplayStyle(next.displayStyle);
     refreshChip();
