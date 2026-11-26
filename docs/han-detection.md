@@ -101,4 +101,18 @@ Reference: the code after the first change. Counts over all 3,608 lines.
 - Cost per unit, paired: `en` -0.158 [-0.295, -0.037], `zh` -0.495 [-0.928, -0.114] for the tables; every reader below 0 for bopomofo.
 - Known price: the 11 traditional Tatoeba lines the old table recognised only through characters that left it are now answered by the fallback as simplified Chinese.
 
-The held-out set was not read for this change: the engine verdict collection was cut by a rate limit. This change stays a draft until it is.
+## Second change: the held-out reading (`frais`)
+
+One reading, after the code freeze, without engine verdicts (the collection was cut by a rate limit, so the verdict gate sees no answer; this reading scores the detector, the same-language gate and the source allowlists only). 3,655 lines (Japanese 1,840, Chinese 1,415, Korean 400) in 101 file-and-channel units, scored once for each prefix of the second change against the code after the first change. The 3 prefixes are the table swap, then bopomofo, then the function characters.
+
+Full change (all three steps):
+
+- `W`: no cell rises. The `ja` and the two Chinese readers on Japanese lines 1 to 0; the `zh,zh-tw,yue` list 129 to 123. Reported without a criterion: the `zh` list 708 to 721 (it deletes more lines because more lines are now read as Chinese).
+- `S`: Japanese class 24 to 23, Chinese class 3 to 3, Korean class 45 to 45.
+- Silence on han-only Chinese lines 0.586 to 0.415. Han-only Japanese lines read as Chinese 0.023 to 0.000 (43 lines in 41 units: carried by one line).
+- Cost per unit, paired by unit (101 units, none up): `en` and `ja` readers -1.238 [-1.698, -0.817], `zh` and `zh-tw` readers -3.723 [-5.104, -2.460], `ko` reader -1.238 [-1.698, -0.817].
+- Units carrying changed lines: 37 of 101, so no criterion is underpowered.
+
+Shorter prefixes, same reading: the table swap alone gives `en` and `ja` cost -0.094 [-0.307, 0.114] and the table swap plus bopomofo -0.139 [-0.352, 0.064], intervals that include 0 (13 and 11 units up). By the rule the longest prefix with no FAIL is the full change, so nothing is removed.
+
+The `zh` list rises (708 to 721, 773 to 798 on `design`), so by the merge rule this change is left ready for the owner to merge. Not measured here: the engine verdict gate, the price on the Tatoeba check (3 to 17 wrong answers of the confident path), Kick chat, Cantonese.
