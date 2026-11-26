@@ -45,3 +45,7 @@ A user turns on manual mode and forgets that new channels start silent; the bar 
 - The popup does not show the started state of the active tab: it lives in the page, and showing it needs a message to the content script. Not done.
 - Twitch Chat Translator: see its own pull request.
 
+
+## Real Brave check (service faked, throwaway profile)
+
+Manual mode: a Spanish line in a fresh channel is not translated and the bar reads "Translation off"; after the switch in the bar it reads "Translating" and the next line is translated; after a reload of the same channel the next line is translated; in a new tab on the same channel the next line is not translated. Automatic mode (control): the first line is translated at once, a new tab translates too. 8 of 8 checks. Not done: a live channel, and the popup state.
