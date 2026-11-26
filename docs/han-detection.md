@@ -181,3 +181,11 @@ Pre-registered before the fresh set `ds5` is read. The owner relaxed the weight 
 4. Weight: gzip at most 16,000 bytes over `master` in total. Speed: median at most 1.10 times, p95 at most 1.25 times.
 
 A FAIL is published as it is. `ds5` is not read again for this candidate.
+
+## Pass B2, calibrated logistic model with a larger budget: results: FAIL, no operating point, fresh set not read
+
+Softmax logistic regression on Han unigrams and bigrams, four classes, trained on the 48,777 train lines the rules leave unanswered, 300 to 1,700 features (2 KB to 11.4 KB estimated gzip), regularisation C from 0.3 to 3, class-balanced. On the 16,406 unanswered dev lines (13,493 Japanese, 428 Taiwanese, 965 Hong Kong, 762 Cantonese, 758 mainland) no setting reached 1 percent wrong among the answered lines: the grid of nine models has no confidence at which the rule's operating point exists.
+
+Diagnostic for the largest model (1,700 features, C = 1), not used to change the rule: confidence 0.6 answers 2,192 lines with 38.8 percent wrong; 0.9 answers 792 with 15.0 percent wrong; 0.97 answers 391 with 11.0 percent wrong; 0.995 answers 153 with 5.9 percent wrong. Few of the errors are Japanese lines named Chinese (18 of 119 at 0.9, 0 of 9 at 0.995); most are Chinese lines named with the wrong Chinese class, mainly Cantonese against Traditional, which the lines left unanswered by the rules do not separate by their characters.
+
+By the rule the candidate answers nothing, so criterion 1 is not met. `ds5` (453,066 Taiwanese, 293,700 mainland, 121,101 Cantonese and 74,855 Japanese chat-like lines) was not read and stays fresh for a later candidate. Reading of the result with twice the budget of the first attempt and a calibrated model: the lines the rules leave unanswered carry too little script evidence for a character model to name their origin; what is missing is context (the stream), not capacity.
