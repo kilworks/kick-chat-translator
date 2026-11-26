@@ -245,3 +245,11 @@ Written after two measurements, which are stated here and not claimed as pre-reg
 Candidate: on a Han-only line that no character rule names, when the stream prior exists, the source language sent to the service is the prior family (`ja` or `zh`) instead of automatic detection. Without a prior, or on any other line, nothing changes. The gates of the earlier steps are untouched.
 
 Criteria, read on the 83 replayed channels and the gold lines: the prior family is right for at least 90 percent of the gold-decided Han-only lines in each stream and at least as often as the service's own verdict; weight at most 300 bytes gzip; no test re-pinned. A FAIL is published as it is.
+
+## Stream prior as the source language of Han-only lines: results
+
+1. Language of the stream against the gold labels, Han-only lines with two annotators agreeing: channels declared Chinese, prior right for 100.0 percent of 197 lines (the service's own verdict names a family for 17.3 percent); channels declared Japanese, prior right for 93.3 percent of 104 lines (the verdict: 87.5 percent right, 5.8 wrong, 6.7 silent). PASS (90 percent and at least the verdict were asked).
+2. Weight: `content.js` gzip +31 bytes. PASS.
+3. No pinned test re-pinned; three new pipeline tests (Japanese channel sends `ja`, Chinese channel sends `zh`, no prior sends nothing), two of them seen red with the change neutralised. PASS.
+
+What it changes for the reader, measured on the real translation service before the rule was written: for Han-only Japanese lines that automatic detection reads as something else, the English translation changes for 75 percent when the source is forced to Japanese; for Han-only Chinese lines it reads as Japanese, for 54.5 percent when forced to Chinese. Not measured: the same through the extension in a browser against the real service (the run ended in refusals on the first-choice endpoint, which the extension falls back from, and its check could not see a line translated into itself), and on a live channel.
