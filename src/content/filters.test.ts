@@ -9,6 +9,7 @@ import {
   shouldDropBySourceLang,
   shouldDropByUserOrChannel,
   skipOnHintForStream,
+  sourceHintForStream,
   skipOnVerdictForStream,
   trustedVerdict,
 } from './filters';
@@ -363,3 +364,23 @@ describe('skipOnHintForStream', () => {
   });
 });
 
+describe('Cantonese stream', () => {
+  const han = '你而家去邊度';
+  it('keeps a Traditional Han-only line for a Traditional reader, and reads it as Cantonese', () => {
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', han, 'zh', false)).toBe(true);
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', han, 'zh', true)).toBe(false);
+    expect(sourceHintForStream('zh-tw', han, 'zh', true)).toBe('yue');
+    expect(sourceHintForStream('zh-tw', han, 'zh', false)).toBe('zh-tw');
+  });
+
+  it('leaves other languages and scripts alone', () => {
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', 'hello 你好', 'zh', true)).toBe(true);
+    expect(sourceHintForStream('zh', han, 'zh', true)).toBe('zh');
+    expect(skipOnHintForStream('ja', 'ja', han, 'zh', true)).toBe(true);
+  });
+
+  it('does not skip a Han-only line the engine calls Chinese', () => {
+    expect(skipOnVerdictForStream('zh', 'zh-tw', true, han, undefined, 'zh', false)).toBe(true);
+    expect(skipOnVerdictForStream('zh', 'zh-tw', true, han, undefined, 'zh', true)).toBe(false);
+  });
+});
