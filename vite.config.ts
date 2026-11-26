@@ -3,11 +3,11 @@ import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
 import preact from '@preact/preset-vite';
 import { crx } from '@crxjs/vite-plugin';
-import manifest from './manifest.config';
+import manifest from './manifest.config.ts';
 
 export default defineConfig(({ mode }) => ({
   resolve: {
-    alias: { '~': resolve(__dirname, 'src') },
+    alias: { '~': resolve(import.meta.dirname, 'src') },
   },
   plugins: [preact(), crx({ manifest })],
   // Integration builds carry the instrumentation, releases must not. A constant
