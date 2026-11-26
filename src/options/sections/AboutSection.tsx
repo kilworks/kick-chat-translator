@@ -104,7 +104,7 @@ export function AboutSection({
             langue, qui est l'etape qui decide de tout le reste : c'est elle qui
             dit a quel moteur envoyer, et c'est elle qui decide si un message est
             saute parce qu'il est deja dans ta langue. */}
-        <ol class="list-inside list-decimal space-y-2 text-sm text-kick-muted">
+        <ol class="kt-prose list-outside list-decimal ps-5 space-y-2 text-sm text-kick-muted">
           <li>{t('The message is read from the page, emotes and links set aside.')}</li>
           <li>
             {t(
@@ -150,7 +150,7 @@ export function AboutSection({
             'Knowing which language a short line is in is the hard part of a chat translator: two Han characters can be Chinese or Japanese. Each question is measured on labelled data before the code changes, and the results are public.',
           )}
         </p>
-        <ul class="list-inside list-disc space-y-2 text-sm text-kick-muted">
+        <ul class="kt-prose list-outside list-disc ps-5 space-y-2 text-sm text-kick-muted">
           <li>
             {t(
               'Japanese or Chinese: lines made only of Han characters are told apart with character lists chosen from labelled data, and with the language the channel speaks.',
