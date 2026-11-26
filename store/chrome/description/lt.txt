@@ -31,5 +31,5 @@ Leidimai paprastais žodžiais: saugykla tavo nustatymams ir vertimų talpyklai;
 
 NEMOKAMA IR ATVIRO KODO
 
-MIT licencija, kiekviena kodo eilutė vieša: github.com/kilworks/kick-chat-translator
+MIT licencija, kiekviena kodo eilutė vieša: github.com/Pkkls/kick-chat-translator
 Pranešimai apie klaidas ir kalbų pageidavimai ten laukiami, o kas pasikeitė kiekvienoje versijoje, rasi leidimų puslapyje.

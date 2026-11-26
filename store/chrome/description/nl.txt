@@ -31,5 +31,5 @@ De rechten in gewone woorden: opslag voor je instellingen en de vertaalcache; to
 
 GRATIS EN OPEN SOURCE
 
-MIT-licentie, elke regel code is openbaar: github.com/kilworks/kick-chat-translator
+MIT-licentie, elke regel code is openbaar: github.com/Pkkls/kick-chat-translator
 Bugmeldingen en taalverzoeken zijn daar welkom, en wat er in elke versie is veranderd staat op de releasepagina.

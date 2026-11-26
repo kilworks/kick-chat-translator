@@ -1,13 +1,13 @@
-Pressing Tab right after typing no longer swaps in the translation of what you had typed a moment earlier: the extension translates your current text first.
+New option, off by default: translate a channel only after you switch it on. Turn on "Translate a channel only after I switch it on in the bar" in the Display tab. Every channel then stays untranslated until you press play on the bar, or Resume in the popup, and the choice lasts for that tab only.
 
-Your DeepL key stays on this device. It is no longer copied to browser sync, never written into a settings export, and removing DeepL from the engine order now sticks. If you ever shared a settings file, change your DeepL key in your DeepL account.
+Chinese and Japanese chat reads better. Short lines written only with Han characters are no longer hidden or mistaken for the other language, Taiwanese and mainland Chinese are told apart far more often, and a mostly Cantonese chat is recognised, so its lines are translated instead of skipped.
 
-Blocked words now match whole words only: blocking "rat" no longer hides "congrats".
+Safer on Chrome: your settings and your DeepL key are now closed to the scripts that run inside Kick pages, and importing a settings file can no longer change your usage statistics choice, your MyMemory email or your Lingva address.
 
-The options page now tells you when your lists are too long for browser sync to save, instead of silently dropping every change.
+Failed lines say "Translation failed" in your language instead of a code, and a translation service that is cooling down is no longer asked again on every batch. Notices are announced to screen readers and shown with reduced motion on.
 
-Repeated lines no longer get your glossary twice, the language you remember for a channel no longer spreads to your other open tabs, and the translation cache now cleans itself once a day.
+Lighter on fast chats: translated lines are found without a heavy style search, a hidden paused tab is no longer read, and the background worker writes the cache once per batch.
 
-The popup and the options page load 84 % less code each time they open.
+The About tab now explains the research behind the translator and links the public repositories.
 
-One server and one permission fewer: chat text is no longer sent to lingva.ml, a custom Lingva server is used over https only, a settings file can no longer change it, and Kick pages can no longer read your DeepL key.
+Also in this version: the new About card is translated into the 42 interface languages, the options lists keep a readable line length, the popup stays under 600 px in every language, and the build dependencies are up to date.

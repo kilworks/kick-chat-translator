@@ -31,5 +31,5 @@ Các quyền, nói đơn giản: storage cho cài đặt và bộ nhớ đệm b
 
 MIỄN PHÍ VÀ MÃ NGUỒN MỞ
 
-Giấy phép MIT, từng dòng mã đều công khai: github.com/kilworks/kick-chat-translator
+Giấy phép MIT, từng dòng mã đều công khai: github.com/Pkkls/kick-chat-translator
 Báo lỗi và yêu cầu thêm ngôn ngữ đều được hoan nghênh ở đó, còn thay đổi của từng phiên bản nằm ở trang releases.

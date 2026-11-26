@@ -31,5 +31,5 @@ Behörigheterna, med enkla ord: lagring för dina inställningar och översättn
 
 GRATIS OCH ÖPPEN KÄLLKOD
 
-MIT-licens, varje kodrad är offentlig: github.com/kilworks/kick-chat-translator
+MIT-licens, varje kodrad är offentlig: github.com/Pkkls/kick-chat-translator
 Felrapporter och önskemål om språk är välkomna där, och vad som ändrats i varje version finns på releasesidan.
