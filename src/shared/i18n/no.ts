@@ -257,4 +257,10 @@ export const no: Record<string, string> = {
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Ikke brukt: bare en https://-adresse godtas, så chat-teksten går aldri ukryptert.",
   "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Ikke lagret: listene dine er for lange for nettlesersynkronisering. Forkort de blokkerte ordene, ordlisten eller brukerlistene.",
   "Not saved.": "Ikke lagret.",
+  "The research behind it": "Forskningen bak",
+  "Knowing which language a short line is in is the hard part of a chat translator: two Han characters can be Chinese or Japanese. Each question is measured on labelled data before the code changes, and the results are public.": "Å vite hvilket språk en kort linje er på er den vanskelige delen av en chat-oversetter: to Han-tegn kan være kinesisk eller japansk. Hvert spørsmål måles på merket data før koden endres, og resultatene er offentlige.",
+  "Japanese or Chinese: lines made only of Han characters are told apart with character lists chosen from labelled data, and with the language the channel speaks.": "Japansk eller kinesisk: linjer laget bare av Han-tegn skilles fra hverandre med tegnlister valgt fra merkede data, og med språket kanalen snakker.",
+  "Cantonese: a mostly Cantonese chat is recognised from its own lines, so its lines are translated instead of skipped as already in your language.": "Kantonesisk: en for det meste kantonesisk chat gjenkjennes fra sine egne linjer, så linjene oversettes i stedet for å hoppes over som allerede på ditt språk.",
+  "Language detection: a small network and a plain linear model were compared on real chat lines, and the network did not do better.": "Språkdeteksjon: et lite nettverk og en vanlig lineær modell ble sammenlignet på ekte chattelinjer, og nettverket gjorde det ikke bedre.",
+  "Reader requests: each request is kept as a case file with what was measured, what changed and what was not proven.": "Leserforespørsler: hver forespørsel oppbevares som en saksmappe med hva som ble målt, hva som ble endret og hva som ikke ble bevist.",
 };

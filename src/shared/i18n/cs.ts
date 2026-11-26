@@ -293,4 +293,10 @@ export const cs: Record<string, string> = {
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Nepoužívá se: přijímá se pouze adresa https://, takže text chatu nikdy necestuje nezašifrovaný.",
   "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Neuloženo: vaše seznamy jsou pro synchronizaci prohlížeče příliš dlouhé. Zkraťte blokovaná slova, glosář nebo seznamy uživatelů.",
   "Not saved.": "Neuloženo.",
+  "The research behind it": "Výzkum za tím",
+  "Knowing which language a short line is in is the hard part of a chat translator: two Han characters can be Chinese or Japanese. Each question is measured on labelled data before the code changes, and the results are public.": "Vědět, v jakém jazyce je krátký řádek, je těžká část překladače chatu: dva znaky Han mohou být čínské nebo japonské. Každá otázka se před změnou kódu měří na označených datech a výsledky jsou veřejné.",
+  "Japanese or Chinese: lines made only of Han characters are told apart with character lists chosen from labelled data, and with the language the channel speaks.": "Japonština nebo čínština: řádky tvořené pouze znaky Han jsou odděleny seznamem znaků vybraným z označených dat a jazykem, kterým kanál mluví.",
+  "Cantonese: a mostly Cantonese chat is recognised from its own lines, so its lines are translated instead of skipped as already in your language.": "Kantonský: Chat převážně kantonský je rozpoznán z jeho vlastních řádků, takže jeho řádky jsou přeloženy namísto přeskakování, jak je tomu již ve vašem jazyce.",
+  "Language detection: a small network and a plain linear model were compared on real chat lines, and the network did not do better.": "Detekce jazyka: malá síť a prostý lineární model byly porovnány na skutečných chatovacích linkách a síť si nevedla lépe.",
+  "Reader requests: each request is kept as a case file with what was measured, what changed and what was not proven.": "Požadavky čtenářů: každá žádost je vedena jako spis s tím, co bylo naměřeno, co se změnilo a co nebylo prokázáno.",
 };

@@ -293,4 +293,10 @@ export const sk: Record<string, string> = {
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "Nepoužíva sa: akceptuje sa iba adresa https://, takže text rozhovoru nikdy neprejde nezašifrovaný.",
   "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "Neuložené: vaše zoznamy sú príliš dlhé na synchronizáciu prehliadača. Skráťte blokované slová, slovník alebo zoznamy používateľov.",
   "Not saved.": "Neuložené.",
+  "The research behind it": "Výskum za tým",
+  "Knowing which language a short line is in is the hard part of a chat translator: two Han characters can be Chinese or Japanese. Each question is measured on labelled data before the code changes, and the results are public.": "Vedieť, v akom jazyku je krátky riadok, je ťažká časť prekladača chatu: dva znaky Han môžu byť čínske alebo japonské. Každá otázka sa meria na označených údajoch pred zmenou kódu a výsledky sú verejné.",
+  "Japanese or Chinese: lines made only of Han characters are told apart with character lists chosen from labelled data, and with the language the channel speaks.": "Japončina alebo čínština: riadky vytvorené iba zo znakov Han sú oddelené zoznamom znakov vybratým z označených údajov a jazykom, ktorým kanál hovorí.",
+  "Cantonese: a mostly Cantonese chat is recognised from its own lines, so its lines are translated instead of skipped as already in your language.": "Kantončina: Chat, ktorý je prevažne kantonský, sa rozpoznáva z vlastných riadkov, takže jeho riadky sa preložia namiesto toho, aby sa preskočili, ako už vo vašom jazyku.",
+  "Language detection: a small network and a plain linear model were compared on real chat lines, and the network did not do better.": "Detekcia jazyka: malá sieť a obyčajný lineárny model sa porovnávali na skutočných chatovacích linkách a sieť si neviedla lepšie.",
+  "Reader requests: each request is kept as a case file with what was measured, what changed and what was not proven.": "Žiadosti čitateľov: každá žiadosť je vedená ako spis s tým, čo sa meralo, čo sa zmenilo a čo sa nepreukázalo.",
 };

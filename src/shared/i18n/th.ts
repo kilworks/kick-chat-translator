@@ -257,4 +257,10 @@ export const th: Record<string, string> = {
   "Not used: only an https:// address is accepted, so chat text never travels unencrypted.": "ไม่ได้ใช้: ยอมรับเฉพาะที่อยู่ https:// เท่านั้น ดังนั้นข้อความแชทจะไม่เดินทางโดยไม่เข้ารหัส",
   "Not saved: your lists are too long for browser sync. Shorten the blocked words, the glossary or the user lists.": "ไม่ได้บันทึก: รายการของคุณยาวเกินไปสำหรับการซิงค์เบราว์เซอร์ ย่อคำที่บล็อก อภิธานศัพท์ หรือรายการผู้ใช้ให้สั้นลง",
   "Not saved.": "ไม่ได้บันทึก",
+  "The research behind it": "การวิจัยเบื้องหลังมัน",
+  "Knowing which language a short line is in is the hard part of a chat translator: two Han characters can be Chinese or Japanese. Each question is measured on labelled data before the code changes, and the results are public.": "การรู้ว่าบรรทัดสั้นๆ เป็นภาษาใดเป็นส่วนที่ยากของนักแปลแชท: อักขระฮั่นสองตัวอาจเป็นภาษาจีนหรือญี่ปุ่นก็ได้ คำถามแต่ละข้อจะถูกวัดจากข้อมูลที่ติดป้ายกำกับก่อนที่โค้ดจะเปลี่ยนแปลง และผลลัพธ์จะแสดงต่อสาธารณะ",
+  "Japanese or Chinese: lines made only of Han characters are told apart with character lists chosen from labelled data, and with the language the channel speaks.": "ญี่ปุ่นหรือจีน: บรรทัดที่ประกอบด้วยอักขระฮั่นเท่านั้น จะถูกแยกออกจากรายการอักขระที่เลือกจากข้อมูลที่ติดป้ายกำกับ และภาษาที่ช่องพูด",
+  "Cantonese: a mostly Cantonese chat is recognised from its own lines, so its lines are translated instead of skipped as already in your language.": "กวางตุ้ง: การแชทแบบกวางตุ้งส่วนใหญ่ได้รับการยอมรับจากประโยคของตัวเอง ดังนั้นจึงมีการแปลประโยคแทนการข้ามเหมือนในภาษาของคุณ",
+  "Language detection: a small network and a plain linear model were compared on real chat lines, and the network did not do better.": "การตรวจจับภาษา: เปรียบเทียบเครือข่ายขนาดเล็กและโมเดลเชิงเส้นธรรมดากับสายสนทนาจริง และเครือข่ายไม่ได้ทำได้ดีกว่านี้",
+  "Reader requests: each request is kept as a case file with what was measured, what changed and what was not proven.": "คำขอของผู้อ่าน: คำขอแต่ละรายการจะถูกเก็บเป็นไฟล์เคสโดยประกอบด้วยสิ่งที่วัดได้ สิ่งใดที่เปลี่ยนแปลง และสิ่งใดที่ไม่ได้รับการพิสูจน์",
 };
