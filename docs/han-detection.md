@@ -218,3 +218,18 @@ Replay of the same 83 collected channel units, in time order.
 3. Weight: gzip 103736 bytes, 306 bytes above the previous step, so about 103,684 plus the veto; speed is the same constant-time check.
 
 Decision by the rule: the direction that passed is shipped (a Han-only line named Chinese in a Japanese channel goes to the service); the direction that failed is not (a line named Japanese in a Chinese channel is not vetoed). Three new unit tests and two pipeline tests; one pipeline test was seen red with the veto removed.
+
+## Hidden lines by reader and channel language: before and after
+
+The design set (3,608 lines of Twitch and PC chat, 1,511 Chinese and 1,936 Japanese by declared channel language, 3,140 of them with a stored answer from the translation service), run through the real gates by the bench of this repository. Lines hidden by a gate for a reader whose language they are not in:
+
+| Reader, channel language | Published 3.6.3 | `master` without the prior | with the prior (computed) |
+|---|---|---|---|
+| Japanese reader, Chinese channel | 14 (0.93 %) | 16 (1.06 %) | 6 (0.40 %) |
+| Chinese reader, Japanese channel | 39 (2.01 %) | 36 (1.86 %) | 0 |
+| English reader, Chinese channel | 537 (35.5 %) | 8 (0.5 %) | 8 (0.5 %) |
+| English reader, Japanese channel | 51 (2.6 %) | 34 (1.8 %) | 34 (1.8 %) |
+
+The prior cannot be replayed on this set, whose lines are distinct samples and not in time order; the last column removes from the third the lines it un-hides by construction: all 10 service-verdict skips of the Japanese reader and all 30 service-verdict and the 6 hint skips of the Chinese reader are Han-only lines with no sure answer or a Chinese one, which the prior and its veto send to the service. What is left for the Japanese reader in a Chinese channel: 6 lines named Japanese by a sure answer (4 Han-only, 2 with kana). The English reader's remaining 34 on Japanese lines are lines that look English (ASCII only) or that the service called English without a letter English does not write.
+
+Reading: the published extension hid 14 of 1,511 Chinese lines from a Japanese reader and 39 of 1,936 Japanese lines from a Chinese reader. The first step of this work removed the English reader's losses (537 to 8). The step before the prior did not help the Japanese reader (14 to 16, two more Chinese lines named Japanese by the Japanese-only characters); the prior takes it to 6.
