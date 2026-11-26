@@ -155,6 +155,7 @@ export const hi: Record<string, string> = {
   'Always dark': 'हमेशा डार्क',
   'Always light': 'हमेशा लाइट',
   'Remember a reading language per channel': 'हर चैनल के लिए पढ़ने की भाषा याद रखें',
+  'Translate a channel only after I switch it on in the bar': 'किसी चैनल का अनुवाद बार में चालू करने के बाद ही करें',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator चैट को आते ही पढ़ता है और हर मैसेज के नीचे आपकी भाषा में अनुवाद रख देता है। भेजने से पहले आप जो लिखते हैं, उसका भी अनुवाद करता है। न अकाउंट, ओपन सोर्स, और अनाम गिनती सिर्फ़ तब जब आप चाहें।',
   'Version': 'वर्ज़न',
   'Languages': 'भाषाएँ',

@@ -155,6 +155,7 @@ export const sl: Record<string, string> = {
   'Always dark': 'Vedno temna',
   'Always light': 'Vedno svetla',
   'Remember a reading language per channel': 'Zapomni si jezik branja za vsak kanal',
+  'Translate a channel only after I switch it on in the bar': 'Prevajaj kanal šele, ko ga vklopim v vrstici',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator bere klepet sproti in pod vsako sporočilo doda prevod v jeziku, v katerem berete. Prevede tudi to, kar napišete, preden sporočilo pošljete. Brez računa, odprtokodno, anonimna statistika pa samo, če jo dovolite.',
   'Version': 'Različica',
   'Languages': 'Jeziki',

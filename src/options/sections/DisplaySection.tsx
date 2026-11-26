@@ -186,6 +186,11 @@ export function DisplaySection({ settings, onPatch }: Props) {
             label={t('Remember a reading language per channel')}
           />
           <ToggleRow
+            checked={settings.startMode === 'manual'}
+            onChange={(v) => onPatch({ startMode: v ? 'manual' : 'auto' })}
+            label={t('Translate a channel only after I switch it on in the bar')}
+          />
+          <ToggleRow
             checked={settings.showFloatingBar}
             onChange={(v) => onPatch({ showFloatingBar: v })}
             label={t('Show the floating bar at the top of chat')}

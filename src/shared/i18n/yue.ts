@@ -176,6 +176,7 @@ export const yue: Record<string, string> = {
   'Always dark': '永遠深色',
   'Always light': '永遠淺色',
   'Remember a reading language per channel': '每個頻道記住閱讀語言',
+  'Translate a channel only after I switch it on in the bar': '喺工具列開咗先翻譯個頻道',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator 會喺聊天訊息一到就讀取，並喺每則訊息下面，用你睇嘅語言顯示譯文。你發送訊息之前，佢都可以先幫你翻譯。唔使帳戶，開源，你同意先會傳送匿名統計。',
   'Version': '版本',
   'Languages': '語言',

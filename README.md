@@ -60,6 +60,8 @@ changed in the settings, and a reading language can be remembered per channel.
 - **Four display styles**: under the message, on the same line, in place of it, or only on hover
 - **Pause one channel** from the chat bar without stopping the others. Switching channels or updating the
   extension keeps open tabs translating, no reload
+- **Start on demand**: an option leaves every new channel untranslated until you switch it on from the chat bar;
+  the choice lasts for that tab and nothing is added to a list
 - **Chrome, Brave, Edge and Firefox**
 
 | Chat, translated as it scrolls | The toolbar popup |

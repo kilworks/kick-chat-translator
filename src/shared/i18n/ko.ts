@@ -155,6 +155,7 @@ export const ko: Record<string, string> = {
   'Always dark': '항상 어둡게',
   'Always light': '항상 밝게',
   'Remember a reading language per channel': '채널마다 읽을 언어 기억',
+  'Translate a channel only after I switch it on in the bar': '막대에서 켠 채널만 번역',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator는 올라오는 채팅을 읽고, 각 메시지 아래에 내가 읽는 언어로 번역을 보여 줍니다. 보내기 전에 입력한 내용도 번역합니다. 계정이 필요 없고, 오픈소스이며, 익명 집계는 동의한 경우에만 전송됩니다.',
   'Version': '버전',
   'Languages': '지원 언어 수',

@@ -155,6 +155,7 @@ export const fa: Record<string, string> = {
   'Always dark': 'همیشه تیره',
   'Always light': 'همیشه روشن',
   'Remember a reading language per channel': 'به‌خاطر سپردن زبان خواندن برای هر کانال',
+  'Translate a channel only after I switch it on in the bar': 'ترجمه کانال فقط پس از روشن کردن آن در نوار',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator چت را همان لحظه که می‌رسد می‌خواند و زیر هر پیام، ترجمه آن را به زبان شما می‌گذارد. آنچه را هم که می‌نویسید پیش از ارسال ترجمه می‌کند. بدون حساب کاربری، متن‌باز، و آمار ناشناس فقط اگر خودتان بخواهید.',
   'Version': 'نسخه',
   'Languages': 'زبان‌ها',

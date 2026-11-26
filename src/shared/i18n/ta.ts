@@ -155,6 +155,7 @@ export const ta: Record<string, string> = {
   'Always dark': 'எப்போதும் டார்க்',
   'Always light': 'எப்போதும் லைட்',
   'Remember a reading language per channel': 'ஒவ்வொரு சேனலுக்கும் படிக்கும் மொழியை நினைவில் வைக்கவும்',
+  'Translate a channel only after I switch it on in the bar': 'பட்டியில் இயக்கிய பிறகே சேனலை மொழிபெயர்க்கவும்',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator அரட்டை வரும்போதே படித்து, ஒவ்வொரு செய்தியின் கீழும் நீங்கள் படிக்கும் மொழியில் மொழிபெயர்ப்பைச் சேர்க்கும். அனுப்பும் முன் நீங்கள் தட்டச்சு செய்வதையும் மொழிபெயர்க்கும். கணக்கு தேவையில்லை, திறந்த மூலம், நீங்கள் ஒப்புக்கொண்டால் மட்டுமே பெயரற்ற எண்ணிக்கை.',
   'Version': 'பதிப்பு',
   'Languages': 'மொழிகள்',

@@ -155,6 +155,7 @@ export const ms: Record<string, string> = {
   'Always dark': 'Sentiasa gelap',
   'Always light': 'Sentiasa cerah',
   'Remember a reading language per channel': 'Ingat bahasa bacaan bagi setiap saluran',
+  'Translate a channel only after I switch it on in the bar': 'Terjemah saluran hanya selepas saya menghidupkannya pada bar',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator membaca sembang sebaik sahaja mesej tiba dan meletakkan terjemahan di bawah setiap mesej dalam bahasa yang anda baca. Ia juga menterjemah apa yang anda taip sebelum menghantar. Tiada akaun, sumber terbuka, dan kiraan tanpa nama hanya jika anda memilih untuk menyertainya.',
   'Version': 'Versi',
   'Languages': 'Bahasa',

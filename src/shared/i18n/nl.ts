@@ -155,6 +155,7 @@ export const nl: Record<string, string> = {
   'Always dark': 'Altijd donker',
   'Always light': 'Altijd licht',
   'Remember a reading language per channel': 'Leestaal per kanaal onthouden',
+  'Translate a channel only after I switch it on in the bar': 'Een kanaal pas vertalen nadat ik het in de balk aanzet',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator leest de chat zodra berichten binnenkomen en zet onder elk bericht een vertaling in de taal waarin jij leest. Ook wat je typt, vertaalt hij voordat je het verstuurt. Geen account, open source, en anonieme tellingen alleen als je dat toestaat.',
   'Version': 'Versie',
   'Languages': 'Talen',

@@ -155,6 +155,7 @@ export const ru: Record<string, string> = {
   'Always dark': 'Всегда тёмная',
   'Always light': 'Всегда светлая',
   'Remember a reading language per channel': 'Запоминать язык чтения для каждого канала',
+  'Translate a channel only after I switch it on in the bar': 'Переводить канал только после того, как я включу его в панели',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator читает чат по мере поступления сообщений и показывает под каждым перевод на ваш язык. Он также переводит то, что вы пишете, перед отправкой. Без аккаунта, с открытым исходным кодом, анонимная статистика только с вашего согласия.',
   'Version': 'Версия',
   'Languages': 'Языки',

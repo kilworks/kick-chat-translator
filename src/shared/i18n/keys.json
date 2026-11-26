@@ -154,6 +154,7 @@
   "Always dark",
   "Always light",
   "Remember a reading language per channel",
+  "Translate a channel only after I switch it on in the bar",
   "Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.",
   "Version",
   "Languages",
