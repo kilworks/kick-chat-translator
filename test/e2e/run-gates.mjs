@@ -39,7 +39,8 @@ const GATES = [
   ['rtl-live', 'node', ['test/e2e/rtl-live.mjs']],
   ['rtl-surfaces', 'node', ['test/e2e/rtl-surfaces.mjs'], { apres: 'snapshot' }],
   ['reduced-motion', 'node', ['test/e2e/reduced-motion.mjs']],
-  ['long-content', 'node', ['test/e2e/long-content.mjs']],
+  // Reads the chat-bundle.js chat-live writes: run beside it, the read raced the write (ENOENT).
+  ['long-content', 'node', ['test/e2e/long-content.mjs'], { apres: 'chat-live' }],
   ['da-surfaces', 'node', ['test/e2e/da-surfaces.mjs'], { apres: 'snapshot' }],
   ['boundaries', 'node', ['test/e2e/boundaries.mjs'], { apres: 'snapshot' }],
   // Wired late. They existed and asserted and simply were not in this list, so
