@@ -1,6 +1,7 @@
 import { COMMON_BOTS } from '~/shared/constants';
 import { foldCase } from '~/shared/normalize';
 import type { Settings } from '~/shared/settings';
+import { familyOf, type Family } from './streamPrior';
 
 export interface MessageMeta {
   username: string;
@@ -453,4 +454,26 @@ export function trimForEngine(text: string): string {
   t = t.replace(EMOJI_RUN, '$1');
   t = dedupeWords(collapseRepeat(trimBypassSuffix(t)));
   return trimEdgeNoise(t);
+}
+
+const HAN_ONLY = /^[\p{Script=Han}\s0-9\p{P}]+$/u;
+
+/**
+ * `skipOnVerdict`, with the stream deciding what the line alone cannot. A Han-only line that no character
+ * rule named has nothing but the engine's verdict to go on, and the engine mixes Japanese and Chinese up
+ * on such lines, so the verdict skips it only when its family is the family of the stream. Every other
+ * line is decided exactly as before.
+ */
+export function skipOnVerdictForStream(
+  verdict: string | undefined,
+  target: string,
+  ignoreEnglish: boolean,
+  text: string,
+  hint: string | undefined,
+  prior: Family | undefined,
+): boolean {
+  if (!skipOnVerdict(verdict, target, ignoreEnglish)) return false;
+  if (hint !== undefined || !HAN_ONLY.test(text)) return true;
+  const family = familyOf(verdict);
+  return family !== undefined && family === prior;
 }

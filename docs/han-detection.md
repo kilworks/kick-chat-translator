@@ -183,3 +183,16 @@ Pre-registered, before the chat of any Japanese or Chinese channel is replayed f
 4. Weight at most 1,500 bytes gzip, speed unchanged within 1.10 times.
 
 A FAIL is published as it is.
+
+## Stream prior for Han-only lines: results
+
+Replay of the collected Twitch chat, 160 channel units of which 83 have at least 200 lines (27 Japanese, 56 Chinese), in time order, with the sure answers of the code on `master`.
+
+1. Prior quality. Japanese units: the prior existed for 99.7 percent of the 4,773 Han-only lines the character rules left unanswered, and was right for 100.0 percent of them. Chinese units: it existed for 95.6 percent of the 42,805 lines and was right for 100.0 percent. PASS (95 percent right and 90 percent present were asked).
+2. Effect, computed from the answers of Google on the design set (Han-only lines, 1,452 Chinese and 188 Japanese) and the replayed prior. Han-only Chinese lines hidden for a Japanese reader: 0.8 percent to 0 (the service said `ja`, the stream said Chinese). Han-only Japanese lines hidden for a Chinese reader: 18.6 percent to 0 (the service said `zh-CN`, the stream said Japanese). PASS (at most 0.1 and 3 percent were asked).
+3. Price. Han-only Japanese lines kept for a Japanese reader although in their language: 29.8 to 30.0 percent (the first 30 sure answers of a stream have no prior), +0.2 points. Han-only Chinese lines kept for a Chinese reader: 76.1 to 77.2 percent, +1.1 points. PASS.
+4. Weight: `content.js` gzip 103,378 to 103,684 bytes (+306, 1,500 allowed). Speed: 0.014 microseconds per line for the prior against about 20 for the detection of a line. PASS.
+
+Pinned tests did not move. New tests: the prior itself (threshold of 30, families, forgetting, reset), the gate (`skipOnVerdictForStream`: the three stream cases, an unknown stream, and every other line decided as before), and three pipeline tests that fail when the gate is neutralised (checked: two of them go red).
+
+Left open on the Japanese side, not covered by this change: Han-only Japanese lines that the character lists name Chinese (1.3 percent of them on the chat-like fresh set) are still skipped for a Chinese reader through the sure-hint gate; and the prior is blind during the first 30 sure answers of a channel. Not measured on a live channel in a browser.
