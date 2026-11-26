@@ -176,6 +176,7 @@ export const zh_tw: Record<string, string> = {
   'Always dark': '一律深色',
   'Always light': '一律淺色',
   'Remember a reading language per channel': '為每個頻道記住閱讀語言',
+  'Translate a channel only after I switch it on in the bar': '僅在我於工具列開啟後才翻譯頻道',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator 會在聊天訊息送達時讀取，並在每則訊息下方顯示你所閱讀語言的譯文。你送出訊息之前，它也能先幫你翻譯。不需要帳號，開放原始碼，只有在你同意後才會傳送匿名統計。',
   'Version': '版本',
   'Languages': '語言',

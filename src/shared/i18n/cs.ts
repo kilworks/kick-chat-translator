@@ -180,6 +180,7 @@ export const cs: Record<string, string> = {
   'Always dark': 'Vždy tmavý',
   'Always light': 'Vždy světlý',
   'Remember a reading language per channel': 'Pamatovat si jazyk čtení pro každý kanál zvlášť',
+  'Translate a channel only after I switch it on in the bar': 'Překládat kanál až po zapnutí v liště',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.':
     'Kick Chat Translator čte chat, jak přichází, a pod každou zprávu doplní překlad do jazyka, ve kterém čteš. Překládá i to, co píšeš, než to odešleš. Bez účtu, open source, a anonymní statistiky jen když to povolíš.',
   'Version': 'Verze',

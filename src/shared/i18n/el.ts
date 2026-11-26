@@ -155,6 +155,7 @@ export const el: Record<string, string> = {
   'Always dark': 'Πάντα σκούρο',
   'Always light': 'Πάντα ανοιχτό',
   'Remember a reading language per channel': 'Απομνημόνευση γλώσσας ανάγνωσης ανά κανάλι',
+  'Translate a channel only after I switch it on in the bar': 'Μετάφραση καναλιού μόνο αφού το ενεργοποιήσω από τη γραμμή',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Το Kick Chat Translator διαβάζει τη συνομιλία μόλις φτάνει και βάζει μια μετάφραση κάτω από κάθε μήνυμα, στη γλώσσα που διαβάζεις. Μεταφράζει επίσης όσα γράφεις πριν τα στείλεις. Χωρίς λογαριασμό, ανοιχτού κώδικα, και ανώνυμα στατιστικά μόνο αν συμφωνήσεις.',
   'Version': 'Έκδοση',
   'Languages': 'Γλώσσες',

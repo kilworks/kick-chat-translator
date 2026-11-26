@@ -155,6 +155,7 @@ export const ro: Record<string, string> = {
   'Always dark': 'Mereu întunecată',
   'Always light': 'Mereu luminoasă',
   'Remember a reading language per channel': 'Reține limba de citire pentru fiecare canal',
+  'Translate a channel only after I switch it on in the bar': 'Tradu un canal doar după ce îl activez din bară',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator citește chatul pe măsură ce sosește și pune sub fiecare mesaj o traducere în limba în care citești. Traduce și ce scrii, înainte să trimiți. Fără cont, open source, cu numărători anonime doar dacă accepți.',
   'Version': 'Versiune',
   'Languages': 'Limbi',

@@ -155,6 +155,7 @@ export const tr: Record<string, string> = {
   'Always dark': 'Her zaman koyu',
   'Always light': 'Her zaman açık',
   'Remember a reading language per channel': 'Okuma dilini kanal başına hatırla',
+  'Translate a channel only after I switch it on in the bar': 'Bir kanalı yalnızca çubukta açtıktan sonra çevir',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator sohbeti geldikçe okur ve her mesajın altına okuduğun dilde bir çeviri koyar. Yazdıklarını da göndermeden önce çevirir. Hesap yok, açık kaynak, anonim sayımlar yalnızca sen izin verirsen.',
   'Version': 'Sürüm',
   'Languages': 'Diller',

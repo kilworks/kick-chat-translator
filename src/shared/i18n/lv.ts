@@ -155,6 +155,7 @@ export const lv: Record<string, string> = {
   'Always dark': 'Vienmēr tumšs',
   'Always light': 'Vienmēr gaišs',
   'Remember a reading language per channel': 'Atcerēties lasīšanas valodu katram kanālam',
+  'Translate a channel only after I switch it on in the bar': 'Tulkot kanālu tikai pēc tam, kad es to ieslēdzu joslā',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator lasa čatu, tiklīdz tas ienāk, un zem katras ziņas parāda tulkojumu tavā lasīšanas valodā. Tas arī iztulko to, ko raksti, pirms nosūti. Bez konta, atvērtā koda, un anonīma statistika tikai tad, ja piekrīti.',
   'Version': 'Versija',
   'Languages': 'Valodas',

@@ -22,6 +22,9 @@ export const SettingsSchema = z.object({
   // l'interrupteur general, celui du popup et des options ; celui du bandeau est
   // local, parce que c'est ce qu'un bouton pause sur un chat veut dire.
   pausedChannels: z.array(z.string()).max(PAUSED_CHANNELS_MAX).default([]),
+  // 'manual': a channel opened in a tab stays untranslated until the reader switches it on from the bar.
+  // The switched-on channels are kept per tab session (see startedChannels.ts), never in these settings.
+  startMode: z.enum(['auto', 'manual']).default('auto'),
   // 'auto' = read in the browser's own language (resolveBrowserLang). Works for any
   // user, anywhere, with no configuration. An explicit ISO code overrides it.
   targetLang: langSetting,

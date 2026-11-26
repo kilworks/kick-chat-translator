@@ -155,6 +155,7 @@ export const vi: Record<string, string> = {
   'Always dark': 'Luôn tối',
   'Always light': 'Luôn sáng',
   'Remember a reading language per channel': 'Nhớ ngôn ngữ đọc cho từng kênh',
+  'Translate a channel only after I switch it on in the bar': 'Chỉ dịch kênh sau khi tôi bật nó trên thanh',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator đọc chat ngay khi tin nhắn đến và đặt bản dịch dưới mỗi tin, bằng ngôn ngữ bạn đọc. Tiện ích cũng dịch những gì bạn gõ trước khi gửi. Không tài khoản, mã nguồn mở, và chỉ đếm ẩn danh nếu bạn bật.',
   'Version': 'Phiên bản',
   'Languages': 'Ngôn ngữ',

@@ -155,6 +155,7 @@ export const da: Record<string, string> = {
   'Always dark': 'Altid mørk',
   'Always light': 'Altid lys',
   'Remember a reading language per channel': 'Husk et læsesprog pr. kanal',
+  'Translate a channel only after I switch it on in the bar': 'Oversæt først en kanal, når jeg slår den til i bjælken',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator læser chatten, efterhånden som beskederne kommer, og sætter en oversættelse under hver besked på det sprog, du læser. Det oversætter også det, du skriver, før du sender det. Ingen konto, open source, og anonyme tal kun hvis du siger ja.',
   'Version': 'Version',
   'Languages': 'Sprog',

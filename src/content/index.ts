@@ -39,6 +39,7 @@ import { localEngine } from './localEngine';
 import { logPlatform, refresh7TV } from './platform';
 import { resolveBrowserLang, withFavorite } from '~/shared/languages';
 import { memoriserLangueChaine, vueDeChaine } from '~/shared/channelLang';
+import { readStarted, setStarted } from '~/shared/startedChannels';
 import { PAUSED_CHANNELS_MAX, ROUTE_POLL_MS } from '~/shared/constants';
 import { msg as localised, setChatTable, setContentLocale } from './msg';
 import { send } from '~/shared/messages';
@@ -159,8 +160,10 @@ async function main(): Promise<void> {
    * le bandeau. Aucun de ces modules n'a eu a changer. La langue retenue pour
    * la chaine y remplace `targetLang` de la meme facon, sans rien ecrire.
    */
+  // Channels the reader switched on in this tab; read once, rewritten by the bar in the manual start mode.
+  let started: ReadonlySet<string> = readStarted();
   function vueLocale(base: Settings = settings, slug = currentSlug): Settings {
-    return vueDeChaine(base, slug);
+    return vueDeChaine(base, slug, started);
   }
 
   const pipeline = new TranslationPipeline(vueLocale());
@@ -254,6 +257,13 @@ async function main(): Promise<void> {
             // Hors d'une chaine il n'y a rien a mettre en pause localement, donc
             // le bouton retombe sur l'interrupteur general.
             if (!slug) return void patchSettings({ enabled });
+            // Manual start: the bar switches the open channel on or off for this tab. Nothing is written to the settings.
+            if (settings.startMode === 'manual') {
+              const before = vueLocale();
+              started = setStarted(slug, enabled);
+              applySettings(settings, before);
+              return;
+            }
             const sansElle = settings.pausedChannels.filter((c) => c !== slug);
             void patchSettings({
               pausedChannels: enabled
@@ -582,14 +592,14 @@ async function main(): Promise<void> {
     pipeline.reapplyBlocked();
   }
 
-  watchSettings((next) => {
+  const applySettings = (next: Settings, before?: Settings): void => {
     // Une copie remplacee recoit encore les reglages, et sans ceci un
     // changement relancerait son observateur et son bandeau.
     if (estOrphelin()) return;
     // Le verdict qui compte est celui de la chaine courante, pas l'interrupteur
     // general : c'est lui qui decide si l'observateur tourne et ce que le
     // bandeau affiche.
-    const prev = vueLocale();
+    const prev = before ?? vueLocale();
     const wasEnabled = prev.enabled;
     settings = next;
     setUsageEnabled(next.usageStats);
@@ -622,7 +632,8 @@ async function main(): Promise<void> {
     }
     if (next.showFloatingBar) mountBar();
     else unmountFloatingBar();
-  });
+  };
+  watchSettings((next) => applySettings(next));
 
   // The Debug tab lives in the options page, another context entirely, and the
   // decisions are made here. It asks, we answer: no subscription, no polling,

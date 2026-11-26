@@ -155,6 +155,7 @@ export const bn: Record<string, string> = {
   'Always dark': 'সবসময় ডার্ক',
   'Always light': 'সবসময় লাইট',
   'Remember a reading language per channel': 'প্রতিটি চ্যানেলের জন্য আলাদা পড়ার ভাষা মনে রাখুন',
+  'Translate a channel only after I switch it on in the bar': 'বার থেকে চালু করার পরেই কোনো চ্যানেল অনুবাদ করুন',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Kick Chat Translator চ্যাট আসার সাথে সাথে পড়ে নেয় এবং প্রতিটি মেসেজের নিচে আপনার পড়ার ভাষায় অনুবাদ বসিয়ে দেয়। পাঠানোর আগে আপনার লেখাও অনুবাদ করে দিতে পারে। অ্যাকাউন্ট লাগে না, ওপেন সোর্স, আর বেনামি গণনা শুধু আপনি চাইলে।',
   'Version': 'ভার্সন',
   'Languages': 'ভাষা',

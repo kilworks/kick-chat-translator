@@ -300,3 +300,29 @@ describe('sliders', () => {
     for (const r of ranges) expect(r.getAttribute('aria-valuetext')).toMatch(/\S/);
   });
 });
+
+describe('manual start', () => {
+  const find = (root: HTMLElement) =>
+    [...root.querySelectorAll('label')].find((l) => (l.textContent ?? '').includes('Translate a channel only after I switch it on in the bar'))
+      ?.querySelector('input') as HTMLInputElement | undefined;
+
+  it('is off by default and turns the manual mode on', () => {
+    const onPatch = vi.fn();
+    const root = mount({}, onPatch);
+    const box = find(root);
+    expect(box).toBeDefined();
+    expect(box!.checked).toBe(false);
+    void act(() => box!.click());
+    expect(onPatch).toHaveBeenCalledWith({ startMode: 'manual' });
+  });
+
+  it('shows the manual mode as on and turns it off', () => {
+    const onPatch = vi.fn();
+    const root = mount({ startMode: 'manual' }, onPatch);
+    const box = find(root);
+    expect(box!.checked).toBe(true);
+    void act(() => box!.click());
+    expect(onPatch).toHaveBeenCalledWith({ startMode: 'auto' });
+  });
+});
+

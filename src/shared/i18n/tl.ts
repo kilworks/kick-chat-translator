@@ -155,6 +155,7 @@ export const tl: Record<string, string> = {
   'Always dark': 'Laging dark',
   'Always light': 'Laging light',
   'Remember a reading language per channel': 'Tandaan ang wikang babasahin kada channel',
+  'Translate a channel only after I switch it on in the bar': 'I-translate lang ang channel pagkatapos kong i-on sa bar',
   'Kick Chat Translator reads chat as it arrives and puts a translation under each message in the language you read. It also translates what you type before you send it. No account, open source, and anonymous counts only if you opt in.': 'Binabasa ng Kick Chat Translator ang chat habang dumarating ito at naglalagay ng salin sa ilalim ng bawat mensahe, sa wikang binabasa mo. Isinasalin din nito ang isinusulat mo bago mo ipadala. Walang account, open source, at anonymous na bilang lang kung pipiliin mo.',
   'Version': 'Bersyon',
   'Languages': 'Mga wika',
