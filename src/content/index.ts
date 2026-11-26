@@ -34,7 +34,7 @@ import {
   pickInjectionTarget,
 } from './selectors';
 import { extractChannelSlug, fetchChannelLangIso } from './kickApi';
-import { LANG_BLOCKED_ASK } from './filters';
+import { LANG_BLOCKED_ASK, START_ASK, START_SET } from './filters';
 import { localEngine } from './localEngine';
 import { logPlatform, refresh7TV } from './platform';
 import { resolveBrowserLang, withFavorite } from '~/shared/languages';
@@ -258,12 +258,7 @@ async function main(): Promise<void> {
             // le bouton retombe sur l'interrupteur general.
             if (!slug) return void patchSettings({ enabled });
             // Manual start: the bar switches the open channel on or off for this tab. Nothing is written to the settings.
-            if (settings.startMode === 'manual') {
-              const before = vueLocale();
-              started = setStarted(slug, enabled);
-              applySettings(settings, before);
-              return;
-            }
+            if (settings.startMode === 'manual') return void startHere(slug, enabled);
             const sansElle = settings.pausedChannels.filter((c) => c !== slug);
             void patchSettings({
               pausedChannels: enabled
@@ -592,6 +587,13 @@ async function main(): Promise<void> {
     pipeline.reapplyBlocked();
   }
 
+  // Manual start: switch a channel on or off for this tab (the bar and the popup both come here).
+  function startHere(slug: string, on: boolean): void {
+    const before = vueLocale();
+    started = setStarted(slug, on);
+    applySettings(settings, before);
+  }
+
   const applySettings = (next: Settings, before?: Settings): void => {
     // Une copie remplacee recoit encore les reglages, et sans ceci un
     // changement relancerait son observateur et son bandeau.
@@ -645,6 +647,11 @@ async function main(): Promise<void> {
     } else if (msg?.type === LANG_BLOCKED_ASK) {
       // The popup's one line about the language allowlist, from the same count as the bar.
       sendResponse({ count: pipeline.langBlockedCount() });
+    } else if (msg?.type === START_ASK) {
+      sendResponse({ waiting: settings.startMode === 'manual' && !!currentSlug && !started.has(currentSlug) });
+    } else if (msg?.type === START_SET && currentSlug && settings.startMode === 'manual') {
+      startHere(currentSlug, true);
+      sendResponse({ waiting: false });
     }
     return false;
   });

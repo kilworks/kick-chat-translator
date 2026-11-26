@@ -79,6 +79,11 @@ export function hasBlockedKeyword(text: string, settings: Settings): boolean {
  */
 export const LANG_BLOCKED_ASK = 'filter.langBlocked';
 
+/** The popup asks the chat tab whether manual start is holding the channel back: `{ waiting: boolean }`. */
+export const START_ASK = 'start.state';
+/** The popup starts the open channel in that tab, as the bar does. */
+export const START_SET = 'start.set';
+
 export function shouldDropBySourceLang(detected: string | undefined, settings: Settings): string | undefined {
   if (settings.sourceLangAllowlist.length === 0) return undefined;
   if (!detected) return 'lang_unknown';
