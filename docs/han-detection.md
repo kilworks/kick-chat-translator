@@ -196,3 +196,15 @@ Replay of the collected Twitch chat, 160 channel units of which 83 have at least
 Pinned tests did not move. New tests: the prior itself (threshold of 30, families, forgetting, reset), the gate (`skipOnVerdictForStream`: the three stream cases, an unknown stream, and every other line decided as before), and three pipeline tests that fail when the gate is neutralised (checked: two of them go red).
 
 Left open on the Japanese side, not covered by this change: Han-only Japanese lines that the character lists name Chinese (1.3 percent of them on the chat-like fresh set) are still skipped for a Chinese reader through the sure-hint gate; and the prior is blind during the first 30 sure answers of a channel. Not measured on a live channel in a browser.
+
+## Stream prior on the sure-hint gate: pre-registered rule
+
+Pre-registered before this measurement. Same prior, applied to the second hiding path: a Han-only line (no kana) that the character lists name Chinese, or that the Japanese-only characters name Japanese, is skipped as already in the reader's language. Change: when the prior exists and its family differs from the family of the line's sure answer, that skip is vetoed and the line goes to the service. With no prior, or an agreeing prior, nothing changes. Lines with kana are untouched.
+
+Replay of the same 83 collected channel units, in time order:
+
+1. In Japanese units, at least 90 percent of the Han-only lines that the lists name Chinese are un-hidden.
+2. In Chinese units, at most 1 percent of the Han-only lines that the lists name Chinese are vetoed, and at least 90 percent of the Han-only lines named Japanese by the Japanese-only characters are vetoed.
+3. Price: the Chinese lines of Japanese units and the Japanese lines of Chinese units that this keeps (counted by declared channel language, which is noisy) are reported; weight at most 300 bytes gzip.
+
+A FAIL is published as it is.
