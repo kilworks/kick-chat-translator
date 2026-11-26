@@ -17,6 +17,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "types": ["chrome", "node", "vite/client"],
     "paths": {
       "~/*": ["./src/*"]
