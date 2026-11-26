@@ -168,3 +168,18 @@ A FAIL is published as it is. `ds4` is not read again for this candidate.
 4. Weight: gzip 102,839 to 103,378, +539 bytes against a margin of 725. Speed, three alternated runs: median 1.05 times, p95 1.03 times. PASS.
 
 Informational, not used to choose: on 33,852 real Twitch lines declared Chinese, 0.1 percent (about 34 lines) are now named `ja`; the benefit and this price are both small, and a Japanese reader would skip those lines as already in their language.
+
+## Stream prior for Han-only lines: design and pre-registered rule
+
+What is still open for Japanese. Google answers, on the design set (Han-only lines, 1,452 Chinese and 188 Japanese by declared channel language): for Chinese lines `en` 75.3 percent (already ignored by the engine-verdict guard), `zh-CN` 22.5, `yue` 1.4, `ja` 0.8; for Japanese lines `ja` 70.2, `zh-CN` 18.6, `en` 10.1. The verdict gate trusts any of them except `en`. So a Japanese reader loses 0.8 percent of the Han-only Chinese lines (answered `ja`), and a Chinese reader loses 18.6 percent of the Han-only Japanese lines (answered `zh-CN`). A Han-only line carries no script evidence, so the line alone cannot settle it; the stream can.
+
+Design. A running count of the sure answers of `confidentLanguage` on the lines of the open channel (exponential decay, a window of about 200 sure answers, at least 30 observed) gives a prior family for the stream: `ja` when Japanese answers are at least 60 percent of the sure answers, `zh` when Chinese answers (`zh`, `zh-tw`, `yue`) are at least 60 percent, undefined otherwise. On a Han-only line that the character lists leave unanswered, the engine verdict may skip the line only when its family (`ja` or Chinese) is the family of the prior; with no prior it may not skip. Lines named by the lists, the kana, the Japanese-only characters or any other sure answer are untouched. The count lives in memory for the open tab, is never stored or sent, and is reset when the channel changes.
+
+Pre-registered, before the chat of any Japanese or Chinese channel is replayed for this change: the replay is the collected Twitch chat of about 90 channel units declared Japanese or Chinese, in time order, with the sure answers computed by the code on `master`.
+
+1. Prior quality: among the Han-only lines that arrive once the prior exists, the prior family equals the family of the declared channel language for at least 95 percent of lines; the prior exists (30 sure answers seen) for at least 90 percent of the Han-only lines of units with at least 200 lines.
+2. Effect, computed with the answer rates of Google measured on the design set above and the replayed prior: the share of Han-only Chinese lines hidden for a `ja` reader falls from 0.8 percent to at most 0.1 percent, and the share of Han-only Japanese lines hidden for a `zh` or `zh-tw` reader falls from 18.6 percent to at most 3 percent.
+3. Price, same computation: the share of Han-only Japanese lines kept for a `ja` reader (not skipped although in the reader's language) rises by at most 35 points (from 30 percent kept to at most 65 percent), and the Chinese readers keep at most 25 percent more Han-only Chinese lines than today.
+4. Weight at most 1,500 bytes gzip, speed unchanged within 1.10 times.
+
+A FAIL is published as it is.
