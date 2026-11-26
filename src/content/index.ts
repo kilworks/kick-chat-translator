@@ -587,6 +587,9 @@ async function main(): Promise<void> {
     pipeline.reapplyBlocked();
   }
 
+  // Manual start: this tab's channel is held back until the reader switches it on.
+  const isWaiting = (): boolean => settings.startMode === 'manual' && !!currentSlug && !started.has(currentSlug);
+
   // Manual start: switch a channel on or off for this tab (the bar and the popup both come here).
   function startHere(slug: string, on: boolean): void {
     const before = vueLocale();
@@ -648,10 +651,10 @@ async function main(): Promise<void> {
       // The popup's one line about the language allowlist, from the same count as the bar.
       sendResponse({ count: pipeline.langBlockedCount() });
     } else if (msg?.type === START_ASK) {
-      sendResponse({ waiting: settings.startMode === 'manual' && !!currentSlug && !started.has(currentSlug) });
-    } else if (msg?.type === START_SET && currentSlug && settings.startMode === 'manual') {
-      startHere(currentSlug, true);
-      sendResponse({ waiting: false });
+      sendResponse({ waiting: isWaiting() });
+    } else if (msg?.type === START_SET) {
+      if (currentSlug && settings.startMode === 'manual') startHere(currentSlug, true);
+      sendResponse({ waiting: isWaiting() });
     }
     return false;
   });

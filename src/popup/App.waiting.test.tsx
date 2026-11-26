@@ -10,7 +10,20 @@ vi.mock('~/shared/messages', () => ({
   send: vi.fn(async (m: { type: string }) => {
     if (m.type === 'settings.get') return { type: 'settings', payload: settings };
     if (m.type === 'stats.get') {
-      return { type: 'stats', payload: { totalRequests: 3, totalCacheHits: 0, totalErrors: 0, byLang: {}, byProvider: {}, byChannel: {}, charsSent: 0, todayKey: 'today', history: [] } };
+      return {
+        type: 'stats',
+        payload: {
+          totalRequests: 3,
+          totalCacheHits: 0,
+          totalErrors: 0,
+          byLang: {},
+          byProvider: {},
+          byChannel: {},
+          charsSent: 0,
+          todayKey: 'today',
+          history: [],
+        },
+      };
     }
     return { type: 'none' };
   }),
@@ -19,17 +32,25 @@ vi.mock('~/shared/messages', () => ({
 const { App } = await import('./App');
 
 const sendMessage = vi.fn();
-function stubTab(waiting: boolean | 'none'): void {
+function stubTab(waiting: boolean | 'none', setAnswer = false): void {
   sendMessage.mockReset();
   sendMessage.mockImplementation(async (_id: number, m: { type: string }) => {
     if (waiting === 'none') throw new Error('Could not establish connection');
     if (m.type === 'start.state') return { waiting };
-    if (m.type === 'start.set') return { waiting: false };
+    if (m.type === 'start.set') return { waiting: setAnswer };
     return undefined;
   });
   vi.stubGlobal('chrome', {
-    runtime: { getManifest: () => ({ version: '0.0.0' }), openOptionsPage: vi.fn(), getURL: (p: string) => `ext://${p}` },
-    tabs: { query: vi.fn(async () => [{ url: 'https://kick.com/some-channel', id: 7 }]), sendMessage, create: vi.fn() },
+    runtime: {
+      getManifest: () => ({ version: '0.0.0' }),
+      openOptionsPage: vi.fn(),
+      getURL: (p: string) => `ext://${p}`,
+    },
+    tabs: {
+      query: vi.fn(async () => [{ url: 'https://kick.com/some-channel', id: 7 }]),
+      sendMessage,
+      create: vi.fn(),
+    },
   });
 }
 
@@ -40,7 +61,8 @@ async function mount(): Promise<HTMLElement> {
   for (let i = 0; i < 6; i++) await new Promise((r) => setTimeout(r, 0));
   return root;
 }
-const resume = (root: HTMLElement) => [...root.querySelectorAll('button')].find((b) => b.textContent === 'Resume');
+const resume = (root: HTMLElement) =>
+  [...root.querySelectorAll('button')].find((b) => b.textContent === 'Resume');
 
 describe('popup, manual start', () => {
   beforeEach(() => {
@@ -59,6 +81,14 @@ describe('popup, manual start', () => {
     for (let i = 0; i < 4; i++) await new Promise((r) => setTimeout(r, 0));
     expect(sendMessage).toHaveBeenCalledWith(7, { type: 'start.set' });
     expect(resume(root)).toBeUndefined();
+  });
+
+  it('keeps the card when the tab says it is still waiting after the click', async () => {
+    stubTab(true, true);
+    const root = await mount();
+    resume(root)!.click();
+    for (let i = 0; i < 4; i++) await new Promise((r) => setTimeout(r, 0));
+    expect(resume(root)).toBeDefined();
   });
 
   it('shows nothing once the channel is started', async () => {

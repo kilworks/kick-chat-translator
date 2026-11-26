@@ -119,6 +119,16 @@ export function App() {
     }
   }
 
+  // Resume: lift the pause kept in the settings, or start the channel in the tab (manual start).
+  async function resumeHere(): Promise<void> {
+    if (pausedHere) return patch('pausedChannels', settings.pausedChannels.filter((c) => c !== channel));
+    if (tabId === undefined) return;
+    const res = (await chrome.tabs.sendMessage(tabId, { type: START_SET }).catch(() => undefined)) as
+      | { waiting?: boolean }
+      | undefined;
+    setWaiting(res?.waiting === true);
+  }
+
   const waitingHere = settings.enabled && !!channel && settings.startMode === 'manual' && waiting;
   const pausedHere = settings.enabled && !!channel && settings.pausedChannels.includes(channel);
   // A channel list that keeps this channel out, said here with the way to it:
@@ -186,33 +196,10 @@ export function App() {
           <p class="text-xs text-kick-muted">{t('Open a Kick channel: its chat is translated as it arrives.')}</p>
         )}
 
-        {waitingHere && !pausedHere && (
+        {(pausedHere || waitingHere) && (
           <section class="kt-card flex items-center justify-between gap-2" role="status">
             <span class="text-xs text-kick-text">{t('Paused on this channel')}</span>
-            <button
-              class="kt-btn"
-              onClick={() => {
-                if (tabId === undefined) return;
-                void chrome.tabs.sendMessage(tabId, { type: START_SET }).then(() => setWaiting(false)).catch(() => undefined);
-              }}
-            >
-              {t('Resume')}
-            </button>
-          </section>
-        )}
-
-        {pausedHere && (
-          <section class="kt-card flex items-center justify-between gap-2">
-            <span class="text-xs text-kick-text">{t('Paused on this channel')}</span>
-            <button
-              class="kt-btn"
-              onClick={() =>
-                void patch(
-                  'pausedChannels',
-                  settings.pausedChannels.filter((c) => c !== channel),
-                )
-              }
-            >
+            <button class="kt-btn" onClick={() => void resumeHere()}>
               {t('Resume')}
             </button>
           </section>
