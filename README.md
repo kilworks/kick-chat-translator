@@ -60,8 +60,11 @@ changed in the settings, and a reading language can be remembered per channel.
 - **Four display styles**: under the message, on the same line, in place of it, or only on hover
 - **Pause one channel** from the chat bar without stopping the others. Switching channels or updating the
   extension keeps open tabs translating, no reload
-- **Start on demand**: an option leaves every new channel untranslated until you switch it on from the chat bar or the toolbar popup;
-  the choice lasts for that tab and nothing is added to a list
+- **Start on demand**: an option leaves every new channel untranslated until you switch it on from the chat bar
+  or the toolbar popup; the choice lasts for that tab and nothing is added to a list
+- **Chinese, Japanese and Cantonese chat**: a line written only with Han characters is settled by the
+  language the channel speaks, Traditional and Simplified Chinese are told apart, and a mostly Cantonese chat
+  is recognised. The measurements are public: [docs/han-detection.md](docs/han-detection.md)
 - **Chrome, Brave, Edge and Firefox**
 
 | Chat, translated as it scrolls | The toolbar popup |
@@ -77,7 +80,7 @@ invented and the translations are answered locally, so no real person's handle e
 
 ## Privacy
 
-No account, no server of mine, and no analytics unless you opt in to a daily anonymous count sent to Google
+No account, no server of its own, and no analytics unless you opt in to a daily anonymous count sent to Google
 Analytics (engines used, errors, speed, never your messages, names or channels). Chat messages go to the
 translation provider you picked and nowhere else, and in on-device mode not even there. A copy installed from
 a store makes no other request. A copy installed by hand asks GitHub for the latest release tag, at most every
@@ -144,7 +147,8 @@ Display.
   usage statistics choice, as they are on this device; it does hold your channel and user lists, so read it before sharing)
 - **Activity**: messages translated, cache hits, every language seen in chat, and why each of the last 50
   lines was translated or left alone
-- **About**: this copy's version, how a message becomes a translation, and the research behind it with links to the public repositories
+- **About**: this copy's version, how a message becomes a translation, and the research behind it, with links to
+  the public repositories
 - **Keyboard**: Alt+T turns chat translation on or off, Alt+W the compose preview
 - The language button in the chat's action bar: one click switches between the channel's language and
   your last pick, press and hold opens the list, typing two letters filters it
@@ -272,13 +276,13 @@ npm run dev              # HMR
 Builds are reproducible: the same commit yields byte-identical zips on any machine, checked by building a
 `git archive` of the tag in an empty folder and comparing hashes.
 
-Beyond the unit tests, 42 offline gates load the built extension into a real browser, drive it and assert
+Beyond the unit tests, 43 offline gates load the built extension into a real browser, drive it and assert
 what it does, with the page served locally and the translation engine answered locally. They need
 Playwright, which is deliberately not a dependency: point `UX_KIT` at a folder whose `node_modules` holds it,
 or run `npm i -D playwright`.
 
 ```bash
-node test/e2e/run-gates.mjs --headless                  # all 42, no window
+node test/e2e/run-gates.mjs --headless                  # all 43, no window
 node test/e2e/store-shots-fixture.mjs --lang=ja         # the store screenshots, in one listing language
 node test/e2e/store-shots-fixture.mjs --gif             # English store screenshots, the README images and this GIF
 ```
