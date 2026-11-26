@@ -69,3 +69,18 @@ Reference: the extraction commit. Candidate: the engine-verdict guard and the me
 - Speed: median 0.96 and p95 1.02 times the reference (three alternated runs). Weight: content.js gzip 99,330 to 99,564 bytes.
 - Parity of the bench with the pipeline: 53 lines, identical decisions. Real Brave proof with a faked service: a traditional line answered `en` is skipped by the published build and translated by the candidate; an English line answered `en` is skipped by both.
 - Not proven: Kick chat (the sets are Twitch plus PC chat), Cantonese (no data), the held-out set, and the verdict gate on the 2,475 lines without a stored verdict.
+
+## Data-driven marker lists: pre-registered rule
+
+Pre-registered before the test split is read. The two hand-made lists (45 Traditional and 45 Simplified characters) are replaced by lists chosen from labelled lines of known origin: Taiwan, mainland China, Hong Kong, Cantonese and Japanese, about 340,000 distinct Han-only lines cut by a hash of the line into train (60 percent), dev (20) and test (20). Subtitle files are left out of selection and scoring, because they are labelled by file name only and mix scripts. A character is added to the Traditional list (Simplified list) in order of newly covered Chinese lines per newly flagged Japanese or other-script line, while the Japanese lines it flags stay under 0.3 percent of the Japanese train lines. The Cantonese list is not changed. Candidates are the characters that differ between the two scripts in the OpenCC character tables. The budget was picked on dev among three values.
+
+On the test split, read once, against the lists on `master`:
+
+1. Japanese leak: the share of Han-only Japanese lines read as Chinese (`zh`, `zh-tw`, `yue`) does not rise.
+2. Recall: the share of Taiwanese lines read `zh-tw` and the share of mainland lines read `zh` each rise by at least 10 points.
+3. Wrong script: Taiwanese lines read `zh` and mainland lines read `zh-tw` each rise by at most 0.3 points.
+4. Cantonese: the share of Cantonese lines read `yue` falls by at most 0.5 points; the share read `zh-tw` rises by at most 5 points (a Cantonese line read `zh-tw` is skipped for a `zh-tw` reader).
+5. Weight: `content.js` gzip grows by at most 4,000 bytes. Speed: median at most 1.10 times, p95 at most 1.25 times.
+6. Tests that pin totals are re-pinned with the confusion diff.
+
+One reading. A FAIL is published as it is.
