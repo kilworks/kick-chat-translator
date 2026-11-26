@@ -477,3 +477,17 @@ export function skipOnVerdictForStream(
   const family = familyOf(verdict);
   return family !== undefined && family === prior;
 }
+
+/**
+ * `skipOnHint`, with one veto from the stream. A Han-only line that the character lists name Chinese, in a
+ * channel whose prior is Japanese, is most often a Japanese line sharing the lists' characters (1.3 percent of
+ * the Han-only Japanese lines), so it is not skipped as already in the reader's language: it goes to the
+ * service. The other direction (a line named Japanese in a Chinese channel) is not vetoed: replayed on
+ * collected chat the prior was missing for most of those lines, so the veto did not hold.
+ */
+export function skipOnHintForStream(hint: string | undefined, target: string, text: string, prior: Family | undefined): boolean {
+  if (!skipOnHint(hint, target)) return false;
+  if (prior === 'ja' && familyOf(hint) === 'zh' && HAN_ONLY.test(text)) return false;
+  return true;
+}
+

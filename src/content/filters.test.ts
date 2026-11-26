@@ -8,6 +8,7 @@ import {
   isSameLanguageAsTarget,
   shouldDropBySourceLang,
   shouldDropByUserOrChannel,
+  skipOnHintForStream,
   skipOnVerdictForStream,
   trustedVerdict,
 } from './filters';
@@ -344,3 +345,21 @@ describe('skipOnVerdictForStream', () => {
     expect(skipOnVerdictForStream('ja', 'ja', false, hanOnly, undefined, 'ja')).toBe(false); // the setting is off
   });
 });
+
+describe('skipOnHintForStream', () => {
+  const hanOnly = '這個問題'; // Han only, named Traditional by the lists
+  it('does not skip a Han-only line named Chinese in a Japanese stream', () => {
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', hanOnly, 'ja')).toBe(false);
+    expect(skipOnHintForStream('zh', 'zh', hanOnly, 'ja')).toBe(false);
+  });
+  it('skips it in a Chinese or unknown stream, as before', () => {
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', hanOnly, 'zh')).toBe(true);
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', hanOnly, undefined)).toBe(true);
+  });
+  it('leaves a line with kana, another language and a different reader alone', () => {
+    expect(skipOnHintForStream('ja', 'ja', 'こんにちは', 'zh')).toBe(true); // Japanese hint in a Chinese stream is not vetoed
+    expect(skipOnHintForStream('zh-tw', 'ja', hanOnly, 'ja')).toBe(false); // not the reader's language anyway
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', hanOnly + 'あ', 'ja')).toBe(true); // kana in the line
+  });
+});
+

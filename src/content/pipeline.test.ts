@@ -324,6 +324,18 @@ describe('TranslationPipeline, the last decisions are kept for the Debug tab', (
     expect(await outcomeOf(p, AMBIGUOUS, 'ja')).toMatch(/already in your language/i);
   });
 
+  it('sends a Han-only line the lists name Traditional to the service in a Japanese stream, for a Traditional reader', async () => {
+    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'zh-tw', pauseWhenHidden: false, ignoreEnglish: true, minTextLength: 2 });
+    await warm(p, (i) => `${JP}${i}`, 'ja');
+    expect(await outcomeOf(p, '這個問題', 'ja')).not.toMatch(/already in your language/i);
+  });
+
+  it('still skips that line for a Traditional reader in a Chinese stream', async () => {
+    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'zh-tw', pauseWhenHidden: false, ignoreEnglish: true, minTextLength: 2 });
+    await warm(p, (i) => `這個問題很難${i}`, 'zh-tw');
+    expect(await outcomeOf(p, '這個問題', 'zh-tw')).toMatch(/already in your language/i);
+  });
+
   // The table shows one line and hangs the rest on the hover, so the ring has to
   // still be holding the rest.
   it('keeps enough of a long message to show it whole on hover', async () => {

@@ -208,3 +208,13 @@ Replay of the same 83 collected channel units, in time order:
 3. Price: the Chinese lines of Japanese units and the Japanese lines of Chinese units that this keeps (counted by declared channel language, which is noisy) are reported; weight at most 300 bytes gzip.
 
 A FAIL is published as it is.
+
+## Stream prior on the sure-hint gate: results
+
+Replay of the same 83 collected channel units, in time order.
+
+1. Japanese units: all 60 Han-only lines that the lists name Chinese (1.26 percent of the 4,773 unanswered-or-named Han-only lines of those units) are un-hidden. PASS.
+2. Chinese units: 12 of 33,056 Han-only lines named Chinese are vetoed (0.04 percent), PASS. Of the 74 Han-only lines named Japanese by the Japanese-only characters, 28 are vetoed (37.8 percent, 90 percent asked), FAIL: for 41 of the 74 the channel had no prior yet (fewer than 30 sure answers of the two families), for 5 the prior was Japanese.
+3. Weight: gzip 103736 bytes, 306 bytes above the previous step, so about 103,684 plus the veto; speed is the same constant-time check.
+
+Decision by the rule: the direction that passed is shipped (a Han-only line named Chinese in a Japanese channel goes to the service); the direction that failed is not (a line named Japanese in a Chinese channel is not vetoed). Three new unit tests and two pipeline tests; one pipeline test was seen red with the veto removed.

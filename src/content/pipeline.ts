@@ -13,7 +13,7 @@ import { extractMessageText, findAllRows } from './selectors';
 import { confidentLanguage, detectLanguageWithBrowser } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
 import { isContextCritical } from '~/shared/langTiers';
-import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, skipOnHint, skipOnVerdictForStream, trimForEngine, trustedVerdict } from './filters';
+import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, skipOnHintForStream, skipOnVerdictForStream, trimForEngine, trustedVerdict } from './filters';
 import { StreamPrior } from './streamPrior';
 import { HANDLED_SELECTOR, inject, incrementFloatingCount, armHoverTranslate, markSkipped, removeAllArtifacts, showError, showLangBlocked, showLoading, showThrottleIndicator, showToast, updateActiveProvider } from './injector';
 import { localEngine } from './localEngine';
@@ -335,7 +335,7 @@ export class TranslationPipeline {
     //   That one needs its semantics rethought, not its input swapped.
     const hint = confidentLanguage(realText);
     this.prior.observe(hint);
-    if (skipOnHint(hint, this.effTarget)) {
+    if (skipOnHintForStream(hint, this.effTarget, realText, this.prior.family())) {
       return localised('skipSameLang', 'it is already in your language');
     }
     const byLang = shouldDropBySourceLang(detected, this.settings);
