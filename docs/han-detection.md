@@ -257,3 +257,22 @@ What it changes for the reader, measured on the real translation service before 
 ## End-to-end proof against the real service (real Brave, throwaway profile)
 
 The built extension, a fixture Japanese channel (32 invented Japanese chat lines, then a Han-only line, `他責`, which in Japanese means blaming others), the real translation service (requests reach it as the extension makes them; the first-choice endpoint answers a refusal and the extension falls back to the second, as it does for any user). English reader. Published build: the service guesses English for the line, so nothing is shown. New build: the stream's language is sent as the source, the service answers Japanese, and the line is shown as "Blame on others". The same line sent with automatic detection by the service alone reads "He is responsible" in the earlier comparison. One line, one run: it shows the path works end to end, it does not measure how often it happens (the comparison above does that).
+
+## Cantonese share of a stream (counter in `streamPrior.ts`)
+
+Counter, not a classifier: among the sure Chinese answers of the open channel (half-life 200 answers), the share named `yue`. At 30 answers and 0.25 it marks the stream Cantonese. The 0.25 was set before any measurement, in the gap the earlier work found (Taiwan and mainland streams name at most 0.4 percent of their Chinese lines `yue`, Cantonese ones about 55 percent). On a Cantonese stream a Han-only line named Traditional (or called Chinese by the engine) is no longer skipped for a Chinese reader and is sent with source `yue`.
+
+Measured on simulated streams of 300 lines drawn from labelled lines of known origin (`ext/ds`, Han-only, subtitles and Wikipedia left out, 100 streams per origin, `scripts/yue-stream.mts`, dev then test read once). Test split:
+
+| Stream | Marked Cantonese | Lines skipped for a Traditional reader |
+| --- | --- | --- |
+| Cantonese (LIHKG, Common Voice) | 100 % | 36.7 to 0.1 % |
+| Hong Kong standard written | 100 % | 33.1 to 0.1 % |
+| Taiwan | 0 % | 69.7 unchanged |
+| mainland | 0 % | 82.0 unchanged |
+| Japanese | 0 % | 1.1 unchanged |
+| half Taiwan, half Cantonese | 93.8 % | 52.7 to 4.5 % |
+
+The test split was read once, before the minimum of 30 answers was made a raw count (it was first applied to the decayed total, so it fired after about 32 answers); dev was rerun after that change and did not move.
+
+Price: in a mixed stream the Taiwanese half is marked too, so those lines are translated for a Traditional reader instead of skipped (extra requests, never a lost line). Not proven: real Cantonese Twitch or Kick chat (no live Cantonese stream was available), and the engine's answer for source `yue`.
