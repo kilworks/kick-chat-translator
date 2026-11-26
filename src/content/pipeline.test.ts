@@ -289,6 +289,53 @@ describe('TranslationPipeline, the last decisions are kept for the Debug tab', (
     for (const o of outcomes) expect(o).not.toMatch(/translation service|already in your language/i);
   });
 
+  // A Han-only line that no character rule names has only the service verdict and the stream to go on:
+  // the service mixes Japanese and Chinese up on such lines, so the stream settles it.
+  const verdict = (lang: string) =>
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: true, result: { translatedText: 'x', detectedLang: lang, provider: 'google' } } });
+  const warm = async (p: TranslationPipeline, make: (i: number) => string, lang: string) => {
+    verdict(lang);
+    for (let i = 0; i < 40; i++) await p.onDomMessage(liveMsg(make(i)));
+    await flush();
+  };
+  const outcomeOf = async (p: TranslationPipeline, text: string, lang: string) => {
+    verdict(lang);
+    await p.onDomMessage(liveMsg(text));
+    await flush();
+    return p.recentDecisions()[0]?.outcome ?? '';
+  };
+  const AMBIGUOUS = '今日'; // two Han characters shared by Chinese and Japanese
+
+  it('keeps a Han-only line for a Japanese reader in a Chinese stream when the service says Japanese', async () => {
+    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'ja', pauseWhenHidden: false, ignoreEnglish: true, minTextLength: 2 });
+    await warm(p, (i) => `這個問題很難${i}`, 'zh-tw');
+    expect(await outcomeOf(p, AMBIGUOUS, 'ja')).not.toMatch(/already in your language/i);
+  });
+
+  it('keeps a Han-only line for a Chinese reader in a Japanese stream when the service says Chinese', async () => {
+    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'zh', pauseWhenHidden: false, ignoreEnglish: true, minTextLength: 2 });
+    await warm(p, (i) => `${JP}${i}`, 'ja');
+    expect(await outcomeOf(p, AMBIGUOUS, 'zh')).not.toMatch(/already in your language/i);
+  });
+
+  it('still skips a Han-only line for a Japanese reader in a Japanese stream when the service says Japanese', async () => {
+    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'ja', pauseWhenHidden: false, ignoreEnglish: true, minTextLength: 2 });
+    await warm(p, (i) => `${JP}${i}`, 'ja');
+    expect(await outcomeOf(p, AMBIGUOUS, 'ja')).toMatch(/already in your language/i);
+  });
+
+  it('sends a Han-only line the lists name Traditional to the service in a Japanese stream, for a Traditional reader', async () => {
+    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'zh-tw', pauseWhenHidden: false, ignoreEnglish: true, minTextLength: 2 });
+    await warm(p, (i) => `${JP}${i}`, 'ja');
+    expect(await outcomeOf(p, '這個問題', 'ja')).not.toMatch(/already in your language/i);
+  });
+
+  it('still skips that line for a Traditional reader in a Chinese stream', async () => {
+    const p = new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'zh-tw', pauseWhenHidden: false, ignoreEnglish: true, minTextLength: 2 });
+    await warm(p, (i) => `這個問題很難${i}`, 'zh-tw');
+    expect(await outcomeOf(p, '這個問題', 'zh-tw')).toMatch(/already in your language/i);
+  });
+
   // The table shows one line and hangs the rest on the hover, so the ring has to
   // still be holding the rest.
   it('keeps enough of a long message to show it whole on hover', async () => {

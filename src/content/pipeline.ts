@@ -13,7 +13,8 @@ import { extractMessageText, findAllRows } from './selectors';
 import { confidentLanguage, detectLanguageWithBrowser } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
 import { isContextCritical } from '~/shared/langTiers';
-import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, skipOnHint, skipOnVerdict, trimForEngine, trustedVerdict } from './filters';
+import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, skipOnHintForStream, skipOnVerdictForStream, trimForEngine, trustedVerdict } from './filters';
+import { StreamPrior } from './streamPrior';
 import { HANDLED_SELECTOR, inject, incrementFloatingCount, armHoverTranslate, markSkipped, removeAllArtifacts, showError, showLangBlocked, showLoading, showThrottleIndicator, showToast, updateActiveProvider } from './injector';
 import { localEngine } from './localEngine';
 import { memCache } from './memcache';
@@ -114,6 +115,9 @@ export class TranslationPipeline {
   private throttleTimer: ReturnType<typeof setTimeout> | undefined;
   // Kept with its slug, so an answer that lands after a channel change never serves the next channel.
   private channelLang: { slug: string; lang: string } | undefined;
+  /** Language family of the open channel, from the sure answers seen so far; settles Han-only lines. */
+  private readonly prior = new StreamPrior();
+  private priorSlug: string | undefined;
   /**
    * The last few calls this made, so the Debug tab can show them. Memory only,
    * never written to storage, and dropped with the page.
@@ -210,6 +214,10 @@ export class TranslationPipeline {
   }
 
   setChannelLang(slug: string, lang: string | undefined): void {
+    if (slug !== this.priorSlug) {
+      this.prior.reset();
+      this.priorSlug = slug;
+    }
     this.channelLang = lang ? { slug, lang } : undefined;
   }
 
@@ -326,7 +334,8 @@ export class TranslationPipeline {
     //   a quieter detector makes it delete MORE for anyone who set an allowlist.
     //   That one needs its semantics rethought, not its input swapped.
     const hint = confidentLanguage(realText);
-    if (skipOnHint(hint, this.effTarget)) {
+    this.prior.observe(hint);
+    if (skipOnHintForStream(hint, this.effTarget, realText, this.prior.family())) {
       return localised('skipSameLang', 'it is already in your language');
     }
     const byLang = shouldDropBySourceLang(detected, this.settings);
@@ -705,7 +714,7 @@ export class TranslationPipeline {
       return;
     }
     if (!opts.force) {
-      if (skipOnVerdict(result.detectedLang, this.effTarget, this.settings.ignoreEnglish)) {
+      if (skipOnVerdictForStream(result.detectedLang, this.effTarget, this.settings.ignoreEnglish, real, confidentLanguage(real), this.prior.family())) {
         this.skip(msg, localised('skipDetected', 'the translation service found it was already in your language'));
         removeAllArtifacts(msg.injectionTarget);
         return;

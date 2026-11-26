@@ -1,6 +1,7 @@
 import { COMMON_BOTS } from '~/shared/constants';
 import { foldCase } from '~/shared/normalize';
 import type { Settings } from '~/shared/settings';
+import { familyOf, type Family } from './streamPrior';
 
 export interface MessageMeta {
   username: string;
@@ -454,3 +455,39 @@ export function trimForEngine(text: string): string {
   t = dedupeWords(collapseRepeat(trimBypassSuffix(t)));
   return trimEdgeNoise(t);
 }
+
+const HAN_ONLY = /^[\p{Script=Han}\s0-9\p{P}]+$/u;
+
+/**
+ * `skipOnVerdict`, with the stream deciding what the line alone cannot. A Han-only line that no character
+ * rule named has nothing but the engine's verdict to go on, and the engine mixes Japanese and Chinese up
+ * on such lines, so the verdict skips it only when its family is the family of the stream. Every other
+ * line is decided exactly as before.
+ */
+export function skipOnVerdictForStream(
+  verdict: string | undefined,
+  target: string,
+  ignoreEnglish: boolean,
+  text: string,
+  hint: string | undefined,
+  prior: Family | undefined,
+): boolean {
+  if (!skipOnVerdict(verdict, target, ignoreEnglish)) return false;
+  if (hint !== undefined || !HAN_ONLY.test(text)) return true;
+  const family = familyOf(verdict);
+  return family !== undefined && family === prior;
+}
+
+/**
+ * `skipOnHint`, with one veto from the stream. A Han-only line that the character lists name Chinese, in a
+ * channel whose prior is Japanese, is most often a Japanese line sharing the lists' characters (1.3 percent of
+ * the Han-only Japanese lines), so it is not skipped as already in the reader's language: it goes to the
+ * service. The other direction (a line named Japanese in a Chinese channel) is not vetoed: replayed on
+ * collected chat the prior was missing for most of those lines, so the veto did not hold.
+ */
+export function skipOnHintForStream(hint: string | undefined, target: string, text: string, prior: Family | undefined): boolean {
+  if (!skipOnHint(hint, target)) return false;
+  if (prior === 'ja' && familyOf(hint) === 'zh' && HAN_ONLY.test(text)) return false;
+  return true;
+}
+

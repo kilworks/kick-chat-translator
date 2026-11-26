@@ -8,6 +8,8 @@ import {
   isSameLanguageAsTarget,
   shouldDropBySourceLang,
   shouldDropByUserOrChannel,
+  skipOnHintForStream,
+  skipOnVerdictForStream,
   trustedVerdict,
 } from './filters';
 
@@ -318,3 +320,46 @@ describe('trustedVerdict', () => {
     expect(trustedVerdict(undefined, '感謝')).toBeUndefined();
   });
 });
+
+describe('skipOnVerdictForStream', () => {
+  // Invented lines. A Han-only line that no character rule named: only the engine verdict and the stream can speak.
+  const hanOnly = '今日'; // two Han characters shared by Chinese and Japanese
+  it('does not skip a Han-only line on a Japanese verdict in a Chinese stream', () => {
+    expect(skipOnVerdictForStream('ja', 'ja', true, hanOnly, undefined, 'zh')).toBe(false);
+  });
+  it('does not skip a Han-only line on a Chinese verdict in a Japanese stream', () => {
+    expect(skipOnVerdictForStream('zh', 'zh', true, hanOnly, undefined, 'ja')).toBe(false);
+    expect(skipOnVerdictForStream('zh-tw', 'zh-tw', true, hanOnly, undefined, 'ja')).toBe(false);
+  });
+  it('skips a Han-only line when the verdict agrees with the stream', () => {
+    expect(skipOnVerdictForStream('ja', 'ja', true, hanOnly, undefined, 'ja')).toBe(true);
+    expect(skipOnVerdictForStream('zh', 'zh-tw', true, hanOnly, undefined, 'zh')).toBe(true);
+  });
+  it('does not skip a Han-only line when the stream is unknown', () => {
+    expect(skipOnVerdictForStream('ja', 'ja', true, hanOnly, undefined, undefined)).toBe(false);
+  });
+  it('decides every other line as before', () => {
+    expect(skipOnVerdictForStream('ja', 'ja', true, 'こんにちは', undefined, 'zh')).toBe(true); // kana
+    expect(skipOnVerdictForStream('ja', 'ja', true, hanOnly, 'ja', 'zh')).toBe(true); // a sure hint
+    expect(skipOnVerdictForStream('fr', 'ja', true, hanOnly, undefined, 'ja')).toBe(false); // other language
+    expect(skipOnVerdictForStream('ja', 'ja', false, hanOnly, undefined, 'ja')).toBe(false); // the setting is off
+  });
+});
+
+describe('skipOnHintForStream', () => {
+  const hanOnly = '這個問題'; // Han only, named Traditional by the lists
+  it('does not skip a Han-only line named Chinese in a Japanese stream', () => {
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', hanOnly, 'ja')).toBe(false);
+    expect(skipOnHintForStream('zh', 'zh', hanOnly, 'ja')).toBe(false);
+  });
+  it('skips it in a Chinese or unknown stream, as before', () => {
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', hanOnly, 'zh')).toBe(true);
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', hanOnly, undefined)).toBe(true);
+  });
+  it('leaves a line with kana, another language and a different reader alone', () => {
+    expect(skipOnHintForStream('ja', 'ja', 'こんにちは', 'zh')).toBe(true); // Japanese hint in a Chinese stream is not vetoed
+    expect(skipOnHintForStream('zh-tw', 'ja', hanOnly, 'ja')).toBe(false); // not the reader's language anyway
+    expect(skipOnHintForStream('zh-tw', 'zh-tw', hanOnly + 'あ', 'ja')).toBe(true); // kana in the line
+  });
+});
+

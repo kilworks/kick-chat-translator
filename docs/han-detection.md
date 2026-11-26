@@ -168,3 +168,72 @@ A FAIL is published as it is. `ds4` is not read again for this candidate.
 4. Weight: gzip 102,839 to 103,378, +539 bytes against a margin of 725. Speed, three alternated runs: median 1.05 times, p95 1.03 times. PASS.
 
 Informational, not used to choose: on 33,852 real Twitch lines declared Chinese, 0.1 percent (about 34 lines) are now named `ja`; the benefit and this price are both small, and a Japanese reader would skip those lines as already in their language.
+
+## Stream prior for Han-only lines: design and pre-registered rule
+
+What is still open for Japanese. Google answers, on the design set (Han-only lines, 1,452 Chinese and 188 Japanese by declared channel language): for Chinese lines `en` 75.3 percent (already ignored by the engine-verdict guard), `zh-CN` 22.5, `yue` 1.4, `ja` 0.8; for Japanese lines `ja` 70.2, `zh-CN` 18.6, `en` 10.1. The verdict gate trusts any of them except `en`. So a Japanese reader loses 0.8 percent of the Han-only Chinese lines (answered `ja`), and a Chinese reader loses 18.6 percent of the Han-only Japanese lines (answered `zh-CN`). A Han-only line carries no script evidence, so the line alone cannot settle it; the stream can.
+
+Design. A running count of the sure answers of `confidentLanguage` on the lines of the open channel (exponential decay, a window of about 200 sure answers, at least 30 observed) gives a prior family for the stream. Only sure answers of the two families count (Japanese, or Chinese: `zh`, `zh-tw`, `yue`); answers in other languages are ignored. The prior is `ja` when Japanese answers are at least 60 percent of them, `zh` when Chinese answers are at least 60 percent, undefined otherwise or before 30 of them were seen. On a Han-only line that the character lists leave unanswered, the engine verdict may skip the line only when its family (`ja` or Chinese) is the family of the prior; with no prior it may not skip. Lines named by the lists, the kana, the Japanese-only characters or any other sure answer are untouched. The count lives in memory for the open tab, is never stored or sent, and is reset when the channel changes.
+
+Pre-registered, before the chat of any Japanese or Chinese channel is replayed for this change: the replay is the collected Twitch chat of about 90 channel units declared Japanese or Chinese, in time order, with the sure answers computed by the code on `master`.
+
+1. Prior quality: among the Han-only lines that arrive once the prior exists, the prior family equals the family of the declared channel language for at least 95 percent of lines; the prior exists (30 sure answers seen) for at least 90 percent of the Han-only lines of units with at least 200 lines.
+2. Effect, computed with the answer rates of Google measured on the design set above and the replayed prior: the share of Han-only Chinese lines hidden for a `ja` reader falls from 0.8 percent to at most 0.1 percent, and the share of Han-only Japanese lines hidden for a `zh` or `zh-tw` reader falls from 18.6 percent to at most 3 percent.
+3. Price, same computation: the share of Han-only Japanese lines kept for a `ja` reader (not skipped although in the reader's language) rises by at most 35 points (from 30 percent kept to at most 65 percent), and the Chinese readers keep at most 25 percent more Han-only Chinese lines than today.
+4. Weight at most 1,500 bytes gzip, speed unchanged within 1.10 times.
+
+A FAIL is published as it is.
+
+## Stream prior for Han-only lines: results
+
+Replay of the collected Twitch chat, 160 channel units of which 83 have at least 200 lines (27 Japanese, 56 Chinese), in time order, with the sure answers of the code on `master`.
+
+1. Prior quality. Japanese units: the prior existed for 99.7 percent of the 4,773 Han-only lines the character rules left unanswered, and was right for 100.0 percent of them. Chinese units: it existed for 95.6 percent of the 42,805 lines and was right for 100.0 percent. PASS (95 percent right and 90 percent present were asked).
+2. Effect, computed from the answers of Google on the design set (Han-only lines, 1,452 Chinese and 188 Japanese) and the replayed prior. Han-only Chinese lines hidden for a Japanese reader: 0.8 percent to 0 (the service said `ja`, the stream said Chinese). Han-only Japanese lines hidden for a Chinese reader: 18.6 percent to 0 (the service said `zh-CN`, the stream said Japanese). PASS (at most 0.1 and 3 percent were asked).
+3. Price. Han-only Japanese lines kept for a Japanese reader although in their language: 29.8 to 30.0 percent (the first 30 sure answers of a stream have no prior), +0.2 points. Han-only Chinese lines kept for a Chinese reader: 76.1 to 77.2 percent, +1.1 points. PASS.
+4. Weight: `content.js` gzip 103,378 to 103,684 bytes (+306, 1,500 allowed). Speed: 0.014 microseconds per line for the prior against about 20 for the detection of a line. PASS.
+
+Pinned tests did not move. New tests: the prior itself (threshold of 30, families, forgetting, reset), the gate (`skipOnVerdictForStream`: the three stream cases, an unknown stream, and every other line decided as before), and three pipeline tests that fail when the gate is neutralised (checked: two of them go red).
+
+Left open on the Japanese side, not covered by this change: Han-only Japanese lines that the character lists name Chinese (1.3 percent of them on the chat-like fresh set) are still skipped for a Chinese reader through the sure-hint gate; and the prior is blind during the first 30 sure answers of a channel. Not measured on a live channel in a browser.
+
+## Stream prior on the sure-hint gate: pre-registered rule
+
+Pre-registered before this measurement. Same prior, applied to the second hiding path: a Han-only line (no kana) that the character lists name Chinese, or that the Japanese-only characters name Japanese, is skipped as already in the reader's language. Change: when the prior exists and its family differs from the family of the line's sure answer, that skip is vetoed and the line goes to the service. With no prior, or an agreeing prior, nothing changes. Lines with kana are untouched.
+
+Replay of the same 83 collected channel units, in time order:
+
+1. In Japanese units, at least 90 percent of the Han-only lines that the lists name Chinese are un-hidden.
+2. In Chinese units, at most 1 percent of the Han-only lines that the lists name Chinese are vetoed, and at least 90 percent of the Han-only lines named Japanese by the Japanese-only characters are vetoed.
+3. Price: the Chinese lines of Japanese units and the Japanese lines of Chinese units that this keeps (counted by declared channel language, which is noisy) are reported; weight at most 300 bytes gzip.
+
+A FAIL is published as it is.
+
+## Stream prior on the sure-hint gate: results
+
+Replay of the same 83 collected channel units, in time order.
+
+1. Japanese units: all 60 Han-only lines that the lists name Chinese (1.26 percent of the 4,773 unanswered-or-named Han-only lines of those units) are un-hidden. PASS.
+2. Chinese units: 12 of 33,056 Han-only lines named Chinese are vetoed (0.04 percent), PASS. Of the 74 Han-only lines named Japanese by the Japanese-only characters, 28 are vetoed (37.8 percent, 90 percent asked), FAIL: for 41 of the 74 the channel had no prior yet (fewer than 30 sure answers of the two families), for 5 the prior was Japanese.
+3. Weight: gzip 103736 bytes, 306 bytes above the previous step, so about 103,684 plus the veto; speed is the same constant-time check.
+
+Decision by the rule: the direction that passed is shipped (a Han-only line named Chinese in a Japanese channel goes to the service); the direction that failed is not (a line named Japanese in a Chinese channel is not vetoed). Three new unit tests and two pipeline tests; one pipeline test was seen red with the veto removed.
+
+## Hidden lines by reader and channel language: before and after
+
+The design set (3,608 lines of Twitch and PC chat, 1,511 Chinese and 1,936 Japanese by declared channel language, 3,140 of them with a stored answer from the translation service), run through the real gates by the bench of this repository. Lines hidden by a gate for a reader whose language they are not in:
+
+| Reader, channel language | Published 3.6.3 | `master` without the prior | with the prior (computed) |
+|---|---|---|---|
+| Japanese reader, Chinese channel | 14 (0.93 %) | 16 (1.06 %) | 6 (0.40 %) |
+| Chinese reader, Japanese channel | 39 (2.01 %) | 36 (1.86 %) | 0 |
+| English reader, Chinese channel | 537 (35.5 %) | 8 (0.5 %) | 8 (0.5 %) |
+| English reader, Japanese channel | 51 (2.6 %) | 34 (1.8 %) | 34 (1.8 %) |
+
+The prior cannot be replayed on this set, whose lines are distinct samples and not in time order; the last column removes from the third the lines it un-hides by construction: all 10 service-verdict skips of the Japanese reader and all 30 service-verdict and the 6 hint skips of the Chinese reader are Han-only lines with no sure answer or a Chinese one, which the prior and its veto send to the service. What is left for the Japanese reader in a Chinese channel: 6 lines named Japanese by a sure answer (4 Han-only, 2 with kana). The English reader's remaining 34 on Japanese lines are lines that look English (ASCII only) or that the service called English without a letter English does not write.
+
+Reading: the published extension hid 14 of 1,511 Chinese lines from a Japanese reader and 39 of 1,936 Japanese lines from a Chinese reader. The first step of this work removed the English reader's losses (537 to 8). The step before the prior did not help the Japanese reader (14 to 16, two more Chinese lines named Japanese by the Japanese-only characters); the prior takes it to 6.
+
+## Real Brave proof for a Japanese reader (translation service faked)
+
+Throwaway profile, the built extension against a fixture channel, the translation service replaced by route interception that always answers `ja`; nothing leaves the machine. Reader language Japanese. Chinese channel (40 invented Traditional Chinese lines, then a Han-only line shared by both languages): the published build skips the line, the new build translates it. Japanese channel (40 invented Japanese lines, then the same line): both builds skip it, which is right. 6 of 6 checks. Not done: the same proof against the real service (the answers of the real service were measured on the design set instead), and on a live channel.
