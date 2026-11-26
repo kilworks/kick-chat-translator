@@ -31,5 +31,5 @@ As permissões, em palavras simples: armazenamento para as suas configurações 
 
 GRATUITO E DE CÓDIGO ABERTO
 
-Licença MIT, cada linha de código pública: github.com/kilworks/kick-chat-translator
+Licença MIT, cada linha de código pública: github.com/Pkkls/kick-chat-translator
 Relatos de bugs e pedidos de idiomas são bem-vindos lá, e o que mudou em cada versão está na página de versões.

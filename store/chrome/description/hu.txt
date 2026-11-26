@@ -31,5 +31,5 @@ Az engedélyek egyszerűen elmondva: tárhely a beállításaidhoz és a fordít
 
 INGYENES ÉS NYÍLT FORRÁSKÓDÚ
 
-MIT licenc, a kód minden sora nyilvános: github.com/kilworks/kick-chat-translator
+MIT licenc, a kód minden sora nyilvános: github.com/Pkkls/kick-chat-translator
 Hibajelentéseket és nyelvi kéréseket szívesen fogadunk ott, az egyes verziók változásai pedig a kiadások oldalán olvashatók.

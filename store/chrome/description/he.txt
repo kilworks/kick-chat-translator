@@ -31,5 +31,5 @@ Kick Chat Translator הוא תוסף חינמי לתרגום צ'אט חי ב-Kic
 
 חינמי ובקוד פתוח
 
-רישיון MIT, כל שורת קוד פומבית: github.com/kilworks/kick-chat-translator
+רישיון MIT, כל שורת קוד פומבית: github.com/Pkkls/kick-chat-translator
 דיווחי באגים ובקשות לשפות מתקבלים שם בברכה, ומה השתנה בכל גרסה מופיע בדף הגרסאות.

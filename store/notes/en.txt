@@ -9,3 +9,5 @@ Failed lines say "Translation failed" in your language instead of a code, and a 
 Lighter on fast chats: translated lines are found without a heavy style search, a hidden paused tab is no longer read, and the background worker writes the cache once per batch.
 
 The About tab now explains the research behind the translator and links the public repositories.
+
+Also in this version: the new About card is translated into the 42 interface languages, the options lists keep a readable line length, the popup stays under 600 px in every language, and the build dependencies are up to date.

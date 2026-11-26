@@ -31,5 +31,5 @@ Les permissions, en clair : le stockage pour tes réglages et son cache de tradu
 
 GRATUIT ET OPEN SOURCE
 
-Licence MIT, code intégralement public : github.com/kilworks/kick-chat-translator
+Licence MIT, code intégralement public : github.com/Pkkls/kick-chat-translator
 Les signalements de bugs et les demandes de langues y sont les bienvenus, et ce qui a changé dans chaque version se trouve sur la page des versions.

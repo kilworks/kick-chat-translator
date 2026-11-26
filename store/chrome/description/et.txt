@@ -31,5 +31,5 @@ Load lihtsate sõnadega: salvestusruum sinu seadetele ja tõlkevahemälule; juur
 
 TASUTA JA AVATUD LÄHTEKOODIGA
 
-MIT-litsents, iga koodirida on avalik: github.com/kilworks/kick-chat-translator
+MIT-litsents, iga koodirida on avalik: github.com/Pkkls/kick-chat-translator
 Veateated ja keelesoovid on seal teretulnud ning iga versiooni muudatused leiad väljalaskelehelt.

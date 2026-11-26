@@ -31,5 +31,5 @@ Hesap yok, bana ait sunucu yok ve sen kabul etmedikçe analitik de yok: kullanı
 
 ÜCRETSİZ VE AÇIK KAYNAK
 
-MIT lisansı, kodun her satırı herkese açık: github.com/kilworks/kick-chat-translator
+MIT lisansı, kodun her satırı herkese açık: github.com/Pkkls/kick-chat-translator
 Hata bildirimleri ve dil istekleri orada memnuniyetle karşılanır, her sürümde nelerin değiştiği de sürümler sayfasında.
