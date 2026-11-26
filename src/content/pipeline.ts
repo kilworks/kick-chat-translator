@@ -13,7 +13,7 @@ import { extractMessageText, findAllRows } from './selectors';
 import { confidentLanguage, detectLanguageWithBrowser } from './langDetect';
 import { resolveBrowserLang } from '~/shared/languages';
 import { isContextCritical } from '~/shared/langTiers';
-import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, skipOnHintForStream, skipOnVerdictForStream, trimForEngine, trustedVerdict } from './filters';
+import { chatLength, hasBlockedKeyword, hasNonEnglishLetter, isBareCommand, isNoise, normalizeElongation, shouldDropBySourceLang, shouldDropByUserOrChannel, skipOnHintForStream, skipOnVerdictForStream, sourceHintForStream, trimForEngine, trustedVerdict } from './filters';
 import { StreamPrior } from './streamPrior';
 import { HANDLED_SELECTOR, inject, incrementFloatingCount, armHoverTranslate, markSkipped, removeAllArtifacts, showError, showLangBlocked, showLoading, showThrottleIndicator, showToast, updateActiveProvider } from './injector';
 import { localEngine } from './localEngine';
@@ -351,7 +351,7 @@ export class TranslationPipeline {
         ? spellOutAbbreviations(realText)
         : spellOutForLanguage(realText, hint),
     );
-    return { real, detected, hint };
+    return { real, detected, hint: sourceHintForStream(hint, realText, this.prior.family()) };
   }
 
   /** Rolling per-channel context (previous lines) for DeepL disambiguation.

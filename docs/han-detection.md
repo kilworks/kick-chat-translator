@@ -237,3 +237,23 @@ Reading: the published extension hid 14 of 1,511 Chinese lines from a Japanese r
 ## Real Brave proof for a Japanese reader (translation service faked)
 
 Throwaway profile, the built extension against a fixture channel, the translation service replaced by route interception that always answers `ja`; nothing leaves the machine. Reader language Japanese. Chinese channel (40 invented Traditional Chinese lines, then a Han-only line shared by both languages): the published build skips the line, the new build translates it. Japanese channel (40 invented Japanese lines, then the same line): both builds skip it, which is right. 6 of 6 checks. Not done: the same proof against the real service (the answers of the real service were measured on the design set instead), and on a live channel.
+
+## Stream prior as the source language of Han-only lines: rule
+
+Written after two measurements, which are stated here and not claimed as pre-registered: (1) on the real translation service, for the 56 Han-only Japanese lines of the design set that automatic detection calls something else, forcing the source language `ja` changes the English translation of 42 (75 percent), and for the 11 Han-only Chinese lines it calls Japanese, forcing `zh-CN` changes 6 (54.5 percent); the changed ones are the right reading (for example a line ending in `ww` goes from "ww during the year" to "Within the year lol"). (2) Against the gold labels (two annotators agree) on Han-only lines: in channels declared Chinese the service's own verdict names a family for 17.3 percent of the lines (and is never wrong) while the stream is right for 100 percent; in channels declared Japanese the verdict is right for 87.5 percent, wrong for 5.8, silent for 6.7, while the stream is right for 93.3 percent.
+
+Candidate: on a Han-only line that no character rule names, when the stream prior exists, the source language sent to the service is the prior family (`ja` or `zh`) instead of automatic detection. Without a prior, or on any other line, nothing changes. The gates of the earlier steps are untouched.
+
+Criteria, read on the 83 replayed channels and the gold lines: the prior family is right for at least 90 percent of the gold-decided Han-only lines in each stream and at least as often as the service's own verdict; weight at most 300 bytes gzip; no test re-pinned. A FAIL is published as it is.
+
+## Stream prior as the source language of Han-only lines: results
+
+1. Language of the stream against the gold labels, Han-only lines with two annotators agreeing: channels declared Chinese, prior right for 100.0 percent of 197 lines (the service's own verdict names a family for 17.3 percent); channels declared Japanese, prior right for 93.3 percent of 104 lines (the verdict: 87.5 percent right, 5.8 wrong, 6.7 silent). PASS (90 percent and at least the verdict were asked).
+2. Weight: `content.js` gzip +31 bytes. PASS.
+3. No pinned test re-pinned; three new pipeline tests (Japanese channel sends `ja`, Chinese channel sends `zh`, no prior sends nothing), two of them seen red with the change neutralised. PASS.
+
+What it changes for the reader, measured on the real translation service before the rule was written: for Han-only Japanese lines that automatic detection reads as something else, the English translation changes for 75 percent when the source is forced to Japanese; for Han-only Chinese lines it reads as Japanese, for 54.5 percent when forced to Chinese. Not measured: the same through the extension in a browser against the real service (the run ended in refusals on the first-choice endpoint, which the extension falls back from, and its check could not see a line translated into itself), and on a live channel.
+
+## End-to-end proof against the real service (real Brave, throwaway profile)
+
+The built extension, a fixture Japanese channel (32 invented Japanese chat lines, then a Han-only line, `他責`, which in Japanese means blaming others), the real translation service (requests reach it as the extension makes them; the first-choice endpoint answers a refusal and the extension falls back to the second, as it does for any user). English reader. Published build: the service guesses English for the line, so nothing is shown. New build: the stream's language is sent as the source, the service answers Japanese, and the line is shown as "Blame on others". The same line sent with automatic detection by the service alone reads "He is responsible" in the earlier comparison. One line, one run: it shows the path works end to end, it does not measure how often it happens (the comparison above does that).

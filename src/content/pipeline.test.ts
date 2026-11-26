@@ -698,3 +698,44 @@ describe('the browser detector, asked once per line', () => {
     expect(ask).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('TranslationPipeline: the stream as the source language of a Han-only line', () => {
+  const JA_LINE = (i: number) => `\u3053\u308c\u306f\u30c6\u30b9\u30c8\u30e1\u30c3\u30bb\u30fc\u30b8\u3067\u3059${i}`; // invented Japanese chat
+  const ZH_LINE = (i: number) => `\u9019\u500b\u554f\u984c\u5f88\u96e3${i}`; // invented Traditional Chinese chat
+  const AMBIGUOUS = '\u4eca\u65e5'; // two Han characters shared by Chinese and Japanese
+  const dom = (text: string, i: number) => {
+    const rowElement = document.createElement('div');
+    const injectionTarget = document.createElement('div');
+    rowElement.appendChild(injectionTarget);
+    return { rowElement, injectionTarget, id: `s${i}`, text, channel: 'chan', username: `user${i}`, isBot: false };
+  };
+  const make = () => new TranslationPipeline({ ...defaultSettings(), enabled: true, targetLang: 'en', pauseWhenHidden: false, minTextLength: 2 });
+  const lastHint = () => sendMock.mock.calls[sendMock.mock.calls.length - 1]?.[0]?.payload?.sourceLangHint as string | undefined;
+
+  beforeEach(() => {
+    sendMock.mockReset();
+    sendMock.mockResolvedValue({ type: 'translate.result', payload: { ok: false, error: { code: 'x', message: 'x' } } });
+  });
+
+  it('sends Japanese as the source of a Han-only line in a Japanese channel', async () => {
+    const p = make();
+    for (let i = 0; i < 40; i++) await p.onDomMessage(dom(JA_LINE(i), i));
+    sendMock.mockClear();
+    await p.onDomMessage(dom(AMBIGUOUS, 100));
+    expect(lastHint()).toBe('ja');
+  });
+
+  it('sends Chinese as the source of a Han-only line in a Chinese channel', async () => {
+    const p = make();
+    for (let i = 0; i < 40; i++) await p.onDomMessage(dom(ZH_LINE(i), i));
+    sendMock.mockClear();
+    await p.onDomMessage(dom(AMBIGUOUS, 100));
+    expect(lastHint()).toBe('zh');
+  });
+
+  it('sends no source for the same line in a channel with no prior', async () => {
+    const p = make();
+    await p.onDomMessage(dom(AMBIGUOUS, 100));
+    expect(lastHint()).toBeUndefined();
+  });
+});
