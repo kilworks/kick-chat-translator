@@ -120,7 +120,7 @@ export const GA_API_SECRET = 'SeO_Zkk4RKCCB0Iv_SDr1A';
 export const GA_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 
 // Self-update check: compare the installed version to the latest GitHub release.
-export const GITHUB_REPO = 'Pkkls/kick-chat-translator';
+export const GITHUB_REPO = 'kilworks/kick-chat-translator';
 /**
  * The listing's id on the Chrome Web Store.
  *

@@ -30,5 +30,5 @@ Chat text goes only to the translation engine you picked. With Google, MyMemory 
 
 FREE AND OPEN SOURCE
 
-MIT licence, every line of code public: github.com/Pkkls/kick-chat-translator
+MIT licence, every line of code public: github.com/kilworks/kick-chat-translator
 Bug reports and language requests are welcome there.

@@ -31,5 +31,5 @@ Käyttöoikeudet selkokielellä: tallennustila asetuksillesi ja käännösvälim
 
 ILMAINEN JA AVOIN LÄHDEKOODI
 
-MIT-lisenssi, jokainen koodirivi on julkinen: github.com/Pkkls/kick-chat-translator
+MIT-lisenssi, jokainen koodirivi on julkinen: github.com/kilworks/kick-chat-translator
 Virheraportit ja kielitoiveet ovat tervetulleita sinne, ja jokaisen version muutokset löytyvät julkaisusivulta.

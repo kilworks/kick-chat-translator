@@ -31,5 +31,5 @@ Povolenia jednoducho povedané: úložisko pre vaše nastavenia a vyrovnávaciu 
 
 ZADARMO A S OTVORENÝM KÓDOM
 
-Licencia MIT, každý riadok kódu je verejný: github.com/Pkkls/kick-chat-translator
+Licencia MIT, každý riadok kódu je verejný: github.com/kilworks/kick-chat-translator
 Hlásenia chýb a žiadosti o nové jazyky tam radi privítame a čo sa v ktorej verzii zmenilo, nájdete na stránke vydaní.

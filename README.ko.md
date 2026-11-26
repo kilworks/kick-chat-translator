@@ -12,7 +12,7 @@ Kick의 어떤 방송 채팅이든 자기 언어로 읽고, 채널의 언어로 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Firefox Add-on](https://img.shields.io/amo/v/kick-chat-translator?label=Firefox%20Add-on&color=53fc18)](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)
-[![CI](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml)
+[![CI](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [English](README.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português (Portugal)](README.pt-PT.md) · [Português (Brasil)](README.pt-BR.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Svenska](README.sv.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Українська](README.uk.md) · [Türkçe](README.tr.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [ไทย](README.th.md) · [Tiếng Việt](README.vi.md) · [Bahasa Indonesia](README.id.md) · [हिन्दी](README.hi.md) · [Suomi](README.fi.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Ελληνικά](README.el.md) · [Magyar](README.hu.md) · [Български](README.bg.md) · [Català](README.ca.md) · [Slovenščina](README.sl.md) · [Eesti](README.et.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [فارسی](README.fa.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Bahasa Melayu](README.ms.md) · [Filipino](README.tl.md) · [粵語](README.yue.md)
@@ -74,7 +74,7 @@ Kick의 어떤 방송 채팅이든 자기 언어로 읽고, 채널의 언어로 
 <details>
 <summary>릴리스 zip으로 직접 설치하기</summary>
 
-[Releases](https://github.com/Pkkls/kick-chat-translator/releases/latest)에서 브라우저에 맞는 zip을 내려받아 압축을 풉니다.
+[Releases](https://github.com/kilworks/kick-chat-translator/releases/latest)에서 브라우저에 맞는 zip을 내려받아 압축을 풉니다.
 
 - Chrome, Brave, Edge(`…-chromium.zip`): `chrome://extensions`를 열고 개발자 모드를 켠 뒤, 압축해제된 확장 프로그램 로드를 눌러 폴더를 고릅니다.
 - Firefox 121+(`…-firefox.zip`): `about:debugging#/runtime/this-firefox`를 열고 임시 부가 기능 로드를 눌러 `manifest.json`을 고릅니다.
@@ -140,7 +140,7 @@ Edge 138 이상에서 제공될 수 있지만 모든 설치본에서 되는 것�
 
 **초록색 바가 사라졌어요.**
 페이지를 새로 고치세요. 다시 그러면 채널과 그 전에 한 일을 적어
-[이슈](https://github.com/Pkkls/kick-chat-translator/issues)를 열어 주세요.
+[이슈](https://github.com/kilworks/kick-chat-translator/issues)를 열어 주세요.
 
 **번역 품질을 높이려면?**
 설정에서 무료 DeepL 키를 추가하세요. 무료 요금제는 월 100만 자이며, DeepL은 무료 엔진보다 나은 언어
@@ -156,7 +156,7 @@ Edge 138 이상에서 제공될 수 있지만 모든 설치본에서 되는 것�
 네, 생방송과 똑같이 작동합니다.
 
 **Kick 업데이트 후에 고장 났어요.**
-Kick은 가끔 채팅의 구조를 바꿉니다. [이슈](https://github.com/Pkkls/kick-chat-translator/issues)를 열어
+Kick은 가끔 채팅의 구조를 바꿉니다. [이슈](https://github.com/kilworks/kick-chat-translator/issues)를 열어
 주시면 수정하겠습니다.
 
 **Kick에서 만든 건가요?**
@@ -171,12 +171,12 @@ Kick은 가끔 채팅의 구조를 바꿉니다. [이슈](https://github.com/Pkk
 - 화면 언어 메뉴에 각 언어의 국기가 표시되고 키보드로도 조작할 수 있습니다
 
 모든 릴리스의 변경 내용과 그 근거가 된 측정값은
-[Releases](https://github.com/Pkkls/kick-chat-translator/releases)와 [CHANGELOG.md](CHANGELOG.md)에 있습니다.
+[Releases](https://github.com/kilworks/kick-chat-translator/releases)와 [CHANGELOG.md](CHANGELOG.md)에 있습니다.
 
 ## 개발
 
 ```bash
-git clone https://github.com/Pkkls/kick-chat-translator.git
+git clone https://github.com/kilworks/kick-chat-translator.git
 cd kick-chat-translator
 npm ci
 npm run release:check    # typecheck, lint, unit tests, build: the gate every package goes through

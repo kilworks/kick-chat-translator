@@ -169,7 +169,7 @@ if (id) {
   // The update check asks GitHub for the latest release. With the installed
   // version equal to it, the extension must stay quiet.
   const update = await page.evaluate(async () => {
-    const res = await fetch('https://api.github.com/repos/Pkkls/kick-chat-translator/releases/latest');
+    const res = await fetch('https://api.github.com/repos/kilworks/kick-chat-translator/releases/latest');
     const json = await res.json();
     return { latest: json.tag_name, installed: chrome?.runtime?.getManifest?.().version ?? null };
   });

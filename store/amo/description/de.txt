@@ -30,5 +30,5 @@ Der Chattext geht nur an die Übersetzungs-Engine, die du gewählt hast. Bei Goo
 
 KOSTENLOS UND OPEN SOURCE
 
-MIT-Lizenz, jede Codezeile ist öffentlich: github.com/Pkkls/kick-chat-translator
+MIT-Lizenz, jede Codezeile ist öffentlich: github.com/kilworks/kick-chat-translator
 Fehlerberichte und Sprachwünsche sind dort willkommen.

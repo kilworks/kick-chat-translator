@@ -30,5 +30,5 @@ El texto del chat va solo al motor de traducción que elegiste. Con Google, MyMe
 
 GRATIS Y DE CÓDIGO ABIERTO
 
-Licencia MIT, todo el código es público: github.com/Pkkls/kick-chat-translator
+Licencia MIT, todo el código es público: github.com/kilworks/kick-chat-translator
 Allí son bienvenidos los informes de errores y las peticiones de idiomas.

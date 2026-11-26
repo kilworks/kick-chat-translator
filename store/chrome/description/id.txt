@@ -31,5 +31,5 @@ Izinnya, dengan bahasa sederhana: storage untuk pengaturan dan cache terjemahann
 
 GRATIS DAN OPEN SOURCE
 
-Lisensi MIT, setiap baris kode terbuka untuk umum: github.com/Pkkls/kick-chat-translator
+Lisensi MIT, setiap baris kode terbuka untuk umum: github.com/kilworks/kick-chat-translator
 Laporan bug dan permintaan bahasa dipersilakan di sana, dan perubahan di setiap versi ada di halaman rilis.

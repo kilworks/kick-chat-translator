@@ -12,7 +12,7 @@ Gratuit, fără cont, nimic de configurat. 43 de limbi, în chat și în extensi
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Utilizatori Chrome](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=utilizatori&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Firefox Add-on](https://img.shields.io/amo/v/kick-chat-translator?label=Firefox%20Add-on&color=53fc18)](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)
-[![CI](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml)
+[![CI](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [English](README.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português (Portugal)](README.pt-PT.md) · [Português (Brasil)](README.pt-BR.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Svenska](README.sv.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Русский](README.ru.md) · [Українська](README.uk.md) · [Türkçe](README.tr.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [ไทย](README.th.md) · [Tiếng Việt](README.vi.md) · [Bahasa Indonesia](README.id.md) · [हिन्दी](README.hi.md) · [Suomi](README.fi.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Ελληνικά](README.el.md) · [Magyar](README.hu.md) · [Български](README.bg.md) · [Català](README.ca.md) · [Slovenščina](README.sl.md) · [Eesti](README.et.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [فارسی](README.fa.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Bahasa Melayu](README.ms.md) · [Filipino](README.tl.md) · [粵語](README.yue.md)
@@ -77,7 +77,7 @@ Versiunile din magazine se actualizează singure.
 <details>
 <summary>Instalare manuală, dintr-un zip de release</summary>
 
-Descarcă zipul pentru browserul tău de la [Releases](https://github.com/Pkkls/kick-chat-translator/releases/latest) și dezarhivează-o.
+Descarcă zipul pentru browserul tău de la [Releases](https://github.com/kilworks/kick-chat-translator/releases/latest) și dezarhivează-o.
 
 - Chrome, Brave, Edge (`…-chromium.zip`): deschide `chrome://extensions`, pornește modul dezvoltator, dă clic pe Load unpacked și alege folderul.
 - Firefox 121+ (`…-firefox.zip`): deschide `about:debugging#/runtime/this-firefox`, dă clic pe Load Temporary Add-on și alege `manifest.json`.
@@ -143,7 +143,7 @@ live, 213 din 234 erau același utilizator care se repeta, 9 erau prea scurte, 7
 era deja în limba de citire. Dacă fila nu arată nimic, extensia nu vede chatul: te rog deschide un issue.
 
 **Bara verde a dispărut.**
-Reîmprospătează pagina. Dacă se întâmplă din nou, deschide un [issue](https://github.com/Pkkls/kick-chat-translator/issues)
+Reîmprospătează pagina. Dacă se întâmplă din nou, deschide un [issue](https://github.com/kilworks/kick-chat-translator/issues)
 cu canalul și ce ai făcut înainte.
 
 **Cum obțin traduceri mai bune?**
@@ -160,7 +160,7 @@ Da. Urmează limba browserului, iar meniul din partea de sus a setărilor o schi
 Da, la fel ca la streamurile live.
 
 **S-a stricat după o actualizare Kick.**
-Kick își schimbă uneori felul în care e construit chatul. Deschide un [issue](https://github.com/Pkkls/kick-chat-translator/issues)
+Kick își schimbă uneori felul în care e construit chatul. Deschide un [issue](https://github.com/kilworks/kick-chat-translator/issues)
 și se repară.
 
 **E făcută de Kick?**
@@ -175,12 +175,12 @@ Nu. E un proiect open-source independent, fără legătură cu Kick.
 - Meniul limbii interfeței arată steagul fiecărei limbi și merge de la tastatură
 
 Fiecare versiune, cu ce s-a schimbat și măsurătoarea din spate:
-[Releases](https://github.com/Pkkls/kick-chat-translator/releases) și [CHANGELOG.md](CHANGELOG.md).
+[Releases](https://github.com/kilworks/kick-chat-translator/releases) și [CHANGELOG.md](CHANGELOG.md).
 
 ## Dezvoltare
 
 ```bash
-git clone https://github.com/Pkkls/kick-chat-translator.git
+git clone https://github.com/kilworks/kick-chat-translator.git
 cd kick-chat-translator
 npm ci
 npm run release:check    # typecheck, lint, unit tests, build: the gate every package goes through

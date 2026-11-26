@@ -30,5 +30,5 @@ Textul din chat ajunge doar la motorul de traducere ales de tine. Cu Google, MyM
 
 GRATUIT ȘI CU COD SURSĂ DESCHIS
 
-Licență MIT, fiecare linie de cod este publică: github.com/Pkkls/kick-chat-translator
+Licență MIT, fiecare linie de cod este publică: github.com/kilworks/kick-chat-translator
 Rapoartele de erori și cererile de limbi sunt binevenite acolo.

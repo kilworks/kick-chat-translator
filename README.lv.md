@@ -12,7 +12,7 @@ Bez maksas, bez konta, nekas nav jāiestata. 43 valodas, gan čatā, gan pašā 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=Chrome%20Web%20Store&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Chrome users](https://img.shields.io/chrome-web-store/users/nkkjmbkmacbdkboijmnhjnblcaiclhni?label=users&color=53fc18)](https://chromewebstore.google.com/detail/kick-chat-translator/nkkjmbkmacbdkboijmnhjnblcaiclhni)
 [![Firefox Add-on](https://img.shields.io/amo/v/kick-chat-translator?label=Firefox%20Add-on&color=53fc18)](https://addons.mozilla.org/firefox/addon/kick-chat-translator/)
-[![CI](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/Pkkls/kick-chat-translator/actions/workflows/ci.yml)
+[![CI](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/kilworks/kick-chat-translator/actions/workflows/ci.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [English](README.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português (Portugal)](README.pt-PT.md) · [Português (Brasil)](README.pt-BR.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Svenska](README.sv.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Русский](README.ru.md) · [Українська](README.uk.md) · [Türkçe](README.tr.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [ไทย](README.th.md) · [Tiếng Việt](README.vi.md) · [Bahasa Indonesia](README.id.md) · [हिन्दी](README.hi.md) · [Suomi](README.fi.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Ελληνικά](README.el.md) · [Magyar](README.hu.md) · [Български](README.bg.md) · [Català](README.ca.md) · [Slovenščina](README.sl.md) · [Eesti](README.et.md) · [Lietuvių](README.lt.md) · [فارسی](README.fa.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Bahasa Melayu](README.ms.md) · [Filipino](README.tl.md) · [粵語](README.yue.md)
@@ -73,7 +73,7 @@ Veikalu versijas atjauninās pašas.
 <details>
 <summary>Instalēšana ar roku no izlaiduma zip</summary>
 
-Lejupielādē savam pārlūkam paredzēto zip no [Releases](https://github.com/Pkkls/kick-chat-translator/releases/latest) un izpako to.
+Lejupielādē savam pārlūkam paredzēto zip no [Releases](https://github.com/kilworks/kick-chat-translator/releases/latest) un izpako to.
 
 - Chrome, Brave, Edge (`…-chromium.zip`): atver `chrome://extensions`, ieslēdz Developer mode, noklikšķini uz Load unpacked, izvēlies mapi.
 - Firefox 121+ (`…-firefox.zip`): atver `about:debugging#/runtime/this-firefox`, noklikšķini uz Load Temporary Add-on, izvēlies `manifest.json`.
@@ -139,7 +139,7 @@ bija lasīšanas valodā. Ja cilnē nav nekā, paplašinājums neredz čatu:
 lūdzu, atver issue.
 
 **Zaļā josla pazuda.**
-Atsvaidzini lapu. Ja tas atkārtojas, atver [issue](https://github.com/Pkkls/kick-chat-translator/issues)
+Atsvaidzini lapu. Ja tas atkārtojas, atver [issue](https://github.com/kilworks/kick-chat-translator/issues)
 ar kanālu un to, ko darīji pirms tam.
 
 **Kā iegūt labākus tulkojumus?**
@@ -157,7 +157,7 @@ Jā. Tas seko tavas pārlūkprogrammas valodai, un izvēlne iestatījumu augšpu
 Jā, tāpat kā tiešraidēs.
 
 **Pēc Kick atjauninājuma tas salūza.**
-Kick dažkārt maina savu čata uzbūvi. Atver [issue](https://github.com/Pkkls/kick-chat-translator/issues),
+Kick dažkārt maina savu čata uzbūvi. Atver [issue](https://github.com/kilworks/kick-chat-translator/issues),
 un tas tiks salabots.
 
 **Vai to ir izveidojis Kick?**
@@ -172,12 +172,12 @@ Versijā 3.2.0:
 - Saskarnes valodas izvēlne rāda katras valodas karogu un darbojas ar tastatūru
 
 Visi izlaidumi ar izmaiņām un mērījumiem to pamatā:
-[Releases](https://github.com/Pkkls/kick-chat-translator/releases) un [CHANGELOG.md](CHANGELOG.md).
+[Releases](https://github.com/kilworks/kick-chat-translator/releases) un [CHANGELOG.md](CHANGELOG.md).
 
 ## Izstrāde
 
 ```bash
-git clone https://github.com/Pkkls/kick-chat-translator.git
+git clone https://github.com/kilworks/kick-chat-translator.git
 cd kick-chat-translator
 npm ci
 npm run release:check    # typecheck, lint, unit tests, build: the gate every package goes through

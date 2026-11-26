@@ -30,5 +30,5 @@ Kick Chat Translator 是一款免费的 Kick 直播聊天翻译扩展。用你�
 
 免费开源
 
-MIT 许可证，所有代码公开：github.com/Pkkls/kick-chat-translator
+MIT 许可证，所有代码公开：github.com/kilworks/kick-chat-translator
 欢迎在那里提交错误报告和语言请求。

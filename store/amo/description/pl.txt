@@ -30,5 +30,5 @@ Tekst czatu trafia tylko do silnika tłumaczącego, który wybierzesz. W przypad
 
 ZA DARMO I Z OTWARTYM KODEM
 
-Licencja MIT, każda linijka kodu jest publiczna: github.com/Pkkls/kick-chat-translator
+Licencja MIT, każda linijka kodu jest publiczna: github.com/kilworks/kick-chat-translator
 Zgłoszenia błędów i prośby o nowe języki są tam mile widziane.

@@ -5,10 +5,10 @@
   "description": "Free live chat translator for Kick: read any stream's chat in your language and reply in the channel's. No account, no setup.",
   "license": "MIT",
   "author": "Pkkls",
-  "homepage": "https://github.com/Pkkls/kick-chat-translator",
+  "homepage": "https://github.com/kilworks/kick-chat-translator",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Pkkls/kick-chat-translator.git"
+    "url": "https://github.com/kilworks/kick-chat-translator.git"
   },
   "type": "module",
   "scripts": {

@@ -2,8 +2,8 @@ Name: Kick Chat Translator (20 of 45 characters)
 Category: Social & Communication
 Language: English, with the localised listings above pasted into their own
   language tabs
-Privacy policy URL: https://github.com/Pkkls/kick-chat-translator/blob/master/PRIVACY.md
-Support / homepage URL: https://github.com/Pkkls/kick-chat-translator
+Privacy policy URL: https://github.com/kilworks/kick-chat-translator/blob/master/PRIVACY.md
+Support / homepage URL: https://github.com/kilworks/kick-chat-translator
 Screenshots: five 1280x800 PNGs from test/e2e/store-fixture/,
   produced by store-shots-fixture.mjs. They are taken on a fabricated chat
   with invented handles and a locally answered engine, so no third party's

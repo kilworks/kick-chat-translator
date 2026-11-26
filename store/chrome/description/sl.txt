@@ -31,5 +31,5 @@ Dovoljenja po domače: shramba za vaše nastavitve in predpomnilnik prevodov; do
 
 BREZPLAČNO IN ODPRTOKODNO
 
-Licenca MIT, vsaka vrstica kode je javna: github.com/Pkkls/kick-chat-translator
+Licenca MIT, vsaka vrstica kode je javna: github.com/kilworks/kick-chat-translator
 Prijave napak in želje po novih jezikih so tam dobrodošle, kaj se je spremenilo v posamezni različici, pa najdete na strani z izdajami.

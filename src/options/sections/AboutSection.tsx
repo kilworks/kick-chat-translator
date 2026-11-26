@@ -188,19 +188,19 @@ export function AboutSection({
         <h3 class="kt-section">{t('Links')}</h3>
         <ul class="space-y-2 text-sm">
           <Lien
-            href="https://github.com/Pkkls/kick-chat-translator/blob/master/CHANGELOG.md"
+            href="https://github.com/kilworks/kick-chat-translator/blob/master/CHANGELOG.md"
             label={t('What changed in this version')}
           />
           <Lien
-            href="https://github.com/Pkkls/kick-chat-translator"
+            href="https://github.com/kilworks/kick-chat-translator"
             label={t('GitHub repository')}
           />
           <Lien
-            href="https://github.com/Pkkls/kick-chat-translator/blob/master/PRIVACY.md"
+            href="https://github.com/kilworks/kick-chat-translator/blob/master/PRIVACY.md"
             label={t('Privacy policy')}
           />
           <Lien
-            href="https://github.com/Pkkls/kick-chat-translator/issues"
+            href="https://github.com/kilworks/kick-chat-translator/issues"
             label={t('Report an issue')}
           />
           {/* Nom propre, pas de cle i18n : le meme projet pour Twitch, sur le store du navigateur. */}

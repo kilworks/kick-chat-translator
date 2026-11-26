@@ -30,5 +30,5 @@ A chat szövege csak az általad választott fordítómotorhoz jut el. Google, M
 
 INGYENES ÉS NYÍLT FORRÁSKÓDÚ
 
-MIT licenc, a kód minden sora nyilvános: github.com/Pkkls/kick-chat-translator
+MIT licenc, a kód minden sora nyilvános: github.com/kilworks/kick-chat-translator
 Hibajelentéseket és nyelvi kéréseket szívesen fogadunk ott.

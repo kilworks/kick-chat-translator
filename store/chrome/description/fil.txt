@@ -31,5 +31,5 @@ Ang mga permiso, sa simpleng salita: storage para sa mga setting mo at sa transl
 
 LIBRE AT OPEN SOURCE
 
-MIT license, bukas sa publiko ang bawat linya ng code: github.com/Pkkls/kick-chat-translator
+MIT license, bukas sa publiko ang bawat linya ng code: github.com/kilworks/kick-chat-translator
 Welcome doon ang mga bug report at hiling na wika, at nasa releases page ang mga nagbago sa bawat bersyon.

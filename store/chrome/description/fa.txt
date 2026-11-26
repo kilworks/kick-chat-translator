@@ -31,5 +31,5 @@ Kick Chat Translator یک مترجم چت زنده و رایگان برای Kick
 
 رایگان و متن‌باز
 
-مجوز MIT، تک‌تک خطوط کد عمومی است: github.com/Pkkls/kick-chat-translator
+مجوز MIT، تک‌تک خطوط کد عمومی است: github.com/kilworks/kick-chat-translator
 گزارش باگ و درخواست زبان آنجا پذیرفته می‌شود، و تغییرات هر نسخه در صفحه نسخه‌ها هست.

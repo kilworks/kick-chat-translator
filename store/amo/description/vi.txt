@@ -30,5 +30,5 @@ Nội dung chat chỉ được gửi đến công cụ dịch mà bạn đã ch�
 
 MIỄN PHÍ VÀ MÃ NGUỒN MỞ
 
-Giấy phép MIT, từng dòng mã đều công khai: github.com/Pkkls/kick-chat-translator
+Giấy phép MIT, từng dòng mã đều công khai: github.com/kilworks/kick-chat-translator
 Báo lỗi và yêu cầu thêm ngôn ngữ đều được hoan nghênh ở đó.

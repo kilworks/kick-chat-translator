@@ -31,5 +31,5 @@ Kick Chat Translator คือส่วนขยายแปลแชทสด�
 
 ฟรีและโอเพนซอร์ส
 
-ไลเซนส์ MIT โค้ดทุกบรรทัดเปิดเผย: github.com/Pkkls/kick-chat-translator
+ไลเซนส์ MIT โค้ดทุกบรรทัดเปิดเผย: github.com/kilworks/kick-chat-translator
 แจ้งบั๊กและขอเพิ่มภาษาได้ที่นั่น และดูว่าแต่ละเวอร์ชันเปลี่ยนอะไรได้ที่หน้า releases
